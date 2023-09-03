@@ -1,17 +1,19 @@
-# Welcome to MkDocs
+# GPU Configuration
 
-For full documentation visit [mkdocs.org](https://www.mkdocs.org).
 
-## Commands
 
-* `mkdocs new [dir-name]` - Create a new project.
-* `mkdocs serve` - Start the live-reloading docs server.
-* `mkdocs build` - Build the documentation site.
-* `mkdocs -h` - Print help message and exit.
+## Specific GPUs Explicitly
 
-## Project layout
+```python
+torch.cuda.set_device(0,1)
 
-    mkdocs.yml    # The configuration file.
-    docs/
-        index.md  # The documentation homepage.
-        ...       # Other markdown pages, images and other files.
+## or you can set the env variable
+CUDA_VISIBLE_DEVICES=0,1
+```
+
+**Comparison:**
+
+If you want to restrict which GPUs are available to your script before it even starts, `CUDA_VISIBLE_DEVICES` is the way to go.
+
+If you want to change the active GPU dynamically based on some logic in your code, you'll need to use `torch.cuda.set_device()`.
+
