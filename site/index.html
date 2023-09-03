@@ -299,7 +299,12 @@
 <pre><code class="language-python">torch.cuda.set_device(0,1)
 
 ## or you can set the env variable
-CUDA_VISIBLE_DEVICES=0,1
+import os
+os.environ[&quot;CUDA_VISIBLE_DEVICES&quot;] = &quot;0,1&quot;
+
+</code></pre>
+<p>or set the env variable when running the code:</p>
+<pre><code class="language-bash">CUDA_VISIBLE_DEVICES=0,1 python script.py
 </code></pre>
 <p><strong>Comparison:</strong></p>
 <p>If you want to restrict which GPUs are available to your script before it even starts, <code>CUDA_VISIBLE_DEVICES</code> is the way to go.</p>
