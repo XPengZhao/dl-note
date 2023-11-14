@@ -1,0 +1,23 @@
+.md-typeset p {
+    text-align: justify;
+    text-justify: inter-word;
+  }
+
+p:has(+ .arithmatex) {
+    margin-bottom: 0px; /* Adjust as needed */
+  }
+
+  .md-content h1 {
+    color: #7C1823; /* Tomato color for h1 */
+    font-weight: bold;
+  }
+  .md-content h2 {
+    color: #133167; /* SteelBlue color for h2 */
+    font-weight: bold;
+  }
+  .md-content h3 {
+    color: #133167; /* LimeGreen color for h3 */
+    font-weight: bold;
+  }
+  /* Add more as needed for h4, h5, h6 */
+
