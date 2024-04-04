@@ -6,6 +6,7 @@
 
 ### Add a new dimension
 
+**unsqueeze()**
 
 ```python
 
@@ -15,6 +16,16 @@ t_new = t.unsqueeze(0) ## shaped [1, 3, 4]
 t_new = t.unsqueeze(1) ## shaped [3, 1, 4]
 t_new = t.unsqueeze(2) ## shaped [3, 4, 1]
 
+```
+
+---
+
+**view()**
+
+```python
+t = torch.rand(2)  ## shaped [2]
+
+t_new = t.view(1, 1, 2) ## shaped [1, 1, 2]
 
 ```
 
@@ -36,5 +47,3 @@ torch.sigmoid(t)
 ```
 
 
-
-```
