@@ -43,7 +43,7 @@ $$
 
 ```python
 t = torch.randn(4)
-torch.sigmoid(t)
+torch.sigmoid(t)l
 ```
 
 

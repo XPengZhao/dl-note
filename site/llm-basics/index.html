@@ -9,10 +9,8 @@
       
       
       
-        <link rel="prev" href="../gpu/">
+        <link rel="prev" href="../neural-graphics/">
       
-      
-        <link rel="next" href="../neural-graphics/">
       
       
       <link rel="icon" href="../assets/images/favicon.png">
@@ -20,7 +18,7 @@
     
     
       
-        <title>Tensor Operation - DL Notes</title>
+        <title>LLM Basics - DL Notes</title>
       
     
     
@@ -66,7 +64,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#tensor-operations" class="md-skip">
+        <a href="#kv-cache" class="md-skip">
           Skip to content
         </a>
       
@@ -102,7 +100,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Tensor Operation
+              LLM Basics
             
           </span>
         </div>
@@ -239,32 +237,10 @@
       
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    Tensor Operation
-    
-  </span>
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../tensor/" class="md-nav__link">
         
   
   
@@ -275,83 +251,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#tensor-creation" class="md-nav__link">
-    <span class="md-ellipsis">
-      Tensor Creation
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#dimension-operations" class="md-nav__link">
-    <span class="md-ellipsis">
-      Dimension Operations
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Dimension Operations">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#add-a-new-dimension" class="md-nav__link">
-    <span class="md-ellipsis">
-      Add a new dimension
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#activate-function" class="md-nav__link">
-    <span class="md-ellipsis">
-      Activate Function
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Activate Function">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#sigmoid" class="md-nav__link">
-    <span class="md-ellipsis">
-      Sigmoid
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -382,10 +281,30 @@
       
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../llm-basics/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    LLM Basics
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -396,6 +315,90 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#kv-cache" class="md-nav__link">
+    <span class="md-ellipsis">
+      KV Cache
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="KV Cache">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#memory-cost" class="md-nav__link">
+    <span class="md-ellipsis">
+      Memory cost
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#attention" class="md-nav__link">
+    <span class="md-ellipsis">
+      Attention
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Attention">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#mha-multi-head-attention" class="md-nav__link">
+    <span class="md-ellipsis">
+      MHA — Multi-Head Attention
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mqa-multi-query-attention" class="md-nav__link">
+    <span class="md-ellipsis">
+      MQA — Multi-Query Attention
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gqa-grouped-query-attention" class="md-nav__link">
+    <span class="md-ellipsis">
+      GQA — Grouped-Query Attention
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -417,8 +420,6 @@
   
   
   
-    
-  
   
     <label class="md-nav__title" for="__toc">
       <span class="md-nav__icon md-icon"></span>
@@ -427,28 +428,19 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#tensor-creation" class="md-nav__link">
+  <a href="#kv-cache" class="md-nav__link">
     <span class="md-ellipsis">
-      Tensor Creation
+      KV Cache
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#dimension-operations" class="md-nav__link">
-    <span class="md-ellipsis">
-      Dimension Operations
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Dimension Operations">
+    <nav class="md-nav" aria-label="KV Cache">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#add-a-new-dimension" class="md-nav__link">
+  <a href="#memory-cost" class="md-nav__link">
     <span class="md-ellipsis">
-      Add a new dimension
+      Memory cost
     </span>
   </a>
   
@@ -460,19 +452,37 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#activate-function" class="md-nav__link">
+  <a href="#attention" class="md-nav__link">
     <span class="md-ellipsis">
-      Activate Function
+      Attention
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Activate Function">
+    <nav class="md-nav" aria-label="Attention">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#sigmoid" class="md-nav__link">
+  <a href="#mha-multi-head-attention" class="md-nav__link">
     <span class="md-ellipsis">
-      Sigmoid
+      MHA — Multi-Head Attention
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mqa-multi-query-attention" class="md-nav__link">
+    <span class="md-ellipsis">
+      MQA — Multi-Query Attention
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gqa-grouped-query-attention" class="md-nav__link">
+    <span class="md-ellipsis">
+      GQA — Grouped-Query Attention
     </span>
   </a>
   
@@ -499,33 +509,60 @@
 
 
 
-<h1 id="tensor-operations">Tensor Operations</h1>
-<h2 id="tensor-creation">Tensor Creation</h2>
-<h2 id="dimension-operations">Dimension Operations</h2>
-<h3 id="add-a-new-dimension">Add a new dimension</h3>
-<p><strong>unsqueeze()</strong></p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">t</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">))</span>  <span class="c1">## shaped [3, 4]</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">t_new</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="c1">## shaped [1, 3, 4]</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="n">t_new</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="c1">## shaped [3, 1, 4]</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="n">t_new</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="c1">## shaped [3, 4, 1]</span>
-</span></code></pre></div>
-<hr />
-<p><strong>view()</strong></p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">t</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>  <span class="c1">## shaped [2]</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="n">t_new</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="c1">## shaped [1, 1, 2]</span>
-</span></code></pre></div>
-<h2 id="activate-function">Activate Function</h2>
-<h3 id="sigmoid">Sigmoid</h3>
-<p><a href="https://pytorch.org/docs/stable/generated/torch.sigmoid.html">torch.sigmoid</a></p>
-<p>Computes the logistic sigmoid function of the elements of input.</p>
+  <h1>LLM Basics</h1>
+
+<h2 id="kv-cache">KV Cache</h2>
+<h3 id="memory-cost">Memory cost</h3>
+<p>The KV cache size is calculated as:</p>
 <div class="arithmatex">\[
-\text{out}_i = \frac{1}{1 + e^{-\text{input}_i}}
+\text{KV size} = 2 \times \text{num layers} \times \text{num heads} \times \text{seq len} \times \text{head dim}
 \]</div>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">t</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="n">torch</span><span class="o">.</span><span class="n">sigmoid</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="n">l</span>
-</span></code></pre></div>
+<p>Assume:</p>
+<ul>
+<li>32 layers, 80 heads, head_dim = 128, seq_len = 4K.</li>
+<li>FP16 KV cache: 2 × 32 × 80 × 4K × 128 × 2 bytes = <strong>~5.2 GB</strong> per sample.</li>
+<li>C8 (int8 KV cache): <strong>half that → ~2.6 GB</strong> per sample.</li>
+</ul>
+<h2 id="attention">Attention</h2>
+<p>In transformer models, the attention module computes:</p>
+<div class="arithmatex">\[
+\operatorname{Attention}(Q, K, V)=\operatorname{softmax}\left(\frac{Q K^T}{\sqrt{d_k}}\right) V
+\]</div>
+<p>Every token produces:</p>
+<ul>
+<li><strong>Q (Query)</strong> — derived from the current token’s hidden state</li>
+<li><strong>K (Key)</strong>, <strong>V (Value)</strong> — derived from the context (previous tokens) and stored in the <strong>KV cache</strong></li>
+</ul>
+<p>The difference between <strong>MHA</strong>, <strong>MQA</strong>, and <strong>GQA</strong> lies in <strong>how many Key/Value projections</strong> are used relative to the number of Query heads.</p>
+<h3 id="mha-multi-head-attention"><strong>MHA — Multi-Head Attention</strong></h3>
+<p>Each attention head has its own set of projections:</p>
+<div class="arithmatex">\[
+Q_i=X W_{Q, i}, \quad K_i=X W_{K, i}, \quad V_i=X W_{V, i}
+\]</div>
+<ul>
+<li>Q heads = K heads = V heads</li>
+</ul>
+<h3 id="mqa-multi-query-attention"><strong>MQA — Multi-Query Attention</strong></h3>
+<p>All heads <strong>share one</strong> K and V projection:</p>
+<div class="arithmatex">\[
+K_{\text {shared }}=X W_K, \quad V_{\text {shared }}=X W_V
+\]</div>
+<ul>
+<li><strong>Multiple Q heads</strong>, but <strong>only one pair of shared K/V</strong>.</li>
+<li>During inference, the same K/V are reused for all heads.</li>
+<li>KV cache size reduced by ~#heads×</li>
+<li><strong>LLaMA 2 7B</strong>, <strong>Mistral</strong>, and most optimized LLMs use MQA to cut memory usage.</li>
+</ul>
+<h3 id="gqa-grouped-query-attention"><strong>GQA — Grouped-Query Attention</strong></h3>
+<p>Queries are split into groups, and each group shares its own K/V:</p>
+<div class="arithmatex">\[
+\text { Group } g: \quad Q_{g, *}, K_g, V_g
+\]</div>
+<ul>
+<li>Suppose you have 8 query heads but only 2 groups → 4 Q heads per group share one K/V.</li>
+<li><strong>K/V heads &lt; Q heads</strong>.</li>
+<li><strong>LLaMA 2 70B</strong>, <strong>Mixtral</strong>, <strong>GPT-J-6B</strong>, etc. use GQA for better memory efficiency.</li>
+</ul>
 
 
 
