@@ -3,7 +3,7 @@ theme:
   name: material
 nav:
   - Home: index.md
-  - GPU Configuration: gpu.md
+  - Hardware: hardware.md
   - Tensor Operation: tensor.md
   - Neural Graphics: neural-graphics.md
   - LLM Basics: llm-basics.md
