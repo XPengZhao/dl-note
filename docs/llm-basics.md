@@ -83,7 +83,7 @@ After computing probabilities (after temperature), sort tokens by probability, a
 $$
 \begin{aligned}
 S_k & =\text { top-k tokens by } p_i \\
-p_i^{\prime} & = \begin{cases}\sum_{j \in s_k} p_j & i \in S_k \\
+p_i^{\prime} & = \begin{cases}\frac{p_i}{\sum_{j \in S_k} p_j} & i \in S_k \\
 0 & \text { otherwise }\end{cases}
 \end{aligned}
 $$
@@ -95,12 +95,12 @@ Then you sample from that truncated distribution.
 
 ### Top-p (nucleus) Sampling
 
-“nucleus” literally means core, center, or the essential central part of something. Instead of a fixed k, we choose the smallest set of tokens whose total probability $\geq p$.
+“nucleus” literally means core, center, or the essential central part of something. Instead of a fixed k, we choose the smallest set of tokens whose cumulative probability $\geq p$.
 
 $$
 \begin{aligned}
 S_p&=\left\{i: \sum_{j \in S_p} p_j \geq p\right\} \\
-p_i^{\prime}&= \begin{cases}\sum_{j \in s_p p_j}^{p_i} & i \in S_p \\
+p_i^{\prime}&= \begin{cases}\frac{p_i}{\sum_{j \in S_p} p_j} & i \in S_p \\
 0 & \text { otherwise }\end{cases}
 \end{aligned}
 $$
@@ -111,3 +111,97 @@ Top-p adapts to uncertainty. Top-k is about rank (k highest scores). Top-p is ab
 
 - If the model is confident (one token dominates), very few tokens are kept.
 - If it’s uncertain (many tokens have similar probabilities), the nucleus expands.
+
+### Min-p
+
+Min-p filters out tokens that are too improbable relative to the top-1. This is newer but increasingly popular (used in Mistral, Gemini, etc.). Instead of fixing $k$ or $p$, you keep tokens above a minimum probability threshold relative to the top-1 token:
+
+$$
+S_{\min }=\left\{i: p_i \geq \min -\mathrm{p} \times p_{\max }\right\}
+$$
+
+If min-p = 0.1, then any token whose probability is at least 10% of the most likely token is kept.Then normalize:
+
+$$
+p_i^{\prime} = \frac{p_i}{\sum_{j \in S_{\min}} p_j}
+$$
+
+- Min-p adaptive to context like top-p, but simpler. It means the number of candidate tokens changes depending on what the model is predicting. If the model is confident, the candidate set is small. If the model is uncertain, the candidate set becomes larger.
+- Avoids cutting off plausible low-rank tokens when the distribution is flat.
+- More numerically stable for long-tail vocabularies.
+
+### Put them together
+You usually combine these in a specific order: Temperature → Softmax → (top-k / top-p / min-p) → Renormalize → Sample
+
+When both top-k and top-p are enabled, you always keep the intersection, which is the smaller of the two sets.
+
+### Example code
+
+Code snippet from [Omniinfer Sampler](https://gitee.com/omniai/omniinfer/blob/master/omni/adaptors/vllm/sample/sampler.py).
+
+```python
+def apply_top_k_top_p(
+    logits_or_prob: torch.Tensor,
+    k: Optional[torch.Tensor],
+    p: Optional[torch.Tensor],
+    is_logits: bool,
+) -> torch.Tensor:
+    if p is None:
+        if k is not None:
+            logits_or_prob = apply_top_k_only(logits_or_prob, k, is_logits)
+        if is_logits:
+            probs = logits_or_prob.softmax(dim=-1, dtype=torch.float32)
+        else:
+            probs = logits_or_prob / logits_or_prob.sum(dim=-1, keepdim=True)
+        return probs, None
+
+    logits_or_prob_sort, logits_or_prob_idx = logits_or_prob.sort(dim=-1, descending=False)
+
+    if k is not None:
+        # Apply top-k.
+        top_k_mask = logits_or_prob_sort.size(1) - k.to(torch.long)  # shape: B
+        # Get all the top_k values.
+        top_k_mask = logits_or_prob_sort.gather(1, top_k_mask.unsqueeze(dim=1))
+        top_k_mask = logits_or_prob_sort < top_k_mask
+        logits_or_prob_sort.masked_fill_(top_k_mask, -float("inf") if is_logits else 0)
+
+    # Apply top-p.
+    if is_logits:
+        probs_sort = logits_or_prob_sort.softmax(dim=-1)
+    else:
+        probs_sort = logits_or_prob_sort / logits_or_prob_sort.sum(dim=-1, keepdim=True)
+    probs_sum = torch.cumsum(probs_sort, dim=-1, out=probs_sort)
+    top_p_mask = probs_sum <= 1 - p.unsqueeze(dim=1)
+    # at least one
+    top_p_mask[:, -1] = False
+    probs_sort.masked_fill_(top_p_mask, 0)
+    probs = probs_sort / probs_sort.sum(dim=-1, keepdim=True)
+    return probs, logits_or_prob_idx
+```
+
+```python
+def apply_top_k_only(
+    logits_or_prob: torch.Tensor,
+    k: torch.Tensor,
+    is_logits: bool,
+) -> torch.Tensor:
+    """
+    Apply top-k mask to the logits.
+
+    This implementation doesn't involve sorting the entire vocab.
+
+    The logits tensor may be updated in-place.
+    """
+    no_top_k_mask = k == logits_or_prob.shape[1]
+    # Set non-top-k rows to 1 so that we can gather.
+    k = k.masked_fill(no_top_k_mask, 1)
+    max_top_k = k.max()
+    # topk.values tensor has shape [batch_size, max_top_k].
+    # Convert top k to 0-based index in range [0, max_top_k).
+    k_index = k.sub_(1).unsqueeze(1)
+    top_k_mask = logits_or_prob.topk(max_top_k, dim=1).values.gather(1, k_index.long())
+    # Handle non-topk rows.
+    top_k_mask.masked_fill_(no_top_k_mask.unsqueeze(1), -float("inf"))
+    logits_or_prob.masked_fill_(logits_or_prob < top_k_mask, -float("inf") if is_logits else float(0))
+    return logits_or_prob
+```
