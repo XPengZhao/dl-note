@@ -139,6 +139,9 @@ When both top-k and top-p are enabled, you always keep the intersection, which i
 
 Code snippet from [Omniinfer Sampler](https://gitee.com/omniai/omniinfer/blob/master/omni/adaptors/vllm/sample/sampler.py).
 
+<details>
+<summary>Top-k and Top-p implementation</summary>
+
 ```python
 def apply_top_k_top_p(
     logits_or_prob: torch.Tensor,
@@ -205,3 +208,171 @@ def apply_top_k_only(
     logits_or_prob.masked_fill_(logits_or_prob < top_k_mask, -float("inf") if is_logits else float(0))
     return logits_or_prob
 ```
+</details>
+
+## Speculvative decoding
+
+
+###  Rejection Sampler
+
+To sample $x \sim p(x)$,  we instead sample $x \sim q(x)$, keeping it if $q(x) \leq p(x)$, and in case $q(x) > p(x)$, we reject the
+sample with probability $1 - \frac{p(x)}{q(x)}$ and resample $x$  from an adjusted distribution $p^{\prime} = \text{norm}(\max(0, p(x) - q(x)))$ instead.
+
+**NOTE:** For for any distributions $p(x)$ and $q(x)$, the tokens sampled via rejection sampling from $p(x)$ and $q(x)$ are distributed identically to those sampled from $p(x)$ alone. The proof is in Appendix A [1].
+
+Rejection sampling works by decomposing the target distribution $p(x)$ into two parts:
+
+-  The accept branch, where tokens are accepted based on the ratio $\frac{p(x)}{q(x)}$, where $q(x)$ is the proposal (draft) distribution.
+
+$$
+  p(\text{accepted}, x = x^{\prime}) = q(x^{\prime}) \cdot \min\left(\frac{p(x^{\prime})}{q(x^{\prime})}, 1\right) = \min(p(x^{\prime}), q(x^{\prime}))
+$$
+
+- The reject branch, where tokens are rejected and resampled from the adjusted distribution $p^{\prime}(x)$. The probability of all tokens being sampled from $q(x)$ being rejected as:
+
+$$
+\begin{aligned}
+    p(\text{rejected}) &= \sum_{x} q(x) \left(1 - \min\left(\frac{p(x)}{q(x)}, 1\right)\right) \\
+    &= \sum_{x} \max(0, q(x) - p(x)) \\
+\end{aligned}
+$$
+
+
+
+**Example Code**
+
+Code snippet from [vLLM](https://github.com/vllm-project/vllm/blob/main/vllm/v1/sample/rejection_sampler.py).
+
+<details>
+<summary>Rejection sampling kernel in Triton</summary>
+
+```python
+# NOTE(woosuk): Avoid specialization to prevent unnecessary recompilation.
+@triton.jit(do_not_specialize=["max_spec_len"])
+def rejection_random_sample_kernel(
+    output_token_ids_ptr,  # [batch_size, max_spec_len + 1]
+    cu_num_draft_tokens_ptr,  # [batch_size]
+    draft_token_ids_ptr,  # [num_tokens]
+    draft_probs_ptr,  # [num_tokens, vocab_size] or None
+    target_probs_ptr,  # [num_tokens, vocab_size]
+    bonus_token_ids_ptr,  # [batch_size]
+    recovered_token_ids_ptr,  # [num_tokens]
+    uniform_probs_ptr,  # [num_tokens]
+    is_greedy_ptr,  # [batch_size]
+    max_spec_len,
+    vocab_size,
+    NO_DRAFT_PROBS: tl.constexpr,
+):
+    req_idx = tl.program_id(0)
+    is_greedy = tl.load(is_greedy_ptr + req_idx)
+    if is_greedy:
+        # Early exit for greedy sampling requests.
+        return
+
+    start_idx = 0 if req_idx == 0 else tl.load(cu_num_draft_tokens_ptr + req_idx - 1)
+    end_idx = tl.load(cu_num_draft_tokens_ptr + req_idx)
+    num_draft_tokens = end_idx - start_idx
+
+    rejected = False
+    for pos in range(num_draft_tokens):
+        if not rejected:
+            draft_token_id = tl.load(draft_token_ids_ptr + start_idx + pos)
+            if NO_DRAFT_PROBS:
+                draft_prob = 1
+            else:
+                draft_prob = tl.load(
+                    draft_probs_ptr + (start_idx + pos) * vocab_size + draft_token_id
+                )
+            target_prob = tl.load(
+                target_probs_ptr + (start_idx + pos) * vocab_size + draft_token_id
+            )
+            uniform_prob = tl.load(uniform_probs_ptr + start_idx + pos)
+            # NOTE(woosuk): While the draft probability should never be 0,
+            # we check it to avoid NaNs. If it happens to be 0, we reject.
+            if draft_prob > 0 and target_prob / draft_prob >= uniform_prob:
+                # Accept.
+                token_id = draft_token_id
+            else:
+                # Reject. Use recovered token.
+                rejected = True
+                token_id = tl.load(recovered_token_ids_ptr + start_idx + pos)
+            tl.store(
+                output_token_ids_ptr + req_idx * (max_spec_len + 1) + pos, token_id
+            )
+
+    if not rejected:
+        # If all tokens are accepted, append the bonus token.
+        bonus_token_id = tl.load(bonus_token_ids_ptr + req_idx)
+        tl.store(
+            output_token_ids_ptr + req_idx * (max_spec_len + 1) + num_draft_tokens,
+            bonus_token_id,
+        )
+```
+
+</details>
+
+<details>
+<summary>Resample kernel in Triton</summary>
+
+
+```python
+@triton.jit
+def sample_recovered_tokens_kernel(
+    output_token_ids_ptr,  # [num_tokens]
+    cu_num_draft_tokens_ptr,  # [batch_size]
+    draft_token_ids_ptr,  # [num_tokens]
+    draft_probs_ptr,  # [num_tokens, vocab_size] or None
+    target_probs_ptr,  # [num_tokens, vocab_size]
+    q_ptr,  # [batch_size, vocab_size]
+    vocab_size,
+    PADDED_VOCAB_SIZE: tl.constexpr,
+    NO_DRAFT_PROBS: tl.constexpr,
+):
+    req_idx = tl.program_id(0)
+    start_idx = 0 if req_idx == 0 else tl.load(cu_num_draft_tokens_ptr + req_idx - 1)
+    end_idx = tl.load(cu_num_draft_tokens_ptr + req_idx)
+    num_draft_tokens = end_idx - start_idx
+
+    # Early exit for out-of-range positions.
+    pos = tl.program_id(1)
+    if pos >= num_draft_tokens:
+        return
+
+    vocab_offset = tl.arange(0, PADDED_VOCAB_SIZE)
+    if NO_DRAFT_PROBS:
+        draft_token_id = tl.load(draft_token_ids_ptr + start_idx + pos)
+        prob = tl.load(
+            target_probs_ptr + (start_idx + pos) * vocab_size + vocab_offset,
+            mask=((vocab_offset < vocab_size) & (vocab_offset != draft_token_id)),
+            other=0,
+        )
+    else:
+        draft_prob = tl.load(
+            draft_probs_ptr + (start_idx + pos) * vocab_size + vocab_offset,
+            mask=vocab_offset < vocab_size,
+            other=0,
+        )
+        target_prob = tl.load(
+            target_probs_ptr + (start_idx + pos) * vocab_size + vocab_offset,
+            mask=vocab_offset < vocab_size,
+            other=0,
+        )
+        prob = tl.maximum(target_prob - draft_prob, 0)
+        # NOTE(woosuk): We don't need `prob = prob / tl.sum(prob)` here because
+        # `tl.argmax` will select the maximum value.
+
+    q = tl.load(
+        q_ptr + req_idx * vocab_size + vocab_offset,
+        mask=vocab_offset < vocab_size,
+        other=float("-inf"),
+    )
+    recovered_id = tl.argmax(prob / q, axis=-1)
+    tl.store(output_token_ids_ptr + start_idx + pos, recovered_id)
+
+```
+</details>
+
+**Reference**
+
+[[1]](https://arxiv.org/pdf/2211.17192) Y Leviathan, M Kalman, Y Matias, "Fast Inference from Transformers via Speculative Decoding", ICML 2023.
+
