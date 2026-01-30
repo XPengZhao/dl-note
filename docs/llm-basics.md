@@ -75,6 +75,8 @@ $$
 
 - $T<1$ Sharper (more peaked). Model becomes confident, less random. $T>1$ Flatter (more uniform). Model becomes exploratory, more diverse.
 - Temperature keeps the order of logits because dividing by a positive number does not change ranking (rank-preserving). If you use top-k = 1 (i.e., greedy), temperature has no effect at all.
+- With a temperature $T \rightarrow 0$, the softmax distribution becomes arbitrarily sharp and converges to greedy (argmax) sampling. For example, at $T=10^{-6}$, the highest logit dominates the distribution, so sampling is effectively greedy in practice.
+- At $T \rightarrow \infty$, the distribution becomes uniform (all tokens equally likely).
 
 ### Top-k Sampling
 
@@ -229,6 +231,13 @@ $$
 $$
 
 - The reject branch, where tokens are rejected and resampled from the adjusted distribution $p^{\prime}(x)$. The probability of all tokens being sampled from $q(x)$ being rejected as:
+
+$$
+\begin{aligned}
+    p(\text{rejected}) &= \sum_{x} q(x) \left(1 - \min\left(\frac{p(x)}{q(x)}, 1\right)\right) \\
+    &= \sum_{x} \max(0, q(x) - p(x)) \\
+\end{aligned}
+$$
 
 $$
 \begin{aligned}
