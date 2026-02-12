@@ -6,7 +6,9 @@ nav:
   - Hardware: hardware.md
   - Tensor Operation: tensor.md
   - Neural Graphics: neural-graphics.md
-  - LLM Basics: llm-basics.md
+  - LLMs:
+      - Preliminary: llms/preliminary.md
+      - Models: llms/models.md
 markdown_extensions:
   - pymdownx.highlight:
       anchor_linenums: true
@@ -18,8 +20,8 @@ markdown_extensions:
   - pymdownx.arithmatex:
       generic: true
 extra_css:
-  - stylesheets/basic.css
   - stylesheets/bootstrap.min.css
+  - stylesheets/basic.css
 extra_javascript:
   - javascripts/mathjax.js
   - https://polyfill.io/v3/polyfill.min.js?features=es6

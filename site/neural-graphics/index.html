@@ -12,7 +12,7 @@
         <link rel="prev" href="../tensor/">
       
       
-        <link rel="next" href="../llm-basics/">
+        <link rel="next" href="../llms/preliminary/">
       
       
       <link rel="icon" href="../assets/images/favicon.png">
@@ -220,12 +220,12 @@
   
   
     <li class="md-nav__item">
-      <a href="../gpu/" class="md-nav__link">
+      <a href="../hardware/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
-    GPU Configuration
+    Hardware
     
   </span>
   
@@ -337,6 +337,15 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#flow-matching" class="md-nav__link">
+    <span class="md-ellipsis">
+      Flow Matching
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -351,18 +360,87 @@
   
   
   
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    LLMs
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            LLMs
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
     <li class="md-nav__item">
-      <a href="../llm-basics/" class="md-nav__link">
+      <a href="../llms/preliminary/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
-    LLM Basics
+    Preliminary
     
   </span>
   
 
       </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../llms/models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Models
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
     </li>
   
 
@@ -417,6 +495,15 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#flow-matching" class="md-nav__link">
+    <span class="md-ellipsis">
+      Flow Matching
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -452,6 +539,16 @@
 <p>Contribution of a point to the cumulative color: <span class="arithmatex">\(\omega_i = T_i \alpha_i\)</span></p>
 <p>Opacity of each ray: <span class="arithmatex">\(\tau = \sum_i \omega_i\)</span></p>
 <p>Depth of each ray: <span class="arithmatex">\(d = \sum_i \omega_i t_i\)</span>, where <span class="arithmatex">\(t_i\)</span> is the distance between the i-th point and the camera</p>
+<h2 id="flow-matching">Flow Matching</h2>
+<p>Let <span class="arithmatex">\(\mathbb{R}^d\)</span> denotes the data space with data points <span class="arithmatex">\(x = (x^1, \cdots ,x^d) \in \mathbb{R}^d\)</span>.</p>
+<blockquote>
+<p>Think of <span class="arithmatex">\(x\)</span> as a location or sample point in the space where your data lives: If your data are 2D points, then <span class="arithmatex">\(d=2\)</span> and each <span class="arithmatex">\(x\)</span> is a point in the 2D plane; if your data are images of size 28x28, then <span class="arithmatex">\(d=784\)</span> and each <span class="arithmatex">\(x\)</span> is a vector representing pixel values.</p>
+</blockquote>
+<p>Two important objects we use in this paper are: the probability density path <span class="arithmatex">\(p: [0,1] \times \mathbb{R}^d \rightarrow \mathbb{R}_{&gt;0}\)</span> which is a time dependent probability density function, i.e., <span class="arithmatex">\(\int p_t(x)dx = 1\)</span>, and a time-dependent vector field <span class="arithmatex">\(v: [0,1] \times \mathbb{R}^d \rightarrow \mathbb{R}^d\)</span>.</p>
+<blockquote>
+<p>In mathematics, writing <span class="arithmatex">\(f: A \rightarrow B\)</span> means that <span class="arithmatex">\(f\)</span> is a function that takes inputs from set <span class="arithmatex">\(A\)</span> and produces outputs in set <span class="arithmatex">\(B\)</span>. So here, <span class="arithmatex">\(p\)</span> is a function that takes two inputs: a time variable from the interval <span class="arithmatex">\(t \in [0,1]\)</span> and a position (data point) <span class="arithmatex">\(x \in \mathbb{R}^d\)</span>, and it outputs a positive real number <span class="arithmatex">\(\mathbb{R}_{&gt;0}\)</span> (the probability density at that point and time). <span class="arithmatex">\(p(x, t)\)</span> or equivalently <span class="arithmatex">\(p_t(x)\)</span> denotes the probability density of <span class="arithmatex">\(x\)</span> at <span class="arithmatex">\(t\)</span>.</p>
+</blockquote>
+<p>A vector field <span class="arithmatex">\(v_t\)</span> can be used to construct a time-dependent diffeomorphic map, called a flow, <span class="arithmatex">\(\phi: [0,1] \times R_d \rightarrow R_d\)</span>, defined via the ordinary differential equation (ODE):</p>
 
 
 

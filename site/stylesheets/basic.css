@@ -20,4 +20,8 @@ p:has(+ .arithmatex) {
     font-weight: bold;
   }
   /* Add more as needed for h4, h5, h6 */
-
+/* Use hollow circles for nested unordered lists. */
+.md-typeset ul ul,
+.md-typeset ul ul ul {
+  list-style-type: circle;
+}

@@ -1,3 +1,110 @@
+# AI Infra Preliminary
+
+## Metrics
+
+### Latency
+
+Latency is the time taken to process a request and generate output tokens. In LLM inference, latency is often measured in two main metrics:
+
+#### Time to first token (TTFT)
+
+Time to First Token (TTFT) is the latency between when a request is received by the inference server and when the first output token is generated and returned to the client. It measures how quickly the model begins responding, and is a primary user-perceived latency metric in streaming LLM systems. Formally:
+
+$$
+\text{TTFT} = t_{\text{first token emitted}} - t_{\text{request received}}
+$$
+
+TTFT mainly captures the prefill phase (processing the input context) plus scheduling and system overhead. It does not include the time required to generate the rest of the output tokens. In details TTFT can be decomposed into:
+
+$$
+\small
+\begin{aligned}
+\text{TTFT} = t_{\text{queue}} + t_{\text{input processing}} + t_{\text{prefill compute}} + t_{\text{first decode step (optional)}} + t_{\text{framework overhead}}
+\end{aligned}
+$$
+
+where:
+
+-  $t_{\text{queue}}$ is the time spent waiting in the scheduler before the request is admitted for execution.
+- $t_{\text{input processing}}$ includes tokenization, multimodal preprocessing (e.g., image or video encoding), and any request-level normalization or formatting.
+- $t_{\text{prefill compute}}$ is the time required to run the forward pass over all input tokens (complexity is $O(L)$ in sequence length $L$), during which the KV cache is populated and the logits at the final prompt position are produced.
+- $t_{\text{first decode step (optional)}}$ accounts for an additional single-step decode iteration in implementations that separate prefill and generation scheduling. In such systems, the first output token is emitted during a subsequent decode pass rather than directly from the prefill logits. In optimized implementations (recent versions of vLLM), this step may be fused with prefill and therefore negligible.
+- $t_{\text{framework overhead}}$ captures auxiliary costs such as CUDA kernel launches, synchronization, memory allocation, sampling (softmax and top-k/top-p), and network transmission of the first streamed token.
+
+For long-context inputs, TTFT is typically dominated by $t_{\text{prefill compute}}$, with the remaining terms contributing comparatively small overhead.
+
+#### Time per output token (TPOT)
+
+Time per Output Token (TPOT) measures the average latency required to generate each token after the first token has been emitted. It characterizes the steady-state decode performance of an autoregressive model and directly determines streaming speed. Formally, for a request generating $N$ output tokens:
+
+$$
+\text{TPOT} = \frac{t_\text{last token emitted} - t_\text{first token emitted}}{N - 1}
+$$
+
+Equivalently, if total end-to-end latency is $T_{\text{total}}$,
+
+$$
+\text{TPOT} = \frac{T_{\text{total}} - \text{TTFT}}{N - 1}
+$$
+
+In steady-state decoding, each output token requires:
+
+$$
+\text{TPOT} = t_{\text{decode compute}} + t_{\text{communication}} + t_{\text{scheduling}} + t_{\text{framework overhead}}
+$$
+
+where:
+
+- $t_{\text{decode compute}}$ is the forward pass for a single token using the KV cache (complexity per step is $O(1+\text{num speculative tokens})$ in sequence length but proportional to model size).
+- $t_{\text{communication}}$ captures the cost of cross-GPU synchronization and data exchange, such as tensor-parallel collectives (all-reduce, all-gather), expert routing and aggregation in MoE models (all-to-all, dispatch/combine), as well as any host–device memory transfers (H2D/D2H) triggered by scheduling or memory management.
+- $t_{\text{scheduling}}$ includes runtime scheduling overhead such as continuous batching, request coordination, admission control, and KV cache allocation, paging, or memory management.
+- $t_{\text{framework overhead}}$ includes auxiliary execution costs such as sampling (softmax, top-k/top-p), kernel launches, synchronization, input/output marshaling, post-processing of results, and token streaming.
+
+Unlike TTFT, TPOT does not require recomputation over the full prompt. However, it still depends on the effective context length, since each decode step performs attention over all cached tokens. Therefore, TPOT scales approximately linearly with the total context length (prompt + generated tokens), though the per-token cost is significantly smaller than prefill.
+
+### Throughput
+
+#### Tokens per Second (TPS)
+
+Tokens per Second (TPS) measures the throughput of an LLM inference system, i.e., how many tokens are processed or generated per second under a given serving configuration. Unlike TTFT and TPOT, which are latency metrics defined at the request level, TPS is a system-level metric that reflects overall serving capacity under load. Over a time interval over a time interval $\Delta t$, TPS can be expressed as:
+
+$$
+\text{TPS} = \frac{N_\text{tokens}}{\Delta t}
+$$
+
+In many cases, TPS refers specifically to decode throughput, counting only generated output tokens:
+
+$$
+\text{TPS}_\text{decode} = \frac{N_\text{output tokens}}{\Delta t}
+$$
+
+and for a single sequence decoded sequentially, it is approximately the inverse of TPOT:
+
+$$
+\text{TPS}_\text{per request} \approx \frac{1}{\text{TPOT}}
+$$
+
+However, in practical serving systems with continuous batching and concurrent decoding, aggregate throughput scales with the effective batch size $B$. For a single replica, the system throughput can be approximated as
+
+$$
+\text{TPS}_\text{replica} \approx \frac{B}{\text{TPOT}}
+$$
+
+and with $R$ data-parallel (DP) replicas,
+
+$$
+\text{TPS}_\text{total} \approx R \times \frac{B}{\text{TPOT}}
+$$
+
+Importantly, for long-context or multimodal workloads, prompt processing can contribute a substantial fraction of total computation. In such cases, it is often necessary to consider end-to-end throughput, which accounts for both prompt and generated tokens:
+
+$$
+\text{TPS}_\text{end-to-end} = \frac{N_\text{prompt tokens} + N_\text{output tokens}}{\Delta t}
+$$
+
+Overall, TPS is influenced by model size, parallelism strategy, effective batch size, kernel efficiency, interconnect bandwidth, and the relative balance between prefill and decode workloads.
+
+
 ## KV Cache
 
 ### Memory cost

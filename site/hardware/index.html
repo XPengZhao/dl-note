@@ -9,8 +9,10 @@
       
       
       
-        <link rel="prev" href="../neural-graphics/">
+        <link rel="prev" href="..">
       
+      
+        <link rel="next" href="../tensor/">
       
       
       <link rel="icon" href="../assets/images/favicon.png">
@@ -18,7 +20,7 @@
     
     
       
-        <title>LLM Basics - DL Notes</title>
+        <title>Hardware - DL Notes</title>
       
     
     
@@ -64,7 +66,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#kv-cache" class="md-skip">
+        <a href="#hardware" class="md-skip">
           Skip to content
         </a>
       
@@ -100,7 +102,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              LLM Basics
+              Hardware
             
           </span>
         </div>
@@ -215,20 +217,104 @@
       
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../gpu/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    Hardware
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
   <span class="md-ellipsis">
-    GPU Configuration
+    Hardware
     
   </span>
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#gpu-npu-gpgpu" class="md-nav__link">
+    <span class="md-ellipsis">
+      GPU, NPU, GPGPU
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#hbm-gddr" class="md-nav__link">
+    <span class="md-ellipsis">
+      HBM, GDDR
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#gpu-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      GPU Configuration
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="GPU Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#specific-gpus-explicitly" class="md-nav__link">
+    <span class="md-ellipsis">
+      Specific GPUs Explicitly
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -281,123 +367,88 @@
       
   
   
+  
+  
     
-  
-  
-  
-    <li class="md-nav__item md-nav__item--active">
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
       
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
           
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
   
   
   <span class="md-ellipsis">
-    LLM Basics
+    LLMs
     
   </span>
   
 
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            LLMs
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../llms/preliminary/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
-    LLM Basics
+    Preliminary
     
   </span>
   
 
       </a>
-      
-        
+    </li>
+  
 
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+              
+            
+              
+                
   
   
   
   
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#kv-cache" class="md-nav__link">
-    <span class="md-ellipsis">
-      KV Cache
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="KV Cache">
-      <ul class="md-nav__list">
+    <li class="md-nav__item">
+      <a href="../llms/models/" class="md-nav__link">
         
-          <li class="md-nav__item">
-  <a href="#memory-cost" class="md-nav__link">
-    <span class="md-ellipsis">
-      Memory cost
-    </span>
-  </a>
   
-</li>
-        
-      </ul>
-    </nav>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#attention" class="md-nav__link">
-    <span class="md-ellipsis">
-      Attention
-    </span>
-  </a>
+  <span class="md-ellipsis">
+    Models
+    
+  </span>
   
-    <nav class="md-nav" aria-label="Attention">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#mha-multi-head-attention" class="md-nav__link">
-    <span class="md-ellipsis">
-      MHA — Multi-Head Attention
-    </span>
-  </a>
+
+      </a>
+    </li>
   
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#mqa-multi-query-attention" class="md-nav__link">
-    <span class="md-ellipsis">
-      MQA — Multi-Query Attention
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#gqa-grouped-query-attention" class="md-nav__link">
-    <span class="md-ellipsis">
-      GQA — Grouped-Query Attention
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-    </ul>
-  
-</nav>
+
+              
+            
+          </ul>
+        </nav>
       
     </li>
   
@@ -420,6 +471,8 @@
   
   
   
+    
+  
   
     <label class="md-nav__title" for="__toc">
       <span class="md-nav__icon md-icon"></span>
@@ -428,61 +481,37 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#kv-cache" class="md-nav__link">
+  <a href="#gpu-npu-gpgpu" class="md-nav__link">
     <span class="md-ellipsis">
-      KV Cache
+      GPU, NPU, GPGPU
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="KV Cache">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#memory-cost" class="md-nav__link">
-    <span class="md-ellipsis">
-      Memory cost
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#attention" class="md-nav__link">
+  <a href="#hbm-gddr" class="md-nav__link">
     <span class="md-ellipsis">
-      Attention
+      HBM, GDDR
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Attention">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#gpu-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      GPU Configuration
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="GPU Configuration">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#mha-multi-head-attention" class="md-nav__link">
+  <a href="#specific-gpus-explicitly" class="md-nav__link">
     <span class="md-ellipsis">
-      MHA — Multi-Head Attention
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#mqa-multi-query-attention" class="md-nav__link">
-    <span class="md-ellipsis">
-      MQA — Multi-Query Attention
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#gqa-grouped-query-attention" class="md-nav__link">
-    <span class="md-ellipsis">
-      GQA — Grouped-Query Attention
+      Specific GPUs Explicitly
     </span>
   </a>
   
@@ -509,60 +538,36 @@
 
 
 
-  <h1>LLM Basics</h1>
-
-<h2 id="kv-cache">KV Cache</h2>
-<h3 id="memory-cost">Memory cost</h3>
-<p>The KV cache size is calculated as:</p>
-<div class="arithmatex">\[
-\text{KV size} = 2 \times \text{num layers} \times \text{num heads} \times \text{seq len} \times \text{head dim}
-\]</div>
-<p>Assume:</p>
+<h1 id="hardware">Hardware</h1>
+<h2 id="gpu-npu-gpgpu">GPU, NPU, GPGPU</h2>
 <ul>
-<li>32 layers, 80 heads, head_dim = 128, seq_len = 4K.</li>
-<li>FP16 KV cache: 2 × 32 × 80 × 4K × 128 × 2 bytes = <strong>~5.2 GB</strong> per sample.</li>
-<li>C8 (int8 KV cache): <strong>half that → ~2.6 GB</strong> per sample.</li>
+<li>
+<p><strong>GPU (Graphics Processing Unit)</strong>: A massively parallel, general-purpose processor (SIMT/SIMD) built for high throughput across many workloads—graphics, linear algebra, and most ML. Very flexible and programmable (CUDA/ROCm).</p>
+</li>
+<li>
+<p><strong>NPU (Neural Processing Unit)</strong>: A domain-specific accelerator optimized for neural-net kernels (matmul/conv, activation, pooling). Prioritizes energy efficiency and latency with fixed-function or semi-programmable dataflows.</p>
+</li>
+<li>
+<p><strong>GPGPU (General-Purpose computing on Graphics Processing Units)</strong>: It means using a GPU’s massively parallel hardware to run non-graphics workloads (science/ML/signal processing, etc.). Instead of drawing triangles, you launch compute kernels that apply the same operation to many data elements at once (SIMT/SIMD). This gives huge throughput for data-parallel problems.</p>
+</li>
 </ul>
-<h2 id="attention">Attention</h2>
-<p>In transformer models, the attention module computes:</p>
-<div class="arithmatex">\[
-\operatorname{Attention}(Q, K, V)=\operatorname{softmax}\left(\frac{Q K^T}{\sqrt{d_k}}\right) V
-\]</div>
-<p>Every token produces:</p>
-<ul>
-<li><strong>Q (Query)</strong> — derived from the current token’s hidden state</li>
-<li><strong>K (Key)</strong>, <strong>V (Value)</strong> — derived from the context (previous tokens) and stored in the <strong>KV cache</strong></li>
-</ul>
-<p>The difference between <strong>MHA</strong>, <strong>MQA</strong>, and <strong>GQA</strong> lies in <strong>how many Key/Value projections</strong> are used relative to the number of Query heads.</p>
-<h3 id="mha-multi-head-attention"><strong>MHA — Multi-Head Attention</strong></h3>
-<p>Each attention head has its own set of projections:</p>
-<div class="arithmatex">\[
-Q_i=X W_{Q, i}, \quad K_i=X W_{K, i}, \quad V_i=X W_{V, i}
-\]</div>
-<ul>
-<li>Q heads = K heads = V heads</li>
-</ul>
-<h3 id="mqa-multi-query-attention"><strong>MQA — Multi-Query Attention</strong></h3>
-<p>All heads <strong>share one</strong> K and V projection:</p>
-<div class="arithmatex">\[
-K_{\text {shared }}=X W_K, \quad V_{\text {shared }}=X W_V
-\]</div>
-<ul>
-<li><strong>Multiple Q heads</strong>, but <strong>only one pair of shared K/V</strong>.</li>
-<li>During inference, the same K/V are reused for all heads.</li>
-<li>KV cache size reduced by ~#heads×</li>
-<li><strong>LLaMA 2 7B</strong>, <strong>Mistral</strong>, and most optimized LLMs use MQA to cut memory usage.</li>
-</ul>
-<h3 id="gqa-grouped-query-attention"><strong>GQA — Grouped-Query Attention</strong></h3>
-<p>Queries are split into groups, and each group shares its own K/V:</p>
-<div class="arithmatex">\[
-\text { Group } g: \quad Q_{g, *}, K_g, V_g
-\]</div>
-<ul>
-<li>Suppose you have 8 query heads but only 2 groups → 4 Q heads per group share one K/V.</li>
-<li><strong>K/V heads &lt; Q heads</strong>.</li>
-<li><strong>LLaMA 2 70B</strong>, <strong>Mixtral</strong>, <strong>GPT-J-6B</strong>, etc. use GQA for better memory efficiency.</li>
-</ul>
+<h2 id="hbm-gddr">HBM, GDDR</h2>
+<p>GDDR (Graphics Double Data Rate) and HBM (High Bandwidth Memory) are two distinct types of memory technologies used in GPUs and high-performance computing systems, differing mainly in architecture, bandwidth, and power efficiency. GDDR uses a traditional planar design with memory chips arranged around the GPU, communicating over a relatively narrow bus at very high clock speeds to achieve high bandwidth. In contrast, HBM stacks multiple DRAM dies vertically and connects them to the processor using through-silicon vias (TSVs) and an interposer, creating an extremely wide memory interface that enables much higher bandwidth at lower clock speeds and reduced power consumption. As a result, HBM provides superior performance per watt and is often used in data centers and AI accelerators, while GDDR remains the preferred choice for consumer GPUs due to its lower cost and simpler integration.</p>
+<h2 id="gpu-configuration">GPU Configuration</h2>
+<p>锁步</p>
+<h3 id="specific-gpus-explicitly">Specific GPUs Explicitly</h3>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">set_device</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="c1">## or you can set the env variable</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;CUDA_VISIBLE_DEVICES&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;0,1&quot;</span>
+</span></code></pre></div>
+<p>or set the env variable when running the code:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nv">CUDA_VISIBLE_DEVICES</span><span class="o">=</span><span class="m">0</span>,1<span class="w"> </span>python<span class="w"> </span>script.py
+</span></code></pre></div>
+<p><strong>Comparison:</strong></p>
+<p>If you want to restrict which GPUs are available to your script before it even starts, <code>CUDA_VISIBLE_DEVICES</code> is the way to go.</p>
+<p>If you want to change the active GPU dynamically based on some logic in your code, you'll need to use <code>torch.cuda.set_device()</code>.</p>
 
 
 

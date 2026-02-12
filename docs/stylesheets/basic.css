@@ -19,5 +19,18 @@ p:has(+ .arithmatex) {
     color: #133167; /* LimeGreen color for h3 */
     font-weight: bold;
   }
-  /* Add more as needed for h4, h5, h6 */
-
+  .md-content h4,
+  .md-content h5,
+  .md-content h6 {
+    font-size: 1.15em;
+    font-weight: 600;
+    letter-spacing: -.01em;
+    line-height: 1.25;
+    margin: 1.5em 0 .8em;
+    color: #133167;
+  }
+/* Use hollow circles for nested unordered lists. */
+.md-typeset ul ul,
+.md-typeset ul ul ul {
+  list-style-type: circle;
+}
