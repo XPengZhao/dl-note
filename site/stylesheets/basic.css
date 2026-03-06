@@ -19,9 +19,34 @@ p:has(+ .arithmatex) {
     color: #133167; /* LimeGreen color for h3 */
     font-weight: bold;
   }
-  /* Add more as needed for h4, h5, h6 */
+  .md-content h4,
+  .md-content h5,
+  .md-content h6 {
+    font-size: 1.15em;
+    font-weight: 600;
+    letter-spacing: -.01em;
+    line-height: 1.25;
+    margin: 1.5em 0 .8em;
+    color: #133167;
+  }
 /* Use hollow circles for nested unordered lists. */
 .md-typeset ul ul,
 .md-typeset ul ul ul {
   list-style-type: circle;
+}
+
+/* Reusable style for bibliography/reference lines. */
+.md-typeset .doc-reference {
+  font-size: 0.85em;
+  color: #6c757d;
+  margin-top: 0.15rem;
+}
+
+.md-typeset .doc-reference-label {
+  margin-bottom: 0.1rem;
+}
+
+
+.md-typeset .doc-section-label {
+  margin-bottom: 0.1rem;
 }

@@ -1,6 +1,6 @@
 
 <!doctype html>
-<html lang="en" class="no-js">
+<html lang="zh" class="no-js">
   <head>
     
       <meta charset="utf-8">
@@ -15,16 +15,16 @@
         <link rel="next" href="../models/">
       
       
-      <link rel="icon" href="../../assets/images/favicon.png">
+      <link rel="icon" href="../../../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.21">
     
     
       
-        <title>Preliminary - DL Notes</title>
+        <title>AI Infra 基础 - DL Notes</title>
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.2a3383ac.min.css">
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.2a3383ac.min.css">
       
       
 
@@ -43,11 +43,11 @@
       
     
     
-      <link rel="stylesheet" href="../../stylesheets/bootstrap.min.css">
+      <link rel="stylesheet" href="../../../stylesheets/bootstrap.min.css">
     
-      <link rel="stylesheet" href="../../stylesheets/basic.css">
+      <link rel="stylesheet" href="../../../stylesheets/basic.css">
     
-    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -66,8 +66,8 @@
     <div data-md-component="skip">
       
         
-        <a href="#ai-infra-preliminary" class="md-skip">
-          Skip to content
+        <a href="#ai-infra" class="md-skip">
+          跳转至
         </a>
       
     </div>
@@ -81,8 +81,8 @@
   
 
 <header class="md-header md-header--shadow" data-md-component="header">
-  <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../.." title="DL Notes" class="md-header__button md-logo" aria-label="DL Notes" data-md-component="logo">
+  <nav class="md-header__inner md-grid" aria-label="页眉">
+    <a href="../../" title="DL Notes" class="md-header__button md-logo" aria-label="DL Notes" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -102,7 +102,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Preliminary
+              AI Infra 基础
             
           </span>
         </div>
@@ -116,20 +116,20 @@
       <div class="md-header__option">
   <div class="md-select">
     
-    <button class="md-header__button md-icon" aria-label="Select language">
+    <button class="md-header__button md-icon" aria-label="选择当前语言">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12.87 15.07-2.54-2.51.03-.03A17.5 17.5 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2zm-2.62 7 1.62-4.33L19.12 17z"/></svg>
     </button>
     <div class="md-select__inner">
       <ul class="md-select__list">
         
           <li class="md-select__item">
-            <a href="./" hreflang="en" class="md-select__link">
+            <a href="../../../llms/preliminary/" hreflang="en" class="md-select__link">
               English
             </a>
           </li>
         
           <li class="md-select__item">
-            <a href="../../zh/llms/preliminary/" hreflang="zh" class="md-select__link">
+            <a href="./" hreflang="zh" class="md-select__link">
               简体中文
             </a>
           </li>
@@ -150,16 +150,16 @@
   <label class="md-search__overlay" for="__search"></label>
   <div class="md-search__inner" role="search">
     <form class="md-search__form" name="search">
-      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <input type="text" class="md-search__input" name="query" aria-label="搜索" placeholder="搜索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
       <label class="md-search__icon md-icon" for="__search">
         
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
         
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
       </label>
-      <nav class="md-search__options" aria-label="Search">
+      <nav class="md-search__options" aria-label="查找">
         
-        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+        <button type="reset" class="md-search__icon md-icon" title="清空当前内容" aria-label="清空当前内容" tabindex="-1">
           
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
         </button>
@@ -170,7 +170,7 @@
       <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
         <div class="md-search-result" data-md-component="search-result">
           <div class="md-search-result__meta">
-            Initializing search
+            正在初始化搜索引擎
           </div>
           <ol class="md-search-result__list" role="presentation"></ol>
         </div>
@@ -204,9 +204,9 @@
 
 
 
-<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+<nav class="md-nav md-nav--primary" aria-label="导航栏" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../.." title="DL Notes" class="md-nav__button md-logo" aria-label="DL Notes" data-md-component="logo">
+    <a href="../../" title="DL Notes" class="md-nav__button md-logo" aria-label="DL Notes" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -224,12 +224,12 @@
   
   
     <li class="md-nav__item">
-      <a href="../.." class="md-nav__link">
+      <a href="../../" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
-    Home
+    首页
     
   </span>
   
@@ -251,7 +251,7 @@
   
   
   <span class="md-ellipsis">
-    Hardware
+    硬件
     
   </span>
   
@@ -273,7 +273,7 @@
   
   
   <span class="md-ellipsis">
-    Tensor Operation
+    张量操作
     
   </span>
   
@@ -295,7 +295,7 @@
   
   
   <span class="md-ellipsis">
-    Neural Graphics
+    神经图形
     
   </span>
   
@@ -330,7 +330,7 @@
   
   
   <span class="md-ellipsis">
-    LLMs
+    大语言模型
     
   </span>
   
@@ -341,7 +341,7 @@
         <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_5">
             <span class="md-nav__icon md-icon"></span>
-            LLMs
+            大语言模型
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
@@ -366,7 +366,7 @@
   
   
   <span class="md-ellipsis">
-    Preliminary
+    AI Infra 基础
     
   </span>
   
@@ -379,7 +379,7 @@
   
   
   <span class="md-ellipsis">
-    Preliminary
+    AI Infra 基础
     
   </span>
   
@@ -388,7 +388,7 @@
       
         
 
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+<nav class="md-nav md-nav--secondary" aria-label="目录">
   
   
   
@@ -397,43 +397,43 @@
   
     <label class="md-nav__title" for="__toc">
       <span class="md-nav__icon md-icon"></span>
-      Table of contents
+      目录
     </label>
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#metrics" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      Metrics
+      指标
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Metrics">
+    <nav class="md-nav" aria-label="指标">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
   <a href="#latency" class="md-nav__link">
     <span class="md-ellipsis">
-      Latency
+      延迟（Latency）
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Latency">
+    <nav class="md-nav" aria-label="延迟（Latency）">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#time-to-first-token-ttft" class="md-nav__link">
+  <a href="#token-ttft" class="md-nav__link">
     <span class="md-ellipsis">
-      Time to first token (TTFT)
+      首 token 时间（TTFT）
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#time-per-output-token-tpot" class="md-nav__link">
+  <a href="#token-tpot" class="md-nav__link">
     <span class="md-ellipsis">
-      Time per output token (TPOT)
+      每输出 token 时间（TPOT）
     </span>
   </a>
   
@@ -447,17 +447,17 @@
           <li class="md-nav__item">
   <a href="#throughput" class="md-nav__link">
     <span class="md-ellipsis">
-      Throughput
+      吞吐（Throughput）
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Throughput">
+    <nav class="md-nav" aria-label="吞吐（Throughput）">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#tokens-per-second-tps" class="md-nav__link">
+  <a href="#token-tps" class="md-nav__link">
     <span class="md-ellipsis">
-      Tokens per Second (TPS)
+      每秒 token 数（TPS）
     </span>
   </a>
   
@@ -484,9 +484,9 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#memory-cost" class="md-nav__link">
+  <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
-      Memory cost
+      显存开销
     </span>
   </a>
   
@@ -498,37 +498,37 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#attention" class="md-nav__link">
+  <a href="#_3" class="md-nav__link">
     <span class="md-ellipsis">
-      Attention
+      注意力
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Attention">
+    <nav class="md-nav" aria-label="注意力">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#mha-multi-head-attention" class="md-nav__link">
+  <a href="#mha" class="md-nav__link">
     <span class="md-ellipsis">
-      MHA — Multi-Head Attention
+      MHA — 多头注意力
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#mqa-multi-query-attention" class="md-nav__link">
+  <a href="#mqa" class="md-nav__link">
     <span class="md-ellipsis">
-      MQA — Multi-Query Attention
+      MQA — 多查询注意力
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#gqa-grouped-query-attention" class="md-nav__link">
+  <a href="#gqa" class="md-nav__link">
     <span class="md-ellipsis">
-      GQA — Grouped-Query Attention
+      GQA — 分组查询注意力
     </span>
   </a>
   
@@ -540,19 +540,19 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#sampling" class="md-nav__link">
+  <a href="#_4" class="md-nav__link">
     <span class="md-ellipsis">
-      Sampling
+      采样
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Sampling">
+    <nav class="md-nav" aria-label="采样">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
   <a href="#temperature" class="md-nav__link">
     <span class="md-ellipsis">
-      Temperature
+      温度（Temperature）
     </span>
   </a>
   
@@ -568,9 +568,9 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#top-p-nucleus-sampling" class="md-nav__link">
+  <a href="#top-pnucleussampling" class="md-nav__link">
     <span class="md-ellipsis">
-      Top-p (nucleus) Sampling
+      Top-p（Nucleus）Sampling
     </span>
   </a>
   
@@ -586,18 +586,18 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#put-them-together" class="md-nav__link">
+  <a href="#_5" class="md-nav__link">
     <span class="md-ellipsis">
-      Put them together
+      组合使用顺序
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#example-code" class="md-nav__link">
+  <a href="#_6" class="md-nav__link">
     <span class="md-ellipsis">
-      Example code
+      示例代码
     </span>
   </a>
   
@@ -609,38 +609,38 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#speculvative-decoding" class="md-nav__link">
+  <a href="#speculative-decoding" class="md-nav__link">
     <span class="md-ellipsis">
-      Speculvative decoding
+      Speculative Decoding
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Speculvative decoding">
+    <nav class="md-nav" aria-label="Speculative Decoding">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#speculative-decoding-speedup" class="md-nav__link">
+  <a href="#speculative-decoding_1" class="md-nav__link">
     <span class="md-ellipsis">
-      Speculative Decoding Speedup
+      Speculative Decoding 的加速机理
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Speculative Decoding Speedup">
+    <nav class="md-nav" aria-label="Speculative Decoding 的加速机理">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#where-does-the-speedup-come-from" class="md-nav__link">
+  <a href="#_7" class="md-nav__link">
     <span class="md-ellipsis">
-      Where does the speedup come from?
+      加速来自哪里？
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#why-speedup-shrinks-at-large-serving-batch-and-can-go-negative" class="md-nav__link">
+  <a href="#batch" class="md-nav__link">
     <span class="md-ellipsis">
-      Why speedup shrinks at large serving batch (and can go negative)?
+      为什么大 batch 下加速会变小，甚至为负？
     </span>
   </a>
   
@@ -666,9 +666,9 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#pre-training-objective-of-llms" class="md-nav__link">
+  <a href="#llm" class="md-nav__link">
     <span class="md-ellipsis">
-      Pre-training Objective of LLMs
+      LLM 的预训练目标
     </span>
   </a>
   
@@ -695,7 +695,7 @@
   
   
   <span class="md-ellipsis">
-    Models
+    模型
     
   </span>
   
@@ -726,7 +726,7 @@
                   <div class="md-sidebar__inner">
                     
 
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+<nav class="md-nav md-nav--secondary" aria-label="目录">
   
   
   
@@ -735,43 +735,43 @@
   
     <label class="md-nav__title" for="__toc">
       <span class="md-nav__icon md-icon"></span>
-      Table of contents
+      目录
     </label>
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#metrics" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      Metrics
+      指标
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Metrics">
+    <nav class="md-nav" aria-label="指标">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
   <a href="#latency" class="md-nav__link">
     <span class="md-ellipsis">
-      Latency
+      延迟（Latency）
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Latency">
+    <nav class="md-nav" aria-label="延迟（Latency）">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#time-to-first-token-ttft" class="md-nav__link">
+  <a href="#token-ttft" class="md-nav__link">
     <span class="md-ellipsis">
-      Time to first token (TTFT)
+      首 token 时间（TTFT）
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#time-per-output-token-tpot" class="md-nav__link">
+  <a href="#token-tpot" class="md-nav__link">
     <span class="md-ellipsis">
-      Time per output token (TPOT)
+      每输出 token 时间（TPOT）
     </span>
   </a>
   
@@ -785,17 +785,17 @@
           <li class="md-nav__item">
   <a href="#throughput" class="md-nav__link">
     <span class="md-ellipsis">
-      Throughput
+      吞吐（Throughput）
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Throughput">
+    <nav class="md-nav" aria-label="吞吐（Throughput）">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#tokens-per-second-tps" class="md-nav__link">
+  <a href="#token-tps" class="md-nav__link">
     <span class="md-ellipsis">
-      Tokens per Second (TPS)
+      每秒 token 数（TPS）
     </span>
   </a>
   
@@ -822,9 +822,9 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#memory-cost" class="md-nav__link">
+  <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
-      Memory cost
+      显存开销
     </span>
   </a>
   
@@ -836,37 +836,37 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#attention" class="md-nav__link">
+  <a href="#_3" class="md-nav__link">
     <span class="md-ellipsis">
-      Attention
+      注意力
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Attention">
+    <nav class="md-nav" aria-label="注意力">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#mha-multi-head-attention" class="md-nav__link">
+  <a href="#mha" class="md-nav__link">
     <span class="md-ellipsis">
-      MHA — Multi-Head Attention
+      MHA — 多头注意力
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#mqa-multi-query-attention" class="md-nav__link">
+  <a href="#mqa" class="md-nav__link">
     <span class="md-ellipsis">
-      MQA — Multi-Query Attention
+      MQA — 多查询注意力
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#gqa-grouped-query-attention" class="md-nav__link">
+  <a href="#gqa" class="md-nav__link">
     <span class="md-ellipsis">
-      GQA — Grouped-Query Attention
+      GQA — 分组查询注意力
     </span>
   </a>
   
@@ -878,19 +878,19 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#sampling" class="md-nav__link">
+  <a href="#_4" class="md-nav__link">
     <span class="md-ellipsis">
-      Sampling
+      采样
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Sampling">
+    <nav class="md-nav" aria-label="采样">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
   <a href="#temperature" class="md-nav__link">
     <span class="md-ellipsis">
-      Temperature
+      温度（Temperature）
     </span>
   </a>
   
@@ -906,9 +906,9 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#top-p-nucleus-sampling" class="md-nav__link">
+  <a href="#top-pnucleussampling" class="md-nav__link">
     <span class="md-ellipsis">
-      Top-p (nucleus) Sampling
+      Top-p（Nucleus）Sampling
     </span>
   </a>
   
@@ -924,18 +924,18 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#put-them-together" class="md-nav__link">
+  <a href="#_5" class="md-nav__link">
     <span class="md-ellipsis">
-      Put them together
+      组合使用顺序
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#example-code" class="md-nav__link">
+  <a href="#_6" class="md-nav__link">
     <span class="md-ellipsis">
-      Example code
+      示例代码
     </span>
   </a>
   
@@ -947,38 +947,38 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#speculvative-decoding" class="md-nav__link">
+  <a href="#speculative-decoding" class="md-nav__link">
     <span class="md-ellipsis">
-      Speculvative decoding
+      Speculative Decoding
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Speculvative decoding">
+    <nav class="md-nav" aria-label="Speculative Decoding">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#speculative-decoding-speedup" class="md-nav__link">
+  <a href="#speculative-decoding_1" class="md-nav__link">
     <span class="md-ellipsis">
-      Speculative Decoding Speedup
+      Speculative Decoding 的加速机理
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Speculative Decoding Speedup">
+    <nav class="md-nav" aria-label="Speculative Decoding 的加速机理">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#where-does-the-speedup-come-from" class="md-nav__link">
+  <a href="#_7" class="md-nav__link">
     <span class="md-ellipsis">
-      Where does the speedup come from?
+      加速来自哪里？
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#why-speedup-shrinks-at-large-serving-batch-and-can-go-negative" class="md-nav__link">
+  <a href="#batch" class="md-nav__link">
     <span class="md-ellipsis">
-      Why speedup shrinks at large serving batch (and can go negative)?
+      为什么大 batch 下加速会变小，甚至为负？
     </span>
   </a>
   
@@ -1004,9 +1004,9 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#pre-training-objective-of-llms" class="md-nav__link">
+  <a href="#llm" class="md-nav__link">
     <span class="md-ellipsis">
-      Pre-training Objective of LLMs
+      LLM 的预训练目标
     </span>
   </a>
   
@@ -1028,145 +1028,146 @@
 
 
 
-<h1 id="ai-infra-preliminary">AI Infra Preliminary</h1>
-<h2 id="metrics">Metrics</h2>
-<h3 id="latency">Latency</h3>
-<p>Latency is the time taken to process a request and generate output tokens. In LLM inference, latency is often measured in two main metrics:</p>
-<h4 id="time-to-first-token-ttft">Time to first token (TTFT)</h4>
-<p>Time to First Token (TTFT) is the latency between when a request is received by the inference server and when the first output token is generated and returned to the client. It measures how quickly the model begins responding, and is a primary user-perceived latency metric in streaming LLM systems. Formally:</p>
+<h1 id="ai-infra">AI Infra 预备知识</h1>
+<h2 id="_1">指标</h2>
+<h3 id="latency">延迟（Latency）</h3>
+<p>延迟是指处理请求并生成输出 token 所需的时间。在 LLM 推理中，通常关注两个核心延迟指标：</p>
+<h4 id="token-ttft">首 token 时间（TTFT）</h4>
+<p>TTFT（Time to First Token）表示从推理服务接收到请求，到第一个输出 token 被生成并返回给客户端的时间间隔。它衡量模型“开始响应”有多快，是流式 LLM 系统中最直接的用户感知延迟指标。形式化地：</p>
 <div class="arithmatex">\[
 \text{TTFT} = t_{\text{first token emitted}} - t_{\text{request received}}
 \]</div>
-<p>TTFT mainly captures the prefill phase (processing the input context) plus scheduling and system overhead. It does not include the time required to generate the rest of the output tokens. In details TTFT can be decomposed into:</p>
+<p>TTFT 主要覆盖 prefill 阶段（处理输入上下文）以及调度与系统开销，不包含后续 token 的生成时间。通常可分解为：</p>
 <div class="arithmatex">\[
 \small
 \begin{aligned}
 \text{TTFT} = t_{\text{queue}} + t_{\text{input processing}} + t_{\text{prefill compute}} + t_{\text{first decode step (optional)}} + t_{\text{framework overhead}}
 \end{aligned}
 \]</div>
-<p>where:</p>
+<p>其中：</p>
 <ul>
-<li><span class="arithmatex">\(t_{\text{queue}}\)</span> is the time spent waiting in the scheduler before the request is admitted for execution.</li>
-<li><span class="arithmatex">\(t_{\text{input processing}}\)</span> includes tokenization, multimodal preprocessing (e.g., image or video encoding), and any request-level normalization or formatting.</li>
-<li><span class="arithmatex">\(t_{\text{prefill compute}}\)</span> is the time required to run the forward pass over all input tokens (complexity is <span class="arithmatex">\(O(L)\)</span> in sequence length <span class="arithmatex">\(L\)</span>), during which the KV cache is populated and the logits at the final prompt position are produced.</li>
-<li><span class="arithmatex">\(t_{\text{first decode step (optional)}}\)</span> accounts for an additional single-step decode iteration in implementations that separate prefill and generation scheduling. In such systems, the first output token is emitted during a subsequent decode pass rather than directly from the prefill logits. In optimized implementations (recent versions of vLLM), this step may be fused with prefill and therefore negligible.</li>
-<li><span class="arithmatex">\(t_{\text{framework overhead}}\)</span> captures auxiliary costs such as CUDA kernel launches, synchronization, memory allocation, sampling (softmax and top-k/top-p), and network transmission of the first streamed token.</li>
+<li><span class="arithmatex">\(t_{\text{queue}}\)</span>：请求进入执行前在调度器中的排队时间。</li>
+<li><span class="arithmatex">\(t_{\text{input processing}}\)</span>：输入处理开销，包括分词、多模态预处理（如图像/视频编码）和请求规范化。</li>
+<li><span class="arithmatex">\(t_{\text{prefill compute}}\)</span>：对全部输入 token 做前向计算的时间（序列长度 <span class="arithmatex">\(L\)</span> 下复杂度约为 <span class="arithmatex">\(O(L)\)</span>），同时建立 KV cache，并得到提示词末位置的 logits。</li>
+<li><span class="arithmatex">\(t_{\text{first decode step (optional)}}\)</span>：某些实现将 prefill 和 decode 调度分离时，首 token 可能要在下一次 decode step 才发出；优化实现中此项可与 prefill 融合，开销很小。</li>
+<li><span class="arithmatex">\(t_{\text{framework overhead}}\)</span>：框架额外开销，如 CUDA kernel 启动、同步、内存分配、采样（softmax/top-k/top-p）以及首 token 网络传输。</li>
 </ul>
-<p>For long-context inputs, TTFT is typically dominated by <span class="arithmatex">\(t_{\text{prefill compute}}\)</span>, with the remaining terms contributing comparatively small overhead.</p>
-<h4 id="time-per-output-token-tpot">Time per output token (TPOT)</h4>
-<p>Time per Output Token (TPOT) measures the average latency required to generate each token after the first token has been emitted. It characterizes the steady-state decode performance of an autoregressive model and directly determines streaming speed. Formally, for a request generating <span class="arithmatex">\(N\)</span> output tokens:</p>
+<p>在长上下文场景下，TTFT 往往由 <span class="arithmatex">\(t_{\text{prefill compute}}\)</span> 主导，其余项通常是次要开销。</p>
+<h4 id="token-tpot">每输出 token 时间（TPOT）</h4>
+<p>TPOT（Time per Output Token）衡量首 token 发出后，平均每个后续 token 的生成延迟。它表征自回归解码的稳态性能，并直接决定流式输出速度。对生成 <span class="arithmatex">\(N\)</span> 个输出 token 的请求：</p>
 <div class="arithmatex">\[
 \text{TPOT} = \frac{t_\text{last token emitted} - t_\text{first token emitted}}{N - 1}
 \]</div>
-<p>Equivalently, if total end-to-end latency is <span class="arithmatex">\(T_{\text{total}}\)</span>,</p>
+<p>等价地，若总端到端时延为 <span class="arithmatex">\(T_{\text{total}}\)</span>：</p>
 <div class="arithmatex">\[
 \text{TPOT} = \frac{T_{\text{total}} - \text{TTFT}}{N - 1}
 \]</div>
-<p>In steady-state decoding, each output token requires:</p>
+<p>在稳态 decode 中，每个 token 的时间可写为：</p>
 <div class="arithmatex">\[
 \text{TPOT} = t_{\text{decode compute}} + t_{\text{communication}} + t_{\text{scheduling}} + t_{\text{framework overhead}}
 \]</div>
-<p>where:</p>
+<p>其中：</p>
 <ul>
-<li><span class="arithmatex">\(t_{\text{decode compute}}\)</span> is the forward pass for a single token using the KV cache (complexity per step is <span class="arithmatex">\(O(1+\text{num speculative tokens})\)</span> in sequence length but proportional to model size).</li>
-<li><span class="arithmatex">\(t_{\text{communication}}\)</span> captures the cost of cross-GPU synchronization and data exchange, such as tensor-parallel collectives (all-reduce, all-gather), expert routing and aggregation in MoE models (all-to-all, dispatch/combine), as well as any host–device memory transfers (H2D/D2H) triggered by scheduling or memory management.</li>
-<li><span class="arithmatex">\(t_{\text{scheduling}}\)</span> includes runtime scheduling overhead such as continuous batching, request coordination, admission control, and KV cache allocation, paging, or memory management.</li>
-<li><span class="arithmatex">\(t_{\text{framework overhead}}\)</span> includes auxiliary execution costs such as sampling (softmax, top-k/top-p), kernel launches, synchronization, input/output marshaling, post-processing of results, and token streaming.</li>
+<li><span class="arithmatex">\(t_{\text{decode compute}}\)</span>：利用 KV cache 的单 token 前向计算。</li>
+<li><span class="arithmatex">\(t_{\text{communication}}\)</span>：跨卡通信与数据交换（如 TP all-reduce/all-gather，MoE all-to-all，以及 H2D/D2H 传输）。</li>
+<li><span class="arithmatex">\(t_{\text{scheduling}}\)</span>：运行时调度开销（连续 batching、请求协调、准入控制、KV 分配/分页/管理）。</li>
+<li><span class="arithmatex">\(t_{\text{framework overhead}}\)</span>：采样、kernel 启动、同步、I/O 封送、后处理和 token streaming 等辅助开销。</li>
 </ul>
-<p>Unlike TTFT, TPOT does not require recomputation over the full prompt. However, it still depends on the effective context length, since each decode step performs attention over all cached tokens. Therefore, TPOT scales approximately linearly with the total context length (prompt + generated tokens), though the per-token cost is significantly smaller than prefill.</p>
-<h3 id="throughput">Throughput</h3>
-<h4 id="tokens-per-second-tps">Tokens per Second (TPS)</h4>
-<p>Tokens per Second (TPS) measures the throughput of an LLM inference system, i.e., how many tokens are processed or generated per second under a given serving configuration. Unlike TTFT and TPOT, which are latency metrics defined at the request level, TPS is a system-level metric that reflects overall serving capacity under load. Over a time interval over a time interval <span class="arithmatex">\(\Delta t\)</span>, TPS can be expressed as:</p>
+<p>与 TTFT 不同，TPOT 不需重算完整 prompt；但由于 decode 仍要对全部缓存上下文做注意力计算，其成本仍受有效上下文长度影响，通常随总上下文（提示词 + 已生成）近似线性增长。</p>
+<h3 id="throughput">吞吐（Throughput）</h3>
+<h4 id="token-tps">每秒 token 数（TPS）</h4>
+<p>TPS（Tokens per Second）衡量系统在给定服务配置下每秒处理/生成 token 的能力。与 TTFT、TPOT 这种请求级指标不同，TPS 是系统级指标，反映整体承载能力。在时间窗口 <span class="arithmatex">\(\Delta t\)</span> 内：</p>
 <div class="arithmatex">\[
 \text{TPS} = \frac{N_\text{tokens}}{\Delta t}
 \]</div>
-<p>In many cases, TPS refers specifically to decode throughput, counting only generated output tokens:</p>
+<p>很多场景下 TPS 特指 decode 吞吐（只统计输出 token）：</p>
 <div class="arithmatex">\[
 \text{TPS}_\text{decode} = \frac{N_\text{output tokens}}{\Delta t}
 \]</div>
-<p>and for a single sequence decoded sequentially, it is approximately the inverse of TPOT:</p>
+<p>对单序列顺序 decode，通常有：</p>
 <div class="arithmatex">\[
 \text{TPS}_\text{per request} \approx \frac{1}{\text{TPOT}}
 \]</div>
-<p>However, in practical serving systems with continuous batching and concurrent decoding, aggregate throughput scales with the effective batch size <span class="arithmatex">\(B\)</span>. For a single replica, the system throughput can be approximated as</p>
+<p>在连续 batching 并发场景中，系统吞吐会随有效 batch 大小 <span class="arithmatex">\(B\)</span> 增长。单副本近似为：</p>
 <div class="arithmatex">\[
 \text{TPS}_\text{replica} \approx \frac{B}{\text{TPOT}}
 \]</div>
-<p>and with <span class="arithmatex">\(R\)</span> data-parallel (DP) replicas,</p>
+<p>若有 <span class="arithmatex">\(R\)</span> 个数据并行（DP）副本：</p>
 <div class="arithmatex">\[
 \text{TPS}_\text{total} \approx R \times \frac{B}{\text{TPOT}}
 \]</div>
-<p>Importantly, for long-context or multimodal workloads, prompt processing can contribute a substantial fraction of total computation. In such cases, it is often necessary to consider end-to-end throughput, which accounts for both prompt and generated tokens:</p>
+<p>对于长上下文或多模态任务，prompt 处理可能占据可观算力，此时应关注端到端吞吐：</p>
 <div class="arithmatex">\[
 \text{TPS}_\text{end-to-end} = \frac{N_\text{prompt tokens} + N_\text{output tokens}}{\Delta t}
 \]</div>
-<p>Overall, TPS is influenced by model size, parallelism strategy, effective batch size, kernel efficiency, interconnect bandwidth, and the relative balance between prefill and decode workloads.</p>
+<p>总体上，TPS 受模型规模、并行策略、有效 batch、大核效率、互联带宽以及 prefill/decode 负载比例共同影响。</p>
 <h2 id="kv-cache">KV Cache</h2>
-<h3 id="memory-cost">Memory cost</h3>
-<p>The KV cache size is calculated as:</p>
+<h3 id="_2">显存开销</h3>
+<p>KV cache 大小计算公式：</p>
 <div class="arithmatex">\[
 \text{KV size} = 2 \times \text{num layers} \times \text{num heads} \times \text{seq len} \times \text{head dim}
 \]</div>
-<p>Assume:</p>
+<p>假设：</p>
 <ul>
-<li>32 layers, 80 heads, head_dim = 128, seq_len = 4K.</li>
-<li>FP16 KV cache: 2 × 32 × 80 × 4K × 128 × 2 bytes = <strong>~5.2 GB</strong> per sample.</li>
-<li>C8 (int8 KV cache): <strong>half that → ~2.6 GB</strong> per sample.</li>
+<li>32 层、80 个头、head_dim = 128、seq_len = 4K。</li>
+<li>FP16 KV cache：2 × 32 × 80 × 4K × 128 × 2 bytes = <strong>约 5.2 GB/样本</strong>。</li>
+<li>C8（int8 KV cache）：约为一半，即 <strong>约 2.6 GB/样本</strong>。</li>
 </ul>
-<h2 id="attention">Attention</h2>
-<p>In transformer models, the attention module computes:</p>
+<h2 id="_3">注意力</h2>
+<p>在 Transformer 中，注意力模块计算：</p>
 <div class="arithmatex">\[
 \operatorname{Attention}(Q, K, V)=\operatorname{softmax}\left(\frac{Q K^T}{\sqrt{d_k}}\right) V
 \]</div>
-<p>Every token produces:</p>
+<p>每个 token 会产生：</p>
 <ul>
-<li><strong>Q (Query)</strong> — derived from the current token’s hidden state</li>
-<li><strong>K (Key)</strong>, <strong>V (Value)</strong> — derived from the context (previous tokens) and stored in the <strong>KV cache</strong></li>
+<li><strong>Q（Query）</strong>：来自当前 token 的隐状态。</li>
+<li><strong>K（Key）</strong>、<strong>V（Value）</strong>：来自上下文（历史 token），并存入 <strong>KV cache</strong>。</li>
 </ul>
-<p>The difference between <strong>MHA</strong>, <strong>MQA</strong>, and <strong>GQA</strong> lies in <strong>how many Key/Value projections</strong> are used relative to the number of Query heads.</p>
-<h3 id="mha-multi-head-attention"><strong>MHA — Multi-Head Attention</strong></h3>
-<p>Each attention head has its own set of projections:</p>
+<p><strong>MHA、MQA、GQA</strong> 的主要区别是：相对于 Query 头数，Key/Value 投影是如何共享的。</p>
+<h3 id="mha"><strong>MHA — 多头注意力</strong></h3>
+<p>每个注意力头都有独立投影：</p>
 <div class="arithmatex">\[
 Q_i=X W_{Q, i}, \quad K_i=X W_{K, i}, \quad V_i=X W_{V, i}
 \]</div>
 <ul>
-<li>Q heads = K heads = V heads</li>
+<li>Q 头数 = K 头数 = V 头数。</li>
 </ul>
-<h3 id="mqa-multi-query-attention"><strong>MQA — Multi-Query Attention</strong></h3>
-<p>All heads <strong>share one</strong> K and V projection:</p>
+<h3 id="mqa"><strong>MQA — 多查询注意力</strong></h3>
+<p>所有头共享同一组 K、V 投影：</p>
 <div class="arithmatex">\[
 K_{\text {shared }}=X W_K, \quad V_{\text {shared }}=X W_V
 \]</div>
 <ul>
-<li><strong>Multiple Q heads</strong>, but <strong>only one pair of shared K/V</strong>.</li>
-<li>During inference, the same K/V are reused for all heads.</li>
-<li>KV cache size reduced by ~#heads×</li>
-<li><strong>LLaMA 2 7B</strong>, <strong>Mistral</strong>, and most optimized LLMs use MQA to cut memory usage.</li>
+<li>Q 头可以很多，但只有一组共享 K/V。</li>
+<li>推理时各头复用同一 K/V。</li>
+<li>KV cache 显存约可按头数倍数下降。</li>
+<li><strong>LLaMA 2 7B</strong>、<strong>Mistral</strong> 等模型常用 MQA 以降低内存开销。</li>
 </ul>
-<h3 id="gqa-grouped-query-attention"><strong>GQA — Grouped-Query Attention</strong></h3>
-<p>Queries are split into groups, and each group shares its own K/V:</p>
+<h3 id="gqa"><strong>GQA — 分组查询注意力</strong></h3>
+<p>将 Query 头分组，每组共享一组 K/V：</p>
 <div class="arithmatex">\[
 \text { Group } g: \quad Q_{g, *}, K_g, V_g
 \]</div>
 <ul>
-<li>Suppose you have 8 query heads but only 2 groups → 4 Q heads per group share one K/V.</li>
-<li><strong>K/V heads &lt; Q heads</strong>.</li>
-<li><strong>LLaMA 2 70B</strong>, <strong>Mixtral</strong>, <strong>GPT-J-6B</strong>, etc. use GQA for better memory efficiency.</li>
+<li>例如 8 个 Q 头、2 组时，每组 4 个 Q 头共享一组 K/V。</li>
+<li><strong>K/V 头数 &lt; Q 头数</strong>。</li>
+<li><strong>LLaMA 2 70B</strong>、<strong>Mixtral</strong>、<strong>GPT-J-6B</strong> 等常用 GQA，在效果与效率间折中。</li>
 </ul>
-<h2 id="sampling">Sampling</h2>
-<h3 id="temperature">Temperature</h3>
-<p>Temperature <span class="arithmatex">\(T\)</span> controls "sharpness" of the probability distribution. Given model logits <span class="arithmatex">\(z_i\)</span>, temperature sampling rescales them before softmax:</p>
+<h2 id="_4">采样</h2>
+<h3 id="temperature">温度（Temperature）</h3>
+<p>温度 <span class="arithmatex">\(T\)</span> 控制概率分布的“尖锐程度”。给定 logits <span class="arithmatex">\(z_i\)</span>，温度采样先缩放再 softmax：</p>
 <div class="arithmatex">\[
 p_i=\frac{e^{z_i / T}}{\sum_j e^{z_j / T}}
 \]</div>
 <ul>
-<li><span class="arithmatex">\(T&lt;1\)</span> Sharper (more peaked). Model becomes confident, less random. <span class="arithmatex">\(T&gt;1\)</span> Flatter (more uniform). Model becomes exploratory, more diverse.</li>
-<li>Temperature keeps the order of logits because dividing by a positive number does not change ranking (rank-preserving). If you use top-k = 1 (i.e., greedy), temperature has no effect at all.</li>
-<li>With a temperature <span class="arithmatex">\(T \rightarrow 0\)</span>, the softmax distribution becomes arbitrarily sharp and converges to greedy (argmax) sampling. For example, at <span class="arithmatex">\(T=10^{-6}\)</span>, the highest logit dominates the distribution, so sampling is effectively greedy in practice.</li>
-<li>At <span class="arithmatex">\(T \rightarrow \infty\)</span>, the distribution becomes uniform (all tokens equally likely).</li>
+<li><span class="arithmatex">\(T&lt;1\)</span>：分布更尖锐，输出更确定、随机性更低。</li>
+<li><span class="arithmatex">\(T&gt;1\)</span>：分布更平坦，探索性更强、多样性更高。</li>
+<li>温度是保序变换（不会改变 logits 排序）。若 top-k = 1（贪心），温度不会产生实际影响。</li>
+<li>当 <span class="arithmatex">\(T \rightarrow 0\)</span> 时，分布趋近 argmax（贪心）。</li>
+<li>当 <span class="arithmatex">\(T \rightarrow \infty\)</span> 时，分布趋近均匀。</li>
 </ul>
 <h3 id="top-k-sampling">Top-k Sampling</h3>
-<p>After computing probabilities (after temperature), sort tokens by probability, and keep only the k highest. Then renormalize <span class="arithmatex">\(p_i^{\prime}\)</span> to get final distribution for sampling.</p>
+<p>在温度处理后按概率排序，仅保留前 k 个 token，并重归一化得到采样分布：</p>
 <div class="arithmatex">\[
 \begin{aligned}
 S_k &amp; =\text { top-k tokens by } p_i \\
@@ -1174,13 +1175,13 @@ p_i^{\prime} &amp; = \begin{cases}\frac{p_i}{\sum_{j \in S_k} p_j} &amp; i \in S
 0 &amp; \text { otherwise }\end{cases}
 \end{aligned}
 \]</div>
-<p>Then you sample from that truncated distribution.</p>
+<p>再从截断后的分布中采样。</p>
 <ul>
-<li>Small k (e.g., 1–10): deterministic and safe (model never picks rare words).</li>
-<li>Large k (e.g., 50–100): more variety but higher risk of off-topic words.</li>
+<li>小 k（如 1–10）：更稳定、更保守。</li>
+<li>大 k（如 50–100）：更有多样性，但偏题风险更高。</li>
 </ul>
-<h3 id="top-p-nucleus-sampling">Top-p (nucleus) Sampling</h3>
-<p>“nucleus” literally means core, center, or the essential central part of something. Instead of a fixed k, we choose the smallest set of tokens whose cumulative probability <span class="arithmatex">\(\geq p\)</span>.</p>
+<h3 id="top-pnucleussampling">Top-p（Nucleus）Sampling</h3>
+<p>“nucleus”指概率质量的核心集合。不同于固定 k，top-p 选择“累计概率达到阈值 <span class="arithmatex">\(p\)</span> 的最小 token 集合”。</p>
 <div class="arithmatex">\[
 \begin{aligned}
 S_p&amp;=\left\{i: \sum_{j \in S_p} p_j \geq p\right\} \\
@@ -1188,33 +1189,34 @@ p_i^{\prime}&amp;= \begin{cases}\frac{p_i}{\sum_{j \in S_p} p_j} &amp; i \in S_p
 0 &amp; \text { otherwise }\end{cases}
 \end{aligned}
 \]</div>
-<p><strong>Key difference vs top-k:</strong></p>
-<p>Top-p adapts to uncertainty. Top-k is about rank (k highest scores). Top-p is about mass (the core mass of the distribution).</p>
+<p><strong>与 top-k 的关键区别：</strong></p>
+<p>top-k 是按排名截断，top-p 是按概率质量截断，因此能自适应模型不确定性。</p>
 <ul>
-<li>If the model is confident (one token dominates), very few tokens are kept.</li>
-<li>If it’s uncertain (many tokens have similar probabilities), the nucleus expands.</li>
+<li>当模型很确定（头部 token 占比高）时，保留 token 很少。</li>
+<li>当模型不确定（概率较分散）时，集合会自动扩大。</li>
 </ul>
 <h3 id="min-p">Min-p</h3>
-<p>Min-p filters out tokens that are too improbable relative to the top-1. This is newer but increasingly popular (used in Mistral, Gemini, etc.). Instead of fixing <span class="arithmatex">\(k\)</span> or <span class="arithmatex">\(p\)</span>, you keep tokens above a minimum probability threshold relative to the top-1 token:</p>
+<p>Min-p 按相对 top-1 的最小概率阈值过滤 token（近年较常见，如 Mistral、Gemini 等）。其规则不是固定 <span class="arithmatex">\(k\)</span> 或累计概率 <span class="arithmatex">\(p\)</span>，而是保留所有满足：</p>
 <div class="arithmatex">\[
 S_{\min }=\left\{i: p_i \geq \min -\mathrm{p} \times p_{\max }\right\}
 \]</div>
-<p>If min-p = 0.1, then any token whose probability is at least 10% of the most likely token is kept.Then normalize:</p>
+<p>若 min-p = 0.1，则保留概率至少为 top-1 概率 10% 的 token。之后再归一化：</p>
 <div class="arithmatex">\[
 p_i^{\prime} = \frac{p_i}{\sum_{j \in S_{\min}} p_j}
 \]</div>
 <ul>
-<li>Min-p adaptive to context like top-p, but simpler. It means the number of candidate tokens changes depending on what the model is predicting. If the model is confident, the candidate set is small. If the model is uncertain, the candidate set becomes larger.</li>
-<li>Avoids cutting off plausible low-rank tokens when the distribution is flat.</li>
-<li>More numerically stable for long-tail vocabularies.</li>
+<li>与 top-p 一样可自适应上下文，但规则更直接。</li>
+<li>在分布较平坦时，不容易错误截断低排名但合理的 token。</li>
+<li>对长尾词表通常更稳定。</li>
 </ul>
-<h3 id="put-them-together">Put them together</h3>
-<p>You usually combine these in a specific order: Temperature → Softmax → (top-k / top-p / min-p) → Renormalize → Sample</p>
-<p>When both top-k and top-p are enabled, you always keep the intersection, which is the smaller of the two sets.</p>
-<h3 id="example-code">Example code</h3>
-<p>Code snippet from <a href="https://gitee.com/omniai/omniinfer/blob/master/omni/adaptors/vllm/sample/sampler.py">Omniinfer Sampler</a>.</p>
+<h3 id="_5">组合使用顺序</h3>
+<p>实际中常按以下顺序组合：</p>
+<p>Temperature → Softmax → (top-k / top-p / min-p) → Renormalize → Sample</p>
+<p>当 top-k 与 top-p 同时开启时，最终候选集是两者交集（更小的集合）。</p>
+<h3 id="_6">示例代码</h3>
+<p>代码来自 <a href="https://gitee.com/omniai/omniinfer/blob/master/omni/adaptors/vllm/sample/sampler.py">Omniinfer Sampler</a>。</p>
 <details>
-<summary>Top-k and Top-p implementation</summary>
+<summary>Top-k 和 Top-p 实现</summary>
 
 <div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">apply_top_k_top_p</span><span class="p">(</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">logits_or_prob</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
@@ -1282,71 +1284,61 @@ p_i^{\prime} = \frac{p_i}{\sum_{j \in S_{\min}} p_j}
 </span></code></pre></div>
 </details>
 
-<h2 id="speculvative-decoding">Speculvative decoding</h2>
-<h3 id="speculative-decoding-speedup">Speculative Decoding Speedup</h3>
-<p>Speculative decoding accelerates inference of a target model <span class="arithmatex">\(M_t\)</span> using a smaller draft model <span class="arithmatex">\(M_d\)</span>. In each decoding cycle, the draft model proposes <span class="arithmatex">\(\gamma\)</span> tokens, which are verified in parallel by the target model. The average per-token latency is:</p>
+<h2 id="speculative-decoding">Speculative Decoding</h2>
+<h3 id="speculative-decoding_1">Speculative Decoding 的加速机理</h3>
+<p>Speculative decoding 使用较小的草稿模型 <span class="arithmatex">\(M_d\)</span> 来加速目标模型 <span class="arithmatex">\(M_t\)</span> 的推理。每个解码周期中，草稿模型先提出 <span class="arithmatex">\(\gamma\)</span> 个 token，再由目标模型并行验证。平均每 token 延迟可写为：</p>
 <div class="arithmatex">\[
 L = \frac{T_{\text{draft}} + T_{\text{target}}}{\tau}.
 \]</div>
-<p>where <span class="arithmatex">\(T_{\text{draft}}\)</span> is the time spent generating draft tokens, <span class="arithmatex">\(T_{\text{target}}\)</span> is the cost of verification, and <span class="arithmatex">\(\tau \in [1, \gamma + 1]\)</span> is the expected number of accepted tokens per cycle, including the bonus token produced by the target model. Let <span class="arithmatex">\(L_\text{target}\)</span> denote the autoregressive per-token latency of <span class="arithmatex">\(M_t\)</span>. The resulting speedup is:</p>
+<p>其中 <span class="arithmatex">\(T_{\text{draft}}\)</span> 是草稿生成开销，<span class="arithmatex">\(T_{\text{target}}\)</span> 是验证开销，<span class="arithmatex">\(\tau \in [1, \gamma + 1]\)</span> 是每周期期望接受长度（含 bonus token）。设 <span class="arithmatex">\(L_\text{target}\)</span> 为目标模型自回归单 token 延迟，则速度提升为：</p>
 <div class="arithmatex">\[
 \eta = \frac{L_\text{target}}{L}.
 \]</div>
-<h4 id="where-does-the-speedup-come-from">Where does the speedup come from?</h4>
-<p>A compact and intuitive model for target-side verification in speculative decoding is:</p>
+<h4 id="_7">加速来自哪里？</h4>
+<p>对目标侧验证时间可使用一个简洁模型：</p>
 <div class="arithmatex">\[
 T_{\text {target }}(n) \approx \alpha_t(n)+n \cdot \bar{\beta}_t(n),
 \]</div>
-<p>where <span class="arithmatex">\(n= B(\gamma + 1)\)</span> denotes the total number of tokens verified in parallel across the serving batch <span class="arithmatex">\(B\)</span>, and <span class="arithmatex">\(\bar{\beta}_t(n)\)</span> is the effective per-token verification cost (seconds/token) achieved at width <span class="arithmatex">\(n\)</span>. In this decomposition, <span class="arithmatex">\(\alpha_t(n)\)</span> collects per-call overheads that are weakly dependent on <span class="arithmatex">\(n\)</span> over a moderate range, including kernel launch and synchronization latency, framework dispatch/graph overhead, per-call bookkeeping (e.g., attention metadata construction and paged-attention index setup), and collective start-up/synchronization in distributed or MoE settings. The term <span class="arithmatex">\(n \cdot \bar{\beta}_t(n)\)</span> aggregates the work that scales approximately proportionally with the number of processed tokens: QKV/MLP GEMMs, attention computation, KV-cache reads/writes, and elementwise operations. For MoE, dispatch/gather payload movement contributes primarily to the linear term, whereas collective start-up is naturally part of the overhead term.</p>
-<p>Crucially, <span class="arithmatex">\(\bar{\beta}_t(n)\)</span> is not constant: as <span class="arithmatex">\(n\)</span> increases from an underfilled regime, GEMM shapes become more favorable, occupancy increases, and cache reuse improves, which raises effective arithmetic intensity and utilization and thereby reduces <span class="arithmatex">\(\bar{\beta}_t(n)\)</span>. This reduction typically continues until a hardware roof is approached (bandwidth-limited by KV/cache traffic or compute-limited by tensor-core throughput), beyond which <span class="arithmatex">\(\bar{\beta}_t(n)\)</span> flattens near a device-determined floor and the total time becomes approximately linear in <span class="arithmatex">\(n\)</span>.</p>
-<p>Under fixed <span class="arithmatex">\(\gamma\)</span> and fixed expected accepted length <span class="arithmatex">\(\tau\)</span>, the target-side contribution to per accepted token latency is:</p>
+<p>其中 <span class="arithmatex">\(n= B(\gamma + 1)\)</span> 为 batch <span class="arithmatex">\(B\)</span> 下并行验证 token 总数，<span class="arithmatex">\(\bar{\beta}_t(n)\)</span> 为在宽度 <span class="arithmatex">\(n\)</span> 下的等效单 token 验证成本。<span class="arithmatex">\(\alpha_t(n)\)</span> 聚合了弱依赖 <span class="arithmatex">\(n\)</span> 的调用级固定开销（kernel 启动、同步、框架调度、attention metadata/paged-attention 索引构建、分布式/MoE 的 collective 启动等）。<span class="arithmatex">\(n \cdot \bar{\beta}_t(n)\)</span> 对应近似线性增长的工作量（QKV/MLP GEMM、attention、KV 读写、逐元素算子等）。</p>
+<p>关键点是：<span class="arithmatex">\(\bar{\beta}_t(n)\)</span> 并非常数。随着 <span class="arithmatex">\(n\)</span> 从低利用区增大，GEMM 形状更友好、占用率和 cache 复用提升，通常会降低单位 token 成本；直到接近硬件上限后趋于平坦。</p>
+<p>在固定 <span class="arithmatex">\(\gamma\)</span> 与固定期望接受长度 <span class="arithmatex">\(\tau\)</span> 下，目标侧对“每个已接受 token 延迟”的贡献近似：</p>
 <div class="arithmatex">\[
 \frac{T_{\text {target }}(n)}{\tau} \approx \frac{\alpha_t(n)}{\tau} + \frac{n}{\tau} \bar{\beta}_t(n).
 \]</div>
-<p>The key intuition for speedup is that verification can make <span class="arithmatex">\(\bar{\beta}_t(n)\)</span> substantially smaller than the baseline autoregressive per-token cost of the target model in the low-batch/underfilled regime, while <span class="arithmatex">\(\alpha_t(n)\)</span> is amortized by <span class="arithmatex">\(\tau\)</span>. A win condition is (ignoring draft cost for the moment) is:</p>
+<p>可获得加速的直观条件（先忽略 draft 成本）是：</p>
 <div class="arithmatex">\[
 \frac{T_{\text {target }}(n)}{\tau} &lt; L_\text{target}(B).
 \]</div>
-<p>Let <span class="arithmatex">\(p = \tau / (\gamma + 1)\)</span> denote the expected acceptance rate per proposed token. A dominant factor for speedup is:</p>
+<p>令 <span class="arithmatex">\(p = \tau / (\gamma + 1)\)</span> 表示提议 token 的期望接受率，一个关键因子是：</p>
 <div class="arithmatex">\[
 \frac{\bar{\beta}_t(n)}{p}  &lt; \bar{\beta}_t(B).
 \]</div>
-<p><span class="arithmatex">\(\scriptstyle\blacksquare\)</span> <strong>It changes the granularity of the target model’s work.</strong> In autoregressive decoding, the target model runs one forward pass per generated token. That produces a long chain of strictly sequential tiny steps. On GPUs, single-token decode is often memory/latency dominated: each step performs limited math relative to the amount of state it touches (KV cache reads/writes, small kernels, synchronization, and launch overhead). As a result, hardware utilization is frequently poor in batch-1 or low-concurrency serving. Even if the model’s FLOPs are high on paper, the achieved throughput per token can be limited by memory bandwidth and launch latency rather than compute.</p>
-<p>Speculative decoding changes the shape of the target computation. Instead of paying the per-step overhead <span class="arithmatex">\((\gamma+1)\)</span> times, the target model pays it once per cycle to verify <span class="arithmatex">\(\gamma\)</span> proposed tokens.Speculative decoding converts many tiny, latency-dominated target steps into fewer, wider verification steps.</p>
-<p><span class="arithmatex">\(\scriptstyle\blacksquare\)</span> <strong>Verification cost grows sublinearly with <span class="arithmatex">\(\gamma\)</span>.</strong> If verifying <span class="arithmatex">\(\gamma\)</span> tokens cost exactly <span class="arithmatex">\((\gamma + 1) \cdot L_\text{target}\)</span>, speculative decoding would never help because you would just be doing the same work plus draft overhead. The practical speedup comes from <span class="arithmatex">\(T_\text{target}(\gamma)\)</span> being closer to one slightly-wider decode step than <span class="arithmatex">\(\gamma\)</span> independent decode steps. This happens because: (1) Fixed overheads (kernel launches, synchronization) are amortized. (2) Higher effective arithmetic intensity and better hardware utilization. Wider verification increases GEMM/attention kernel sizes, improving occupancy and cache reuse, so the target’s verification pass often achieves higher FLOP/byte (at L2/HBM) and higher tensor-core efficiency than single-token decode.</p>
-<h4 id="why-speedup-shrinks-at-large-serving-batch-and-can-go-negative">Why speedup shrinks at large serving batch (and can go negative)?</h4>
-<p>In batch-1 or low-concurrency serving, baseline autoregressive decode has poor utilization, leaving a lot of headroom for speculative verification to improve efficiency. As serving batch increases, baseline decode already becomes wider and more efficient, so speculative decoding has less sublinearity to exploit. Once the system is close to compute saturation (compute-bound), <span class="arithmatex">\(T_\text{target}(\gamma)\)</span>  becomes closer to linear in <span class="arithmatex">\(\gamma\)</span>, and speculative decoding may provide little benefit or even a negative speedup because you add draft compute and extra control flow. The following are common failure cases of speculative decoding:</p>
+<p><span class="arithmatex">\(\scriptstyle\blacksquare\)</span> <strong>它改变了目标模型工作的粒度。</strong> 自回归解码每次只处理 1 个 token，形成大量串行小步，常受内存访问/启动时延限制。Speculative decoding 将多个小步验证合并为更少但更宽的验证步，从而提升利用率。</p>
+<p><span class="arithmatex">\(\scriptstyle\blacksquare\)</span> <strong>验证开销随 <span class="arithmatex">\(\gamma\)</span> 的增长常呈次线性。</strong> 如果验证 <span class="arithmatex">\(\gamma\)</span> 个 token 的成本严格等于 <span class="arithmatex">\((\gamma+1)\cdot L_\text{target}\)</span>，则不会加速。现实中由于固定开销摊销、算术强度提升、占用率与 cache 命中改善，验证成本通常低于线性外推。</p>
+<h4 id="batch">为什么大 batch 下加速会变小，甚至为负？</h4>
+<p>在 batch=1 或低并发时，基线自回归 decode 利用率低，speculative 仍有较大优化空间。随着 batch 增大，基线本身变“更宽更高效”，speculative 能额外榨取的次线性收益减少。若系统已接近计算饱和，验证时间会更接近线性，同时又增加了 draft 与控制流开销，可能导致负收益。常见失败场景：</p>
 <ul>
-<li>
-<p>Low acceptance rate: <span class="arithmatex">\(\tau\)</span> is small, amortization fails.</p>
-</li>
-<li>
-<p>Draft too slow: <span class="arithmatex">\(\frac{T_\text{draft}}{\tau}\)</span> eat the gain.</p>
-</li>
-<li>
-<p>Already compute-saturated serving: verification is near-linear; little headroom remains.</p>
-</li>
-<li>
-<p>Implementation overhead: rejection bookkeeping, synchronization, KV handling, and sampling logic can erase theoretical wins if not engineered tightly.</p>
-</li>
+<li>接受率低：<span class="arithmatex">\(\tau\)</span> 小，摊销不足。</li>
+<li>draft 太慢：<span class="arithmatex">\(\frac{T_\text{draft}}{\tau}\)</span> 吃掉收益。</li>
+<li>服务已算力饱和：验证近线性，剩余空间很小。</li>
+<li>实现开销过高：拒绝采样记账、同步、KV 管理、采样逻辑等吞噬理论收益。</li>
 </ul>
-<p class="doc-reference-label"><strong>Reference</strong></p>
+<p class="doc-reference-label"><strong>参考文献</strong></p>
 
 <p class="doc-reference">[1] Chen J, Liang Y, Liu Z. DFlash: Block Diffusion for Flash Speculative Decoding. arXiv preprint arXiv:2602.06036, 2026.</p>
 
 <h3 id="rejection-sampler">Rejection Sampler</h3>
-<p>To sample <span class="arithmatex">\(x \sim p(x)\)</span>,  we instead sample <span class="arithmatex">\(x \sim q(x)\)</span>, keeping it if <span class="arithmatex">\(q(x) \leq p(x)\)</span>, and in case <span class="arithmatex">\(q(x) &gt; p(x)\)</span>, we reject the
-sample with probability <span class="arithmatex">\(1 - \frac{p(x)}{q(x)}\)</span> and resample <span class="arithmatex">\(x\)</span>  from an adjusted distribution <span class="arithmatex">\(p^{\prime} = \text{norm}(\max(0, p(x) - q(x)))\)</span> instead.</p>
-<p><strong>NOTE:</strong> For for any distributions <span class="arithmatex">\(p(x)\)</span> and <span class="arithmatex">\(q(x)\)</span>, the tokens sampled via rejection sampling from <span class="arithmatex">\(p(x)\)</span> and <span class="arithmatex">\(q(x)\)</span> are distributed identically to those sampled from <span class="arithmatex">\(p(x)\)</span> alone. The proof is in Appendix A [1].</p>
-<p>Rejection sampling works by decomposing the target distribution <span class="arithmatex">\(p(x)\)</span> into two parts:</p>
+<p>若目标是采样 <span class="arithmatex">\(x \sim p(x)\)</span>，可先从提议分布 <span class="arithmatex">\(q(x)\)</span> 采样：当 <span class="arithmatex">\(q(x) \leq p(x)\)</span> 时接受；当 <span class="arithmatex">\(q(x) &gt; p(x)\)</span> 时，以概率 <span class="arithmatex">\(1 - \frac{p(x)}{q(x)}\)</span> 拒绝，并改为从调整分布 <span class="arithmatex">\(p^{\prime} = \text{norm}(\max(0, p(x) - q(x)))\)</span> 重新采样。</p>
+<p><strong>说明：</strong> 对任意分布 <span class="arithmatex">\(p(x)\)</span> 与 <span class="arithmatex">\(q(x)\)</span>，基于拒绝采样流程得到的 token 分布与直接从 <span class="arithmatex">\(p(x)\)</span> 采样一致（证明见附录 A [1]）。</p>
+<p>拒绝采样可看成将目标分布 <span class="arithmatex">\(p(x)\)</span> 拆成两部分：</p>
 <ul>
-<li>The accept branch, where tokens are accepted based on the ratio <span class="arithmatex">\(\frac{p(x)}{q(x)}\)</span>, where <span class="arithmatex">\(q(x)\)</span> is the proposal (draft) distribution.</li>
+<li>接受分支：按 <span class="arithmatex">\(\frac{p(x)}{q(x)}\)</span> 比率接受（<span class="arithmatex">\(q(x)\)</span> 为草稿分布）。</li>
 </ul>
 <div class="arithmatex">\[
   p(\text{accepted}, x = x^{\prime}) = q(x^{\prime}) \cdot \min\left(\frac{p(x^{\prime})}{q(x^{\prime})}, 1\right) = \min(p(x^{\prime}), q(x^{\prime}))
 \]</div>
 <ul>
-<li>The reject branch, where tokens are rejected and resampled from the adjusted distribution <span class="arithmatex">\(p^{\prime}(x)\)</span>. The probability of all tokens being sampled from <span class="arithmatex">\(q(x)\)</span> being rejected as:</li>
+<li>拒绝分支：被拒绝后从调整分布 <span class="arithmatex">\(p^{\prime}(x)\)</span> 重采样。所有从 <span class="arithmatex">\(q(x)\)</span> 采样 token 被拒绝的概率：</li>
 </ul>
 <div class="arithmatex">\[
 \begin{aligned}
@@ -1360,10 +1352,10 @@ sample with probability <span class="arithmatex">\(1 - \frac{p(x)}{q(x)}\)</span
     &amp;= \sum_{x} \max(0, q(x) - p(x)) \\
 \end{aligned}
 \]</div>
-<p><strong>Example Code</strong></p>
-<p>Code snippet from <a href="https://github.com/vllm-project/vllm/blob/main/vllm/v1/sample/rejection_sampler.py">vLLM</a>.</p>
+<p><strong>示例代码</strong></p>
+<p>代码来自 <a href="https://github.com/vllm-project/vllm/blob/main/vllm/v1/sample/rejection_sampler.py">vLLM</a>。</p>
 <details>
-<summary>Rejection sampling kernel in Triton</summary>
+<summary>Triton 中的拒绝采样 kernel</summary>
 
 <div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># NOTE(woosuk): Avoid specialization to prevent unnecessary recompilation.</span>
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="nd">@triton</span><span class="o">.</span><span class="n">jit</span><span class="p">(</span><span class="n">do_not_specialize</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;max_spec_len&quot;</span><span class="p">])</span>
@@ -1430,7 +1422,7 @@ sample with probability <span class="arithmatex">\(1 - \frac{p(x)}{q(x)}\)</span
 </details>
 
 <details>
-<summary>Resample kernel in Triton</summary>
+<summary>Triton 中的重采样 kernel</summary>
 
 
 <div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nd">@triton</span><span class="o">.</span><span class="n">jit</span>
@@ -1488,23 +1480,23 @@ sample with probability <span class="arithmatex">\(1 - \frac{p(x)}{q(x)}\)</span
 </span></code></pre></div>
 </details>
 
-<p><strong>Reference</strong></p>
+<p><strong>参考文献</strong></p>
 <p><a href="https://arxiv.org/pdf/2211.17192">[1]</a> Y Leviathan, M Kalman, Y Matias, "Fast Inference from Transformers via Speculative Decoding", ICML 2023.</p>
-<h2 id="pre-training-objective-of-llms">Pre-training Objective of LLMs</h2>
-<p>A large language model trained from scratch is optimized using maximum likelihood estimation (MLE) over a large text corpus.</p>
-<p>Given a sequence of tokens <span class="arithmatex">\((t_1, t_2, \ldots, t_n)\)</span> sampled from the data distribution <span class="arithmatex">\(p_\text{data}\)</span> the model defines an autoregressive factorization:</p>
+<h2 id="llm">LLM 的预训练目标</h2>
+<p>从零训练的大语言模型通常通过最大似然估计（MLE）在大规模语料上进行优化。</p>
+<p>给定从数据分布 <span class="arithmatex">\(p_\text{data}\)</span> 采样得到的 token 序列 <span class="arithmatex">\((t_1, t_2, \ldots, t_n)\)</span>，模型定义如下自回归分解：</p>
 <div class="arithmatex">\[
 p_\theta(t_1, t_2, \ldots, t_n) = \prod_{i=1}^n p_\theta(t_i | t_1, t_2, \ldots, t_{i-1})
 \]</div>
-<p>The training objective is to maximize the log-likelihood of the data, which is equivalent to minimizing the negative log-likelihood (NLL):</p>
+<p>训练目标是最大化数据对数似然，等价于最小化负对数似然（NLL）：</p>
 <div class="arithmatex">\[
 \mathcal{L}(\theta) = - \mathbb{E}_{(t_1, t_2, \ldots, t_i) \sim p_\text{data}} \left[ \log p_\theta(t_i | t_1, t_2, \ldots, t_{i-1}) \right]
 \]</div>
-<p>In practice, this loss is implemented as token-level cross-entropy with one-hot targets:</p>
+<p>在实践中，通常实现为 token 级 one-hot 交叉熵：</p>
 <div class="arithmatex">\[
 \mathcal{L} = -\frac{1}{N} \sum_{\text{tokens}} \log p_\theta(t_i | t_1, t_2, \ldots, t_{i-1})
 \]</div>
-<p>This objective corresponds to minimizing the cross-entropy between the empirical data distribution and the model distribution. or equivalently, minimizing <span class="arithmatex">\(KL(p_\text{data} || p_\theta)\)</span>.</p>
+<p>该目标等价于最小化经验数据分布与模型分布之间的交叉熵；也可视作最小化 <span class="arithmatex">\(KL(p_\text{data} || p_\theta)\)</span>。</p>
 
 
 
@@ -1553,12 +1545,12 @@ p_\theta(t_1, t_2, \ldots, t_n) = \prod_{i=1}^n p_\theta(t_i | t_1, t_2, \ldots,
     
     
       
-      <script id="__config" type="application/json">{"base": "../..", "features": [], "search": "../../assets/javascripts/workers/search.973d3a69.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"base": "../../..", "features": [], "search": "../../../assets/javascripts/workers/search.973d3a69.min.js", "tags": null, "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}, "version": null}</script>
     
     
-      <script src="../../assets/javascripts/bundle.f55a23d4.min.js"></script>
+      <script src="../../../assets/javascripts/bundle.f55a23d4.min.js"></script>
       
-        <script src="../../javascripts/mathjax.js"></script>
+        <script src="../../../javascripts/mathjax.js"></script>
       
         <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
       
