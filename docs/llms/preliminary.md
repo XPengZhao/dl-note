@@ -171,6 +171,30 @@ $$
 - **K/V heads < Q heads**.
 - **LLaMA 2 70B**, **Mixtral**, **GPT-J-6B**, etc. use GQA for better memory efficiency.
 
+## Parallelism
+
+### Data Parallelism (DP)
+
+Data Parallelism (DP) is the most conventional and intuitive form of distributed execution in machine learning systems. Its central idea is simple: the same model is instantiated on multiple devices, while the input workload is partitioned across those instances. Each worker executes an identical computation graph on a different subset of data. In this sense, it changes only the mapping of computation to hardware.
+
+Because the parameters are duplicated rather than partitioned, DP does not reduce the memory footprint on any individual device. This property defines its practical scope: DP is effective when the model already fits within the memory budget of a single GPU, but it is insufficient when the model itself exceeds per-device capacity. Its primary value therefore lies in scaling throughput and serving concurrency through replication.
+
+In training, DP is commonly used to increase effective batch size and improve hardware utilization. Each worker processes a shard of the mini-batch, computes local gradients, and then participates in synchronization so that all model copies remain numerically consistent after the optimization step. In inference, the same replication principle still applies, but without gradient exchange. Instead, each worker handles an independent subset of requests or token batches. Under inference workloads, DP should therefore be understood mainly as a mechanism for traffic distribution rather than model partitioning.
+
+In hybrid deployments, DP often coexists with Tensor Parallelism (TP) and Expert Parallelism (EP). Under such configurations, a “DP replica” should not be interpreted too literally as a single GPU. Rather, one DP unit may itself be a multi-GPU group whose internal execution is organized by TP or EP. From this perspective, DP defines the outer structure of workload replication, while TP and EP determine how computation is carried out within each replica.
+
+#### The collective communication related to DP
+
+The communication behavior associated with DP depends fundamentally on whether the system is performing training or inference.
+
+During distributed training, each DP worker computes gradients from its local mini-batch shard. Since every worker maintains the same parameter set, these gradients must be synchronized after each step to preserve consistency across replicas. The standard collective primitive for this purpose is all-reduce over gradients. In some implementations, the same effect is realized through reduce-scatter followed by all-gather, but the objective remains unchanged: to aggregate gradient contributions from all DP ranks and produce identical parameter updates on every worker.
+
+By contrast, inference does not involve backward propagation or optimizer steps. Each DP rank serves an independent portion of the request stream, so DP itself introduces no mandatory per-layer collective communication. Under inference, it functions primarily as a scheduling and traffic-partitioning mechanism rather than a synchronization-intensive execution strategy.
+
+That said, a DP-based inference system is not entirely communication-free. The runtime still requires system-level coordination for request dispatch, load balancing, admission control, and result collection. In practice, such coordination often relies on communication patterns such as all-gather to exchange metadata, state, or scheduling information across ranks. These operations belong to the serving framework rather than the model’s numerical execution.
+
+In hybrid MoE deployments, DP usually contributes limited communication overhead during inference, while the parallel mechanisms inside each DP unit are often more communication-intensive. Tensor Parallelism typically relies on collectives such as all-reduce or all-gather within a TP group, whereas Expert Parallelism introduces token routing across devices that host different experts. Accordingly, communication analysis in a hybrid system should separate the outer DP dimension from the inner model-parallel dimensions: DP governs workload distribution, while the dominant communication cost usually comes from TP or EP.
+
 ## Sampling
 ### Temperature
 
@@ -318,6 +342,8 @@ def apply_top_k_only(
     return logits_or_prob
 ```
 </details>
+
+
 
 ## Speculvative decoding
 

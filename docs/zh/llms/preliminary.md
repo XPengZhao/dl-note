@@ -2,19 +2,19 @@
 
 ## 指标
 
-### 延迟（Latency）
+### 延迟
 
-延迟是指处理请求并生成输出 token 所需的时间。在 LLM 推理中，通常关注两个核心延迟指标：
+延迟是处理请求并生成输出 token 所需的时间。在 LLM 推理中，延迟通常通过两个主要指标来衡量：
 
 #### 首 token 时间（TTFT）
 
-TTFT（Time to First Token）表示从推理服务接收到请求，到第一个输出 token 被生成并返回给客户端的时间间隔。它衡量模型“开始响应”有多快，是流式 LLM 系统中最直接的用户感知延迟指标。形式化地：
+首 token 时间（TTFT）是指从推理服务器收到请求，到第一个输出 token 被生成并返回给客户端之间的延迟。它衡量模型开始响应的速度，是流式 LLM 系统中最核心的用户感知延迟指标。形式化定义为：
 
 $$
 \text{TTFT} = t_{\text{first token emitted}} - t_{\text{request received}}
 $$
 
-TTFT 主要覆盖 prefill 阶段（处理输入上下文）以及调度与系统开销，不包含后续 token 的生成时间。通常可分解为：
+TTFT 主要反映 prefill 阶段（处理输入上下文）以及调度和系统开销。它不包含生成其余输出 token 所需的时间。更细致地，TTFT 可分解为：
 
 $$
 \small
@@ -25,29 +25,29 @@ $$
 
 其中：
 
-- $t_{\text{queue}}$：请求进入执行前在调度器中的排队时间。
-- $t_{\text{input processing}}$：输入处理开销，包括分词、多模态预处理（如图像/视频编码）和请求规范化。
-- $t_{\text{prefill compute}}$：对全部输入 token 做前向计算的时间（序列长度 $L$ 下复杂度约为 $O(L)$），同时建立 KV cache，并得到提示词末位置的 logits。
-- $t_{\text{first decode step (optional)}}$：某些实现将 prefill 和 decode 调度分离时，首 token 可能要在下一次 decode step 才发出；优化实现中此项可与 prefill 融合，开销很小。
-- $t_{\text{framework overhead}}$：框架额外开销，如 CUDA kernel 启动、同步、内存分配、采样（softmax/top-k/top-p）以及首 token 网络传输。
+-  $t_{\text{queue}}$ 是请求在被调度器接纳执行前的排队时间。
+- $t_{\text{input processing}}$ 包括 tokenization、多模态预处理（例如图像或视频编码）以及请求级归一化或格式化。
+- $t_{\text{prefill compute}}$ 是对全部输入 token 执行前向计算所需时间（序列长度为 $L$ 时复杂度为 $O(L)$），在该过程中会填充 KV cache 并得到 prompt 末位置的 logits。
+- $t_{\text{first decode step (optional)}}$ 对应某些将 prefill 与 generation 调度分离的实现中的额外一次 decode step。在这些系统中，首个输出 token 由后续 decode pass 产生，而不是直接由 prefill logits 产生。在优化实现（vLLM 的较新版本）中，这一步可能与 prefill 融合，因此可忽略不计。
+- $t_{\text{framework overhead}}$ 表示额外成本，例如 CUDA kernel 启动、同步、内存分配、采样（softmax 与 top-k/top-p）以及首个流式 token 的网络传输。
 
-在长上下文场景下，TTFT 往往由 $t_{\text{prefill compute}}$ 主导，其余项通常是次要开销。
+在长上下文输入下，TTFT 通常由 $t_{\text{prefill compute}}$ 主导，其余项贡献相对较小。
 
 #### 每输出 token 时间（TPOT）
 
-TPOT（Time per Output Token）衡量首 token 发出后，平均每个后续 token 的生成延迟。它表征自回归解码的稳态性能，并直接决定流式输出速度。对生成 $N$ 个输出 token 的请求：
+每输出 token 时间（TPOT）衡量在首 token 发出之后，平均生成每个 token 所需的延迟。它刻画自回归模型的稳态 decode 性能，并直接决定流式输出速度。形式化地，对于生成 $N$ 个输出 token 的请求：
 
 $$
 \text{TPOT} = \frac{t_\text{last token emitted} - t_\text{first token emitted}}{N - 1}
 $$
 
-等价地，若总端到端时延为 $T_{\text{total}}$：
+等价地，若端到端总延迟为 $T_{\text{total}}$，
 
 $$
 \text{TPOT} = \frac{T_{\text{total}} - \text{TTFT}}{N - 1}
 $$
 
-在稳态 decode 中，每个 token 的时间可写为：
+在稳态解码中，每个输出 token 需要：
 
 $$
 \text{TPOT} = t_{\text{decode compute}} + t_{\text{communication}} + t_{\text{scheduling}} + t_{\text{framework overhead}}
@@ -55,60 +55,61 @@ $$
 
 其中：
 
-- $t_{\text{decode compute}}$：利用 KV cache 的单 token 前向计算。
-- $t_{\text{communication}}$：跨卡通信与数据交换（如 TP all-reduce/all-gather，MoE all-to-all，以及 H2D/D2H 传输）。
-- $t_{\text{scheduling}}$：运行时调度开销（连续 batching、请求协调、准入控制、KV 分配/分页/管理）。
-- $t_{\text{framework overhead}}$：采样、kernel 启动、同步、I/O 封送、后处理和 token streaming 等辅助开销。
+- $t_{\text{decode compute}}$ 是使用 KV cache 对单个 token 执行前向计算的时间（每步在序列长度维度上的复杂度为 $O(1+\text{num speculative tokens})$，但与模型规模成正比）。
+- $t_{\text{communication}}$ 表示跨 GPU 同步与数据交换成本，例如 tensor parallel 的集合通信（all-reduce、all-gather）、MoE 模型中的 expert 路由与聚合（all-to-all、dispatch/combine），以及由调度或内存管理触发的主机-设备内存传输（H2D/D2H）。
+- $t_{\text{scheduling}}$ 包括运行时调度开销，例如 continuous batching、请求协调、准入控制，以及 KV cache 分配、分页或内存管理。
+- $t_{\text{framework overhead}}$ 包括辅助执行成本，例如采样（softmax、top-k/top-p）、kernel 启动、同步、输入输出编组、结果后处理以及 token 流式传输。
 
-与 TTFT 不同，TPOT 不需重算完整 prompt；但由于 decode 仍要对全部缓存上下文做注意力计算，其成本仍受有效上下文长度影响，通常随总上下文（提示词 + 已生成）近似线性增长。
+与 TTFT 不同，TPOT 不需要对完整 prompt 重新计算。但它仍取决于有效上下文长度，因为每步 decode 都需要对全部已缓存 token 执行 attention。因此 TPOT 通常随总上下文长度（prompt + 已生成 token）近似线性增长，不过其单 token 成本显著小于 prefill。
 
-### 吞吐（Throughput）
+### 吞吐
 
 #### 每秒 token 数（TPS）
 
-TPS（Tokens per Second）衡量系统在给定服务配置下每秒处理/生成 token 的能力。与 TTFT、TPOT 这种请求级指标不同，TPS 是系统级指标，反映整体承载能力。在时间窗口 $\Delta t$ 内：
+每秒 token 数（TPS）用于衡量 LLM 推理系统的吞吐，即在给定服务配置下每秒可处理或生成多少 token。与 TTFT 和 TPOT 这类在请求级定义的延迟指标不同，TPS 是系统级指标，反映负载下的整体服务能力。在时间区间 $\Delta t$ 内，TPS 可表示为：
 
 $$
 \text{TPS} = \frac{N_\text{tokens}}{\Delta t}
 $$
 
-很多场景下 TPS 特指 decode 吞吐（只统计输出 token）：
+很多情况下，TPS 特指 decode 吞吐，即只统计生成的输出 token：
 
 $$
 \text{TPS}_\text{decode} = \frac{N_\text{output tokens}}{\Delta t}
 $$
 
-对单序列顺序 decode，通常有：
+对于单序列顺序解码，它大致是 TPOT 的倒数：
 
 $$
 \text{TPS}_\text{per request} \approx \frac{1}{\text{TPOT}}
 $$
 
-在连续 batching 并发场景中，系统吞吐会随有效 batch 大小 $B$ 增长。单副本近似为：
+但在具有 continuous batching 和并发解码的实际服务系统中，总吞吐会随有效 batch 大小 $B$ 扩展。对于单个副本，系统吞吐可近似为
 
 $$
 \text{TPS}_\text{replica} \approx \frac{B}{\text{TPOT}}
 $$
 
-若有 $R$ 个数据并行（DP）副本：
+若有 $R$ 个数据并行（DP）副本，
 
 $$
 \text{TPS}_\text{total} \approx R \times \frac{B}{\text{TPOT}}
 $$
 
-对于长上下文或多模态任务，prompt 处理可能占据可观算力，此时应关注端到端吞吐：
+需要注意的是，对于长上下文或多模态负载，prompt 处理可能占据总计算的很大比例。在这种情况下，通常需要考虑端到端吞吐，它同时计入 prompt 与输出 token：
 
 $$
 \text{TPS}_\text{end-to-end} = \frac{N_\text{prompt tokens} + N_\text{output tokens}}{\Delta t}
 $$
 
-总体上，TPS 受模型规模、并行策略、有效 batch、大核效率、互联带宽以及 prefill/decode 负载比例共同影响。
+总体而言，TPS 受模型规模、并行策略、有效 batch 大小、kernel 效率、互联带宽，以及 prefill 与 decode 负载相对占比的影响。
+
 
 ## KV Cache
 
-### 显存开销
+### 内存开销
 
-KV cache 大小计算公式：
+KV cache 大小计算为：
 
 $$
 \text{KV size} = 2 \times \text{num layers} \times \text{num heads} \times \text{seq len} \times \text{head dim}
@@ -117,12 +118,12 @@ $$
 假设：
 
 - 32 层、80 个头、head_dim = 128、seq_len = 4K。
-- FP16 KV cache：2 × 32 × 80 × 4K × 128 × 2 bytes = **约 5.2 GB/样本**。
-- C8（int8 KV cache）：约为一半，即 **约 2.6 GB/样本**。
+- FP16 KV cache：2 × 32 × 80 × 4K × 128 × 2 bytes = **约 5.2 GB** 每样本。
+- C8（int8 KV cache）：**约减半，即约 2.6 GB** 每样本。
 
-## 注意力
+## Attention
 
-在 Transformer 中，注意力模块计算：
+在 transformer 模型中，attention 模块计算：
 
 $$
 \operatorname{Attention}(Q, K, V)=\operatorname{softmax}\left(\frac{Q K^T}{\sqrt{d_k}}\right) V
@@ -130,65 +131,87 @@ $$
 
 每个 token 会产生：
 
-- **Q（Query）**：来自当前 token 的隐状态。
-- **K（Key）**、**V（Value）**：来自上下文（历史 token），并存入 **KV cache**。
+- **Q（Query）** - 来自当前 token 的隐藏状态
+- **K（Key）**、**V（Value）** - 来自上下文（此前 token）并存储在 **KV cache** 中
 
-**MHA、MQA、GQA** 的主要区别是：相对于 Query 头数，Key/Value 投影是如何共享的。
+**MHA**、**MQA** 和 **GQA** 的区别在于：相对于 Query 头数，使用了多少组 Key/Value 投影。
 
-### **MHA — 多头注意力**
+### **MHA — Multi-Head Attention**
 
-每个注意力头都有独立投影：
+每个 attention 头都有各自独立的投影：
 
 $$
 Q_i=X W_{Q, i}, \quad K_i=X W_{K, i}, \quad V_i=X W_{V, i}
 $$
 
-- Q 头数 = K 头数 = V 头数。
+- Q 头数 = K 头数 = V 头数
 
-### **MQA — 多查询注意力**
+### **MQA — Multi-Query Attention**
 
-所有头共享同一组 K、V 投影：
+所有头 **共享一组** K 和 V 投影：
 
 $$
 K_{\text {shared }}=X W_K, \quad V_{\text {shared }}=X W_V
 $$
 
-- Q 头可以很多，但只有一组共享 K/V。
-- 推理时各头复用同一 K/V。
-- KV cache 显存约可按头数倍数下降。
-- **LLaMA 2 7B**、**Mistral** 等模型常用 MQA 以降低内存开销。
+- **多个 Q 头**，但 **只有一对共享 K/V**。
+- 推理时，所有头复用相同的 K/V。
+- KV cache 大小可减少约 #heads 倍。
+- **LLaMA 2 7B**、**Mistral** 及多数优化后的 LLM 使用 MQA 以降低内存占用。
 
-### **GQA — 分组查询注意力**
+### **GQA — Grouped-Query Attention**
 
-将 Query 头分组，每组共享一组 K/V：
+Query 被分组，每组共享各自的 K/V：
 
 $$
 \text { Group } g: \quad Q_{g, *}, K_g, V_g
 $$
 
-- 例如 8 个 Q 头、2 组时，每组 4 个 Q 头共享一组 K/V。
+- 例如有 8 个 query 头但只有 2 组，则每组 4 个 Q 头共享一组 K/V。
 - **K/V 头数 < Q 头数**。
-- **LLaMA 2 70B**、**Mixtral**、**GPT-J-6B** 等常用 GQA，在效果与效率间折中。
+- **LLaMA 2 70B**、**Mixtral**、**GPT-J-6B** 等使用 GQA 以提升内存效率。
 
-## 采样
+## Parallelism
 
-### 温度（Temperature）
+### Data Parallelism（DP）
 
-温度 $T$ 控制概率分布的“尖锐程度”。给定 logits $z_i$，温度采样先缩放再 softmax：
+Data Parallelism（DP）是机器学习系统中最传统、也最直观的分布式执行形式。它的核心思想很简单：在多个设备上实例化同一个模型，同时将输入工作负载分片到这些实例上。每个 worker 在不同的数据子集上执行相同的计算图。从这个意义上讲，它只改变了计算到硬件的映射方式。
+
+由于参数是复制而不是切分，DP 不会降低单个设备上的内存占用。这一特性界定了它的实际适用范围：当模型本身已经可以放入单卡显存时，DP 很有效；但如果模型本身超过单设备容量，DP 就不够用。因此，它的主要价值在于通过副本扩展吞吐和服务并发。
+
+在训练中，DP 常用于增大有效 batch size 并提升硬件利用率。每个 worker 处理 mini-batch 的一个分片，计算本地梯度，然后参与同步，使所有模型副本在优化步之后保持数值一致。在推理中，同样适用这种副本机制，但不再有梯度交换。取而代之的是，每个 worker 处理独立的请求子集或 token batch。因此在推理负载下，DP 应主要被理解为一种流量分发机制，而不是模型切分机制。
+
+在混合部署中，DP 往往与 Tensor Parallelism（TP）和 Expert Parallelism（EP）并存。在这种配置下，“DP replica” 不应被字面地理解为单张 GPU。一个 DP 单元本身可能是一个多 GPU 组，其内部执行由 TP 或 EP 组织。从这个视角看，DP 定义的是工作负载复制的外层结构，而 TP 与 EP 决定每个副本内部如何执行计算。
+
+#### 与 DP 相关的集合通信
+
+与 DP 相关的通信行为，本质上取决于系统是在训练还是推理。
+
+在分布式训练中，每个 DP worker 基于本地 mini-batch 分片计算梯度。由于每个 worker 都维护同一套参数，这些梯度必须在每个 step 后同步，以保证副本间一致性。用于这一目的的标准集合通信原语是对梯度执行 all-reduce。在一些实现中，也会用 reduce-scatter 后接 all-gather 来实现同样效果，但目标不变：聚合所有 DP rank 的梯度贡献，并在每个 worker 上得到一致的参数更新。
+
+相比之下，推理不涉及反向传播或优化器 step。每个 DP rank 服务于独立的一部分请求流，因此 DP 本身不会引入强制性的逐层集合通信。在推理场景下，它主要充当调度与流量切分机制，而不是同步密集型执行策略。
+
+即便如此，基于 DP 的推理系统也并非完全无通信。运行时仍需要系统级协调，例如请求分发、负载均衡、准入控制与结果收集。实践中，这类协调常依赖 all-gather 等通信模式，在各 rank 间交换元数据、状态或调度信息。这些操作属于服务框架层，而非模型数值执行本身。
+
+在混合 MoE 部署中，DP 在推理阶段通常只引入有限通信开销，而每个 DP 单元内部的并行机制往往更“重通信”。Tensor Parallelism 通常依赖 TP 组内的 all-reduce 或 all-gather 等集合通信，而 Expert Parallelism 会引入跨设备的 token 路由以访问不同专家。因此，分析混合系统中的通信时，应区分外层 DP 维度与内层模型并行维度：DP 负责工作负载分发，而主导通信成本的通常是 TP 或 EP。
+
+## Sampling
+### Temperature
+
+温度 $T$ 控制概率分布的“尖锐度”。给定模型 logits $z_i$，温度采样会在 softmax 前对其重缩放：
 
 $$
 p_i=\frac{e^{z_i / T}}{\sum_j e^{z_j / T}}
 $$
 
-- $T<1$：分布更尖锐，输出更确定、随机性更低。
-- $T>1$：分布更平坦，探索性更强、多样性更高。
-- 温度是保序变换（不会改变 logits 排序）。若 top-k = 1（贪心），温度不会产生实际影响。
-- 当 $T \rightarrow 0$ 时，分布趋近 argmax（贪心）。
-- 当 $T \rightarrow \infty$ 时，分布趋近均匀。
+- $T<1$ 时更尖锐（峰值更高），模型更“自信”、随机性更低；$T>1$ 时更平坦（更均匀），模型更具探索性、多样性更高。
+- 温度会保持 logits 的顺序，因为除以正数不会改变排序（保序）。如果使用 top-k = 1（即 greedy），温度完全不起作用。
+- 当温度 $T \rightarrow 0$ 时，softmax 分布会变得任意尖锐并收敛到 greedy（argmax）采样。例如在 $T=10^{-6}$ 时，最高 logit 会主导分布，因此在实践中几乎等价于 greedy。
+- 当 $T \rightarrow \infty$ 时，分布会趋于均匀（所有 token 概率相同）。
 
 ### Top-k Sampling
 
-在温度处理后按概率排序，仅保留前 k 个 token，并重归一化得到采样分布：
+在计算概率（温度处理后）后，按概率排序，仅保留概率最高的 k 个 token。然后对 $p_i^{\prime}$ 归一化得到最终采样分布。
 
 $$
 \begin{aligned}
@@ -198,14 +221,14 @@ p_i^{\prime} & = \begin{cases}\frac{p_i}{\sum_{j \in S_k} p_j} & i \in S_k \\
 \end{aligned}
 $$
 
-再从截断后的分布中采样。
+然后从该截断分布中采样。
 
-- 小 k（如 1–10）：更稳定、更保守。
-- 大 k（如 50–100）：更有多样性，但偏题风险更高。
+- 小 k（例如 1-10）：更确定、更安全（模型几乎不会选择罕见词）。
+- 大 k（例如 50-100）：更有变化，但选出离题词的风险更高。
 
-### Top-p（Nucleus）Sampling
+### Top-p（nucleus）Sampling
 
-“nucleus”指概率质量的核心集合。不同于固定 k，top-p 选择“累计概率达到阈值 $p$ 的最小 token 集合”。
+“nucleus” 的字面含义是核心、中心或本质核心部分。与固定 k 不同，我们选择累计概率 $\geq p$ 的最小 token 集合。
 
 $$
 \begin{aligned}
@@ -217,40 +240,38 @@ $$
 
 **与 top-k 的关键区别：**
 
-top-k 是按排名截断，top-p 是按概率质量截断，因此能自适应模型不确定性。
+Top-p 会随不确定性自适应。Top-k 看的是排名（前 k 个），Top-p 看的是概率质量（分布核心质量）。
 
-- 当模型很确定（头部 token 占比高）时，保留 token 很少。
-- 当模型不确定（概率较分散）时，集合会自动扩大。
+- 如果模型很确定（一个 token 占主导），保留的 token 会很少。
+- 如果模型不确定（很多 token 概率接近），nucleus 集合会扩大。
 
 ### Min-p
 
-Min-p 按相对 top-1 的最小概率阈值过滤 token（近年较常见，如 Mistral、Gemini 等）。其规则不是固定 $k$ 或累计概率 $p$，而是保留所有满足：
+Min-p 会过滤掉相对 top-1 来说“过于不可能”的 token。这是较新的方法，但越来越流行（Mistral、Gemini 等在用）。它不固定 $k$ 或 $p$，而是保留相对 top-1 token 超过最小概率阈值的 token：
 
 $$
 S_{\min }=\left\{i: p_i \geq \min -\mathrm{p} \times p_{\max }\right\}
 $$
 
-若 min-p = 0.1，则保留概率至少为 top-1 概率 10% 的 token。之后再归一化：
+如果 min-p = 0.1，则任何概率至少达到最可能 token 的 10% 的 token 都会被保留。随后归一化：
 
 $$
 p_i^{\prime} = \frac{p_i}{\sum_{j \in S_{\min}} p_j}
 $$
 
-- 与 top-p 一样可自适应上下文，但规则更直接。
-- 在分布较平坦时，不容易错误截断低排名但合理的 token。
-- 对长尾词表通常更稳定。
+- Min-p 与 top-p 一样会随上下文自适应，但更简单。它意味着候选 token 数量会随模型当前预测而变化。模型越确定，候选集越小；模型越不确定，候选集越大。
+- 在分布较平坦时，可避免过早截断一些看起来排名低但仍合理的 token。
+- 对长尾词表通常有更好的数值稳定性。
 
-### 组合使用顺序
+### 组合使用
 
-实际中常按以下顺序组合：
+通常按以下顺序组合使用：Temperature → Softmax → (top-k / top-p / min-p) → Renormalize → Sample
 
-Temperature → Softmax → (top-k / top-p / min-p) → Renormalize → Sample
-
-当 top-k 与 top-p 同时开启时，最终候选集是两者交集（更小的集合）。
+当 top-k 和 top-p 同时启用时，最终保留的是二者交集，也就是更小的那个集合。
 
 ### 示例代码
 
-代码来自 [Omniinfer Sampler](https://gitee.com/omniai/omniinfer/blob/master/omni/adaptors/vllm/sample/sampler.py)。
+代码片段来自 [Omniinfer Sampler](https://gitee.com/omniai/omniinfer/blob/master/omni/adaptors/vllm/sample/sampler.py)。
 
 <details>
 <summary>Top-k 和 Top-p 实现</summary>
@@ -323,17 +344,19 @@ def apply_top_k_only(
 ```
 </details>
 
-## Speculative Decoding
 
-### Speculative Decoding 的加速机理
 
-Speculative decoding 使用较小的草稿模型 $M_d$ 来加速目标模型 $M_t$ 的推理。每个解码周期中，草稿模型先提出 $\gamma$ 个 token，再由目标模型并行验证。平均每 token 延迟可写为：
+## Speculvative decoding
+
+### Speculative Decoding 加速
+
+Speculative decoding 通过更小的草稿模型 $M_d$ 来加速目标模型 $M_t$ 的推理。每个解码周期中，草稿模型先提出 $\gamma$ 个 token，再由目标模型并行验证。平均每 token 延迟为：
 
 $$
 L = \frac{T_{\text{draft}} + T_{\text{target}}}{\tau}.
 $$
 
-其中 $T_{\text{draft}}$ 是草稿生成开销，$T_{\text{target}}$ 是验证开销，$\tau \in [1, \gamma + 1]$ 是每周期期望接受长度（含 bonus token）。设 $L_\text{target}$ 为目标模型自回归单 token 延迟，则速度提升为：
+其中，$T_{\text{draft}}$ 是生成草稿 token 的时间，$T_{\text{target}}$ 是验证开销，$\tau \in [1, \gamma + 1]$ 是每周期期望接受的 token 数（包含目标模型产生的 bonus token）。令 $L_\text{target}$ 表示 $M_t$ 自回归逐 token 延迟，则速度提升为：
 
 $$
 \eta = \frac{L_\text{target}}{L}.
@@ -341,66 +364,76 @@ $$
 
 #### 加速来自哪里？
 
-对目标侧验证时间可使用一个简洁模型：
+对于 speculative decoding 的目标侧验证，可用一个紧凑且直观的模型表示：
 
 $$
 T_{\text {target }}(n) \approx \alpha_t(n)+n \cdot \bar{\beta}_t(n),
 $$
 
-其中 $n= B(\gamma + 1)$ 为 batch $B$ 下并行验证 token 总数，$\bar{\beta}_t(n)$ 为在宽度 $n$ 下的等效单 token 验证成本。$\alpha_t(n)$ 聚合了弱依赖 $n$ 的调用级固定开销（kernel 启动、同步、框架调度、attention metadata/paged-attention 索引构建、分布式/MoE 的 collective 启动等）。$n \cdot \bar{\beta}_t(n)$ 对应近似线性增长的工作量（QKV/MLP GEMM、attention、KV 读写、逐元素算子等）。
+其中 $n= B(\gamma + 1)$ 表示在服务 batch $B$ 中并行验证的 token 总数，$\bar{\beta}_t(n)$ 是宽度为 $n$ 时的有效逐 token 验证成本（秒/token）。在这个分解里，$\alpha_t(n)$ 聚合了在中等范围内对 $n$ 弱依赖的调用级开销，包括 kernel 启动与同步延迟、框架分发/图调度开销、每次调用的记账成本（如 attention metadata 构建与 paged-attention 索引设置），以及分布式或 MoE 场景下的 collective 启动/同步。项 $n \cdot \bar{\beta}_t(n)$ 则聚合了与处理 token 数近似成比例增长的工作：QKV/MLP GEMM、attention 计算、KV-cache 读写与逐元素操作。对 MoE 而言，dispatch/gather 的载荷搬运主要计入线性项，而 collective 启动更自然地归于开销项。
 
-关键点是：$\bar{\beta}_t(n)$ 并非常数。随着 $n$ 从低利用区增大，GEMM 形状更友好、占用率和 cache 复用提升，通常会降低单位 token 成本；直到接近硬件上限后趋于平坦。
+关键是，$\bar{\beta}_t(n)$ 不是常数：当 $n$ 从低填充区增大时，GEMM 形状更友好、occupancy 提高、cache 复用改善，从而提高有效算术强度与利用率，并降低 $\bar{\beta}_t(n)$。这种下降通常会持续到接近硬件上限（受 KV/cache 流量带宽或 tensor-core 算力限制）后趋于平坦，此时 $\bar{\beta}_t(n)$ 接近由设备决定的下限，总时间也会近似线性随 $n$ 增长。
 
-在固定 $\gamma$ 与固定期望接受长度 $\tau$ 下，目标侧对“每个已接受 token 延迟”的贡献近似：
+在固定 $\gamma$ 和固定期望接受长度 $\tau$ 下，目标侧对每个“已接受 token 延迟”的贡献为：
 
 $$
 \frac{T_{\text {target }}(n)}{\tau} \approx \frac{\alpha_t(n)}{\tau} + \frac{n}{\tau} \bar{\beta}_t(n).
 $$
 
-可获得加速的直观条件（先忽略 draft 成本）是：
+加速的关键直觉是：在低 batch/低填充区，验证过程可让 $\bar{\beta}_t(n)$ 显著小于目标模型基线自回归逐 token 成本，同时 $\alpha_t(n)$ 会被 $\tau$ 摊销。一个获益条件是（暂时忽略 draft 成本）：
 
 $$
 \frac{T_{\text {target }}(n)}{\tau} < L_\text{target}(B).
 $$
 
-令 $p = \tau / (\gamma + 1)$ 表示提议 token 的期望接受率，一个关键因子是：
+令 $p = \tau / (\gamma + 1)$ 表示每个提议 token 的期望接受率。决定加速效果的主导因子之一是：
 
 $$
 \frac{\bar{\beta}_t(n)}{p}  < \bar{\beta}_t(B).
 $$
 
-$\scriptstyle\blacksquare$ **它改变了目标模型工作的粒度。** 自回归解码每次只处理 1 个 token，形成大量串行小步，常受内存访问/启动时延限制。Speculative decoding 将多个小步验证合并为更少但更宽的验证步，从而提升利用率。
 
-$\scriptstyle\blacksquare$ **验证开销随 $\gamma$ 的增长常呈次线性。** 如果验证 $\gamma$ 个 token 的成本严格等于 $(\gamma+1)\cdot L_\text{target}$，则不会加速。现实中由于固定开销摊销、算术强度提升、占用率与 cache 命中改善，验证成本通常低于线性外推。
+$\scriptstyle\blacksquare$ **它改变了目标模型工作的粒度。** 在自回归解码中，目标模型每生成一个 token 都执行一次前向，形成一长串严格串行的小步。对 GPU 而言，单 token decode 往往受内存/时延主导：每步相对于访问的状态量（KV cache 读写、小 kernel、同步与启动开销）来说计算量有限。因此在 batch-1 或低并发服务中，硬件利用率通常较差。即使模型理论 FLOPs 很高，实际逐 token 吞吐也可能受内存带宽和启动延迟而非算力上限约束。
 
-#### 为什么大 batch 下加速会变小，甚至为负？
+Speculative decoding 改变了目标计算形态。目标模型不再把每步开销支付 $(\gamma+1)$ 次，而是每周期支付一次来验证 $\gamma$ 个提议 token。Speculative decoding 将大量细碎、时延主导的目标步，转成更少但更宽的验证步。
 
-在 batch=1 或低并发时，基线自回归 decode 利用率低，speculative 仍有较大优化空间。随着 batch 增大，基线本身变“更宽更高效”，speculative 能额外榨取的次线性收益减少。若系统已接近计算饱和，验证时间会更接近线性，同时又增加了 draft 与控制流开销，可能导致负收益。常见失败场景：
+$\scriptstyle\blacksquare$ **验证成本随 $\gamma$ 的增长是次线性的。** 如果验证 $\gamma$ 个 token 的成本精确等于 $(\gamma + 1) \cdot L_\text{target}$，speculative decoding 就不会有帮助，因为这只是做了同样的工作再加上 draft 开销。实际中的速度提升来自 $T_\text{target}(\gamma)$ 更接近“一次稍宽的 decode”，而不是 $\gamma$ 次独立 decode。原因包括：(1) 固定开销（kernel 启动、同步）被摊销；(2) 更高的有效算术强度与硬件利用率。更宽的验证会放大 GEMM/attention kernel 规模，提升 occupancy 与 cache 复用，因此目标模型验证 pass 往往可获得更高 FLOP/byte（L2/HBM）与更高 tensor-core 效率。
 
-- 接受率低：$\tau$ 小，摊销不足。
+#### 为什么在大服务 batch 下加速会变小（甚至为负）？
+
+在 batch-1 或低并发服务下，基线自回归 decode 利用率较差，speculative verification 仍有较大优化空间。随着服务 batch 增大，基线 decode 本身已更宽、更高效，speculative decoding 能利用的次线性空间变小。当系统接近算力饱和（compute-bound）时，$T_\text{target}(\gamma)$ 会更接近对 $\gamma$ 线性增长，而 speculative decoding 可能收益很小，甚至出现负加速，因为它引入了 draft 计算与额外控制流。常见失败场景包括：
+
+- 接受率低：$\tau$ 小，摊销失败。
+
 - draft 太慢：$\frac{T_\text{draft}}{\tau}$ 吃掉收益。
-- 服务已算力饱和：验证近线性，剩余空间很小。
-- 实现开销过高：拒绝采样记账、同步、KV 管理、采样逻辑等吞噬理论收益。
 
-<p class="doc-reference-label"><strong>参考文献</strong></p>
+- 服务已算力饱和：验证近线性，可优化空间很小。
+
+- 实现开销大：拒绝记账、同步、KV 处理和采样逻辑若实现不够紧凑，会抹去理论收益。
+
+
+
+
+<p class="doc-reference-label"><strong>Reference</strong></p>
 
 <p class="doc-reference">[1] Chen J, Liang Y, Liu Z. DFlash: Block Diffusion for Flash Speculative Decoding. arXiv preprint arXiv:2602.06036, 2026.</p>
 
-### Rejection Sampler
 
-若目标是采样 $x \sim p(x)$，可先从提议分布 $q(x)$ 采样：当 $q(x) \leq p(x)$ 时接受；当 $q(x) > p(x)$ 时，以概率 $1 - \frac{p(x)}{q(x)}$ 拒绝，并改为从调整分布 $p^{\prime} = \text{norm}(\max(0, p(x) - q(x)))$ 重新采样。
+###  Rejection Sampler
 
-**说明：** 对任意分布 $p(x)$ 与 $q(x)$，基于拒绝采样流程得到的 token 分布与直接从 $p(x)$ 采样一致（证明见附录 A [1]）。
+若目标是采样 $x \sim p(x)$，可先从 $q(x)$ 采样 $x$：当 $q(x) \leq p(x)$ 时保留；当 $q(x) > p(x)$ 时，以概率 $1 - \frac{p(x)}{q(x)}$ 拒绝该样本，并改为从调整分布 $p^{\prime} = \text{norm}(\max(0, p(x) - q(x)))$ 重新采样 $x$。
 
-拒绝采样可看成将目标分布 $p(x)$ 拆成两部分：
+**NOTE:** 对任意分布 $p(x)$ 与 $q(x)$，通过 rejection sampling（基于 $p(x)$ 和 $q(x)$）得到的 token 分布，与直接从 $p(x)$ 采样得到的分布完全一致。证明见附录 A [1]。
 
-- 接受分支：按 $\frac{p(x)}{q(x)}$ 比率接受（$q(x)$ 为草稿分布）。
+Rejection sampling 的思路是将目标分布 $p(x)$ 分解为两部分：
+
+-  接受分支：基于比率 $\frac{p(x)}{q(x)}$ 接受 token，其中 $q(x)$ 是提议（draft）分布。
 
 $$
   p(\text{accepted}, x = x^{\prime}) = q(x^{\prime}) \cdot \min\left(\frac{p(x^{\prime})}{q(x^{\prime})}, 1\right) = \min(p(x^{\prime}), q(x^{\prime}))
 $$
 
-- 拒绝分支：被拒绝后从调整分布 $p^{\prime}(x)$ 重采样。所有从 $q(x)$ 采样 token 被拒绝的概率：
+- 拒绝分支：token 被拒后从调整分布 $p^{\prime}(x)$ 重采样。所有从 $q(x)$ 采样 token 被拒绝的概率为：
 
 $$
 \begin{aligned}
@@ -415,10 +448,12 @@ $$
     &= \sum_{x} \max(0, q(x) - p(x)) \\
 \end{aligned}
 $$
+
+
 
 **示例代码**
 
-代码来自 [vLLM](https://github.com/vllm-project/vllm/blob/main/vllm/v1/sample/rejection_sampler.py)。
+代码片段来自 [vLLM](https://github.com/vllm-project/vllm/blob/main/vllm/v1/sample/rejection_sampler.py)。
 
 <details>
 <summary>Triton 中的拒绝采样 kernel</summary>
@@ -549,30 +584,31 @@ def sample_recovered_tokens_kernel(
 ```
 </details>
 
-**参考文献**
+**Reference**
 
 [[1]](https://arxiv.org/pdf/2211.17192) Y Leviathan, M Kalman, Y Matias, "Fast Inference from Transformers via Speculative Decoding", ICML 2023.
 
-## LLM 的预训练目标
 
-从零训练的大语言模型通常通过最大似然估计（MLE）在大规模语料上进行优化。
+## LLM 预训练目标
 
-给定从数据分布 $p_\text{data}$ 采样得到的 token 序列 $(t_1, t_2, \ldots, t_n)$，模型定义如下自回归分解：
+从零训练的大语言模型，通常是在大规模文本语料上用最大似然估计（MLE）进行优化。
+
+给定从数据分布 $p_\text{data}$ 采样的 token 序列 $(t_1, t_2, \ldots, t_n)$，模型定义如下自回归分解：
 
 $$
 p_\theta(t_1, t_2, \ldots, t_n) = \prod_{i=1}^n p_\theta(t_i | t_1, t_2, \ldots, t_{i-1})
 $$
 
-训练目标是最大化数据对数似然，等价于最小化负对数似然（NLL）：
+训练目标是最大化数据的对数似然，这等价于最小化负对数似然（NLL）：
 
 $$
 \mathcal{L}(\theta) = - \mathbb{E}_{(t_1, t_2, \ldots, t_i) \sim p_\text{data}} \left[ \log p_\theta(t_i | t_1, t_2, \ldots, t_{i-1}) \right]
 $$
 
-在实践中，通常实现为 token 级 one-hot 交叉熵：
+在实践中，这个损失实现为以 one-hot 目标计算的 token 级交叉熵：
 
 $$
 \mathcal{L} = -\frac{1}{N} \sum_{\text{tokens}} \log p_\theta(t_i | t_1, t_2, \ldots, t_{i-1})
 $$
 
-该目标等价于最小化经验数据分布与模型分布之间的交叉熵；也可视作最小化 $KL(p_\text{data} || p_\theta)$。
+该目标对应于最小化经验数据分布与模型分布之间的交叉熵；等价地，也是在最小化 $KL(p_\text{data} || p_\theta)$。
