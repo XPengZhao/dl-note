@@ -321,6 +321,76 @@ def apply_top_k_only(
 
 ## Speculvative decoding
 
+### Speculative Decoding Speedup
+
+Speculative decoding accelerates inference of a target model $M_t$ using a smaller draft model $M_d$. In each decoding cycle, the draft model proposes $\gamma$ tokens, which are verified in parallel by the target model. The average per-token latency is:
+
+$$
+L = \frac{T_{\text{draft}} + T_{\text{target}}}{\tau}.
+$$
+
+where $T_{\text{draft}}$ is the time spent generating draft tokens, $T_{\text{target}}$ is the cost of verification, and $\tau \in [1, \gamma + 1]$ is the expected number of accepted tokens per cycle, including the bonus token produced by the target model. Let $L_\text{target}$ denote the autoregressive per-token latency of $M_t$. The resulting speedup is:
+
+$$
+\eta = \frac{L_\text{target}}{L}.
+$$
+
+#### Where does the speedup come from?
+
+A compact and intuitive model for target-side verification in speculative decoding is:
+
+$$
+T_{\text {target }}(n) \approx \alpha_t(n)+n \cdot \bar{\beta}_t(n),
+$$
+
+where $n= B(\gamma + 1)$ denotes the total number of tokens verified in parallel across the serving batch $B$, and $\bar{\beta}_t(n)$ is the effective per-token verification cost (seconds/token) achieved at width $n$. In this decomposition, $\alpha_t(n)$ collects per-call overheads that are weakly dependent on $n$ over a moderate range, including kernel launch and synchronization latency, framework dispatch/graph overhead, per-call bookkeeping (e.g., attention metadata construction and paged-attention index setup), and collective start-up/synchronization in distributed or MoE settings. The term $n \cdot \bar{\beta}_t(n)$ aggregates the work that scales approximately proportionally with the number of processed tokens: QKV/MLP GEMMs, attention computation, KV-cache reads/writes, and elementwise operations. For MoE, dispatch/gather payload movement contributes primarily to the linear term, whereas collective start-up is naturally part of the overhead term.
+
+Crucially, $\bar{\beta}_t(n)$ is not constant: as $n$ increases from an underfilled regime, GEMM shapes become more favorable, occupancy increases, and cache reuse improves, which raises effective arithmetic intensity and utilization and thereby reduces $\bar{\beta}_t(n)$. This reduction typically continues until a hardware roof is approached (bandwidth-limited by KV/cache traffic or compute-limited by tensor-core throughput), beyond which $\bar{\beta}_t(n)$ flattens near a device-determined floor and the total time becomes approximately linear in $n$.
+
+Under fixed $\gamma$ and fixed expected accepted length $\tau$, the target-side contribution to per accepted token latency is:
+
+$$
+\frac{T_{\text {target }}(n)}{\tau} \approx \frac{\alpha_t(n)}{\tau} + \frac{n}{\tau} \bar{\beta}_t(n).
+$$
+
+The key intuition for speedup is that verification can make $\bar{\beta}_t(n)$ substantially smaller than the baseline autoregressive per-token cost of the target model in the low-batch/underfilled regime, while $\alpha_t(n)$ is amortized by $\tau$. A win condition is (ignoring draft cost for the moment) is:
+
+$$
+\frac{T_{\text {target }}(n)}{\tau} < L_\text{target}(B).
+$$
+
+Let $p = \tau / (\gamma + 1)$ denote the expected acceptance rate per proposed token. A dominant factor for speedup is:
+
+$$
+\frac{\bar{\beta}_t(n)}{p}  < \bar{\beta}_t(B).
+$$
+
+
+$\scriptstyle\blacksquare$ **It changes the granularity of the target model’s work.** In autoregressive decoding, the target model runs one forward pass per generated token. That produces a long chain of strictly sequential tiny steps. On GPUs, single-token decode is often memory/latency dominated: each step performs limited math relative to the amount of state it touches (KV cache reads/writes, small kernels, synchronization, and launch overhead). As a result, hardware utilization is frequently poor in batch-1 or low-concurrency serving. Even if the model’s FLOPs are high on paper, the achieved throughput per token can be limited by memory bandwidth and launch latency rather than compute.
+
+Speculative decoding changes the shape of the target computation. Instead of paying the per-step overhead $(\gamma+1)$ times, the target model pays it once per cycle to verify $\gamma$ proposed tokens.Speculative decoding converts many tiny, latency-dominated target steps into fewer, wider verification steps.
+
+$\scriptstyle\blacksquare$ **Verification cost grows sublinearly with $\gamma$.** If verifying $\gamma$ tokens cost exactly $(\gamma + 1) \cdot L_\text{target}$, speculative decoding would never help because you would just be doing the same work plus draft overhead. The practical speedup comes from $T_\text{target}(\gamma)$ being closer to one slightly-wider decode step than $\gamma$ independent decode steps. This happens because: (1) Fixed overheads (kernel launches, synchronization) are amortized. (2) Higher effective arithmetic intensity and better hardware utilization. Wider verification increases GEMM/attention kernel sizes, improving occupancy and cache reuse, so the target’s verification pass often achieves higher FLOP/byte (at L2/HBM) and higher tensor-core efficiency than single-token decode.
+
+#### Why speedup shrinks at large serving batch (and can go negative)?
+
+In batch-1 or low-concurrency serving, baseline autoregressive decode has poor utilization, leaving a lot of headroom for speculative verification to improve efficiency. As serving batch increases, baseline decode already becomes wider and more efficient, so speculative decoding has less sublinearity to exploit. Once the system is close to compute saturation (compute-bound), $T_\text{target}(\gamma)$  becomes closer to linear in $\gamma$, and speculative decoding may provide little benefit or even a negative speedup because you add draft compute and extra control flow. The following are common failure cases of speculative decoding:
+
+- Low acceptance rate: $\tau$ is small, amortization fails.
+
+- Draft too slow: $\frac{T_\text{draft}}{\tau}$ eat the gain.
+
+- Already compute-saturated serving: verification is near-linear; little headroom remains.
+
+- Implementation overhead: rejection bookkeeping, synchronization, KV handling, and sampling logic can erase theoretical wins if not engineered tightly.
+
+
+
+
+<p class="doc-reference-label"><strong>Reference</strong></p>
+
+<p class="doc-reference">[1] Chen J, Liang Y, Liu Z. DFlash: Block Diffusion for Flash Speculative Decoding. arXiv preprint arXiv:2602.06036, 2026.</p>
+
 
 ###  Rejection Sampler
 

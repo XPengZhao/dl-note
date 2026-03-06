@@ -34,3 +34,19 @@ p:has(+ .arithmatex) {
 .md-typeset ul ul ul {
   list-style-type: circle;
 }
+
+/* Reusable style for bibliography/reference lines. */
+.md-typeset .doc-reference {
+  font-size: 0.85em;
+  color: #6c757d;
+  margin-top: 0.15rem;
+}
+
+.md-typeset .doc-reference-label {
+  margin-bottom: 0.1rem;
+}
+
+
+.md-typeset .doc-section-label {
+  margin-bottom: 0.1rem;
+}
