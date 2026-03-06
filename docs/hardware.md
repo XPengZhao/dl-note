@@ -15,6 +15,8 @@ GDDR (Graphics Double Data Rate) and HBM (High Bandwidth Memory) are two distinc
 
 ## GPU Configuration
 
+锁步
+
 ### Specific GPUs Explicitly
 
 ```python

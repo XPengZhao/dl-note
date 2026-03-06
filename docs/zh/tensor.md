@@ -1,10 +1,10 @@
-# Tensor Operations
+# 张量操作
 
-## Tensor Creation
+## 张量创建
 
-## Dimension Operations
+## 维度操作
 
-### Add a new dimension
+### 增加一个新维度
 
 **unsqueeze()**
 
@@ -29,13 +29,13 @@ t_new = t.view(1, 1, 2) ## shaped [1, 1, 2]
 
 ```
 
-## Activate Function
+## 激活函数
 
 ### Sigmoid
 
 [torch.sigmoid](https://pytorch.org/docs/stable/generated/torch.sigmoid.html)
 
-Computes the logistic sigmoid function of the elements of input.
+计算输入张量每个元素的 logistic sigmoid 函数：
 
 $$
 \text{out}_i = \frac{1}{1 + e^{-\text{input}_i}}
@@ -91,14 +91,13 @@ def log_softmax(input: torch.Tensor, dim: int = -1) -> torch.Tensor:
     return log_softmax_output
 ```
 
-
-Compute the maximum value in the input tensor and subtract it from all elements for numerical stability.
+为保证数值稳定性，先减去输入中的最大值：
 
 $$
 x'_i = x_i - \max_j(x_j)
 $$
 
-calculate the sum of exponentials of the values.
+再计算指数和：
 
 $$
 \text{sum\_exp} = \sum_j e^{x'_j} = \sum_j e^{x_j} \cdot e^{-\max_j(x_j)}
@@ -108,7 +107,7 @@ $$
 \text{log\_sum\_exp} = \log(\text{sum\_exp}) = \log\left(\sum_j e^{x_j}\right) - \max_j(x_j)
 $$
 
-Finally, compute the log-softmax values using the stabilized inputs.
+最后得到稳定形式的 log-softmax：
 
 $$
 \text{log\_softmax}(x_i) = x'_i - \text{log\_sum\_exp} = x_i - \log\left(\sum_j e^{x_j}\right)
@@ -116,10 +115,10 @@ $$
 
 ## CUDAGraph
 
-static tensor, why not dynamic tensor?
+为什么要使用静态张量，而不是动态张量？
 
-When using CUDA Graphs, the operations and data involved in the graph must remain static to ensure correct execution. Dynamic tensors, which can change shape or size during runtime, would violate this requirement. CUDA Graphs capture a fixed sequence of operations and memory accesses, so any changes to tensor dimensions would lead to inconsistencies and potential errors during execution. Therefore, only static tensors with fixed shapes can be used within CUDA Graphs to maintain the integrity of the captured computation.
+使用 CUDA Graph 时，图中涉及的操作与内存访问必须保持静态，才能保证正确执行。动态张量在运行时可能改变 shape 或 size，这会破坏图捕获时假设的固定执行路径。CUDA Graph 捕获的是一段固定的操作序列和内存布局，因此张量维度变化会造成不一致甚至运行错误。所以在 CUDA Graph 中通常需要固定 shape 的静态张量。
 
-why need buffer tensor?
+为什么需要 buffer tensor？
 
-Buffer tensors are used in CUDA Graphs to provide pre-allocated memory space for dynamic data that may change during the execution of the graph. Since CUDA Graphs require static memory allocations for efficient execution, buffer tensors act as placeholders that can hold varying data without altering the overall structure of the graph. This allows for flexibility in handling inputs or intermediate results while still adhering to the constraints of CUDA Graphs, ensuring that the graph can be executed efficiently without the overhead of dynamic memory allocation during runtime.
+buffer tensor 用于给执行过程中变化的数据提供预分配内存。由于 CUDA Graph 追求运行时不进行动态分配，buffer 可以作为占位区域承载输入或中间结果的变化，同时不改变图结构。这使得在满足 CUDA Graph 静态约束的前提下，仍能保留一定的数据灵活性，并降低运行时分配带来的开销。

@@ -1,5 +1,9 @@
 # Models
 
+## LLMs Timeline
+
+[LLMs Timeline](https://llm-timeline.com/)
+
 ## Qwen3-Omni
 
 ### Overview
@@ -35,3 +39,34 @@ Main features of Qwen3-Omni:
 - The filter bank features of the audio are downsampled 8 times using Conv2D blocks before the attention layers, from 100 Hz(10ms) to 12.5 Hz. Each frame of the audio representation corresponds to approximately an 80 ms segment of the original audio signal.
 - Specifically, the training data includes 80% Chinese and English pseudo-labeled ASR data, 10% ASR data from other languages, and 10% audio understanding data.
 - To balance the efficiency of real-time prefill caching with the performance for offline audio tasks, AuT utilizes flash attention with dynamic attention window sizes, covering attention query patterns ranging from 1 to 8 seconds.
+
+
+## DFlash
+
+```bash
+export SGLANG_ALLOW_OVERWRITE_LONGER_CONTEXT_LEN=1
+export MODEL_PATH=/models/Qwen
+export TVM_FFI_CUDA_ARCH_LIST="9.0"
+
+## DFLASH
+CUDA_VISIBLE_DEVICES=4,5,6,7 python -m sglang.launch_server \
+    --model-path $MODEL_PATH/Qwen3-Coder-30B-A3B-Instruct \
+    --disable-radix-cache \
+    --tp-size 4 \
+    --dtype bfloat16 \
+    --attention-backend fa3 \
+    --context-length 32000 \
+    --max-running-requests 12 \
+    --port 8005 \
+    --host 0.0.0.0 \
+    --mem-fraction-static 0.8 \
+    --speculative-algorithm DFLASH \
+    --speculative-draft-model-path $MODEL_PATH/Qwen3-Coder-30B-A3B-DFlash \
+    --trust-remote-code
+```
+
+Under the same MTBench serving configuration (80 prompts, 1024-token output cap, request rate and max concurrency both set to 12, OpenAI-compatible sglang backend with continuous usage statistics enabled), we compared speculative decoding between DFlash (draft block size = 16) and EAGLE-3 (layer-16 speculation). The position-wise acceptance distributions are similar at shallow draft positions, but DFlash consistently maintains higher acceptance mass across deeper positions, with a slower decay beyond mid-range indices. <b>It shows a higher average accepted length for DFlash (3.78) relative to EAGLE-3 (3.49)</b>.
+
+<div align="center">
+  <iframe src="../../assets/images/dflash-accepted-length.pdf" title="Accepted Length of DFlash vs. Eagle 3" width="700" height="500"></iframe>
+</div>
