@@ -195,6 +195,74 @@ That said, a DP-based inference system is not entirely communication-free. The r
 
 In hybrid MoE deployments, DP usually contributes limited communication overhead during inference, while the parallel mechanisms inside each DP unit are often more communication-intensive. Tensor Parallelism typically relies on collectives such as all-reduce or all-gather within a TP group, whereas Expert Parallelism introduces token routing across devices that host different experts. Accordingly, communication analysis in a hybrid system should separate the outer DP dimension from the inner model-parallel dimensions: DP governs workload distribution, while the dominant communication cost usually comes from TP or EP.
 
+
+### Tensor Parallelism (TP)
+
+TP partitions the computation of a single layer across multiple devices by sharding the layer’s weight tensors, rather than replicating the full layer on every rank. In large transformer models, this is typically applied to the projection matrices in attention and MLP blocks. The core objective is to reduce the per-device memory footprint and enable execution of layers whose parameters or activations would otherwise exceed the capacity of a single accelerator.
+
+Consider a linear transformation
+
+$$
+Y = X W,
+$$
+
+where $X \in \mathbb{R}^{B \times H}$, $W \in \mathbb{R}^{H \times O}$, and $Y \in \mathbb{R}^{B \times O}$. Under TP, $W$ is is divided across a process group of $p$ ranks. Two common decompositions are column-wise sharding and row-wise sharding.
+
+In column-wise TP, the output dimension $O$  is partitioned, so each rank stores
+
+$$
+W_i \in \mathbb{R}^{H \times O/p}
+$$
+
+Each rank computes a partial output
+
+$$
+Y_i = X W_i \in \mathbb{R}^{B \times O/p}
+$$
+
+which corresponds to a slice of the final output tensor. This pattern is natural for the first projection in transformer feed-forward blocks, because the partial outputs can often remain distributed until a later synchronization point.
+
+In row-wise TP, the input dimension $H$ is partitioned, so each rank stores
+
+$$
+W_i \in \mathbb{R}^{H/p \times O},
+$$
+
+The input $X$ must then be partitioned consistently, and each rank computes a partial contribution to the full output:
+
+$$
+Y_i = X_i W_i \in \mathbb{R}^{B \times O}
+$$
+
+Since these are additive contributions to the same output tensor, the ranks must sum them to recover $Y$. This makes row-wise TP naturally coupled with a reduction step.
+
+For transformer layers, TP is usually designed so that adjacent projections alternate between communication-light and communication-heavy layouts. A standard example is the two-layer MLP block. The first linear layer expands the hidden state and is often implemented with column-wise TP, while the second projects back to the hidden dimension using row-wise TP. This pairing avoids unnecessary materialization of full intermediate activations on every rank and keeps most of the computation local until the boundary where the distributed partial results must be merged.
+
+The main advantage of TP is that it scales model width without requiring full parameter replication. However, its efficiency depends strongly on the balance between local matrix multiplication and inter-rank communication. As TP degree increases, per-rank GEMM sizes become smaller and communication becomes a larger fraction of the step time. For this reason, TP is usually effective only within a tightly coupled device group, such as GPUs connected by high-bandwidth intra-node interconnects.
+
+#### The collective communication related to TP
+
+The communication pattern in TP is determined by how tensors are sharded and whether the local computation produces disjoint output slices or partial sums. In practice, TP relies primarily on three collective patterns: all-gather, reduce-scatter, and all-reduce. Their role is not incidental; they define the synchronization boundaries of tensor-parallel execution.
+
+In a column-wise partitioned linear layer, each rank produces a distinct shard of the output features. If the next operator can consume the activation in sharded form, no immediate communication is required. This is one of the main reasons column-wise sharding is attractive. However, when a subsequent operation expects the full activation tensor, the ranks must perform an all-gather to assemble
+
+$$
+Y = [Y_0, Y_1, \ldots, Y_{p-1}]
+$$
+
+Thus, all-gather is associated with reconstructing a feature dimension that was split across ranks.
+
+In a row-wise partitioned linear layer, each rank computes only a partial contribution to the same output tensor. The global result is
+
+$$
+Y = \sum_{i=0}^{p-1} Y_i.
+$$
+
+This requires a summation across the TP group. Conceptually, this is an all-reduce if every rank needs the full output. In optimized implementations, the communication may instead be fused with downstream sharding requirements and expressed as a reduce-scatter, which both sums the partial results and redistributes the output into shards for the next stage.
+
+At the systems level, the cost of TP communication is shaped by message size, collective algorithm, process-group topology, and overlap with computation. Since TP collectives are invoked at fine granularity inside individual layers, their latency sensitivity is high. This is why TP is typically constrained to a small number of nearby devices: the communication volume may be moderate, but the synchronization frequency is high. Once the TP group spans slower links, collective latency can dominate the runtime and erase the gains from parameter sharding. A practical interpretation is that TP converts a single large matrix multiplication into several smaller local GEMMs plus structured collectives. Its performance therefore depends on whether the reduction in memory pressure and per-rank compute fits outweighs the repeated cost of all-gather, reduce-scatter, and all-reduce across the tensor-parallel group.
+
+
 ## Sampling
 ### Temperature
 
