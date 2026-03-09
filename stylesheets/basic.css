@@ -1,0 +1,52 @@
+.md-typeset p {
+    text-align: justify;
+    text-justify: inter-word;
+  }
+
+p:has(+ .arithmatex) {
+    margin-bottom: 0px; /* Adjust as needed */
+  }
+
+  .md-content h1 {
+    color: #7C1823; /* Tomato color for h1 */
+    font-weight: bold;
+  }
+  .md-content h2 {
+    color: #133167; /* SteelBlue color for h2 */
+    font-weight: bold;
+  }
+  .md-content h3 {
+    color: #133167; /* LimeGreen color for h3 */
+    font-weight: bold;
+  }
+  .md-content h4,
+  .md-content h5,
+  .md-content h6 {
+    font-size: 1.15em;
+    font-weight: 600;
+    letter-spacing: -.01em;
+    line-height: 1.25;
+    margin: 1.5em 0 .8em;
+    color: #133167;
+  }
+/* Use hollow circles for nested unordered lists. */
+.md-typeset ul ul,
+.md-typeset ul ul ul {
+  list-style-type: circle;
+}
+
+/* Reusable style for bibliography/reference lines. */
+.md-typeset .doc-reference {
+  font-size: 0.85em;
+  color: #6c757d;
+  margin-top: 0.15rem;
+}
+
+.md-typeset .doc-reference-label {
+  margin-bottom: 0.1rem;
+}
+
+
+.md-typeset .doc-section-label {
+  margin-bottom: 0.1rem;
+}
