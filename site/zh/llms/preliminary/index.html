@@ -412,13 +412,13 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#latency" class="md-nav__link">
+  <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
-      延迟（Latency）
+      延迟
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="延迟（Latency）">
+    <nav class="md-nav" aria-label="延迟">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -445,13 +445,13 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#throughput" class="md-nav__link">
+  <a href="#_3" class="md-nav__link">
     <span class="md-ellipsis">
-      吞吐（Throughput）
+      吞吐
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="吞吐（Throughput）">
+    <nav class="md-nav" aria-label="吞吐">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -474,6 +474,30 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      调度
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="调度">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#chunked-prefill" class="md-nav__link">
+    <span class="md-ellipsis">
+      Chunked Prefill
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#kv-cache" class="md-nav__link">
     <span class="md-ellipsis">
       KV Cache
@@ -484,9 +508,9 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#_2" class="md-nav__link">
+  <a href="#_5" class="md-nav__link">
     <span class="md-ellipsis">
-      显存开销
+      内存开销
     </span>
   </a>
   
@@ -498,37 +522,37 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#_3" class="md-nav__link">
+  <a href="#attention" class="md-nav__link">
     <span class="md-ellipsis">
-      注意力
+      Attention
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="注意力">
+    <nav class="md-nav" aria-label="Attention">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#mha" class="md-nav__link">
+  <a href="#mha-multi-head-attention" class="md-nav__link">
     <span class="md-ellipsis">
-      MHA — 多头注意力
+      MHA — Multi-Head Attention
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#mqa" class="md-nav__link">
+  <a href="#mqa-multi-query-attention" class="md-nav__link">
     <span class="md-ellipsis">
-      MQA — 多查询注意力
+      MQA — Multi-Query Attention
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#gqa" class="md-nav__link">
+  <a href="#gqa-grouped-query-attention" class="md-nav__link">
     <span class="md-ellipsis">
-      GQA — 分组查询注意力
+      GQA — Grouped-Query Attention
     </span>
   </a>
   
@@ -540,19 +564,100 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#_4" class="md-nav__link">
+  <a href="#parallelism" class="md-nav__link">
     <span class="md-ellipsis">
-      采样
+      Parallelism
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="采样">
+    <nav class="md-nav" aria-label="Parallelism">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#data-parallelism-dp" class="md-nav__link">
+    <span class="md-ellipsis">
+      数据并行（Data Parallelism, DP）
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="数据并行（Data Parallelism, DP）">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#dp" class="md-nav__link">
+    <span class="md-ellipsis">
+      与 DP 相关的集合通信
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tensor-parallelism-tp" class="md-nav__link">
+    <span class="md-ellipsis">
+      张量并行（Tensor Parallelism, TP）
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="张量并行（Tensor Parallelism, TP）">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tp-collective-communication" class="md-nav__link">
+    <span class="md-ellipsis">
+      与 TP 相关的集合通信（Collective Communication）
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#kernel" class="md-nav__link">
+    <span class="md-ellipsis">
+      Kernel
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#overhead" class="md-nav__link">
+    <span class="md-ellipsis">
+      Overhead
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sampling" class="md-nav__link">
+    <span class="md-ellipsis">
+      Sampling
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Sampling">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
   <a href="#temperature" class="md-nav__link">
     <span class="md-ellipsis">
-      温度（Temperature）
+      Temperature
     </span>
   </a>
   
@@ -570,7 +675,7 @@
           <li class="md-nav__item">
   <a href="#top-pnucleussampling" class="md-nav__link">
     <span class="md-ellipsis">
-      Top-p（Nucleus）Sampling
+      Top-p（nucleus）Sampling
     </span>
   </a>
   
@@ -586,16 +691,16 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#_5" class="md-nav__link">
+  <a href="#_6" class="md-nav__link">
     <span class="md-ellipsis">
-      组合使用顺序
+      组合使用
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#_6" class="md-nav__link">
+  <a href="#_7" class="md-nav__link">
     <span class="md-ellipsis">
       示例代码
     </span>
@@ -609,27 +714,27 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#speculvative-decoding" class="md-nav__link">
+    <span class="md-ellipsis">
+      Speculvative decoding
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Speculvative decoding">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
   <a href="#speculative-decoding" class="md-nav__link">
     <span class="md-ellipsis">
-      Speculative Decoding
+      Speculative Decoding 加速
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Speculative Decoding">
+    <nav class="md-nav" aria-label="Speculative Decoding 加速">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#speculative-decoding_1" class="md-nav__link">
-    <span class="md-ellipsis">
-      Speculative Decoding 的加速机理
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Speculative Decoding 的加速机理">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#_7" class="md-nav__link">
+  <a href="#_8" class="md-nav__link">
     <span class="md-ellipsis">
       加速来自哪里？
     </span>
@@ -640,7 +745,7 @@
           <li class="md-nav__item">
   <a href="#batch" class="md-nav__link">
     <span class="md-ellipsis">
-      为什么大 batch 下加速会变小，甚至为负？
+      为什么在大服务 batch 下加速会变小（甚至为负）？
     </span>
   </a>
   
@@ -668,7 +773,7 @@
         <li class="md-nav__item">
   <a href="#llm" class="md-nav__link">
     <span class="md-ellipsis">
-      LLM 的预训练目标
+      LLM 预训练目标
     </span>
   </a>
   
@@ -750,13 +855,13 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#latency" class="md-nav__link">
+  <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
-      延迟（Latency）
+      延迟
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="延迟（Latency）">
+    <nav class="md-nav" aria-label="延迟">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -783,13 +888,13 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#throughput" class="md-nav__link">
+  <a href="#_3" class="md-nav__link">
     <span class="md-ellipsis">
-      吞吐（Throughput）
+      吞吐
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="吞吐（Throughput）">
+    <nav class="md-nav" aria-label="吞吐">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -812,6 +917,30 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      调度
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="调度">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#chunked-prefill" class="md-nav__link">
+    <span class="md-ellipsis">
+      Chunked Prefill
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#kv-cache" class="md-nav__link">
     <span class="md-ellipsis">
       KV Cache
@@ -822,9 +951,9 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#_2" class="md-nav__link">
+  <a href="#_5" class="md-nav__link">
     <span class="md-ellipsis">
-      显存开销
+      内存开销
     </span>
   </a>
   
@@ -836,37 +965,37 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#_3" class="md-nav__link">
+  <a href="#attention" class="md-nav__link">
     <span class="md-ellipsis">
-      注意力
+      Attention
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="注意力">
+    <nav class="md-nav" aria-label="Attention">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#mha" class="md-nav__link">
+  <a href="#mha-multi-head-attention" class="md-nav__link">
     <span class="md-ellipsis">
-      MHA — 多头注意力
+      MHA — Multi-Head Attention
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#mqa" class="md-nav__link">
+  <a href="#mqa-multi-query-attention" class="md-nav__link">
     <span class="md-ellipsis">
-      MQA — 多查询注意力
+      MQA — Multi-Query Attention
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#gqa" class="md-nav__link">
+  <a href="#gqa-grouped-query-attention" class="md-nav__link">
     <span class="md-ellipsis">
-      GQA — 分组查询注意力
+      GQA — Grouped-Query Attention
     </span>
   </a>
   
@@ -878,19 +1007,100 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#_4" class="md-nav__link">
+  <a href="#parallelism" class="md-nav__link">
     <span class="md-ellipsis">
-      采样
+      Parallelism
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="采样">
+    <nav class="md-nav" aria-label="Parallelism">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#data-parallelism-dp" class="md-nav__link">
+    <span class="md-ellipsis">
+      数据并行（Data Parallelism, DP）
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="数据并行（Data Parallelism, DP）">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#dp" class="md-nav__link">
+    <span class="md-ellipsis">
+      与 DP 相关的集合通信
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tensor-parallelism-tp" class="md-nav__link">
+    <span class="md-ellipsis">
+      张量并行（Tensor Parallelism, TP）
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="张量并行（Tensor Parallelism, TP）">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tp-collective-communication" class="md-nav__link">
+    <span class="md-ellipsis">
+      与 TP 相关的集合通信（Collective Communication）
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#kernel" class="md-nav__link">
+    <span class="md-ellipsis">
+      Kernel
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#overhead" class="md-nav__link">
+    <span class="md-ellipsis">
+      Overhead
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sampling" class="md-nav__link">
+    <span class="md-ellipsis">
+      Sampling
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Sampling">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
   <a href="#temperature" class="md-nav__link">
     <span class="md-ellipsis">
-      温度（Temperature）
+      Temperature
     </span>
   </a>
   
@@ -908,7 +1118,7 @@
           <li class="md-nav__item">
   <a href="#top-pnucleussampling" class="md-nav__link">
     <span class="md-ellipsis">
-      Top-p（Nucleus）Sampling
+      Top-p（nucleus）Sampling
     </span>
   </a>
   
@@ -924,16 +1134,16 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#_5" class="md-nav__link">
+  <a href="#_6" class="md-nav__link">
     <span class="md-ellipsis">
-      组合使用顺序
+      组合使用
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#_6" class="md-nav__link">
+  <a href="#_7" class="md-nav__link">
     <span class="md-ellipsis">
       示例代码
     </span>
@@ -947,27 +1157,27 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#speculvative-decoding" class="md-nav__link">
+    <span class="md-ellipsis">
+      Speculvative decoding
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Speculvative decoding">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
   <a href="#speculative-decoding" class="md-nav__link">
     <span class="md-ellipsis">
-      Speculative Decoding
+      Speculative Decoding 加速
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Speculative Decoding">
+    <nav class="md-nav" aria-label="Speculative Decoding 加速">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#speculative-decoding_1" class="md-nav__link">
-    <span class="md-ellipsis">
-      Speculative Decoding 的加速机理
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Speculative Decoding 的加速机理">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#_7" class="md-nav__link">
+  <a href="#_8" class="md-nav__link">
     <span class="md-ellipsis">
       加速来自哪里？
     </span>
@@ -978,7 +1188,7 @@
           <li class="md-nav__item">
   <a href="#batch" class="md-nav__link">
     <span class="md-ellipsis">
-      为什么大 batch 下加速会变小，甚至为负？
+      为什么在大服务 batch 下加速会变小（甚至为负）？
     </span>
   </a>
   
@@ -1006,7 +1216,7 @@
         <li class="md-nav__item">
   <a href="#llm" class="md-nav__link">
     <span class="md-ellipsis">
-      LLM 的预训练目标
+      LLM 预训练目标
     </span>
   </a>
   
@@ -1030,14 +1240,14 @@
 
 <h1 id="ai-infra">AI Infra 预备知识</h1>
 <h2 id="_1">指标</h2>
-<h3 id="latency">延迟（Latency）</h3>
-<p>延迟是指处理请求并生成输出 token 所需的时间。在 LLM 推理中，通常关注两个核心延迟指标：</p>
+<h3 id="_2">延迟</h3>
+<p>延迟是处理请求并生成输出 token 所需的时间。在 LLM 推理中，延迟通常通过两个主要指标来衡量：</p>
 <h4 id="token-ttft">首 token 时间（TTFT）</h4>
-<p>TTFT（Time to First Token）表示从推理服务接收到请求，到第一个输出 token 被生成并返回给客户端的时间间隔。它衡量模型“开始响应”有多快，是流式 LLM 系统中最直接的用户感知延迟指标。形式化地：</p>
+<p>首 token 时间（TTFT）是指从推理服务器收到请求，到第一个输出 token 被生成并返回给客户端之间的延迟。它衡量模型开始响应的速度，是流式 LLM 系统中最核心的用户感知延迟指标。形式化定义为：</p>
 <div class="arithmatex">\[
 \text{TTFT} = t_{\text{first token emitted}} - t_{\text{request received}}
 \]</div>
-<p>TTFT 主要覆盖 prefill 阶段（处理输入上下文）以及调度与系统开销，不包含后续 token 的生成时间。通常可分解为：</p>
+<p>TTFT 主要反映 prefill 阶段（处理输入上下文）以及调度和系统开销。它不包含生成其余输出 token 所需的时间。更细致地，TTFT 可分解为：</p>
 <div class="arithmatex">\[
 \small
 \begin{aligned}
@@ -1046,128 +1256,193 @@
 \]</div>
 <p>其中：</p>
 <ul>
-<li><span class="arithmatex">\(t_{\text{queue}}\)</span>：请求进入执行前在调度器中的排队时间。</li>
-<li><span class="arithmatex">\(t_{\text{input processing}}\)</span>：输入处理开销，包括分词、多模态预处理（如图像/视频编码）和请求规范化。</li>
-<li><span class="arithmatex">\(t_{\text{prefill compute}}\)</span>：对全部输入 token 做前向计算的时间（序列长度 <span class="arithmatex">\(L\)</span> 下复杂度约为 <span class="arithmatex">\(O(L)\)</span>），同时建立 KV cache，并得到提示词末位置的 logits。</li>
-<li><span class="arithmatex">\(t_{\text{first decode step (optional)}}\)</span>：某些实现将 prefill 和 decode 调度分离时，首 token 可能要在下一次 decode step 才发出；优化实现中此项可与 prefill 融合，开销很小。</li>
-<li><span class="arithmatex">\(t_{\text{framework overhead}}\)</span>：框架额外开销，如 CUDA kernel 启动、同步、内存分配、采样（softmax/top-k/top-p）以及首 token 网络传输。</li>
+<li><span class="arithmatex">\(t_{\text{queue}}\)</span> 是请求在被调度器接纳执行前的排队时间。</li>
+<li><span class="arithmatex">\(t_{\text{input processing}}\)</span> 包括 tokenization、多模态预处理（例如图像或视频编码）以及请求级归一化或格式化。</li>
+<li><span class="arithmatex">\(t_{\text{prefill compute}}\)</span> 是对全部输入 token 执行前向计算所需时间（序列长度为 <span class="arithmatex">\(L\)</span> 时复杂度为 <span class="arithmatex">\(O(L)\)</span>），在该过程中会填充 KV cache 并得到 prompt 末位置的 logits。</li>
+<li><span class="arithmatex">\(t_{\text{first decode step (optional)}}\)</span> 对应某些将 prefill 与 generation 调度分离的实现中的额外一次 decode step。在这些系统中，首个输出 token 由后续 decode pass 产生，而不是直接由 prefill logits 产生。在优化实现（vLLM 的较新版本）中，这一步可能与 prefill 融合，因此可忽略不计。</li>
+<li><span class="arithmatex">\(t_{\text{framework overhead}}\)</span> 表示额外成本，例如 CUDA kernel 启动、同步、内存分配、采样（softmax 与 top-k/top-p）以及首个流式 token 的网络传输。</li>
 </ul>
-<p>在长上下文场景下，TTFT 往往由 <span class="arithmatex">\(t_{\text{prefill compute}}\)</span> 主导，其余项通常是次要开销。</p>
+<p>在长上下文输入下，TTFT 通常由 <span class="arithmatex">\(t_{\text{prefill compute}}\)</span> 主导，其余项贡献相对较小。</p>
 <h4 id="token-tpot">每输出 token 时间（TPOT）</h4>
-<p>TPOT（Time per Output Token）衡量首 token 发出后，平均每个后续 token 的生成延迟。它表征自回归解码的稳态性能，并直接决定流式输出速度。对生成 <span class="arithmatex">\(N\)</span> 个输出 token 的请求：</p>
+<p>每输出 token 时间（TPOT）衡量在首 token 发出之后，平均生成每个 token 所需的延迟。它刻画自回归模型的稳态 decode 性能，并直接决定流式输出速度。形式化地，对于生成 <span class="arithmatex">\(N\)</span> 个输出 token 的请求：</p>
 <div class="arithmatex">\[
 \text{TPOT} = \frac{t_\text{last token emitted} - t_\text{first token emitted}}{N - 1}
 \]</div>
-<p>等价地，若总端到端时延为 <span class="arithmatex">\(T_{\text{total}}\)</span>：</p>
+<p>等价地，若端到端总延迟为 <span class="arithmatex">\(T_{\text{total}}\)</span>，</p>
 <div class="arithmatex">\[
 \text{TPOT} = \frac{T_{\text{total}} - \text{TTFT}}{N - 1}
 \]</div>
-<p>在稳态 decode 中，每个 token 的时间可写为：</p>
+<p>在稳态解码中，每个输出 token 需要：</p>
 <div class="arithmatex">\[
 \text{TPOT} = t_{\text{decode compute}} + t_{\text{communication}} + t_{\text{scheduling}} + t_{\text{framework overhead}}
 \]</div>
 <p>其中：</p>
 <ul>
-<li><span class="arithmatex">\(t_{\text{decode compute}}\)</span>：利用 KV cache 的单 token 前向计算。</li>
-<li><span class="arithmatex">\(t_{\text{communication}}\)</span>：跨卡通信与数据交换（如 TP all-reduce/all-gather，MoE all-to-all，以及 H2D/D2H 传输）。</li>
-<li><span class="arithmatex">\(t_{\text{scheduling}}\)</span>：运行时调度开销（连续 batching、请求协调、准入控制、KV 分配/分页/管理）。</li>
-<li><span class="arithmatex">\(t_{\text{framework overhead}}\)</span>：采样、kernel 启动、同步、I/O 封送、后处理和 token streaming 等辅助开销。</li>
+<li><span class="arithmatex">\(t_{\text{decode compute}}\)</span> 是使用 KV cache 对单个 token 执行前向计算的时间（每步在序列长度维度上的复杂度为 <span class="arithmatex">\(O(1+\text{num speculative tokens})\)</span>，但与模型规模成正比）。</li>
+<li><span class="arithmatex">\(t_{\text{communication}}\)</span> 表示跨 GPU 同步与数据交换成本，例如 tensor parallel 的集合通信（all-reduce、all-gather）、MoE 模型中的 expert 路由与聚合（all-to-all、dispatch/combine），以及由调度或内存管理触发的主机-设备内存传输（H2D/D2H）。</li>
+<li><span class="arithmatex">\(t_{\text{scheduling}}\)</span> 包括运行时调度开销，例如 continuous batching、请求协调、准入控制，以及 KV cache 分配、分页或内存管理。</li>
+<li><span class="arithmatex">\(t_{\text{framework overhead}}\)</span> 包括辅助执行成本，例如采样（softmax、top-k/top-p）、kernel 启动、同步、输入输出编组、结果后处理以及 token 流式传输。</li>
 </ul>
-<p>与 TTFT 不同，TPOT 不需重算完整 prompt；但由于 decode 仍要对全部缓存上下文做注意力计算，其成本仍受有效上下文长度影响，通常随总上下文（提示词 + 已生成）近似线性增长。</p>
-<h3 id="throughput">吞吐（Throughput）</h3>
+<p>与 TTFT 不同，TPOT 不需要对完整 prompt 重新计算。但它仍取决于有效上下文长度，因为每步 decode 都需要对全部已缓存 token 执行 attention。因此 TPOT 通常随总上下文长度（prompt + 已生成 token）近似线性增长，不过其单 token 成本显著小于 prefill。</p>
+<h3 id="_3">吞吐</h3>
 <h4 id="token-tps">每秒 token 数（TPS）</h4>
-<p>TPS（Tokens per Second）衡量系统在给定服务配置下每秒处理/生成 token 的能力。与 TTFT、TPOT 这种请求级指标不同，TPS 是系统级指标，反映整体承载能力。在时间窗口 <span class="arithmatex">\(\Delta t\)</span> 内：</p>
+<p>每秒 token 数（TPS）用于衡量 LLM 推理系统的吞吐，即在给定服务配置下每秒可处理或生成多少 token。与 TTFT 和 TPOT 这类在请求级定义的延迟指标不同，TPS 是系统级指标，反映负载下的整体服务能力。在时间区间 <span class="arithmatex">\(\Delta t\)</span> 内，TPS 可表示为：</p>
 <div class="arithmatex">\[
 \text{TPS} = \frac{N_\text{tokens}}{\Delta t}
 \]</div>
-<p>很多场景下 TPS 特指 decode 吞吐（只统计输出 token）：</p>
+<p>很多情况下，TPS 特指 decode 吞吐，即只统计生成的输出 token：</p>
 <div class="arithmatex">\[
 \text{TPS}_\text{decode} = \frac{N_\text{output tokens}}{\Delta t}
 \]</div>
-<p>对单序列顺序 decode，通常有：</p>
+<p>对于单序列顺序解码，它大致是 TPOT 的倒数：</p>
 <div class="arithmatex">\[
 \text{TPS}_\text{per request} \approx \frac{1}{\text{TPOT}}
 \]</div>
-<p>在连续 batching 并发场景中，系统吞吐会随有效 batch 大小 <span class="arithmatex">\(B\)</span> 增长。单副本近似为：</p>
+<p>但在具有 continuous batching 和并发解码的实际服务系统中，总吞吐会随有效 batch 大小 <span class="arithmatex">\(B\)</span> 扩展。对于单个副本，系统吞吐可近似为</p>
 <div class="arithmatex">\[
 \text{TPS}_\text{replica} \approx \frac{B}{\text{TPOT}}
 \]</div>
-<p>若有 <span class="arithmatex">\(R\)</span> 个数据并行（DP）副本：</p>
+<p>若有 <span class="arithmatex">\(R\)</span> 个数据并行（DP）副本，</p>
 <div class="arithmatex">\[
 \text{TPS}_\text{total} \approx R \times \frac{B}{\text{TPOT}}
 \]</div>
-<p>对于长上下文或多模态任务，prompt 处理可能占据可观算力，此时应关注端到端吞吐：</p>
+<p>需要注意的是，对于长上下文或多模态负载，prompt 处理可能占据总计算的很大比例。在这种情况下，通常需要考虑端到端吞吐，它同时计入 prompt 与输出 token：</p>
 <div class="arithmatex">\[
 \text{TPS}_\text{end-to-end} = \frac{N_\text{prompt tokens} + N_\text{output tokens}}{\Delta t}
 \]</div>
-<p>总体上，TPS 受模型规模、并行策略、有效 batch、大核效率、互联带宽以及 prefill/decode 负载比例共同影响。</p>
+<p>总体而言，TPS 受模型规模、并行策略、有效 batch 大小、kernel 效率、互联带宽，以及 prefill 与 decode 负载相对占比的影响。</p>
+<h2 id="_4">调度</h2>
+<h3 id="chunked-prefill">Chunked Prefill</h3>
+<p>Chunked prefill 是一种面向长上下文推理的 serving 侧优化。它不再用一次 prefill pass 处理整个 prompt，而是将其切分为多个较小的 chunk，并按增量方式依次执行。若输入序列长度为 <span class="arithmatex">\(L\)</span>，chunk 大小为 <span class="arithmatex">\(C\)</span>，那么 prefill 阶段可被分解为大约</p>
+<div class="arithmatex">\[
+N_{\text{chunks}} = \left\lceil \frac{L}{C} \right\rceil
+\]</div>
+<p>个子请求。对于第 <span class="arithmatex">\(j\)</span> 个 chunk，模型只处理该 chunk 对应的 token 区间，并将得到的 key 和 value 追加到 KV cache 中，然后再进入下一个 chunk。</p>
+<p>从系统角度看，这样做的主要动机在于 prefill 和 decode 的执行特征明显不同。长 prefill 请求通常更宽、计算更重，而 decode 则由大量细粒度、对延迟敏感的迭代构成。如果运行时把一个很长的 prompt 当作单个整体 prefill 来执行，该请求可能会在较长时间内占据 GPU，并拖慢不相关的 decode 工作。Chunked prefill 将 prompt 处理的调度粒度变得更细，使运行时能够在长 prefill 请求、decode step 以及其他较短 prompt 之间进行穿插调度。实践中，它主要是一种在 continuous batching 下改善公平性与响应性的优化。</p>
+<p>Chunked prefill 还可以降低 prefill 阶段的峰值运行时显存。当 prompt 一次性处理时，运行时往往需要为完整序列分配更大的临时激活、attention workspace 或其他中间 buffer。分块之后，这些瞬时 buffer 更接近按 chunk 大小而不是按完整 prompt 长度增长，因此在超长输入下有助于避免 OOM。但它不会降低最终的 KV cache 占用：只要所有 prompt token 都需要保留在上下文中，它们对应的 key 和 value 仍然必须存储。也就是说，chunked prefill 缓解的是 prefill 过程中的瞬时显存压力，而不是稳态的 KV cache 需求。</p>
+<p>它改变的是调度特性和峰值内存行为，而不是模型语义。在 attention mask 和数值计算一致的前提下，最终得到的 KV cache 和输出 logits 与未分块的 prefill 是相同的。其代价在于，chunk 太小时会引入更多 kernel 启动和调度开销，而 chunk 太大时又会逐渐退化为普通的整体 prefill。从概念上看，chunked prefill 属于 serving runtime，而不是模型结构本身。</p>
 <h2 id="kv-cache">KV Cache</h2>
-<h3 id="_2">显存开销</h3>
-<p>KV cache 大小计算公式：</p>
+<h3 id="_5">内存开销</h3>
+<p>KV cache 大小计算为：</p>
 <div class="arithmatex">\[
 \text{KV size} = 2 \times \text{num layers} \times \text{num heads} \times \text{seq len} \times \text{head dim}
 \]</div>
 <p>假设：</p>
 <ul>
 <li>32 层、80 个头、head_dim = 128、seq_len = 4K。</li>
-<li>FP16 KV cache：2 × 32 × 80 × 4K × 128 × 2 bytes = <strong>约 5.2 GB/样本</strong>。</li>
-<li>C8（int8 KV cache）：约为一半，即 <strong>约 2.6 GB/样本</strong>。</li>
+<li>FP16 KV cache：2 × 32 × 80 × 4K × 128 × 2 bytes = <strong>约 5.2 GB</strong> 每样本。</li>
+<li>C8（int8 KV cache）：<strong>约减半，即约 2.6 GB</strong> 每样本。</li>
 </ul>
-<h2 id="_3">注意力</h2>
-<p>在 Transformer 中，注意力模块计算：</p>
+<h2 id="attention">Attention</h2>
+<p>在 transformer 模型中，attention 模块计算：</p>
 <div class="arithmatex">\[
 \operatorname{Attention}(Q, K, V)=\operatorname{softmax}\left(\frac{Q K^T}{\sqrt{d_k}}\right) V
 \]</div>
 <p>每个 token 会产生：</p>
 <ul>
-<li><strong>Q（Query）</strong>：来自当前 token 的隐状态。</li>
-<li><strong>K（Key）</strong>、<strong>V（Value）</strong>：来自上下文（历史 token），并存入 <strong>KV cache</strong>。</li>
+<li><strong>Q（Query）</strong> - 来自当前 token 的隐藏状态</li>
+<li><strong>K（Key）</strong>、<strong>V（Value）</strong> - 来自上下文（此前 token）并存储在 <strong>KV cache</strong> 中</li>
 </ul>
-<p><strong>MHA、MQA、GQA</strong> 的主要区别是：相对于 Query 头数，Key/Value 投影是如何共享的。</p>
-<h3 id="mha"><strong>MHA — 多头注意力</strong></h3>
-<p>每个注意力头都有独立投影：</p>
+<p><strong>MHA</strong>、<strong>MQA</strong> 和 <strong>GQA</strong> 的区别在于：相对于 Query 头数，使用了多少组 Key/Value 投影。</p>
+<h3 id="mha-multi-head-attention"><strong>MHA — Multi-Head Attention</strong></h3>
+<p>每个 attention 头都有各自独立的投影：</p>
 <div class="arithmatex">\[
 Q_i=X W_{Q, i}, \quad K_i=X W_{K, i}, \quad V_i=X W_{V, i}
 \]</div>
 <ul>
-<li>Q 头数 = K 头数 = V 头数。</li>
+<li>Q 头数 = K 头数 = V 头数</li>
 </ul>
-<h3 id="mqa"><strong>MQA — 多查询注意力</strong></h3>
-<p>所有头共享同一组 K、V 投影：</p>
+<h3 id="mqa-multi-query-attention"><strong>MQA — Multi-Query Attention</strong></h3>
+<p>所有头 <strong>共享一组</strong> K 和 V 投影：</p>
 <div class="arithmatex">\[
 K_{\text {shared }}=X W_K, \quad V_{\text {shared }}=X W_V
 \]</div>
 <ul>
-<li>Q 头可以很多，但只有一组共享 K/V。</li>
-<li>推理时各头复用同一 K/V。</li>
-<li>KV cache 显存约可按头数倍数下降。</li>
-<li><strong>LLaMA 2 7B</strong>、<strong>Mistral</strong> 等模型常用 MQA 以降低内存开销。</li>
+<li><strong>多个 Q 头</strong>，但 <strong>只有一对共享 K/V</strong>。</li>
+<li>推理时，所有头复用相同的 K/V。</li>
+<li>KV cache 大小可减少约 #heads 倍。</li>
+<li><strong>LLaMA 2 7B</strong>、<strong>Mistral</strong> 及多数优化后的 LLM 使用 MQA 以降低内存占用。</li>
 </ul>
-<h3 id="gqa"><strong>GQA — 分组查询注意力</strong></h3>
-<p>将 Query 头分组，每组共享一组 K/V：</p>
+<h3 id="gqa-grouped-query-attention"><strong>GQA — Grouped-Query Attention</strong></h3>
+<p>Query 被分组，每组共享各自的 K/V：</p>
 <div class="arithmatex">\[
 \text { Group } g: \quad Q_{g, *}, K_g, V_g
 \]</div>
 <ul>
-<li>例如 8 个 Q 头、2 组时，每组 4 个 Q 头共享一组 K/V。</li>
+<li>例如有 8 个 query 头但只有 2 组，则每组 4 个 Q 头共享一组 K/V。</li>
 <li><strong>K/V 头数 &lt; Q 头数</strong>。</li>
-<li><strong>LLaMA 2 70B</strong>、<strong>Mixtral</strong>、<strong>GPT-J-6B</strong> 等常用 GQA，在效果与效率间折中。</li>
+<li><strong>LLaMA 2 70B</strong>、<strong>Mixtral</strong>、<strong>GPT-J-6B</strong> 等使用 GQA 以提升内存效率。</li>
 </ul>
-<h2 id="_4">采样</h2>
-<h3 id="temperature">温度（Temperature）</h3>
-<p>温度 <span class="arithmatex">\(T\)</span> 控制概率分布的“尖锐程度”。给定 logits <span class="arithmatex">\(z_i\)</span>，温度采样先缩放再 softmax：</p>
+<h2 id="parallelism">Parallelism</h2>
+<h3 id="data-parallelism-dp">数据并行（Data Parallelism, DP）</h3>
+<p>Data Parallelism（DP）是机器学习系统中最传统、也最直观的分布式执行形式。它的核心思想很简单：在多个设备上实例化同一个模型，同时将输入工作负载分片到这些实例上。每个 worker 在不同的数据子集上执行相同的计算图。从这个意义上讲，它只改变了计算到硬件的映射方式。</p>
+<p>由于参数是复制而不是切分，DP 不会降低单个设备上的内存占用。这一特性界定了它的实际适用范围：当模型本身已经可以放入单卡显存时，DP 很有效；但如果模型本身超过单设备容量，DP 就不够用。因此，它的主要价值在于通过副本扩展吞吐和服务并发。</p>
+<p>在训练中，DP 常用于增大有效 batch size 并提升硬件利用率。每个 worker 处理 mini-batch 的一个分片，计算本地梯度，然后参与同步，使所有模型副本在优化步之后保持数值一致。在推理中，同样适用这种副本机制，但不再有梯度交换。取而代之的是，每个 worker 处理独立的请求子集或 token batch。因此在推理负载下，DP 应主要被理解为一种流量分发机制，而不是模型切分机制。</p>
+<p>在混合部署中，DP 往往与 Tensor Parallelism（TP）和 Expert Parallelism（EP）并存。在这种配置下，“DP replica” 不应被字面地理解为单张 GPU。一个 DP 单元本身可能是一个多 GPU 组，其内部执行由 TP 或 EP 组织。从这个视角看，DP 定义的是工作负载复制的外层结构，而 TP 与 EP 决定每个副本内部如何执行计算。</p>
+<h4 id="dp">与 DP 相关的集合通信</h4>
+<p>与 DP 相关的通信行为，本质上取决于系统是在训练还是推理。</p>
+<p>在分布式训练中，每个 DP worker 基于本地 mini-batch 分片计算梯度。由于每个 worker 都维护同一套参数，这些梯度必须在每个 step 后同步，以保证副本间一致性。用于这一目的的标准集合通信原语是对梯度执行 all-reduce。在一些实现中，也会用 reduce-scatter 后接 all-gather 来实现同样效果，但目标不变：聚合所有 DP rank 的梯度贡献，并在每个 worker 上得到一致的参数更新。</p>
+<p>相比之下，推理不涉及反向传播或优化器 step。每个 DP rank 服务于独立的一部分请求流，因此 DP 本身不会引入强制性的逐层集合通信。在推理场景下，它主要充当调度与流量切分机制，而不是同步密集型执行策略。</p>
+<p>即便如此，基于 DP 的推理系统也并非完全无通信。运行时仍需要系统级协调，例如请求分发、负载均衡、准入控制与结果收集。实践中，这类协调常依赖 all-gather 等通信模式，在各 rank 间交换元数据、状态或调度信息。这些操作属于服务框架层，而非模型数值执行本身。</p>
+<p>在混合 MoE 部署中，DP 在推理阶段通常只引入有限通信开销，而每个 DP 单元内部的并行机制往往更“重通信”。Tensor Parallelism 通常依赖 TP 组内的 all-reduce 或 all-gather 等集合通信，而 Expert Parallelism 会引入跨设备的 token 路由以访问不同专家。因此，分析混合系统中的通信时，应区分外层 DP 维度与内层模型并行维度：DP 负责工作负载分发，而主导通信成本的通常是 TP 或 EP。</p>
+<h3 id="tensor-parallelism-tp">张量并行（Tensor Parallelism, TP）</h3>
+<p>张量并行（TP）通过对单层计算中的权重张量进行切分，将计算分布到多个设备上，而不是在每个 rank 上复制完整的层参数。在大规模 Transformer 模型中，这种方式通常应用于注意力层和 MLP 层中的投影矩阵。其核心目标是降低单设备的参数与激活内存占用，从而能够运行那些在单个加速器上无法容纳的超大规模模型层。</p>
+<p>考虑一个线性变换：</p>
+<div class="arithmatex">\[
+Y = X W,
+\]</div>
+<p>其中 <span class="arithmatex">\(X \in \mathbb{R}^{B \times H}\)</span>，<span class="arithmatex">\(W \in \mathbb{R}^{H \times O}\)</span>，<span class="arithmatex">\(Y \in \mathbb{R}^{B \times O}\)</span>。在 TP 中，权重矩阵 <span class="arithmatex">\(W\)</span> 会在 <span class="arithmatex">\(p\)</span> 个 rank 构成的进程组上进行切分。常见的两种切分方式是按列切分（column-wise sharding）和按行切分（row-wise sharding）。</p>
+<p>在列切分的 TP 中，输出维度 <span class="arithmatex">\(O\)</span> 被划分，因此每个 rank 存储</p>
+<div class="arithmatex">\[
+W_i \in \mathbb{R}^{H \times O/p}
+\]</div>
+<p>每个 rank 计算一个局部输出</p>
+<div class="arithmatex">\[
+Y_i = X W_i \in \mathbb{R}^{B \times O/p}
+\]</div>
+<p>这对应于最终输出张量的一个切片。这种模式在 Transformer 的前馈网络（feed-forward block）的第一层投影中非常常见，因为这些部分输出通常可以保持分布式状态，直到后续某个需要同步的阶段才进行合并。</p>
+<p>在行切分的 TP 中，输入维度 <span class="arithmatex">\(H\)</span> 被划分，因此每个 rank 存储</p>
+<div class="arithmatex">\[
+W_i \in \mathbb{R}^{H/p \times O}
+\]</div>
+<p>输入 <span class="arithmatex">\(X\)</span> 也必须按照相同方式进行切分，每个 rank 计算对最终输出的一个部分贡献：</p>
+<div class="arithmatex">\[
+Y_i = X_i W_i \in \mathbb{R}^{B \times O}
+\]</div>
+<p>由于这些结果都是对同一个输出张量的加性贡献，因此所有 rank 的结果需要进行求和才能恢复完整的 <span class="arithmatex">\(Y\)</span>。因此，行切分的 TP 天然需要一个归约（reduction）步骤。</p>
+<p>在 Transformer 的实现中，TP 通常会通过在相邻投影层之间交替使用通信较轻和通信较重的布局来设计。例如，在两层 MLP 结构中，第一层线性变换通常采用列切分以扩展隐藏维度，而第二层则使用行切分将其投影回原始隐藏维度。这种组合可以避免在每个 rank 上物化完整的中间激活，同时尽量延迟通信，使大部分计算保持在本地完成。</p>
+<p>TP 的主要优势在于能够扩展模型的宽度，而无需在每个设备上复制全部参数。然而，其效率在很大程度上取决于本地矩阵乘计算与跨 rank 通信之间的平衡。随着 TP 并行度的增加，每个 rank 的 GEMM 规模会变小，而通信在整体执行时间中的占比则会上升。因此，TP 通常只在紧密连接的设备组中使用，例如同一节点内通过高带宽互联（如 NVLink）连接的 GPU。</p>
+<h4 id="tp-collective-communication">与 TP 相关的集合通信（Collective Communication）</h4>
+<p>TP 中的通信模式由张量的切分方式以及本地计算产生的是独立输出切片还是部分求和结果所决定。在实际系统中，TP 主要依赖三种集合通信操作：all-gather、reduce-scatter 和 all-reduce。这些通信操作不仅用于数据交换，同时也定义了张量并行执行过程中的同步边界。</p>
+<p>在列切分的线性层中，每个 rank 生成的是输出特征的一部分。如果下一个算子能够直接消费这种分布式形式的激活，则不需要立即进行通信。这也是列切分在实践中常用的原因之一。然而，如果后续操作需要完整的激活张量，那么所有 rank 必须执行一次 all-gather 来重建完整输出：</p>
+<div class="arithmatex">\[
+Y = [Y_0, Y_1, \ldots, Y_{p-1}]
+\]</div>
+<p>因此，all-gather 通常用于恢复在特征维度上被拆分的张量。</p>
+<p>在行切分的线性层中，每个 rank 只计算最终输出的一部分贡献。全局输出为：</p>
+<div class="arithmatex">\[
+Y = \sum_{i=0}^{p-1} Y_i
+\]</div>
+<p>这需要在 TP 组内进行求和操作。如果每个 rank 都需要完整的输出，则该操作可以表示为 all-reduce。在一些优化实现中，这个通信步骤会与后续的张量切分需求融合，并通过 reduce-scatter 实现，从而在完成求和的同时将输出重新分布为分片形式，以供下一阶段计算使用。</p>
+<p>从系统角度来看，TP 通信的成本受到消息大小、集合通信算法、进程组拓扑结构以及通信与计算的重叠程度等因素的影响。由于 TP 的集合通信是在每一层内部以较高频率触发的，其性能对通信延迟非常敏感。因此，TP 通常只在少量且拓扑接近的设备之间使用。若 TP 组跨越较慢的网络链路，集合通信延迟很容易成为性能瓶颈，从而抵消参数切分带来的收益。</p>
+<p>从整体角度看，TP 本质上是将一次大型矩阵乘法拆分为多个较小的本地 GEMM 计算，并辅以结构化的集合通信操作。因此，其性能取决于两个因素之间的权衡：一方面是降低单设备内存压力与计算规模带来的好处，另一方面是 all-gather、reduce-scatter 和 all-reduce 等通信操作所带来的额外开销。</p>
+<h2 id="kernel">Kernel</h2>
+<h2 id="overhead">Overhead</h2>
+<p>一个tensor在steam1中准备好了，stream2要用，是还需要一个D2D copy嘛，这个时间大概是多久？和stream2 上准备的tensor stream2直接用差了多少？</p>
+<h2 id="sampling">Sampling</h2>
+<h3 id="temperature">Temperature</h3>
+<p>温度 <span class="arithmatex">\(T\)</span> 控制概率分布的“尖锐度”。给定模型 logits <span class="arithmatex">\(z_i\)</span>，温度采样会在 softmax 前对其重缩放：</p>
 <div class="arithmatex">\[
 p_i=\frac{e^{z_i / T}}{\sum_j e^{z_j / T}}
 \]</div>
 <ul>
-<li><span class="arithmatex">\(T&lt;1\)</span>：分布更尖锐，输出更确定、随机性更低。</li>
-<li><span class="arithmatex">\(T&gt;1\)</span>：分布更平坦，探索性更强、多样性更高。</li>
-<li>温度是保序变换（不会改变 logits 排序）。若 top-k = 1（贪心），温度不会产生实际影响。</li>
-<li>当 <span class="arithmatex">\(T \rightarrow 0\)</span> 时，分布趋近 argmax（贪心）。</li>
-<li>当 <span class="arithmatex">\(T \rightarrow \infty\)</span> 时，分布趋近均匀。</li>
+<li><span class="arithmatex">\(T&lt;1\)</span> 时更尖锐（峰值更高），模型更“自信”、随机性更低；<span class="arithmatex">\(T&gt;1\)</span> 时更平坦（更均匀），模型更具探索性、多样性更高。</li>
+<li>温度会保持 logits 的顺序，因为除以正数不会改变排序（保序）。如果使用 top-k = 1（即 greedy），温度完全不起作用。</li>
+<li>当温度 <span class="arithmatex">\(T \rightarrow 0\)</span> 时，softmax 分布会变得任意尖锐并收敛到 greedy（argmax）采样。例如在 <span class="arithmatex">\(T=10^{-6}\)</span> 时，最高 logit 会主导分布，因此在实践中几乎等价于 greedy。</li>
+<li>当 <span class="arithmatex">\(T \rightarrow \infty\)</span> 时，分布会趋于均匀（所有 token 概率相同）。</li>
 </ul>
 <h3 id="top-k-sampling">Top-k Sampling</h3>
-<p>在温度处理后按概率排序，仅保留前 k 个 token，并重归一化得到采样分布：</p>
+<p>在计算概率（温度处理后）后，按概率排序，仅保留概率最高的 k 个 token。然后对 <span class="arithmatex">\(p_i^{\prime}\)</span> 归一化得到最终采样分布。</p>
 <div class="arithmatex">\[
 \begin{aligned}
 S_k &amp; =\text { top-k tokens by } p_i \\
@@ -1175,13 +1450,13 @@ p_i^{\prime} &amp; = \begin{cases}\frac{p_i}{\sum_{j \in S_k} p_j} &amp; i \in S
 0 &amp; \text { otherwise }\end{cases}
 \end{aligned}
 \]</div>
-<p>再从截断后的分布中采样。</p>
+<p>然后从该截断分布中采样。</p>
 <ul>
-<li>小 k（如 1–10）：更稳定、更保守。</li>
-<li>大 k（如 50–100）：更有多样性，但偏题风险更高。</li>
+<li>小 k（例如 1-10）：更确定、更安全（模型几乎不会选择罕见词）。</li>
+<li>大 k（例如 50-100）：更有变化，但选出离题词的风险更高。</li>
 </ul>
-<h3 id="top-pnucleussampling">Top-p（Nucleus）Sampling</h3>
-<p>“nucleus”指概率质量的核心集合。不同于固定 k，top-p 选择“累计概率达到阈值 <span class="arithmatex">\(p\)</span> 的最小 token 集合”。</p>
+<h3 id="top-pnucleussampling">Top-p（nucleus）Sampling</h3>
+<p>“nucleus” 的字面含义是核心、中心或本质核心部分。与固定 k 不同，我们选择累计概率 <span class="arithmatex">\(\geq p\)</span> 的最小 token 集合。</p>
 <div class="arithmatex">\[
 \begin{aligned}
 S_p&amp;=\left\{i: \sum_{j \in S_p} p_j \geq p\right\} \\
@@ -1190,31 +1465,30 @@ p_i^{\prime}&amp;= \begin{cases}\frac{p_i}{\sum_{j \in S_p} p_j} &amp; i \in S_p
 \end{aligned}
 \]</div>
 <p><strong>与 top-k 的关键区别：</strong></p>
-<p>top-k 是按排名截断，top-p 是按概率质量截断，因此能自适应模型不确定性。</p>
+<p>Top-p 会随不确定性自适应。Top-k 看的是排名（前 k 个），Top-p 看的是概率质量（分布核心质量）。</p>
 <ul>
-<li>当模型很确定（头部 token 占比高）时，保留 token 很少。</li>
-<li>当模型不确定（概率较分散）时，集合会自动扩大。</li>
+<li>如果模型很确定（一个 token 占主导），保留的 token 会很少。</li>
+<li>如果模型不确定（很多 token 概率接近），nucleus 集合会扩大。</li>
 </ul>
 <h3 id="min-p">Min-p</h3>
-<p>Min-p 按相对 top-1 的最小概率阈值过滤 token（近年较常见，如 Mistral、Gemini 等）。其规则不是固定 <span class="arithmatex">\(k\)</span> 或累计概率 <span class="arithmatex">\(p\)</span>，而是保留所有满足：</p>
+<p>Min-p 会过滤掉相对 top-1 来说“过于不可能”的 token。这是较新的方法，但越来越流行（Mistral、Gemini 等在用）。它不固定 <span class="arithmatex">\(k\)</span> 或 <span class="arithmatex">\(p\)</span>，而是保留相对 top-1 token 超过最小概率阈值的 token：</p>
 <div class="arithmatex">\[
 S_{\min }=\left\{i: p_i \geq \min -\mathrm{p} \times p_{\max }\right\}
 \]</div>
-<p>若 min-p = 0.1，则保留概率至少为 top-1 概率 10% 的 token。之后再归一化：</p>
+<p>如果 min-p = 0.1，则任何概率至少达到最可能 token 的 10% 的 token 都会被保留。随后归一化：</p>
 <div class="arithmatex">\[
 p_i^{\prime} = \frac{p_i}{\sum_{j \in S_{\min}} p_j}
 \]</div>
 <ul>
-<li>与 top-p 一样可自适应上下文，但规则更直接。</li>
-<li>在分布较平坦时，不容易错误截断低排名但合理的 token。</li>
-<li>对长尾词表通常更稳定。</li>
+<li>Min-p 与 top-p 一样会随上下文自适应，但更简单。它意味着候选 token 数量会随模型当前预测而变化。模型越确定，候选集越小；模型越不确定，候选集越大。</li>
+<li>在分布较平坦时，可避免过早截断一些看起来排名低但仍合理的 token。</li>
+<li>对长尾词表通常有更好的数值稳定性。</li>
 </ul>
-<h3 id="_5">组合使用顺序</h3>
-<p>实际中常按以下顺序组合：</p>
-<p>Temperature → Softmax → (top-k / top-p / min-p) → Renormalize → Sample</p>
-<p>当 top-k 与 top-p 同时开启时，最终候选集是两者交集（更小的集合）。</p>
-<h3 id="_6">示例代码</h3>
-<p>代码来自 <a href="https://gitee.com/omniai/omniinfer/blob/master/omni/adaptors/vllm/sample/sampler.py">Omniinfer Sampler</a>。</p>
+<h3 id="_6">组合使用</h3>
+<p>通常按以下顺序组合使用：Temperature → Softmax → (top-k / top-p / min-p) → Renormalize → Sample</p>
+<p>当 top-k 和 top-p 同时启用时，最终保留的是二者交集，也就是更小的那个集合。</p>
+<h3 id="_7">示例代码</h3>
+<p>代码片段来自 <a href="https://gitee.com/omniai/omniinfer/blob/master/omni/adaptors/vllm/sample/sampler.py">Omniinfer Sampler</a>。</p>
 <details>
 <summary>Top-k 和 Top-p 实现</summary>
 
@@ -1284,61 +1558,70 @@ p_i^{\prime} = \frac{p_i}{\sum_{j \in S_{\min}} p_j}
 </span></code></pre></div>
 </details>
 
-<h2 id="speculative-decoding">Speculative Decoding</h2>
-<h3 id="speculative-decoding_1">Speculative Decoding 的加速机理</h3>
-<p>Speculative decoding 使用较小的草稿模型 <span class="arithmatex">\(M_d\)</span> 来加速目标模型 <span class="arithmatex">\(M_t\)</span> 的推理。每个解码周期中，草稿模型先提出 <span class="arithmatex">\(\gamma\)</span> 个 token，再由目标模型并行验证。平均每 token 延迟可写为：</p>
+<h2 id="speculvative-decoding">Speculvative decoding</h2>
+<h3 id="speculative-decoding">Speculative Decoding 加速</h3>
+<p>Speculative decoding 通过更小的草稿模型 <span class="arithmatex">\(M_d\)</span> 来加速目标模型 <span class="arithmatex">\(M_t\)</span> 的推理。每个解码周期中，草稿模型先提出 <span class="arithmatex">\(\gamma\)</span> 个 token，再由目标模型并行验证。平均每 token 延迟为：</p>
 <div class="arithmatex">\[
 L = \frac{T_{\text{draft}} + T_{\text{target}}}{\tau}.
 \]</div>
-<p>其中 <span class="arithmatex">\(T_{\text{draft}}\)</span> 是草稿生成开销，<span class="arithmatex">\(T_{\text{target}}\)</span> 是验证开销，<span class="arithmatex">\(\tau \in [1, \gamma + 1]\)</span> 是每周期期望接受长度（含 bonus token）。设 <span class="arithmatex">\(L_\text{target}\)</span> 为目标模型自回归单 token 延迟，则速度提升为：</p>
+<p>其中，<span class="arithmatex">\(T_{\text{draft}}\)</span> 是生成草稿 token 的时间，<span class="arithmatex">\(T_{\text{target}}\)</span> 是验证开销，<span class="arithmatex">\(\tau \in [1, \gamma + 1]\)</span> 是每周期期望接受的 token 数（包含目标模型产生的 bonus token）。令 <span class="arithmatex">\(L_\text{target}\)</span> 表示 <span class="arithmatex">\(M_t\)</span> 自回归逐 token 延迟，则速度提升为：</p>
 <div class="arithmatex">\[
 \eta = \frac{L_\text{target}}{L}.
 \]</div>
-<h4 id="_7">加速来自哪里？</h4>
-<p>对目标侧验证时间可使用一个简洁模型：</p>
+<h4 id="_8">加速来自哪里？</h4>
+<p>对于 speculative decoding 的目标侧验证，可用一个紧凑且直观的模型表示：</p>
 <div class="arithmatex">\[
 T_{\text {target }}(n) \approx \alpha_t(n)+n \cdot \bar{\beta}_t(n),
 \]</div>
-<p>其中 <span class="arithmatex">\(n= B(\gamma + 1)\)</span> 为 batch <span class="arithmatex">\(B\)</span> 下并行验证 token 总数，<span class="arithmatex">\(\bar{\beta}_t(n)\)</span> 为在宽度 <span class="arithmatex">\(n\)</span> 下的等效单 token 验证成本。<span class="arithmatex">\(\alpha_t(n)\)</span> 聚合了弱依赖 <span class="arithmatex">\(n\)</span> 的调用级固定开销（kernel 启动、同步、框架调度、attention metadata/paged-attention 索引构建、分布式/MoE 的 collective 启动等）。<span class="arithmatex">\(n \cdot \bar{\beta}_t(n)\)</span> 对应近似线性增长的工作量（QKV/MLP GEMM、attention、KV 读写、逐元素算子等）。</p>
-<p>关键点是：<span class="arithmatex">\(\bar{\beta}_t(n)\)</span> 并非常数。随着 <span class="arithmatex">\(n\)</span> 从低利用区增大，GEMM 形状更友好、占用率和 cache 复用提升，通常会降低单位 token 成本；直到接近硬件上限后趋于平坦。</p>
-<p>在固定 <span class="arithmatex">\(\gamma\)</span> 与固定期望接受长度 <span class="arithmatex">\(\tau\)</span> 下，目标侧对“每个已接受 token 延迟”的贡献近似：</p>
+<p>其中 <span class="arithmatex">\(n= B(\gamma + 1)\)</span> 表示在服务 batch <span class="arithmatex">\(B\)</span> 中并行验证的 token 总数，<span class="arithmatex">\(\bar{\beta}_t(n)\)</span> 是宽度为 <span class="arithmatex">\(n\)</span> 时的有效逐 token 验证成本（秒/token）。在这个分解里，<span class="arithmatex">\(\alpha_t(n)\)</span> 聚合了在中等范围内对 <span class="arithmatex">\(n\)</span> 弱依赖的调用级开销，包括 kernel 启动与同步延迟、框架分发/图调度开销、每次调用的记账成本（如 attention metadata 构建与 paged-attention 索引设置），以及分布式或 MoE 场景下的 collective 启动/同步。项 <span class="arithmatex">\(n \cdot \bar{\beta}_t(n)\)</span> 则聚合了与处理 token 数近似成比例增长的工作：QKV/MLP GEMM、attention 计算、KV-cache 读写与逐元素操作。对 MoE 而言，dispatch/gather 的载荷搬运主要计入线性项，而 collective 启动更自然地归于开销项。</p>
+<p>关键是，<span class="arithmatex">\(\bar{\beta}_t(n)\)</span> 不是常数：当 <span class="arithmatex">\(n\)</span> 从低填充区增大时，GEMM 形状更友好、occupancy 提高、cache 复用改善，从而提高有效算术强度与利用率，并降低 <span class="arithmatex">\(\bar{\beta}_t(n)\)</span>。这种下降通常会持续到接近硬件上限（受 KV/cache 流量带宽或 tensor-core 算力限制）后趋于平坦，此时 <span class="arithmatex">\(\bar{\beta}_t(n)\)</span> 接近由设备决定的下限，总时间也会近似线性随 <span class="arithmatex">\(n\)</span> 增长。</p>
+<p>在固定 <span class="arithmatex">\(\gamma\)</span> 和固定期望接受长度 <span class="arithmatex">\(\tau\)</span> 下，目标侧对每个“已接受 token 延迟”的贡献为：</p>
 <div class="arithmatex">\[
 \frac{T_{\text {target }}(n)}{\tau} \approx \frac{\alpha_t(n)}{\tau} + \frac{n}{\tau} \bar{\beta}_t(n).
 \]</div>
-<p>可获得加速的直观条件（先忽略 draft 成本）是：</p>
+<p>加速的关键直觉是：在低 batch/低填充区，验证过程可让 <span class="arithmatex">\(\bar{\beta}_t(n)\)</span> 显著小于目标模型基线自回归逐 token 成本，同时 <span class="arithmatex">\(\alpha_t(n)\)</span> 会被 <span class="arithmatex">\(\tau\)</span> 摊销。一个获益条件是（暂时忽略 draft 成本）：</p>
 <div class="arithmatex">\[
 \frac{T_{\text {target }}(n)}{\tau} &lt; L_\text{target}(B).
 \]</div>
-<p>令 <span class="arithmatex">\(p = \tau / (\gamma + 1)\)</span> 表示提议 token 的期望接受率，一个关键因子是：</p>
+<p>令 <span class="arithmatex">\(p = \tau / (\gamma + 1)\)</span> 表示每个提议 token 的期望接受率。决定加速效果的主导因子之一是：</p>
 <div class="arithmatex">\[
 \frac{\bar{\beta}_t(n)}{p}  &lt; \bar{\beta}_t(B).
 \]</div>
-<p><span class="arithmatex">\(\scriptstyle\blacksquare\)</span> <strong>它改变了目标模型工作的粒度。</strong> 自回归解码每次只处理 1 个 token，形成大量串行小步，常受内存访问/启动时延限制。Speculative decoding 将多个小步验证合并为更少但更宽的验证步，从而提升利用率。</p>
-<p><span class="arithmatex">\(\scriptstyle\blacksquare\)</span> <strong>验证开销随 <span class="arithmatex">\(\gamma\)</span> 的增长常呈次线性。</strong> 如果验证 <span class="arithmatex">\(\gamma\)</span> 个 token 的成本严格等于 <span class="arithmatex">\((\gamma+1)\cdot L_\text{target}\)</span>，则不会加速。现实中由于固定开销摊销、算术强度提升、占用率与 cache 命中改善，验证成本通常低于线性外推。</p>
-<h4 id="batch">为什么大 batch 下加速会变小，甚至为负？</h4>
-<p>在 batch=1 或低并发时，基线自回归 decode 利用率低，speculative 仍有较大优化空间。随着 batch 增大，基线本身变“更宽更高效”，speculative 能额外榨取的次线性收益减少。若系统已接近计算饱和，验证时间会更接近线性，同时又增加了 draft 与控制流开销，可能导致负收益。常见失败场景：</p>
+<p><span class="arithmatex">\(\scriptstyle\blacksquare\)</span> <strong>它改变了目标模型工作的粒度。</strong> 在自回归解码中，目标模型每生成一个 token 都执行一次前向，形成一长串严格串行的小步。对 GPU 而言，单 token decode 往往受内存/时延主导：每步相对于访问的状态量（KV cache 读写、小 kernel、同步与启动开销）来说计算量有限。因此在 batch-1 或低并发服务中，硬件利用率通常较差。即使模型理论 FLOPs 很高，实际逐 token 吞吐也可能受内存带宽和启动延迟而非算力上限约束。</p>
+<p>Speculative decoding 改变了目标计算形态。目标模型不再把每步开销支付 <span class="arithmatex">\((\gamma+1)\)</span> 次，而是每周期支付一次来验证 <span class="arithmatex">\(\gamma\)</span> 个提议 token。Speculative decoding 将大量细碎、时延主导的目标步，转成更少但更宽的验证步。</p>
+<p><span class="arithmatex">\(\scriptstyle\blacksquare\)</span> <strong>验证成本随 <span class="arithmatex">\(\gamma\)</span> 的增长是次线性的。</strong> 如果验证 <span class="arithmatex">\(\gamma\)</span> 个 token 的成本精确等于 <span class="arithmatex">\((\gamma + 1) \cdot L_\text{target}\)</span>，speculative decoding 就不会有帮助，因为这只是做了同样的工作再加上 draft 开销。实际中的速度提升来自 <span class="arithmatex">\(T_\text{target}(\gamma)\)</span> 更接近“一次稍宽的 decode”，而不是 <span class="arithmatex">\(\gamma\)</span> 次独立 decode。原因包括：(1) 固定开销（kernel 启动、同步）被摊销；(2) 更高的有效算术强度与硬件利用率。更宽的验证会放大 GEMM/attention kernel 规模，提升 occupancy 与 cache 复用，因此目标模型验证 pass 往往可获得更高 FLOP/byte（L2/HBM）与更高 tensor-core 效率。</p>
+<h4 id="batch">为什么在大服务 batch 下加速会变小（甚至为负）？</h4>
+<p>在 batch-1 或低并发服务下，基线自回归 decode 利用率较差，speculative verification 仍有较大优化空间。随着服务 batch 增大，基线 decode 本身已更宽、更高效，speculative decoding 能利用的次线性空间变小。当系统接近算力饱和（compute-bound）时，<span class="arithmatex">\(T_\text{target}(\gamma)\)</span> 会更接近对 <span class="arithmatex">\(\gamma\)</span> 线性增长，而 speculative decoding 可能收益很小，甚至出现负加速，因为它引入了 draft 计算与额外控制流。常见失败场景包括：</p>
 <ul>
-<li>接受率低：<span class="arithmatex">\(\tau\)</span> 小，摊销不足。</li>
-<li>draft 太慢：<span class="arithmatex">\(\frac{T_\text{draft}}{\tau}\)</span> 吃掉收益。</li>
-<li>服务已算力饱和：验证近线性，剩余空间很小。</li>
-<li>实现开销过高：拒绝采样记账、同步、KV 管理、采样逻辑等吞噬理论收益。</li>
+<li>
+<p>接受率低：<span class="arithmatex">\(\tau\)</span> 小，摊销失败。</p>
+</li>
+<li>
+<p>draft 太慢：<span class="arithmatex">\(\frac{T_\text{draft}}{\tau}\)</span> 吃掉收益。</p>
+</li>
+<li>
+<p>服务已算力饱和：验证近线性，可优化空间很小。</p>
+</li>
+<li>
+<p>实现开销大：拒绝记账、同步、KV 处理和采样逻辑若实现不够紧凑，会抹去理论收益。</p>
+</li>
 </ul>
-<p class="doc-reference-label"><strong>参考文献</strong></p>
+<p class="doc-reference-label"><strong>Reference</strong></p>
 
 <p class="doc-reference">[1] Chen J, Liang Y, Liu Z. DFlash: Block Diffusion for Flash Speculative Decoding. arXiv preprint arXiv:2602.06036, 2026.</p>
 
 <h3 id="rejection-sampler">Rejection Sampler</h3>
-<p>若目标是采样 <span class="arithmatex">\(x \sim p(x)\)</span>，可先从提议分布 <span class="arithmatex">\(q(x)\)</span> 采样：当 <span class="arithmatex">\(q(x) \leq p(x)\)</span> 时接受；当 <span class="arithmatex">\(q(x) &gt; p(x)\)</span> 时，以概率 <span class="arithmatex">\(1 - \frac{p(x)}{q(x)}\)</span> 拒绝，并改为从调整分布 <span class="arithmatex">\(p^{\prime} = \text{norm}(\max(0, p(x) - q(x)))\)</span> 重新采样。</p>
-<p><strong>说明：</strong> 对任意分布 <span class="arithmatex">\(p(x)\)</span> 与 <span class="arithmatex">\(q(x)\)</span>，基于拒绝采样流程得到的 token 分布与直接从 <span class="arithmatex">\(p(x)\)</span> 采样一致（证明见附录 A [1]）。</p>
-<p>拒绝采样可看成将目标分布 <span class="arithmatex">\(p(x)\)</span> 拆成两部分：</p>
+<p>若目标是采样 <span class="arithmatex">\(x \sim p(x)\)</span>，可先从 <span class="arithmatex">\(q(x)\)</span> 采样 <span class="arithmatex">\(x\)</span>：当 <span class="arithmatex">\(q(x) \leq p(x)\)</span> 时保留；当 <span class="arithmatex">\(q(x) &gt; p(x)\)</span> 时，以概率 <span class="arithmatex">\(1 - \frac{p(x)}{q(x)}\)</span> 拒绝该样本，并改为从调整分布 <span class="arithmatex">\(p^{\prime} = \text{norm}(\max(0, p(x) - q(x)))\)</span> 重新采样 <span class="arithmatex">\(x\)</span>。</p>
+<p><strong>NOTE:</strong> 对任意分布 <span class="arithmatex">\(p(x)\)</span> 与 <span class="arithmatex">\(q(x)\)</span>，通过 rejection sampling（基于 <span class="arithmatex">\(p(x)\)</span> 和 <span class="arithmatex">\(q(x)\)</span>）得到的 token 分布，与直接从 <span class="arithmatex">\(p(x)\)</span> 采样得到的分布完全一致。证明见附录 A [1]。</p>
+<p>Rejection sampling 的思路是将目标分布 <span class="arithmatex">\(p(x)\)</span> 分解为两部分：</p>
 <ul>
-<li>接受分支：按 <span class="arithmatex">\(\frac{p(x)}{q(x)}\)</span> 比率接受（<span class="arithmatex">\(q(x)\)</span> 为草稿分布）。</li>
+<li>接受分支：基于比率 <span class="arithmatex">\(\frac{p(x)}{q(x)}\)</span> 接受 token，其中 <span class="arithmatex">\(q(x)\)</span> 是提议（draft）分布。</li>
 </ul>
 <div class="arithmatex">\[
   p(\text{accepted}, x = x^{\prime}) = q(x^{\prime}) \cdot \min\left(\frac{p(x^{\prime})}{q(x^{\prime})}, 1\right) = \min(p(x^{\prime}), q(x^{\prime}))
 \]</div>
 <ul>
-<li>拒绝分支：被拒绝后从调整分布 <span class="arithmatex">\(p^{\prime}(x)\)</span> 重采样。所有从 <span class="arithmatex">\(q(x)\)</span> 采样 token 被拒绝的概率：</li>
+<li>拒绝分支：token 被拒后从调整分布 <span class="arithmatex">\(p^{\prime}(x)\)</span> 重采样。所有从 <span class="arithmatex">\(q(x)\)</span> 采样 token 被拒绝的概率为：</li>
 </ul>
 <div class="arithmatex">\[
 \begin{aligned}
@@ -1353,7 +1636,7 @@ T_{\text {target }}(n) \approx \alpha_t(n)+n \cdot \bar{\beta}_t(n),
 \end{aligned}
 \]</div>
 <p><strong>示例代码</strong></p>
-<p>代码来自 <a href="https://github.com/vllm-project/vllm/blob/main/vllm/v1/sample/rejection_sampler.py">vLLM</a>。</p>
+<p>代码片段来自 <a href="https://github.com/vllm-project/vllm/blob/main/vllm/v1/sample/rejection_sampler.py">vLLM</a>。</p>
 <details>
 <summary>Triton 中的拒绝采样 kernel</summary>
 
@@ -1480,23 +1763,23 @@ T_{\text {target }}(n) \approx \alpha_t(n)+n \cdot \bar{\beta}_t(n),
 </span></code></pre></div>
 </details>
 
-<p><strong>参考文献</strong></p>
+<p><strong>Reference</strong></p>
 <p><a href="https://arxiv.org/pdf/2211.17192">[1]</a> Y Leviathan, M Kalman, Y Matias, "Fast Inference from Transformers via Speculative Decoding", ICML 2023.</p>
-<h2 id="llm">LLM 的预训练目标</h2>
-<p>从零训练的大语言模型通常通过最大似然估计（MLE）在大规模语料上进行优化。</p>
-<p>给定从数据分布 <span class="arithmatex">\(p_\text{data}\)</span> 采样得到的 token 序列 <span class="arithmatex">\((t_1, t_2, \ldots, t_n)\)</span>，模型定义如下自回归分解：</p>
+<h2 id="llm">LLM 预训练目标</h2>
+<p>从零训练的大语言模型，通常是在大规模文本语料上用最大似然估计（MLE）进行优化。</p>
+<p>给定从数据分布 <span class="arithmatex">\(p_\text{data}\)</span> 采样的 token 序列 <span class="arithmatex">\((t_1, t_2, \ldots, t_n)\)</span>，模型定义如下自回归分解：</p>
 <div class="arithmatex">\[
 p_\theta(t_1, t_2, \ldots, t_n) = \prod_{i=1}^n p_\theta(t_i | t_1, t_2, \ldots, t_{i-1})
 \]</div>
-<p>训练目标是最大化数据对数似然，等价于最小化负对数似然（NLL）：</p>
+<p>训练目标是最大化数据的对数似然，这等价于最小化负对数似然（NLL）：</p>
 <div class="arithmatex">\[
 \mathcal{L}(\theta) = - \mathbb{E}_{(t_1, t_2, \ldots, t_i) \sim p_\text{data}} \left[ \log p_\theta(t_i | t_1, t_2, \ldots, t_{i-1}) \right]
 \]</div>
-<p>在实践中，通常实现为 token 级 one-hot 交叉熵：</p>
+<p>在实践中，这个损失实现为以 one-hot 目标计算的 token 级交叉熵：</p>
 <div class="arithmatex">\[
 \mathcal{L} = -\frac{1}{N} \sum_{\text{tokens}} \log p_\theta(t_i | t_1, t_2, \ldots, t_{i-1})
 \]</div>
-<p>该目标等价于最小化经验数据分布与模型分布之间的交叉熵；也可视作最小化 <span class="arithmatex">\(KL(p_\text{data} || p_\theta)\)</span>。</p>
+<p>该目标对应于最小化经验数据分布与模型分布之间的交叉熵；等价地，也是在最小化 <span class="arithmatex">\(KL(p_\text{data} || p_\theta)\)</span>。</p>
 
 
 

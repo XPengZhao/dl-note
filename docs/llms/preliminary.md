@@ -104,6 +104,24 @@ $$
 
 Overall, TPS is influenced by model size, parallelism strategy, effective batch size, kernel efficiency, interconnect bandwidth, and the relative balance between prefill and decode workloads.
 
+## Scheduling
+
+### Chunked Prefill
+
+Chunked prefill is a serving-side optimization for long-context inference. Instead of processing the entire prompt in one prefill pass, the runtime splits it into smaller chunks and executes them incrementally. If the input length is $L$ and the chunk size is $C$, the prefill stage is decomposed into roughly
+
+$$
+N_{\text{chunks}} = \left\lceil \frac{L}{C} \right\rceil
+$$
+
+sub-requests. For chunk $j$, the model processes only the assigned token range and appends the resulting keys and values to the KV cache before moving to the next chunk.
+
+The main systems motivation is that prefill and decode have different execution characteristics. A long prefill request is wide and compute-heavy, whereas decode consists of many small latency-sensitive iterations. If a very long prompt is executed as one monolithic prefill, it can occupy the GPU for a long interval and delay unrelated decode work. Chunked prefill reduces the scheduling granularity of prompt processing, allowing the runtime to interleave long-prefill requests with decode steps or shorter prompts from other users. In practice, this is mainly a fairness and responsiveness optimization under continuous batching.
+
+Chunked prefill can also reduce peak runtime memory during prefill. When the prompt is processed all at once, the runtime may need larger temporary activations, attention workspaces, or other intermediate buffers for the full sequence. With chunking, these transient buffers scale with the chunk size rather than the full prompt length, which can help avoid OOM for very long inputs. However, it does not reduce the final KV cache footprint: if all prompt tokens remain in context, their keys and values still have to be stored. In other words, chunked prefill can lower transient prefill memory, but not the steady-state KV cache requirement.
+
+This changes scheduling and peak-memory behavior rather than model semantics. The final KV cache and output logits are identical to those of an unchunked prefill, assuming the same attention mask and numerics. The trade-off is that very small chunks increase launch and scheduling overhead, while very large chunks recover the behavior of ordinary monolithic prefill. Conceptually, chunked prefill belongs to the serving runtime rather than the model architecture.
+
 
 ## KV Cache
 
@@ -194,6 +212,74 @@ By contrast, inference does not involve backward propagation or optimizer steps.
 That said, a DP-based inference system is not entirely communication-free. The runtime still requires system-level coordination for request dispatch, load balancing, admission control, and result collection. In practice, such coordination often relies on communication patterns such as all-gather to exchange metadata, state, or scheduling information across ranks. These operations belong to the serving framework rather than the model’s numerical execution.
 
 In hybrid MoE deployments, DP usually contributes limited communication overhead during inference, while the parallel mechanisms inside each DP unit are often more communication-intensive. Tensor Parallelism typically relies on collectives such as all-reduce or all-gather within a TP group, whereas Expert Parallelism introduces token routing across devices that host different experts. Accordingly, communication analysis in a hybrid system should separate the outer DP dimension from the inner model-parallel dimensions: DP governs workload distribution, while the dominant communication cost usually comes from TP or EP.
+
+
+### Tensor Parallelism (TP)
+
+TP partitions the computation of a single layer across multiple devices by sharding the layer’s weight tensors, rather than replicating the full layer on every rank. In large transformer models, this is typically applied to the projection matrices in attention and MLP blocks. The core objective is to reduce the per-device memory footprint and enable execution of layers whose parameters or activations would otherwise exceed the capacity of a single accelerator.
+
+Consider a linear transformation
+
+$$
+Y = X W,
+$$
+
+where $X \in \mathbb{R}^{B \times H}$, $W \in \mathbb{R}^{H \times O}$, and $Y \in \mathbb{R}^{B \times O}$. Under TP, $W$ is is divided across a process group of $p$ ranks. Two common decompositions are column-wise sharding and row-wise sharding.
+
+In column-wise TP, the output dimension $O$  is partitioned, so each rank stores
+
+$$
+W_i \in \mathbb{R}^{H \times O/p}
+$$
+
+Each rank computes a partial output
+
+$$
+Y_i = X W_i \in \mathbb{R}^{B \times O/p}
+$$
+
+which corresponds to a slice of the final output tensor. This pattern is natural for the first projection in transformer feed-forward blocks, because the partial outputs can often remain distributed until a later synchronization point.
+
+In row-wise TP, the input dimension $H$ is partitioned, so each rank stores
+
+$$
+W_i \in \mathbb{R}^{H/p \times O},
+$$
+
+The input $X$ must then be partitioned consistently, and each rank computes a partial contribution to the full output:
+
+$$
+Y_i = X_i W_i \in \mathbb{R}^{B \times O}
+$$
+
+Since these are additive contributions to the same output tensor, the ranks must sum them to recover $Y$. This makes row-wise TP naturally coupled with a reduction step.
+
+For transformer layers, TP is usually designed so that adjacent projections alternate between communication-light and communication-heavy layouts. A standard example is the two-layer MLP block. The first linear layer expands the hidden state and is often implemented with column-wise TP, while the second projects back to the hidden dimension using row-wise TP. This pairing avoids unnecessary materialization of full intermediate activations on every rank and keeps most of the computation local until the boundary where the distributed partial results must be merged.
+
+The main advantage of TP is that it scales model width without requiring full parameter replication. However, its efficiency depends strongly on the balance between local matrix multiplication and inter-rank communication. As TP degree increases, per-rank GEMM sizes become smaller and communication becomes a larger fraction of the step time. For this reason, TP is usually effective only within a tightly coupled device group, such as GPUs connected by high-bandwidth intra-node interconnects.
+
+#### The collective communication related to TP
+
+The communication pattern in TP is determined by how tensors are sharded and whether the local computation produces disjoint output slices or partial sums. In practice, TP relies primarily on three collective patterns: all-gather, reduce-scatter, and all-reduce. Their role is not incidental; they define the synchronization boundaries of tensor-parallel execution.
+
+In a column-wise partitioned linear layer, each rank produces a distinct shard of the output features. If the next operator can consume the activation in sharded form, no immediate communication is required. This is one of the main reasons column-wise sharding is attractive. However, when a subsequent operation expects the full activation tensor, the ranks must perform an all-gather to assemble
+
+$$
+Y = [Y_0, Y_1, \ldots, Y_{p-1}]
+$$
+
+Thus, all-gather is associated with reconstructing a feature dimension that was split across ranks.
+
+In a row-wise partitioned linear layer, each rank computes only a partial contribution to the same output tensor. The global result is
+
+$$
+Y = \sum_{i=0}^{p-1} Y_i.
+$$
+
+This requires a summation across the TP group. Conceptually, this is an all-reduce if every rank needs the full output. In optimized implementations, the communication may instead be fused with downstream sharding requirements and expressed as a reduce-scatter, which both sums the partial results and redistributes the output into shards for the next stage.
+
+At the systems level, the cost of TP communication is shaped by message size, collective algorithm, process-group topology, and overlap with computation. Since TP collectives are invoked at fine granularity inside individual layers, their latency sensitivity is high. This is why TP is typically constrained to a small number of nearby devices: the communication volume may be moderate, but the synchronization frequency is high. Once the TP group spans slower links, collective latency can dominate the runtime and erase the gains from parameter sharding. A practical interpretation is that TP converts a single large matrix multiplication into several smaller local GEMMs plus structured collectives. Its performance therefore depends on whether the reduction in memory pressure and per-rank compute fits outweighs the repeated cost of all-gather, reduce-scatter, and all-reduce across the tensor-parallel group.
+
 
 ## Sampling
 ### Temperature
