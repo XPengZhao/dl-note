@@ -44,14 +44,6 @@ markdown_extensions:
 extra_css:
   - stylesheets/bootstrap.min.css
   - stylesheets/basic.css
-extra:
-  alternate:
-    - name: English
-      link: /
-      lang: en
-    - name: 简体中文
-      link: /zh/
-      lang: zh
 extra_javascript:
   - javascripts/mathjax.js
   - https://polyfill.io/v3/polyfill.min.js?features=es6
