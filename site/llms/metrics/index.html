@@ -9,22 +9,22 @@
       
       
       
-        <link rel="prev" href="..">
+        <link rel="prev" href="../../neural-graphics/">
       
       
-        <link rel="next" href="../tensor/">
+        <link rel="next" href="../kv-cache/">
       
       
-      <link rel="icon" href="../assets/images/favicon.png">
+      <link rel="icon" href="../../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.21">
     
     
       
-        <title>Hardware - DL Notes</title>
+        <title>Metrics - DL Notes</title>
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.2a3383ac.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.2a3383ac.min.css">
       
       
 
@@ -43,11 +43,11 @@
       
     
     
-      <link rel="stylesheet" href="../stylesheets/bootstrap.min.css">
+      <link rel="stylesheet" href="../../stylesheets/bootstrap.min.css">
     
-      <link rel="stylesheet" href="../stylesheets/basic.css">
+      <link rel="stylesheet" href="../../stylesheets/basic.css">
     
-    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -66,7 +66,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#hardware" class="md-skip">
+        <a href="#metrics" class="md-skip">
           Skip to content
         </a>
       
@@ -82,7 +82,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href=".." title="DL Notes" class="md-header__button md-logo" aria-label="DL Notes" data-md-component="logo">
+    <a href="../.." title="DL Notes" class="md-header__button md-logo" aria-label="DL Notes" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -102,7 +102,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Hardware
+              Metrics
             
           </span>
         </div>
@@ -129,7 +129,7 @@
           </li>
         
           <li class="md-select__item">
-            <a href="../zh/hardware/" hreflang="zh" class="md-select__link">
+            <a href="../../zh/llms/metrics/" hreflang="zh" class="md-select__link">
               简体中文
             </a>
           </li>
@@ -206,7 +206,7 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href=".." title="DL Notes" class="md-nav__button md-logo" aria-label="DL Notes" data-md-component="logo">
+    <a href="../.." title="DL Notes" class="md-nav__button md-logo" aria-label="DL Notes" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -224,7 +224,7 @@
   
   
     <li class="md-nav__item">
-      <a href=".." class="md-nav__link">
+      <a href="../.." class="md-nav__link">
         
   
   
@@ -241,6 +241,112 @@
     
       
       
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hardware/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Hardware
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tensor/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Tensor Operation
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../neural-graphics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Neural Graphics
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    AI Infra
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            AI Infra
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
   
   
     
@@ -260,7 +366,7 @@
   
   
   <span class="md-ellipsis">
-    Hardware
+    Metrics
     
   </span>
   
@@ -273,7 +379,7 @@
   
   
   <span class="md-ellipsis">
-    Hardware
+    Metrics
     
   </span>
   
@@ -296,37 +402,52 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#gpu-npu-gpgpu" class="md-nav__link">
+  <a href="#latency" class="md-nav__link">
     <span class="md-ellipsis">
-      GPU, NPU, GPGPU
+      Latency
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#hbm-gddr" class="md-nav__link">
-    <span class="md-ellipsis">
-      HBM, GDDR
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#gpu-configuration" class="md-nav__link">
-    <span class="md-ellipsis">
-      GPU Configuration
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="GPU Configuration">
+    <nav class="md-nav" aria-label="Latency">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#specific-gpus-explicitly" class="md-nav__link">
+  <a href="#time-to-first-token-ttft" class="md-nav__link">
     <span class="md-ellipsis">
-      Specific GPUs Explicitly
+      Time to First Token (TTFT)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#time-per-output-token-tpot" class="md-nav__link">
+    <span class="md-ellipsis">
+      Time per Output Token (TPOT)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#throughput" class="md-nav__link">
+    <span class="md-ellipsis">
+      Throughput
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Throughput">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tokens-per-second-tps" class="md-nav__link">
+    <span class="md-ellipsis">
+      Tokens per Second (TPS)
     </span>
   </a>
   
@@ -344,110 +465,6 @@
     </li>
   
 
-    
-      
-      
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../tensor/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    Tensor Operation
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../neural-graphics/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    Neural Graphics
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
-    
-    
-    
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
-        
-          
-          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    AI Infra
-    
-  </span>
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_5">
-            <span class="md-nav__icon md-icon"></span>
-            AI Infra
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../llms/metrics/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    Metrics
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
               
             
               
@@ -457,7 +474,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../llms/kv-cache/" class="md-nav__link">
+      <a href="../kv-cache/" class="md-nav__link">
         
   
   
@@ -480,7 +497,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../llms/serving-runtime/" class="md-nav__link">
+      <a href="../serving-runtime/" class="md-nav__link">
         
   
   
@@ -503,7 +520,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../llms/parallelism/" class="md-nav__link">
+      <a href="../parallelism/" class="md-nav__link">
         
   
   
@@ -526,7 +543,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../llms/decoding/" class="md-nav__link">
+      <a href="../decoding/" class="md-nav__link">
         
   
   
@@ -549,7 +566,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../llms/training-objective/" class="md-nav__link">
+      <a href="../training-objective/" class="md-nav__link">
         
   
   
@@ -579,7 +596,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../llms/models/" class="md-nav__link">
+      <a href="../models/" class="md-nav__link">
         
   
   
@@ -621,37 +638,52 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#gpu-npu-gpgpu" class="md-nav__link">
+  <a href="#latency" class="md-nav__link">
     <span class="md-ellipsis">
-      GPU, NPU, GPGPU
+      Latency
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#hbm-gddr" class="md-nav__link">
-    <span class="md-ellipsis">
-      HBM, GDDR
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#gpu-configuration" class="md-nav__link">
-    <span class="md-ellipsis">
-      GPU Configuration
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="GPU Configuration">
+    <nav class="md-nav" aria-label="Latency">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#specific-gpus-explicitly" class="md-nav__link">
+  <a href="#time-to-first-token-ttft" class="md-nav__link">
     <span class="md-ellipsis">
-      Specific GPUs Explicitly
+      Time to First Token (TTFT)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#time-per-output-token-tpot" class="md-nav__link">
+    <span class="md-ellipsis">
+      Time per Output Token (TPOT)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#throughput" class="md-nav__link">
+    <span class="md-ellipsis">
+      Throughput
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Throughput">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tokens-per-second-tps" class="md-nav__link">
+    <span class="md-ellipsis">
+      Tokens per Second (TPS)
     </span>
   </a>
   
@@ -678,36 +710,81 @@
 
 
 
-<h1 id="hardware">Hardware</h1>
-<h2 id="gpu-npu-gpgpu">GPU, NPU, GPGPU</h2>
+<h1 id="metrics">Metrics</h1>
+<p>Latency and throughput metrics are the main interface between runtime behavior and user-visible serving performance. Most serving optimizations are not meaningful in isolation: a technique matters only if it changes what users experience or how much work the system can sustain. TTFT, TPOT, and TPS provide the vocabulary for describing that change. Without them, it becomes difficult to explain whether a scheduling policy improves responsiveness, whether a memory optimization really increases concurrency, or whether a deployment trade-off helps latency at the expense of throughput.</p>
+<h2 id="latency">Latency</h2>
+<p>Latency is the time taken to process a request and generate output tokens. In LLM inference, latency is often measured with two main metrics.</p>
+<p>The reason latency is split into multiple metrics is that a single end-to-end number hides different bottlenecks. Some techniques primarily improve how fast the model starts responding, whereas others improve steady-state generation speed.</p>
+<h3 id="time-to-first-token-ttft">Time to First Token (TTFT)</h3>
+<p>Time to First Token (TTFT) is the latency between when a request is received by the inference server and when the first output token is generated and returned to the client. It measures how quickly the model begins responding and is one of the most important user-perceived metrics in streaming systems:</p>
+<div class="arithmatex">\[
+\text{TTFT} = t_{\text{first token emitted}} - t_{\text{request received}}
+\]</div>
+<p>TTFT mainly captures the prefill phase plus scheduling and framework overhead. A useful decomposition is:</p>
+<div class="arithmatex">\[
+\small
+\begin{aligned}
+\text{TTFT} = t_{\text{queue}} + t_{\text{input processing}} + t_{\text{prefill compute}} + t_{\text{first decode step (optional)}} + t_{\text{framework overhead}}
+\end{aligned}
+\]</div>
+<p>where:</p>
 <ul>
-<li>
-<p><strong>GPU (Graphics Processing Unit)</strong>: A massively parallel, general-purpose processor (SIMT/SIMD) built for high throughput across many workloads—graphics, linear algebra, and most ML. Very flexible and programmable (CUDA/ROCm).</p>
-</li>
-<li>
-<p><strong>NPU (Neural Processing Unit)</strong>: A domain-specific accelerator optimized for neural-net kernels (matmul/conv, activation, pooling). Prioritizes energy efficiency and latency with fixed-function or semi-programmable dataflows.</p>
-</li>
-<li>
-<p><strong>GPGPU (General-Purpose computing on Graphics Processing Units)</strong>: It means using a GPU’s massively parallel hardware to run non-graphics workloads (science/ML/signal processing, etc.). Instead of drawing triangles, you launch compute kernels that apply the same operation to many data elements at once (SIMT/SIMD). This gives huge throughput for data-parallel problems.</p>
-</li>
+<li><span class="arithmatex">\(t_{\text{queue}}\)</span> is the waiting time before the scheduler admits the request.</li>
+<li><span class="arithmatex">\(t_{\text{input processing}}\)</span> includes tokenization, multimodal preprocessing, and request formatting.</li>
+<li><span class="arithmatex">\(t_{\text{prefill compute}}\)</span> is the forward pass over all input tokens, during which the KV cache is populated.</li>
+<li><span class="arithmatex">\(t_{\text{first decode step (optional)}}\)</span> appears in runtimes that separate prefill from the first decode step.</li>
+<li><span class="arithmatex">\(t_{\text{framework overhead}}\)</span> includes kernel launch latency, synchronization, allocation, sampling, and streaming overhead.</li>
 </ul>
-<h2 id="hbm-gddr">HBM, GDDR</h2>
-<p>GDDR (Graphics Double Data Rate) and HBM (High Bandwidth Memory) are two distinct types of memory technologies used in GPUs and high-performance computing systems, differing mainly in architecture, bandwidth, and power efficiency. GDDR uses a traditional planar design with memory chips arranged around the GPU, communicating over a relatively narrow bus at very high clock speeds to achieve high bandwidth. In contrast, HBM stacks multiple DRAM dies vertically and connects them to the processor using through-silicon vias (TSVs) and an interposer, creating an extremely wide memory interface that enables much higher bandwidth at lower clock speeds and reduced power consumption. As a result, HBM provides superior performance per watt and is often used in data centers and AI accelerators, while GDDR remains the preferred choice for consumer GPUs due to its lower cost and simpler integration.</p>
-<h2 id="gpu-configuration">GPU Configuration</h2>
-<p>锁步</p>
-<h3 id="specific-gpus-explicitly">Specific GPUs Explicitly</h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">set_device</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="c1">## or you can set the env variable</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;CUDA_VISIBLE_DEVICES&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;0,1&quot;</span>
-</span></code></pre></div>
-<p>or set the env variable when running the code:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nv">CUDA_VISIBLE_DEVICES</span><span class="o">=</span><span class="m">0</span>,1<span class="w"> </span>python<span class="w"> </span>script.py
-</span></code></pre></div>
-<p><strong>Comparison:</strong></p>
-<p>If you want to restrict which GPUs are available to your script before it even starts, <code>CUDA_VISIBLE_DEVICES</code> is the way to go.</p>
-<p>If you want to change the active GPU dynamically based on some logic in your code, you'll need to use <code>torch.cuda.set_device()</code>.</p>
+<p>For long-context inputs, TTFT is usually dominated by <span class="arithmatex">\(t_{\text{prefill compute}}\)</span>.</p>
+<h3 id="time-per-output-token-tpot">Time per Output Token (TPOT)</h3>
+<p>Time per Output Token (TPOT) measures the average latency required to generate each token after the first token has been emitted. It characterizes steady-state decode performance. For a request that generates <span class="arithmatex">\(N\)</span> output tokens:</p>
+<div class="arithmatex">\[
+\text{TPOT} = \frac{t_\text{last token emitted} - t_\text{first token emitted}}{N - 1}
+\]</div>
+<p>Equivalently, if total end-to-end latency is <span class="arithmatex">\(T_{\text{total}}\)</span>:</p>
+<div class="arithmatex">\[
+\text{TPOT} = \frac{T_{\text{total}} - \text{TTFT}}{N - 1}
+\]</div>
+<p>In steady-state decoding, each output token incurs:</p>
+<div class="arithmatex">\[
+\text{TPOT} = t_{\text{decode compute}} + t_{\text{communication}} + t_{\text{scheduling}} + t_{\text{framework overhead}}
+\]</div>
+<p>where:</p>
+<ul>
+<li><span class="arithmatex">\(t_{\text{decode compute}}\)</span> is the forward pass for one decode step using the KV cache.</li>
+<li><span class="arithmatex">\(t_{\text{communication}}\)</span> includes cross-GPU collectives, expert routing, and host-device transfers triggered by runtime behavior.</li>
+<li><span class="arithmatex">\(t_{\text{scheduling}}\)</span> includes batching, coordination, admission control, and KV-cache management.</li>
+<li><span class="arithmatex">\(t_{\text{framework overhead}}\)</span> includes sampling, launches, synchronization, and token-streaming overhead.</li>
+</ul>
+<p>Unlike TTFT, TPOT does not recompute the full prompt. However, it still depends on effective context length because each decode step attends to all cached tokens.</p>
+<h2 id="throughput">Throughput</h2>
+<h3 id="tokens-per-second-tps">Tokens per Second (TPS)</h3>
+<p>Tokens per Second (TPS) measures system throughput, that is, how many tokens are processed or generated per second under a given serving configuration. Over a time interval <span class="arithmatex">\(\Delta t\)</span>:</p>
+<p>Once a service must support many concurrent users, the central question is no longer only how fast one request finishes, but how much aggregate work one deployment can sustain before queues begin to grow.</p>
+<div class="arithmatex">\[
+\text{TPS} = \frac{N_\text{tokens}}{\Delta t}
+\]</div>
+<p>In many cases, TPS refers specifically to decode throughput:</p>
+<div class="arithmatex">\[
+\text{TPS}_\text{decode} = \frac{N_\text{output tokens}}{\Delta t}
+\]</div>
+<p>For a single sequential request, it is approximately the inverse of TPOT:</p>
+<div class="arithmatex">\[
+\text{TPS}_\text{per request} \approx \frac{1}{\text{TPOT}}
+\]</div>
+<p>In practical serving systems with continuous batching and concurrent decoding, aggregate throughput scales with the effective batch size <span class="arithmatex">\(B\)</span>. For a single replica:</p>
+<div class="arithmatex">\[
+\text{TPS}_\text{replica} \approx \frac{B}{\text{TPOT}}
+\]</div>
+<p>and with <span class="arithmatex">\(R\)</span> data-parallel replicas:</p>
+<div class="arithmatex">\[
+\text{TPS}_\text{total} \approx R \times \frac{B}{\text{TPOT}}
+\]</div>
+<p>For long-context or multimodal workloads, it is also useful to consider end-to-end throughput:</p>
+<div class="arithmatex">\[
+\text{TPS}_\text{end-to-end} = \frac{N_\text{prompt tokens} + N_\text{output tokens}}{\Delta t}
+\]</div>
+<p>Overall, TPS is influenced by model size, parallelism strategy, effective batch size, kernel efficiency, interconnect bandwidth, and the balance between prefill and decode.</p>
 
 
 
@@ -756,12 +833,12 @@
     
     
       
-      <script id="__config" type="application/json">{"base": "..", "features": [], "search": "../assets/javascripts/workers/search.973d3a69.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"base": "../..", "features": [], "search": "../../assets/javascripts/workers/search.973d3a69.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../assets/javascripts/bundle.f55a23d4.min.js"></script>
+      <script src="../../assets/javascripts/bundle.f55a23d4.min.js"></script>
       
-        <script src="../javascripts/mathjax.js"></script>
+        <script src="../../javascripts/mathjax.js"></script>
       
         <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
       

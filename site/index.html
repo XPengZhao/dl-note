@@ -300,9 +300,18 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#llms" class="md-nav__link">
+  <a href="#ai-infra" class="md-nav__link">
     <span class="md-ellipsis">
-      LLMs
+      AI Infra
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#models" class="md-nav__link">
+    <span class="md-ellipsis">
+      Models
     </span>
   </a>
   
@@ -428,7 +437,7 @@
   
   
   <span class="md-ellipsis">
-    LLMs
+    AI Infra
     
   </span>
   
@@ -439,7 +448,7 @@
         <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_5">
             <span class="md-nav__icon md-icon"></span>
-            LLMs
+            AI Infra
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
@@ -450,12 +459,12 @@
   
   
     <li class="md-nav__item">
-      <a href="llms/preliminary/" class="md-nav__link">
+      <a href="llms/metrics/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
-    Preliminary
+    Metrics
     
   </span>
   
@@ -468,6 +477,128 @@
             
               
                 
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="llms/kv-cache/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    KV Cache
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="llms/serving-runtime/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Serving Runtime
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="llms/parallelism/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Parallelism
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="llms/decoding/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Decoding
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="llms/training-objective/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Training Objective
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
   
   
   
@@ -484,14 +615,6 @@
   
 
       </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
     </li>
   
 
@@ -551,9 +674,18 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#llms" class="md-nav__link">
+  <a href="#ai-infra" class="md-nav__link">
     <span class="md-ellipsis">
-      LLMs
+      AI Infra
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#models" class="md-nav__link">
+    <span class="md-ellipsis">
+      Models
     </span>
   </a>
   
@@ -604,7 +736,12 @@
 <ol>
 <li><a href="hardware/">Hardware</a> - GPU/NPU basics, memory systems, and practical GPU configuration</li>
 <li><a href="tensor/">Tensor Operations</a> - core tensor manipulations, activation functions, and CUDA Graph notes</li>
-<li><a href="llms/preliminary/">AI Infra Preliminary</a> - LLM serving metrics, latency/throughput trade-offs, and KV cache fundamentals</li>
+<li><a href="llms/metrics/">AI Infra Metrics</a> - TTFT, TPOT, and TPS</li>
+<li><a href="llms/kv-cache/">KV Cache</a> - KV memory semantics, paged blocks, and prefix reuse</li>
+<li><a href="llms/serving-runtime/">Serving Runtime</a> - chunked prefill, admission control, and runtime-side stability</li>
+<li><a href="llms/parallelism/">Parallelism</a> - DP and TP from the perspective of memory, throughput, and communication</li>
+<li><a href="llms/decoding/">Decoding and Sampling</a> - sampling policies and speculative decoding</li>
+<li><a href="llms/training-objective/">Training Objective</a> - autoregressive pre-training objective</li>
 <li><a href="llms/models/">Models</a> - model-specific notes (Qwen3-Omni, DFlash) and practical serving commands</li>
 <li><a href="neural-graphics/">Neural Graphics</a> - NeRF and Flow Matching foundations</li>
 </ol>
@@ -614,9 +751,17 @@
 <li><a href="hardware/">Hardware</a></li>
 <li><a href="tensor/">Tensor Operations</a></li>
 </ul>
-<h3 id="llms">LLMs</h3>
+<h3 id="ai-infra">AI Infra</h3>
 <ul>
-<li><a href="llms/preliminary/">AI Infra Preliminary</a></li>
+<li><a href="llms/metrics/">Metrics</a></li>
+<li><a href="llms/kv-cache/">KV Cache</a></li>
+<li><a href="llms/serving-runtime/">Serving Runtime</a></li>
+<li><a href="llms/parallelism/">Parallelism</a></li>
+<li><a href="llms/decoding/">Decoding and Sampling</a></li>
+<li><a href="llms/training-objective/">Training Objective</a></li>
+</ul>
+<h3 id="models">Models</h3>
+<ul>
 <li><a href="llms/models/">Models</a></li>
 </ul>
 <h3 id="graphics-and-generative-modeling">Graphics and Generative Modeling</h3>

@@ -1,6 +1,6 @@
 
 <!doctype html>
-<html lang="zh" class="no-js">
+<html lang="en" class="no-js">
   <head>
     
       <meta charset="utf-8">
@@ -9,10 +9,10 @@
       
       
       
-        <link rel="prev" href="../">
+        <link rel="prev" href="../kv-cache/">
       
       
-        <link rel="next" href="../tensor/">
+        <link rel="next" href="../parallelism/">
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
@@ -20,7 +20,7 @@
     
     
       
-        <title>硬件 - DL Notes</title>
+        <title>Serving Runtime - DL Notes</title>
       
     
     
@@ -66,8 +66,8 @@
     <div data-md-component="skip">
       
         
-        <a href="#_1" class="md-skip">
-          跳转至
+        <a href="#serving-runtime" class="md-skip">
+          Skip to content
         </a>
       
     </div>
@@ -81,8 +81,8 @@
   
 
 <header class="md-header md-header--shadow" data-md-component="header">
-  <nav class="md-header__inner md-grid" aria-label="页眉">
-    <a href="../" title="DL Notes" class="md-header__button md-logo" aria-label="DL Notes" data-md-component="logo">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="DL Notes" class="md-header__button md-logo" aria-label="DL Notes" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -102,7 +102,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              硬件
+              Serving Runtime
             
           </span>
         </div>
@@ -116,20 +116,20 @@
       <div class="md-header__option">
   <div class="md-select">
     
-    <button class="md-header__button md-icon" aria-label="选择当前语言">
+    <button class="md-header__button md-icon" aria-label="Select language">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12.87 15.07-2.54-2.51.03-.03A17.5 17.5 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2zm-2.62 7 1.62-4.33L19.12 17z"/></svg>
     </button>
     <div class="md-select__inner">
       <ul class="md-select__list">
         
           <li class="md-select__item">
-            <a href="../../hardware/" hreflang="en" class="md-select__link">
+            <a href="./" hreflang="en" class="md-select__link">
               English
             </a>
           </li>
         
           <li class="md-select__item">
-            <a href="./" hreflang="zh" class="md-select__link">
+            <a href="../../zh/llms/serving-runtime/" hreflang="zh" class="md-select__link">
               简体中文
             </a>
           </li>
@@ -150,16 +150,16 @@
   <label class="md-search__overlay" for="__search"></label>
   <div class="md-search__inner" role="search">
     <form class="md-search__form" name="search">
-      <input type="text" class="md-search__input" name="query" aria-label="搜索" placeholder="搜索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
       <label class="md-search__icon md-icon" for="__search">
         
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
         
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
       </label>
-      <nav class="md-search__options" aria-label="查找">
+      <nav class="md-search__options" aria-label="Search">
         
-        <button type="reset" class="md-search__icon md-icon" title="清空当前内容" aria-label="清空当前内容" tabindex="-1">
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
           
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
         </button>
@@ -170,7 +170,7 @@
       <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
         <div class="md-search-result" data-md-component="search-result">
           <div class="md-search-result__meta">
-            正在初始化搜索引擎
+            Initializing search
           </div>
           <ol class="md-search-result__list" role="presentation"></ol>
         </div>
@@ -204,9 +204,9 @@
 
 
 
-<nav class="md-nav md-nav--primary" aria-label="导航栏" data-md-level="0">
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../" title="DL Notes" class="md-nav__button md-logo" aria-label="DL Notes" data-md-component="logo">
+    <a href="../.." title="DL Notes" class="md-nav__button md-logo" aria-label="DL Notes" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -224,140 +224,12 @@
   
   
     <li class="md-nav__item">
-      <a href="../" class="md-nav__link">
+      <a href="../.." class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
-    首页
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-    
-      
-      
-  
-  
-    
-  
-  
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    硬件
-    
-  </span>
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
-        
-  
-  
-  <span class="md-ellipsis">
-    硬件
-    
-  </span>
-  
-
-      </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="目录">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      目录
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#gpunpugpgpu" class="md-nav__link">
-    <span class="md-ellipsis">
-      GPU、NPU、GPGPU
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#hbmgddr" class="md-nav__link">
-    <span class="md-ellipsis">
-      HBM、GDDR
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#gpu" class="md-nav__link">
-    <span class="md-ellipsis">
-      GPU 配置
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="GPU 配置">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#gpu_1" class="md-nav__link">
-    <span class="md-ellipsis">
-      显式指定 GPU
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../tensor/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    张量操作
+    Home
     
   </span>
   
@@ -374,12 +246,12 @@
   
   
     <li class="md-nav__item">
-      <a href="../neural-graphics/" class="md-nav__link">
+      <a href="../../hardware/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
-    神经图形
+    Hardware
     
   </span>
   
@@ -395,16 +267,62 @@
   
   
   
+    <li class="md-nav__item">
+      <a href="../../tensor/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Tensor Operation
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../neural-graphics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Neural Graphics
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
     
     
     
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
         
           
           <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
@@ -420,7 +338,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_5">
             <span class="md-nav__icon md-icon"></span>
             AI Infra
@@ -434,12 +352,12 @@
   
   
     <li class="md-nav__item">
-      <a href="../llms/metrics/" class="md-nav__link">
+      <a href="../metrics/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
-    指标
+    Metrics
     
   </span>
   
@@ -457,7 +375,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../llms/kv-cache/" class="md-nav__link">
+      <a href="../kv-cache/" class="md-nav__link">
         
   
   
@@ -477,15 +395,122 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../llms/serving-runtime/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    Serving Runtime
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
   <span class="md-ellipsis">
-    推理运行时
+    Serving Runtime
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#scheduling" class="md-nav__link">
+    <span class="md-ellipsis">
+      Scheduling
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Scheduling">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#chunked-prefill" class="md-nav__link">
+    <span class="md-ellipsis">
+      Chunked Prefill
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#admission-control-and-stability" class="md-nav__link">
+    <span class="md-ellipsis">
+      Admission Control and Stability
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cross-stream-tensor-reuse" class="md-nav__link">
+    <span class="md-ellipsis">
+      Cross-Stream Tensor Reuse
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../parallelism/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Parallelism
     
   </span>
   
@@ -503,12 +528,12 @@
   
   
     <li class="md-nav__item">
-      <a href="../llms/parallelism/" class="md-nav__link">
+      <a href="../decoding/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
-    并行策略
+    Decoding
     
   </span>
   
@@ -526,35 +551,12 @@
   
   
     <li class="md-nav__item">
-      <a href="../llms/decoding/" class="md-nav__link">
+      <a href="../training-objective/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
-    解码与采样
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../llms/training-objective/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    训练目标
+    Training Objective
     
   </span>
   
@@ -579,12 +581,12 @@
   
   
     <li class="md-nav__item">
-      <a href="../llms/models/" class="md-nav__link">
+      <a href="../models/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
-    模型
+    Models
     
   </span>
   
@@ -607,7 +609,7 @@
                   <div class="md-sidebar__inner">
                     
 
-<nav class="md-nav md-nav--secondary" aria-label="目录">
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
   
   
   
@@ -616,42 +618,42 @@
   
     <label class="md-nav__title" for="__toc">
       <span class="md-nav__icon md-icon"></span>
-      目录
+      Table of contents
     </label>
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#gpunpugpgpu" class="md-nav__link">
+  <a href="#scheduling" class="md-nav__link">
     <span class="md-ellipsis">
-      GPU、NPU、GPGPU
+      Scheduling
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#hbmgddr" class="md-nav__link">
-    <span class="md-ellipsis">
-      HBM、GDDR
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#gpu" class="md-nav__link">
-    <span class="md-ellipsis">
-      GPU 配置
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="GPU 配置">
+    <nav class="md-nav" aria-label="Scheduling">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#gpu_1" class="md-nav__link">
+  <a href="#chunked-prefill" class="md-nav__link">
     <span class="md-ellipsis">
-      显式指定 GPU
+      Chunked Prefill
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#admission-control-and-stability" class="md-nav__link">
+    <span class="md-ellipsis">
+      Admission Control and Stability
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cross-stream-tensor-reuse" class="md-nav__link">
+    <span class="md-ellipsis">
+      Cross-Stream Tensor Reuse
     </span>
   </a>
   
@@ -678,36 +680,26 @@
 
 
 
-<h1 id="_1">硬件</h1>
-<h2 id="gpunpugpgpu">GPU、NPU、GPGPU</h2>
-<ul>
-<li>
-<p><strong>GPU（Graphics Processing Unit，图形处理器）</strong>：一种高度并行、通用的处理器（SIMT/SIMD），面向高吞吐场景设计，适用于图形、线性代数和大多数机器学习任务。灵活且可编程（CUDA/ROCm）。</p>
-</li>
-<li>
-<p><strong>NPU（Neural Processing Unit，神经网络处理器）</strong>：面向神经网络算子的专用加速器（如 matmul/conv、激活、池化）。通常通过固定功能或半可编程数据流，优先优化能效与时延。</p>
-</li>
-<li>
-<p><strong>GPGPU（General-Purpose computing on Graphics Processing Units，通用 GPU 计算）</strong>：指利用 GPU 的大规模并行硬件执行非图形任务（科学计算/机器学习/信号处理等）。你不是在绘制三角形，而是在运行计算 kernel，让同一种操作并行作用于大量数据元素（SIMT/SIMD），从而在数据并行问题上获得高吞吐。</p>
-</li>
-</ul>
-<h2 id="hbmgddr">HBM、GDDR</h2>
-<p>GDDR（Graphics Double Data Rate）和 HBM（High Bandwidth Memory）是用于 GPU 与高性能计算系统的两类不同显存技术，主要差异在于架构、带宽与能效。GDDR 采用传统平面布局，显存芯片分布在 GPU 周围，通过相对较窄的总线和高频率获得带宽。HBM 则将多层 DRAM 进行 3D 堆叠，并通过 TSV（硅通孔）与中介层（interposer）连接处理器，形成超宽内存接口，在更低频率下实现更高带宽和更低功耗。因此，HBM 在性能功耗比上更优，常见于数据中心与 AI 加速器；GDDR 因成本更低、集成更简单，仍是消费级 GPU 的主流选择。</p>
-<h2 id="gpu">GPU 配置</h2>
-<p>锁步</p>
-<h3 id="gpu_1">显式指定 GPU</h3>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">set_device</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="c1">## or you can set the env variable</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;CUDA_VISIBLE_DEVICES&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;0,1&quot;</span>
-</span></code></pre></div>
-<p>也可以在运行时直接设置环境变量：</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nv">CUDA_VISIBLE_DEVICES</span><span class="o">=</span><span class="m">0</span>,1<span class="w"> </span>python<span class="w"> </span>script.py
-</span></code></pre></div>
-<p><strong>对比：</strong></p>
-<p>如果你希望在脚本启动前就限制可见 GPU，使用 <code>CUDA_VISIBLE_DEVICES</code> 最直接。</p>
-<p>如果你希望根据代码逻辑在运行中动态切换当前设备，则需要 <code>torch.cuda.set_device()</code>。</p>
+<h1 id="serving-runtime">Serving Runtime</h1>
+<p>Many serving bottlenecks appear only after deployment. Even when the model is fixed, the system still has to decide how requests are admitted, how long prompts are interleaved with decode work, and how memory pressure is handled in steady state. This is why runtime deserves to be discussed separately from model architecture: under real workloads, scheduling and memory management can substantially change the effective behavior of the same model.</p>
+<h2 id="scheduling">Scheduling</h2>
+<h3 id="chunked-prefill">Chunked Prefill</h3>
+<p>Chunked prefill is a serving-side optimization for long-context inference. Instead of processing the entire prompt in one prefill pass, the runtime splits it into smaller chunks and executes them incrementally. If the input length is <span class="arithmatex">\(L\)</span> and the chunk size is <span class="arithmatex">\(C\)</span>, the prefill stage is decomposed into roughly</p>
+<div class="arithmatex">\[
+N_{\text{chunks}} = \left\lceil \frac{L}{C} \right\rceil
+\]</div>
+<p>sub-requests. For chunk <span class="arithmatex">\(j\)</span>, the model processes only the assigned token range and appends the resulting keys and values to the KV cache before moving to the next chunk.</p>
+<p>A long prefill request is wide and compute-heavy, whereas decode consists of many small latency-sensitive iterations. If a very long prompt is executed as one monolithic prefill, it can occupy the GPU for a long interval and delay unrelated decode work. Chunked prefill reduces the scheduling granularity of prompt processing, allowing the runtime to interleave long-prefill requests with decode steps or shorter prompts from other users. In practice, this is mainly a fairness and responsiveness optimization under continuous batching.</p>
+<p>Chunked prefill can also reduce peak runtime memory during prefill. When the prompt is processed all at once, the runtime may need larger temporary activations, attention workspaces, or other intermediate buffers for the full sequence. With chunking, these transient buffers scale with the chunk size rather than the full prompt length, which can help avoid OOM for very long inputs. However, it does not reduce the final KV cache footprint: if all prompt tokens remain in context, their keys and values still have to be stored. In other words, chunked prefill can lower transient prefill memory, but not the steady-state KV cache requirement.</p>
+<p>This changes scheduling and peak-memory behavior rather than model semantics. The final KV cache and output logits are identical to those of an unchunked prefill, assuming the same attention mask and numerics. The trade-off is that very small chunks increase launch and scheduling overhead, while very large chunks recover the behavior of ordinary monolithic prefill. Conceptually, chunked prefill belongs to the serving runtime rather than the model architecture.</p>
+<h3 id="admission-control-and-stability">Admission Control and Stability</h3>
+<p>In practice, serving stability is largely determined by admission-control knobs such as <code>max-num-seqs</code>, <code>max-num-batched-tokens</code>, and the effective GPU memory budget exposed to the runtime. These parameters define how much concurrent work the engine may admit before it approaches the KV-capacity wall.</p>
+<p>Naively maximizing concurrency often backfires. A deployment that admits too much work can cross into a regime dominated by preemption, swapping, or long queueing delays, which lowers effective throughput and makes latency unpredictable.</p>
+<p>The tuning objective is usually not to maximize theoretical concurrency at any cost. A more useful target is the stable operating region in which the runtime sustains high GPU utilization without repeatedly triggering preemption, swapping, or large tail-latency spikes. This is why runtime tuning is inseparable from KV-cache analysis: batching policy, scheduler behavior, and memory pressure are coupled.</p>
+<h3 id="cross-stream-tensor-reuse">Cross-Stream Tensor Reuse</h3>
+<p>If a tensor is produced on one CUDA stream and consumed on another, a device-to-device copy is not required by default. The same storage can be reused across streams as long as the program establishes the correct ordering, typically through events or stream synchronization. The main cost is therefore synchronization and any lost overlap, not mandatory duplication of the tensor.</p>
+<p>This topic matters because stream-level execution is often misunderstood. When engineers observe work crossing stream boundaries, it is easy to assume that the main penalty is copying, whereas in many cases the real issue is serialization, dependency tracking, or lost overlap.</p>
+<p>An explicit copy becomes necessary only when the program intentionally creates a new buffer, changes layout, or moves data between devices. From a runtime-analysis perspective, cross-stream communication is usually a question of dependency management rather than a question of whether a new tensor payload must be copied.</p>
 
 
 
@@ -756,7 +748,7 @@
     
     
       
-      <script id="__config" type="application/json">{"base": "../..", "features": [], "search": "../../assets/javascripts/workers/search.973d3a69.min.js", "tags": null, "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}, "version": null}</script>
+      <script id="__config" type="application/json">{"base": "../..", "features": [], "search": "../../assets/javascripts/workers/search.973d3a69.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
       <script src="../../assets/javascripts/bundle.f55a23d4.min.js"></script>

@@ -20,17 +20,27 @@ plugins:
             Hardware: 硬件
             Tensor Operation: 张量操作
             Neural Graphics: 神经图形
-            LLMs: 大语言模型
-            Preliminary: AI Infra 基础
+            AI Infra: AI Infra
+            Metrics: 指标
+            KV Cache: KV Cache
+            Serving Runtime: 推理运行时
+            Parallelism: 并行策略
+            Decoding: 解码与采样
+            Training Objective: 训练目标
             Models: 模型
 nav:
   - Home: index.md
   - Hardware: hardware.md
   - Tensor Operation: tensor.md
   - Neural Graphics: neural-graphics.md
-  - LLMs:
-      - Preliminary: llms/preliminary.md
-      - Models: llms/models.md
+  - AI Infra:
+      - Metrics: llms/metrics.md
+      - KV Cache: llms/kv-cache.md
+      - Serving Runtime: llms/serving-runtime.md
+      - Parallelism: llms/parallelism.md
+      - Decoding: llms/decoding.md
+      - Training Objective: llms/training-objective.md
+  - Models: llms/models.md
 markdown_extensions:
   - pymdownx.highlight:
       anchor_linenums: true

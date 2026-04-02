@@ -300,9 +300,18 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#ai-infra" class="md-nav__link">
+    <span class="md-ellipsis">
+      AI Infra
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#_4" class="md-nav__link">
     <span class="md-ellipsis">
-      大语言模型
+      模型
     </span>
   </a>
   
@@ -428,7 +437,7 @@
   
   
   <span class="md-ellipsis">
-    大语言模型
+    AI Infra
     
   </span>
   
@@ -439,7 +448,7 @@
         <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_5">
             <span class="md-nav__icon md-icon"></span>
-            大语言模型
+            AI Infra
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
@@ -450,12 +459,12 @@
   
   
     <li class="md-nav__item">
-      <a href="llms/preliminary/" class="md-nav__link">
+      <a href="llms/metrics/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
-    AI Infra 基础
+    指标
     
   </span>
   
@@ -468,6 +477,128 @@
             
               
                 
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="llms/kv-cache/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    KV Cache
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="llms/serving-runtime/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    推理运行时
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="llms/parallelism/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    并行策略
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="llms/decoding/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    解码与采样
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="llms/training-objective/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    训练目标
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
   
   
   
@@ -484,14 +615,6 @@
   
 
       </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
     </li>
   
 
@@ -551,9 +674,18 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#ai-infra" class="md-nav__link">
+    <span class="md-ellipsis">
+      AI Infra
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#_4" class="md-nav__link">
     <span class="md-ellipsis">
-      大语言模型
+      模型
     </span>
   </a>
   
@@ -605,7 +737,12 @@
 <ol>
 <li><a href="hardware/">硬件</a> - GPU/NPU 基础、显存类型与 GPU 配置</li>
 <li><a href="tensor/">张量操作</a> - 常见张量维度操作、激活函数与 CUDA Graph</li>
-<li><a href="llms/preliminary/">LLM 基础</a> - 推理延迟/吞吐指标、KV Cache 与采样机制</li>
+<li><a href="llms/metrics/">AI Infra 指标</a> - TTFT、TPOT 与 TPS</li>
+<li><a href="llms/kv-cache/">KV Cache</a> - KV 内存语义、paged blocks 与 prefix 复用</li>
+<li><a href="llms/serving-runtime/">推理运行时</a> - chunked prefill、准入控制与运行时稳定性</li>
+<li><a href="llms/parallelism/">并行策略</a> - 从显存、吞吐与通信理解 DP/TP</li>
+<li><a href="llms/decoding/">解码与采样</a> - 采样策略与 speculative decoding</li>
+<li><a href="llms/training-objective/">训练目标</a> - 自回归预训练目标</li>
 <li><a href="llms/models/">模型笔记</a> - Qwen3-Omni 与 DFlash 的结构和实践命令</li>
 <li><a href="neural-graphics/">神经图形</a> - NeRF 与 Flow Matching 基础</li>
 </ol>
@@ -615,9 +752,17 @@
 <li><a href="hardware/">硬件</a></li>
 <li><a href="tensor/">张量操作</a></li>
 </ul>
-<h3 id="_4">大语言模型</h3>
+<h3 id="ai-infra">AI Infra</h3>
 <ul>
-<li><a href="llms/preliminary/">LLM 基础</a></li>
+<li><a href="llms/metrics/">指标</a></li>
+<li><a href="llms/kv-cache/">KV Cache</a></li>
+<li><a href="llms/serving-runtime/">推理运行时</a></li>
+<li><a href="llms/parallelism/">并行策略</a></li>
+<li><a href="llms/decoding/">解码与采样</a></li>
+<li><a href="llms/training-objective/">训练目标</a></li>
+</ul>
+<h3 id="_4">模型</h3>
+<ul>
 <li><a href="llms/models/">模型笔记</a></li>
 </ul>
 <h3 id="_5">图形与生成建模</h3>

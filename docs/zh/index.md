@@ -8,9 +8,14 @@
 
 1. [硬件](hardware.md) - GPU/NPU 基础、显存类型与 GPU 配置
 2. [张量操作](tensor.md) - 常见张量维度操作、激活函数与 CUDA Graph
-3. [LLM 基础](llms/preliminary.md) - 推理延迟/吞吐指标、KV Cache 与采样机制
-4. [模型笔记](llms/models.md) - Qwen3-Omni 与 DFlash 的结构和实践命令
-5. [神经图形](neural-graphics.md) - NeRF 与 Flow Matching 基础
+3. [AI Infra 指标](llms/metrics.md) - TTFT、TPOT 与 TPS
+4. [KV Cache](llms/kv-cache.md) - KV 内存语义、paged blocks 与 prefix 复用
+5. [推理运行时](llms/serving-runtime.md) - chunked prefill、准入控制与运行时稳定性
+6. [并行策略](llms/parallelism.md) - 从显存、吞吐与通信理解 DP/TP
+7. [解码与采样](llms/decoding.md) - 采样策略与 speculative decoding
+8. [训练目标](llms/training-objective.md) - 自回归预训练目标
+9. [模型笔记](llms/models.md) - Qwen3-Omni 与 DFlash 的结构和实践命令
+10. [神经图形](neural-graphics.md) - NeRF 与 Flow Matching 基础
 
 ## 文档目录
 
@@ -19,9 +24,17 @@
 - [硬件](hardware.md)
 - [张量操作](tensor.md)
 
-### 大语言模型
+### AI Infra
 
-- [LLM 基础](llms/preliminary.md)
+- [指标](llms/metrics.md)
+- [KV Cache](llms/kv-cache.md)
+- [推理运行时](llms/serving-runtime.md)
+- [并行策略](llms/parallelism.md)
+- [解码与采样](llms/decoding.md)
+- [训练目标](llms/training-objective.md)
+
+### 模型
+
 - [模型笔记](llms/models.md)
 
 ### 图形与生成建模

@@ -1,0 +1,991 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../metrics/">
+      
+      
+        <link rel="next" href="../serving-runtime/">
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.21">
+    
+    
+      
+        <title>KV Cache - DL Notes</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.2a3383ac.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../stylesheets/bootstrap.min.css">
+    
+      <link rel="stylesheet" href="../../stylesheets/basic.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#kv-cache" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="DL Notes" class="md-header__button md-logo" aria-label="DL Notes" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            DL Notes
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              KV Cache
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+      <div class="md-header__option">
+  <div class="md-select">
+    
+    <button class="md-header__button md-icon" aria-label="Select language">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12.87 15.07-2.54-2.51.03-.03A17.5 17.5 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2zm-2.62 7 1.62-4.33L19.12 17z"/></svg>
+    </button>
+    <div class="md-select__inner">
+      <ul class="md-select__list">
+        
+          <li class="md-select__item">
+            <a href="./" hreflang="en" class="md-select__link">
+              English
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="../../zh/llms/kv-cache/" hreflang="zh" class="md-select__link">
+              简体中文
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="DL Notes" class="md-nav__button md-logo" aria-label="DL Notes" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    DL Notes
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Home
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hardware/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Hardware
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tensor/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Tensor Operation
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../neural-graphics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Neural Graphics
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    AI Infra
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            AI Infra
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../metrics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Metrics
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    KV Cache
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    KV Cache
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#kv-memory" class="md-nav__link">
+    <span class="md-ellipsis">
+      KV Memory
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="KV Memory">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#memory-cost" class="md-nav__link">
+    <span class="md-ellipsis">
+      Memory Cost
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#relationship-among-requests-tokens-blocks-and-pages" class="md-nav__link">
+    <span class="md-ellipsis">
+      Relationship Among Requests, Tokens, Blocks, and Pages
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-pagedattention-is-needed" class="md-nav__link">
+    <span class="md-ellipsis">
+      Why PagedAttention Is Needed
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#contiguous-within-a-block-non-contiguous-across-blocks" class="md-nav__link">
+    <span class="md-ellipsis">
+      Contiguous Within a Block, Non-Contiguous Across Blocks
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#prefix-caching-is-reuse-at-block-granularity" class="md-nav__link">
+    <span class="md-ellipsis">
+      Prefix Caching Is Reuse at Block Granularity
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#what-preemption-means" class="md-nav__link">
+    <span class="md-ellipsis">
+      What Preemption Means
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#attention-and-kv-efficiency" class="md-nav__link">
+    <span class="md-ellipsis">
+      Attention and KV Efficiency
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Attention and KV Efficiency">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#mha-multi-head-attention" class="md-nav__link">
+    <span class="md-ellipsis">
+      MHA: Multi-Head Attention
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mqa-multi-query-attention" class="md-nav__link">
+    <span class="md-ellipsis">
+      MQA: Multi-Query Attention
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gqa-grouped-query-attention" class="md-nav__link">
+    <span class="md-ellipsis">
+      GQA: Grouped-Query Attention
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#related" class="md-nav__link">
+    <span class="md-ellipsis">
+      Related
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../serving-runtime/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Serving Runtime
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../parallelism/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Parallelism
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../decoding/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Decoding
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../training-objective/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Training Objective
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Models
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#kv-memory" class="md-nav__link">
+    <span class="md-ellipsis">
+      KV Memory
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="KV Memory">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#memory-cost" class="md-nav__link">
+    <span class="md-ellipsis">
+      Memory Cost
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#relationship-among-requests-tokens-blocks-and-pages" class="md-nav__link">
+    <span class="md-ellipsis">
+      Relationship Among Requests, Tokens, Blocks, and Pages
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-pagedattention-is-needed" class="md-nav__link">
+    <span class="md-ellipsis">
+      Why PagedAttention Is Needed
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#contiguous-within-a-block-non-contiguous-across-blocks" class="md-nav__link">
+    <span class="md-ellipsis">
+      Contiguous Within a Block, Non-Contiguous Across Blocks
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#prefix-caching-is-reuse-at-block-granularity" class="md-nav__link">
+    <span class="md-ellipsis">
+      Prefix Caching Is Reuse at Block Granularity
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#what-preemption-means" class="md-nav__link">
+    <span class="md-ellipsis">
+      What Preemption Means
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#attention-and-kv-efficiency" class="md-nav__link">
+    <span class="md-ellipsis">
+      Attention and KV Efficiency
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Attention and KV Efficiency">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#mha-multi-head-attention" class="md-nav__link">
+    <span class="md-ellipsis">
+      MHA: Multi-Head Attention
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mqa-multi-query-attention" class="md-nav__link">
+    <span class="md-ellipsis">
+      MQA: Multi-Query Attention
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gqa-grouped-query-attention" class="md-nav__link">
+    <span class="md-ellipsis">
+      GQA: Grouped-Query Attention
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#related" class="md-nav__link">
+    <span class="md-ellipsis">
+      Related
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="kv-cache">KV Cache</h1>
+<p>In long-context serving, the main bottleneck is often not model weights but the memory required to keep attention state alive. As prompts grow and concurrency rises, KV cache quickly becomes the dominant systems object: it limits how many requests can stay active, determines when preemption occurs, and strongly shapes deployment choices such as DP versus TP. Many serving optimizations exist precisely because this memory budget is tight.</p>
+<h2 id="kv-memory">KV Memory</h2>
+<h3 id="memory-cost">Memory Cost</h3>
+<p>The KV-cache size can be approximated as:</p>
+<p>The first question is why KV cache becomes expensive so quickly. The answer is that it scales with every token that remains in context and with every transformer layer, so even moderate sequence lengths can translate into multi-gigabyte memory footprints per request.</p>
+<div class="arithmatex">\[
+\text{KV size} = 2 \times \text{num layers} \times \text{num heads} \times \text{seq len} \times \text{head dim}
+\]</div>
+<p>Assume:</p>
+<ul>
+<li>32 layers, 80 heads, <code>head_dim = 128</code>, <code>seq_len = 4K</code></li>
+<li>FP16 KV cache: <span class="arithmatex">\(2 \times 32 \times 80 \times 4K \times 128 \times 2\)</span> bytes <span class="arithmatex">\(\approx 5.2\)</span> GB per sample</li>
+<li>int8 KV cache: approximately half of that, or about 2.6 GB per sample</li>
+</ul>
+<h3 id="relationship-among-requests-tokens-blocks-and-pages">Relationship Among Requests, Tokens, Blocks, and Pages</h3>
+<p>In a serving system, a request is the application-level object, a token is the sequence-level object, and a KV block is the runtime-level memory object used to manage the KV cache. A request corresponds to one logical token sequence. As prefill and decode proceed, every token in that sequence produces keys and values at every layer, and those tensors are appended to the request's KV cache. If the runtime uses a block size of <span class="arithmatex">\(B\)</span> tokens, then a request of length <span class="arithmatex">\(L\)</span> requires approximately</p>
+<div class="arithmatex">\[
+N_{\text{blocks}} = \left\lceil \frac{L}{B} \right\rceil
+\]</div>
+<p>KV blocks to store its context state.</p>
+<p>Accordingly, a request is not mapped to one monolithic contiguous KV allocation. It is mapped to a list of blocks:</p>
+<div class="arithmatex">\[
+\text{request} \rightarrow \text{token sequence} \rightarrow \text{KV blocks}
+\]</div>
+<p>The final block is often only partially filled, so the block size determines the granularity of tail waste. Smaller blocks improve memory granularity, whereas larger blocks shorten the block table and simplify management at the cost of coarser reuse.</p>
+<p>In the vLLM context, page is primarily a description of this organization style rather than a distinct object above blocks. A paged KV cache means that the KV state of one request is assembled from many fixed-size blocks rather than one contiguous physical segment. In this sense, page refers to the paged organization, while block refers to the actual allocation unit.</p>
+<h3 id="why-pagedattention-is-needed">Why PagedAttention Is Needed</h3>
+<p>PagedAttention is not mainly about how data are laid out inside one block. Its central purpose is to define how a growing request is represented by multiple blocks while preserving a logically contiguous KV address space.</p>
+<p>The underlying problem is that a naive contiguous-allocation design does not match the way serving workloads evolve. Requests arrive with different lengths, they grow during decoding, and they leave at different times. A memory manager that insists on large contiguous allocations will fragment quickly and force costly data movement.</p>
+<p>First, it avoids reserving one large contiguous memory region for each request. If the KV cache for a request had to remain physically contiguous, mixed long and short requests would quickly create external fragmentation.</p>
+<p>Second, it avoids expensive data movement when a request grows. During autoregressive decoding, new tokens are appended to the context one by one. Under a contiguous-allocation scheme, a request that outgrows its original region would require copying its existing KV tensors to a larger contiguous region. Under PagedAttention, the runtime only needs to attach new blocks.</p>
+<p>Third, it makes sharing, eviction, and scheduling naturally block-granular. Prefix caching reuses complete blocks, and memory reclamation or scheduler-driven eviction also operates at block granularity.</p>
+<h3 id="contiguous-within-a-block-non-contiguous-across-blocks">Contiguous Within a Block, Non-Contiguous Across Blocks</h3>
+<p>PagedAttention does not imply that the GPU reads KV tensors in a fully random way. A more precise description is contiguous within a block and potentially non-contiguous across blocks. The runtime maintains a block table that maps logical sequence positions to physical blocks. The attention kernel then uses this mapping to locate the physical blocks associated with a request and performs reads and computation block by block.</p>
+<p>The indirection introduced by PagedAttention is therefore block-level rather than token-level. A block can still use a regular memory layout favorable to vectorized access and high-bandwidth reads, while non-contiguity appears mainly in the list of physical blocks that together form one request.</p>
+<h3 id="prefix-caching-is-reuse-at-block-granularity">Prefix Caching Is Reuse at Block Granularity</h3>
+<p>In vLLM, automatic prefix caching does not reuse arbitrary token ranges. It reuses complete blocks. Let the block size be <span class="arithmatex">\(B\)</span>. If two requests share a common prefix of length <span class="arithmatex">\(L_{\text{shared}}\)</span>, then at most</p>
+<div class="arithmatex">\[
+\left\lfloor \frac{L_{\text{shared}}}{B} \right\rfloor
+\]</div>
+<p>complete blocks can be reused directly. A partially filled tail block usually cannot be treated as a cache hit. Therefore, the block size affects not only memory-allocation granularity but also prefix-cache reuse granularity.</p>
+<h3 id="what-preemption-means">What Preemption Means</h3>
+<p>In vLLM, preemption means that when the GPU no longer has enough available KV blocks to satisfy the current scheduling decision, the runtime temporarily interrupts one or more in-flight requests and reclaims or migrates the KV resources they occupy so that other requests can proceed. It is fundamentally a scheduling response to memory pressure rather than a numerical property of the model.</p>
+<p>The reason preemption matters is that it marks the boundary between a healthy operating regime and a memory-stressed one. A system may remain alive after preemption begins, but repeated preemption usually indicates that concurrency has exceeded what the current KV budget can support efficiently.</p>
+<p>At the systems level, preemption usually indicates that the configuration is close to or already hitting the KV-capacity wall. Typical triggers include excessive request concurrency, very long contexts, large output lengths, insufficient tensor parallelism leading to a small per-GPU KV budget, or overly aggressive settings of <code>max-num-seqs</code> or <code>max-num-batched-tokens</code>.</p>
+<h2 id="attention-and-kv-efficiency">Attention and KV Efficiency</h2>
+<p>In transformer models, the attention module computes:</p>
+<div class="arithmatex">\[
+\operatorname{Attention}(Q, K, V)=\operatorname{softmax}\left(\frac{Q K^T}{\sqrt{d_k}}\right) V
+\]</div>
+<p>Every token produces:</p>
+<ul>
+<li><strong>Q (Query)</strong>, derived from the current token's hidden state</li>
+<li><strong>K (Key)</strong> and <strong>V (Value)</strong>, derived from the context and stored in the KV cache</li>
+</ul>
+<p>The difference among MHA, MQA, and GQA lies in how many Key/Value projections are used relative to the number of Query heads.</p>
+<p>In inference, MHA, MQA, and GQA are not only architectural details; they directly change how much KV state must be stored per token, which in turn changes feasible context length and concurrency.</p>
+<h3 id="mha-multi-head-attention">MHA: Multi-Head Attention</h3>
+<p>Each attention head has its own set of projections:</p>
+<div class="arithmatex">\[
+Q_i = X W_{Q, i}, \quad K_i = X W_{K, i}, \quad V_i = X W_{V, i}
+\]</div>
+<ul>
+<li>The number of Q, K, and V heads is the same.</li>
+</ul>
+<h3 id="mqa-multi-query-attention">MQA: Multi-Query Attention</h3>
+<p>All heads share one K projection and one V projection:</p>
+<div class="arithmatex">\[
+K_{\text{shared}} = X W_K, \quad V_{\text{shared}} = X W_V
+\]</div>
+<ul>
+<li>There are multiple Q heads but only one shared K/V pair.</li>
+<li>The same K/V tensors are reused by all heads during inference.</li>
+<li>KV-cache size is reduced substantially relative to standard MHA.</li>
+</ul>
+<h3 id="gqa-grouped-query-attention">GQA: Grouped-Query Attention</h3>
+<p>Queries are split into groups, and each group shares its own K/V:</p>
+<div class="arithmatex">\[
+\text{Group } g: \quad Q_{g, *}, K_g, V_g
+\]</div>
+<ul>
+<li>K/V heads are fewer than Q heads.</li>
+<li>GQA is a compromise between the representational flexibility of MHA and the memory efficiency of MQA.</li>
+</ul>
+<h2 id="related">Related</h2>
+<ul>
+<li><a href="../metrics/">Metrics</a> defines TTFT, TPOT, and TPS.</li>
+<li><a href="../serving-runtime/">Serving Runtime</a> covers scheduler behavior once KV memory becomes the bottleneck.</li>
+<li><a href="../parallelism/">Parallelism</a> explains how DP and TP change memory budget, throughput, and communication.</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      <script id="__config" type="application/json">{"base": "../..", "features": [], "search": "../../assets/javascripts/workers/search.973d3a69.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.f55a23d4.min.js"></script>
+      
+        <script src="../../javascripts/mathjax.js"></script>
+      
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>
