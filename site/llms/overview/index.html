@@ -9,10 +9,10 @@
       
       
       
-        <link rel="prev" href="../request-lifecycle/">
+        <link rel="prev" href="../../neural-graphics/">
       
       
-        <link rel="next" href="../kv-cache/">
+        <link rel="next" href="../request-lifecycle/">
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
@@ -20,7 +20,7 @@
     
     
       
-        <title>Metrics - DL Notes</title>
+        <title>Overview - DL Notes</title>
       
     
     
@@ -66,7 +66,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#metrics" class="md-skip">
+        <a href="#ai-infra-overview" class="md-skip">
           Skip to content
         </a>
       
@@ -102,7 +102,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Metrics
+              Overview
             
           </span>
         </div>
@@ -129,7 +129,7 @@
           </li>
         
           <li class="md-select__item">
-            <a href="../../zh/llms/metrics/" hreflang="zh" class="md-select__link">
+            <a href="../../zh/llms/overview/" hreflang="zh" class="md-select__link">
               简体中文
             </a>
           </li>
@@ -349,10 +349,32 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../overview/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    Overview
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -363,6 +385,158 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#why-an-overview-helps" class="md-nav__link">
+    <span class="md-ellipsis">
+      Why an Overview Helps
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#two-axes-control-plane-and-data-plane" class="md-nav__link">
+    <span class="md-ellipsis">
+      Two Axes: Control Plane and Data Plane
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#layered-view-of-the-inference-stack" class="md-nav__link">
+    <span class="md-ellipsis">
+      Layered View of the Inference Stack
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Layered View of the Inference Stack">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-application-layer" class="md-nav__link">
+    <span class="md-ellipsis">
+      1. Application Layer
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-agent-and-orchestration-layer" class="md-nav__link">
+    <span class="md-ellipsis">
+      2. Agent and Orchestration Layer
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-gateway-and-routing-layer" class="md-nav__link">
+    <span class="md-ellipsis">
+      3. Gateway and Routing Layer
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-serving-engine-layer" class="md-nav__link">
+    <span class="md-ellipsis">
+      4. Serving Engine Layer
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-runtime-and-scheduler-layer" class="md-nav__link">
+    <span class="md-ellipsis">
+      5. Runtime and Scheduler Layer
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#6-model-execution-layer" class="md-nav__link">
+    <span class="md-ellipsis">
+      6. Model Execution Layer
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#7-operator-and-kernel-layer" class="md-nav__link">
+    <span class="md-ellipsis">
+      7. Operator and Kernel Layer
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#8-system-runtime-and-hardware-layer" class="md-nav__link">
+    <span class="md-ellipsis">
+      8. System Runtime and Hardware Layer
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#where-vllm-and-sglang-fit" class="md-nav__link">
+    <span class="md-ellipsis">
+      Where vLLM and SGLang Fit
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#a-request-walkthrough" class="md-nav__link">
+    <span class="md-ellipsis">
+      A Request Walkthrough
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#a-practical-reading-map" class="md-nav__link">
+    <span class="md-ellipsis">
+      A Practical Reading Map
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -395,32 +569,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    Metrics
-    
-  </span>
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../metrics/" class="md-nav__link">
         
   
   
@@ -431,83 +583,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#latency" class="md-nav__link">
-    <span class="md-ellipsis">
-      Latency
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Latency">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#time-to-first-token-ttft" class="md-nav__link">
-    <span class="md-ellipsis">
-      Time to First Token (TTFT)
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#time-per-output-token-tpot" class="md-nav__link">
-    <span class="md-ellipsis">
-      Time per Output Token (TPOT)
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#throughput" class="md-nav__link">
-    <span class="md-ellipsis">
-      Throughput
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Throughput">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#tokens-per-second-tps" class="md-nav__link">
-    <span class="md-ellipsis">
-      Tokens per Second (TPS)
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -684,28 +759,100 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#latency" class="md-nav__link">
+  <a href="#why-an-overview-helps" class="md-nav__link">
     <span class="md-ellipsis">
-      Latency
+      Why an Overview Helps
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Latency">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#two-axes-control-plane-and-data-plane" class="md-nav__link">
+    <span class="md-ellipsis">
+      Two Axes: Control Plane and Data Plane
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#layered-view-of-the-inference-stack" class="md-nav__link">
+    <span class="md-ellipsis">
+      Layered View of the Inference Stack
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Layered View of the Inference Stack">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#time-to-first-token-ttft" class="md-nav__link">
+  <a href="#1-application-layer" class="md-nav__link">
     <span class="md-ellipsis">
-      Time to First Token (TTFT)
+      1. Application Layer
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#time-per-output-token-tpot" class="md-nav__link">
+  <a href="#2-agent-and-orchestration-layer" class="md-nav__link">
     <span class="md-ellipsis">
-      Time per Output Token (TPOT)
+      2. Agent and Orchestration Layer
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-gateway-and-routing-layer" class="md-nav__link">
+    <span class="md-ellipsis">
+      3. Gateway and Routing Layer
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-serving-engine-layer" class="md-nav__link">
+    <span class="md-ellipsis">
+      4. Serving Engine Layer
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-runtime-and-scheduler-layer" class="md-nav__link">
+    <span class="md-ellipsis">
+      5. Runtime and Scheduler Layer
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#6-model-execution-layer" class="md-nav__link">
+    <span class="md-ellipsis">
+      6. Model Execution Layer
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#7-operator-and-kernel-layer" class="md-nav__link">
+    <span class="md-ellipsis">
+      7. Operator and Kernel Layer
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#8-system-runtime-and-hardware-layer" class="md-nav__link">
+    <span class="md-ellipsis">
+      8. System Runtime and Hardware Layer
     </span>
   </a>
   
@@ -717,26 +864,29 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#throughput" class="md-nav__link">
+  <a href="#where-vllm-and-sglang-fit" class="md-nav__link">
     <span class="md-ellipsis">
-      Throughput
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Throughput">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#tokens-per-second-tps" class="md-nav__link">
-    <span class="md-ellipsis">
-      Tokens per Second (TPS)
+      Where vLLM and SGLang Fit
     </span>
   </a>
   
 </li>
-        
-      </ul>
-    </nav>
+      
+        <li class="md-nav__item">
+  <a href="#a-request-walkthrough" class="md-nav__link">
+    <span class="md-ellipsis">
+      A Request Walkthrough
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#a-practical-reading-map" class="md-nav__link">
+    <span class="md-ellipsis">
+      A Practical Reading Map
+    </span>
+  </a>
   
 </li>
       
@@ -756,81 +906,101 @@
 
 
 
-<h1 id="metrics">Metrics</h1>
-<p>Latency and throughput metrics are the main interface between runtime behavior and user-visible serving performance. Most serving optimizations are not meaningful in isolation: a technique matters only if it changes what users experience or how much work the system can sustain. TTFT, TPOT, and TPS provide the vocabulary for describing that change. Without them, it becomes difficult to explain whether a scheduling policy improves responsiveness, whether a memory optimization really increases concurrency, or whether a deployment trade-off helps latency at the expense of throughput.</p>
-<h2 id="latency">Latency</h2>
-<p>Latency is the time taken to process a request and generate output tokens. In LLM inference, latency is often measured with two main metrics.</p>
-<p>The reason latency is split into multiple metrics is that a single end-to-end number hides different bottlenecks. Some techniques primarily improve how fast the model starts responding, whereas others improve steady-state generation speed.</p>
-<h3 id="time-to-first-token-ttft">Time to First Token (TTFT)</h3>
-<p>Time to First Token (TTFT) is the latency between when a request is received by the inference server and when the first output token is generated and returned to the client. It measures how quickly the model begins responding and is one of the most important user-perceived metrics in streaming systems:</p>
-<div class="arithmatex">\[
-\text{TTFT} = t_{\text{first token emitted}} - t_{\text{request received}}
-\]</div>
-<p>TTFT mainly captures the prefill phase plus scheduling and framework overhead. A useful decomposition is:</p>
-<div class="arithmatex">\[
-\small
-\begin{aligned}
-\text{TTFT} = t_{\text{queue}} + t_{\text{input processing}} + t_{\text{prefill compute}} + t_{\text{first decode step (optional)}} + t_{\text{framework overhead}}
-\end{aligned}
-\]</div>
-<p>where:</p>
+<h1 id="ai-infra-overview">AI Infra Overview</h1>
+<p>Modern inference is a stack, not a single framework. When people say they are "using vLLM" or "using SGLang", they are usually naming only one layer in a much larger online system. Real deployments also include application logic, orchestration, request routing, scheduling policy, model execution, kernel libraries, and hardware/runtime support underneath. Without a whole-stack view, it is easy to confuse where a bottleneck actually lives or which layer is responsible for solving it.</p>
+<h2 id="why-an-overview-helps">Why an Overview Helps</h2>
+<p>Many AI Infra questions look similar on the surface but belong to different layers.</p>
 <ul>
-<li><span class="arithmatex">\(t_{\text{queue}}\)</span> is the waiting time before the scheduler admits the request.</li>
-<li><span class="arithmatex">\(t_{\text{input processing}}\)</span> includes tokenization, multimodal preprocessing, and request formatting.</li>
-<li><span class="arithmatex">\(t_{\text{prefill compute}}\)</span> is the forward pass over all input tokens, during which the KV cache is populated.</li>
-<li><span class="arithmatex">\(t_{\text{first decode step (optional)}}\)</span> appears in runtimes that separate prefill from the first decode step.</li>
-<li><span class="arithmatex">\(t_{\text{framework overhead}}\)</span> includes kernel launch latency, synchronization, allocation, sampling, and streaming overhead.</li>
+<li>If an agent workflow is too slow, the bottleneck may be prompt construction, tool latency, or request fan-out, not the serving engine itself.</li>
+<li>If throughput is low, the issue may lie in upper-layer routing or batching policy rather than in kernels.</li>
+<li>If one engine shows preemption or unstable latency, the root cause may be KV pressure, admission control, or deployment topology, not model quality.</li>
 </ul>
-<p>For long-context inputs, TTFT is usually dominated by <span class="arithmatex">\(t_{\text{prefill compute}}\)</span>.</p>
-<h3 id="time-per-output-token-tpot">Time per Output Token (TPOT)</h3>
-<p>Time per Output Token (TPOT) measures the average latency required to generate each token after the first token has been emitted. It characterizes steady-state decode performance. For a request that generates <span class="arithmatex">\(N\)</span> output tokens:</p>
-<div class="arithmatex">\[
-\text{TPOT} = \frac{t_\text{last token emitted} - t_\text{first token emitted}}{N - 1}
-\]</div>
-<p>Equivalently, if total end-to-end latency is <span class="arithmatex">\(T_{\text{total}}\)</span>:</p>
-<div class="arithmatex">\[
-\text{TPOT} = \frac{T_{\text{total}} - \text{TTFT}}{N - 1}
-\]</div>
-<p>In steady-state decoding, each output token incurs:</p>
-<div class="arithmatex">\[
-\text{TPOT} = t_{\text{decode compute}} + t_{\text{communication}} + t_{\text{scheduling}} + t_{\text{framework overhead}}
-\]</div>
-<p>where:</p>
+<p>An overview is useful because it separates these concerns before diving into individual mechanisms.</p>
+<h2 id="two-axes-control-plane-and-data-plane">Two Axes: Control Plane and Data Plane</h2>
+<p>One useful way to read the stack is to distinguish control plane from data plane.</p>
 <ul>
-<li><span class="arithmatex">\(t_{\text{decode compute}}\)</span> is the forward pass for one decode step using the KV cache.</li>
-<li><span class="arithmatex">\(t_{\text{communication}}\)</span> includes cross-GPU collectives, expert routing, and host-device transfers triggered by runtime behavior.</li>
-<li><span class="arithmatex">\(t_{\text{scheduling}}\)</span> includes batching, coordination, admission control, and KV-cache management.</li>
-<li><span class="arithmatex">\(t_{\text{framework overhead}}\)</span> includes sampling, launches, synchronization, and token-streaming overhead.</li>
+<li>The <strong>control plane</strong> decides what should run, where it should run, and under what policy. It includes routing, quota, autoscaling, admission control, model selection, and agent-level orchestration.</li>
+<li>The <strong>data plane</strong> executes the request itself. It includes prompt preprocessing, serving-engine scheduling, model forward passes, kernels, memory movement, and hardware execution.</li>
 </ul>
-<p>Unlike TTFT, TPOT does not recompute the full prompt. However, it still depends on effective context length because each decode step attends to all cached tokens.</p>
-<h2 id="throughput">Throughput</h2>
-<h3 id="tokens-per-second-tps">Tokens per Second (TPS)</h3>
-<p>Tokens per Second (TPS) measures system throughput, that is, how many tokens are processed or generated per second under a given serving configuration. Over a time interval <span class="arithmatex">\(\Delta t\)</span>:</p>
-<p>Once a service must support many concurrent users, the central question is no longer only how fast one request finishes, but how much aggregate work one deployment can sustain before queues begin to grow.</p>
-<div class="arithmatex">\[
-\text{TPS} = \frac{N_\text{tokens}}{\Delta t}
-\]</div>
-<p>In many cases, TPS refers specifically to decode throughput:</p>
-<div class="arithmatex">\[
-\text{TPS}_\text{decode} = \frac{N_\text{output tokens}}{\Delta t}
-\]</div>
-<p>For a single sequential request, it is approximately the inverse of TPOT:</p>
-<div class="arithmatex">\[
-\text{TPS}_\text{per request} \approx \frac{1}{\text{TPOT}}
-\]</div>
-<p>In practical serving systems with continuous batching and concurrent decoding, aggregate throughput scales with the effective batch size <span class="arithmatex">\(B\)</span>. For a single replica:</p>
-<div class="arithmatex">\[
-\text{TPS}_\text{replica} \approx \frac{B}{\text{TPOT}}
-\]</div>
-<p>and with <span class="arithmatex">\(R\)</span> data-parallel replicas:</p>
-<div class="arithmatex">\[
-\text{TPS}_\text{total} \approx R \times \frac{B}{\text{TPOT}}
-\]</div>
-<p>For long-context or multimodal workloads, it is also useful to consider end-to-end throughput:</p>
-<div class="arithmatex">\[
-\text{TPS}_\text{end-to-end} = \frac{N_\text{prompt tokens} + N_\text{output tokens}}{\Delta t}
-\]</div>
-<p>Overall, TPS is influenced by model size, parallelism strategy, effective batch size, kernel efficiency, interconnect bandwidth, and the balance between prefill and decode.</p>
+<p>Most real systems cut across both planes. For example, upper-layer routing is a control-plane decision, but it directly affects data-plane cache locality and batch formation.</p>
+<h2 id="layered-view-of-the-inference-stack">Layered View of the Inference Stack</h2>
+<p>The following layered view is a practical way to organize the system:</p>
+<div class="mermaid">flowchart TD
+    A["Application Layer&lt;br/&gt;Chat app, API product, workflow service"] --&gt; B["Agent / Orchestration Layer&lt;br/&gt;Tool use, prompt assembly, multi-step plans"]
+    B --&gt; C["Gateway / Routing Layer&lt;br/&gt;Load balancing, model selection, sticky routing, quotas"]
+    C --&gt; D["Serving Engine Layer&lt;br/&gt;vLLM, SGLang, TGI, TensorRT-LLM server"]
+    D --&gt; E["Runtime / Scheduler Layer&lt;br/&gt;Continuous batching, KV manager, admission control, prefill/decode scheduling"]
+    E --&gt; F["Model Execution Layer&lt;br/&gt;Transformer blocks, attention, MLP, MoE, sampling"]
+    F --&gt; G["Operator / Kernel Layer&lt;br/&gt;Paged attention, GEMM, all-reduce, fused ops, Triton/CUDA kernels"]
+    G --&gt; H["System Runtime / Hardware Layer&lt;br/&gt;CUDA, NCCL, GPU memory, NVLink/PCIe, HBM, SMs"]</div>
+<h3 id="1-application-layer">1. Application Layer</h3>
+<p>This is where the user-facing product lives: chat, search, coding assistant, document pipeline, or enterprise workflow. This layer decides what user action should turn into an inference request and what business constraints matter, such as latency targets, session continuity, or cost ceilings.</p>
+<h3 id="2-agent-and-orchestration-layer">2. Agent and Orchestration Layer</h3>
+<p>This layer constructs the actual workload sent to the model. It may include prompt assembly, retrieval, tool invocation, multi-turn memory, speculative branches, or task decomposition. Agent frameworks belong here. Their main role is not low-level execution efficiency, but workload shaping: they determine request size, request frequency, and cross-request structure.</p>
+<h3 id="3-gateway-and-routing-layer">3. Gateway and Routing Layer</h3>
+<p>This layer decides which backend receives each request. It includes external load balancing, model selection, sticky routing, traffic isolation, and multi-replica policies. For long-context serving, this layer matters more than it first appears because routing decisions directly affect prefix-cache locality, batch formation, and fairness across replicas.</p>
+<h3 id="4-serving-engine-layer">4. Serving Engine Layer</h3>
+<p>This is where frameworks such as <strong>vLLM</strong> and <strong>SGLang</strong> usually sit. They provide the engine abstraction that accepts tokenized or structured requests and exposes generation APIs. They are not the whole stack; rather, they are the core serving substrate between upper-layer traffic management and lower-layer model execution.</p>
+<p>Typical responsibilities of this layer include:</p>
+<ul>
+<li>request admission and lifecycle management</li>
+<li>batching and streaming interfaces</li>
+<li>KV-cache management and paging</li>
+<li>decode loop orchestration</li>
+<li>integration with distributed execution</li>
+</ul>
+<h3 id="5-runtime-and-scheduler-layer">5. Runtime and Scheduler Layer</h3>
+<p>Inside one serving engine, there is another layer of structure: the runtime. This is where internal scheduling happens. Continuous batching, chunked prefill, preemption, block allocation, admission control, and KV-pressure handling all live here.</p>
+<p>This layer is often where performance is won or lost. Two deployments can use the same model and the same engine, yet behave very differently because their runtime policies differ.</p>
+<h3 id="6-model-execution-layer">6. Model Execution Layer</h3>
+<p>This is the mathematical model itself: attention blocks, MLPs, MoE routing, RoPE, sampling heads, and output logits. Questions such as "does this model use GQA?" or "how large is the KV cache per token?" belong here.</p>
+<h3 id="7-operator-and-kernel-layer">7. Operator and Kernel Layer</h3>
+<p>This layer implements the heavy lifting: GEMMs, fused kernels, paged attention, all-reduce, reduce-scatter, dispatch/combine, and custom Triton or CUDA kernels. It is where abstract model computation becomes real device work.</p>
+<h3 id="8-system-runtime-and-hardware-layer">8. System Runtime and Hardware Layer</h3>
+<p>At the bottom sit CUDA, NCCL, GPU memory systems, interconnects such as NVLink or PCIe, and the hardware execution resources themselves. Bandwidth, memory capacity, collective latency, and kernel launch overhead all ultimately resolve at this layer.</p>
+<h2 id="where-vllm-and-sglang-fit">Where vLLM and SGLang Fit</h2>
+<p>vLLM and SGLang are best understood as <strong>serving engines with substantial internal runtime logic</strong>.</p>
+<ul>
+<li>They are below the application, agent, and external routing layers.</li>
+<li>They are above model kernels and hardware execution.</li>
+<li>They contain their own scheduler, batching logic, KV manager, and runtime policies.</li>
+</ul>
+<p>So when someone says "we use vLLM", that typically means:</p>
+<ol>
+<li>upper layers still decide what requests to send</li>
+<li>vLLM handles request execution, batching, and internal runtime management</li>
+<li>lower layers still determine the actual operator efficiency and hardware utilization</li>
+</ol>
+<p>This is why engine-level tuning alone is never the whole story. A well-tuned engine can still underperform if the upper layer creates poor workload shape, and an excellent application policy can still be constrained by weak runtime scheduling or kernel efficiency.</p>
+<h2 id="a-request-walkthrough">A Request Walkthrough</h2>
+<p>A single online request usually flows through the stack in roughly this order:</p>
+<ol>
+<li>The application or agent layer decides that a model call is needed.</li>
+<li>The orchestration layer assembles prompts, retrieved context, tool outputs, and decoding policy.</li>
+<li>The routing layer chooses a model endpoint or replica.</li>
+<li>The serving engine admits the request and places it into its internal scheduler.</li>
+<li>The runtime allocates KV blocks, batches prefill or decode work, and decides when the request runs.</li>
+<li>The model execution layer runs transformer computation.</li>
+<li>The operator layer launches kernels and collectives.</li>
+<li>The hardware/runtime layer executes those kernels and moves data.</li>
+<li>Tokens stream back upward through the same stack.</li>
+</ol>
+<p>Thinking in this sequence makes debugging easier because it localizes failure modes. For example:</p>
+<ul>
+<li>high TTFT may come from prompt assembly, queueing, or prefill cost</li>
+<li>low TPS may come from routing fragmentation, poor batching, or communication overhead</li>
+<li>unstable latency may come from scheduler pressure, KV exhaustion, or upper-layer fan-out behavior</li>
+</ul>
+<h2 id="a-practical-reading-map">A Practical Reading Map</h2>
+<p>Within this notebook, the AI Infra pages can be read as a top-down decomposition of the middle of this stack:</p>
+<ul>
+<li><a href="../metrics/">Metrics</a>: how behavior is measured</li>
+<li><a href="../kv-cache/">KV Cache</a>: the central memory object of long-context serving</li>
+<li><a href="../serving-runtime/">Serving Runtime</a>: how one engine schedules and stabilizes requests</li>
+<li><a href="../parallelism/">Parallelism</a>: how execution is distributed across devices</li>
+<li><a href="../decoding/">Decoding and Sampling</a>: how decode-time behavior is shaped</li>
+<li><a href="../training-objective/">Training Objective</a>: the probabilistic base underlying inference-time outputs</li>
+</ul>
 
 
 

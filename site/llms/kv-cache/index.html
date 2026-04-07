@@ -352,6 +352,52 @@
   
   
     <li class="md-nav__item">
+      <a href="../overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Overview
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../request-lifecycle/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Request Lifecycle
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../metrics/" class="md-nav__link">
         
   
@@ -443,14 +489,44 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#relationship-among-requests-tokens-blocks-and-pages" class="md-nav__link">
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#logical-vs-physical-view" class="md-nav__link">
     <span class="md-ellipsis">
-      Relationship Among Requests, Tokens, Blocks, and Pages
+      Logical vs Physical View
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Logical vs Physical View">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#requests-tokens-blocks-and-pages" class="md-nav__link">
+    <span class="md-ellipsis">
+      Requests, Tokens, Blocks, and Pages
     </span>
   </a>
   
 </li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pagedattention" class="md-nav__link">
+    <span class="md-ellipsis">
+      PagedAttention
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="PagedAttention">
+      <ul class="md-nav__list">
         
           <li class="md-nav__item">
   <a href="#why-pagedattention-is-needed" class="md-nav__link">
@@ -470,6 +546,39 @@
   
 </li>
         
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#kv-manager" class="md-nav__link">
+    <span class="md-ellipsis">
+      KV Manager
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="KV Manager">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#block-table-and-allocation-granularity" class="md-nav__link">
+    <span class="md-ellipsis">
+      Block Table and Allocation Granularity
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#a-concrete-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      A Concrete Example
+    </span>
+  </a>
+  
+</li>
+        
           <li class="md-nav__item">
   <a href="#prefix-caching-is-reuse-at-block-granularity" class="md-nav__link">
     <span class="md-ellipsis">
@@ -480,9 +589,18 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#what-preemption-means" class="md-nav__link">
+  <a href="#preemption-reclamation-and-memory-pressure" class="md-nav__link">
     <span class="md-ellipsis">
-      What Preemption Means
+      Preemption, Reclamation, and Memory Pressure
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#interaction-with-the-scheduler" class="md-nav__link">
+    <span class="md-ellipsis">
+      Interaction with the Scheduler
     </span>
   </a>
   
@@ -494,13 +612,13 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#attention-and-kv-efficiency" class="md-nav__link">
+  <a href="#attention-variants-and-kv-cost" class="md-nav__link">
     <span class="md-ellipsis">
-      Attention and KV Efficiency
+      Attention Variants and KV Cost
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Attention and KV Efficiency">
+    <nav class="md-nav" aria-label="Attention Variants and KV Cost">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -719,14 +837,44 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#relationship-among-requests-tokens-blocks-and-pages" class="md-nav__link">
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#logical-vs-physical-view" class="md-nav__link">
     <span class="md-ellipsis">
-      Relationship Among Requests, Tokens, Blocks, and Pages
+      Logical vs Physical View
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Logical vs Physical View">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#requests-tokens-blocks-and-pages" class="md-nav__link">
+    <span class="md-ellipsis">
+      Requests, Tokens, Blocks, and Pages
     </span>
   </a>
   
 </li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pagedattention" class="md-nav__link">
+    <span class="md-ellipsis">
+      PagedAttention
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="PagedAttention">
+      <ul class="md-nav__list">
         
           <li class="md-nav__item">
   <a href="#why-pagedattention-is-needed" class="md-nav__link">
@@ -746,6 +894,39 @@
   
 </li>
         
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#kv-manager" class="md-nav__link">
+    <span class="md-ellipsis">
+      KV Manager
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="KV Manager">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#block-table-and-allocation-granularity" class="md-nav__link">
+    <span class="md-ellipsis">
+      Block Table and Allocation Granularity
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#a-concrete-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      A Concrete Example
+    </span>
+  </a>
+  
+</li>
+        
           <li class="md-nav__item">
   <a href="#prefix-caching-is-reuse-at-block-granularity" class="md-nav__link">
     <span class="md-ellipsis">
@@ -756,9 +937,18 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#what-preemption-means" class="md-nav__link">
+  <a href="#preemption-reclamation-and-memory-pressure" class="md-nav__link">
     <span class="md-ellipsis">
-      What Preemption Means
+      Preemption, Reclamation, and Memory Pressure
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#interaction-with-the-scheduler" class="md-nav__link">
+    <span class="md-ellipsis">
+      Interaction with the Scheduler
     </span>
   </a>
   
@@ -770,13 +960,13 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#attention-and-kv-efficiency" class="md-nav__link">
+  <a href="#attention-variants-and-kv-cost" class="md-nav__link">
     <span class="md-ellipsis">
-      Attention and KV Efficiency
+      Attention Variants and KV Cost
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Attention and KV Efficiency">
+    <nav class="md-nav" aria-label="Attention Variants and KV Cost">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -840,8 +1030,8 @@
 <p>In long-context serving, the main bottleneck is often not model weights but the memory required to keep attention state alive. As prompts grow and concurrency rises, KV cache quickly becomes the dominant systems object: it limits how many requests can stay active, determines when preemption occurs, and strongly shapes deployment choices such as DP versus TP. Many serving optimizations exist precisely because this memory budget is tight.</p>
 <h2 id="kv-memory">KV Memory</h2>
 <h3 id="memory-cost">Memory Cost</h3>
-<p>The KV-cache size can be approximated as:</p>
 <p>The first question is why KV cache becomes expensive so quickly. The answer is that it scales with every token that remains in context and with every transformer layer, so even moderate sequence lengths can translate into multi-gigabyte memory footprints per request.</p>
+<p>The KV-cache size can be approximated as:</p>
 <div class="arithmatex">\[
 \text{KV size} = 2 \times \text{num layers} \times \text{num heads} \times \text{seq len} \times \text{head dim}
 \]</div>
@@ -851,7 +1041,9 @@
 <li>FP16 KV cache: <span class="arithmatex">\(2 \times 32 \times 80 \times 4K \times 128 \times 2\)</span> bytes <span class="arithmatex">\(\approx 5.2\)</span> GB per sample</li>
 <li>int8 KV cache: approximately half of that, or about 2.6 GB per sample</li>
 </ul>
-<h3 id="relationship-among-requests-tokens-blocks-and-pages">Relationship Among Requests, Tokens, Blocks, and Pages</h3>
+<h2 id="logical-vs-physical-view">Logical vs Physical View</h2>
+<p>Understanding KV cache requires separating the logical object seen by the model from the physical object managed by the runtime. Logically, a request is a growing token sequence with saved attention state. Physically, that state is stored as many fixed-size memory objects that can be allocated, mapped, reused, and reclaimed over time.</p>
+<h3 id="requests-tokens-blocks-and-pages">Requests, Tokens, Blocks, and Pages</h3>
 <p>In a serving system, a request is the application-level object, a token is the sequence-level object, and a KV block is the runtime-level memory object used to manage the KV cache. A request corresponds to one logical token sequence. As prefill and decode proceed, every token in that sequence produces keys and values at every layer, and those tensors are appended to the request's KV cache. If the runtime uses a block size of <span class="arithmatex">\(B\)</span> tokens, then a request of length <span class="arithmatex">\(L\)</span> requires approximately</p>
 <div class="arithmatex">\[
 N_{\text{blocks}} = \left\lceil \frac{L}{B} \right\rceil
@@ -861,8 +1053,9 @@ N_{\text{blocks}} = \left\lceil \frac{L}{B} \right\rceil
 <div class="arithmatex">\[
 \text{request} \rightarrow \text{token sequence} \rightarrow \text{KV blocks}
 \]</div>
-<p>The final block is often only partially filled, so the block size determines the granularity of tail waste. Smaller blocks improve memory granularity, whereas larger blocks shorten the block table and simplify management at the cost of coarser reuse.</p>
+<p>The final block is often only partially filled, so the block size determines the granularity of tail waste.</p>
 <p>In the vLLM context, page is primarily a description of this organization style rather than a distinct object above blocks. A paged KV cache means that the KV state of one request is assembled from many fixed-size blocks rather than one contiguous physical segment. In this sense, page refers to the paged organization, while block refers to the actual allocation unit.</p>
+<h2 id="pagedattention">PagedAttention</h2>
 <h3 id="why-pagedattention-is-needed">Why PagedAttention Is Needed</h3>
 <p>PagedAttention is not mainly about how data are laid out inside one block. Its central purpose is to define how a growing request is represented by multiple blocks while preserving a logically contiguous KV address space.</p>
 <p>The underlying problem is that a naive contiguous-allocation design does not match the way serving workloads evolve. Requests arrive with different lengths, they grow during decoding, and they leave at different times. A memory manager that insists on large contiguous allocations will fragment quickly and force costly data movement.</p>
@@ -872,17 +1065,41 @@ N_{\text{blocks}} = \left\lceil \frac{L}{B} \right\rceil
 <h3 id="contiguous-within-a-block-non-contiguous-across-blocks">Contiguous Within a Block, Non-Contiguous Across Blocks</h3>
 <p>PagedAttention does not imply that the GPU reads KV tensors in a fully random way. A more precise description is contiguous within a block and potentially non-contiguous across blocks. The runtime maintains a block table that maps logical sequence positions to physical blocks. The attention kernel then uses this mapping to locate the physical blocks associated with a request and performs reads and computation block by block.</p>
 <p>The indirection introduced by PagedAttention is therefore block-level rather than token-level. A block can still use a regular memory layout favorable to vectorized access and high-bandwidth reads, while non-contiguity appears mainly in the list of physical blocks that together form one request.</p>
+<h2 id="kv-manager">KV Manager</h2>
+<p>KV cache describes what is stored; a KV manager describes how that storage is allocated, mapped, reused, reclaimed, and protected under load. Once serving enters the long-context or high-concurrency regime, this manager effectively becomes one of the central runtime components.</p>
+<h3 id="block-table-and-allocation-granularity">Block Table and Allocation Granularity</h3>
+<p>Because one request is mapped to a list of physical blocks rather than one contiguous region, the runtime needs metadata that records this mapping. The block table serves this role: it translates logical sequence positions into the physical blocks that actually hold the KV tensors.</p>
+<p>The choice of block size matters because it sets the allocation granularity of the manager. Small blocks reduce tail waste and allow finer-grained reuse, but they make the block table longer and can increase management overhead. Large blocks simplify metadata and can be friendlier to some kernels, but they waste more space at the tail and make reuse coarser.</p>
+<h3 id="a-concrete-example">A Concrete Example</h3>
+<p>Suppose the block size is 16 tokens and one request currently has 53 tokens in context. The runtime will need</p>
+<div class="arithmatex">\[
+\left\lceil \frac{53}{16} \right\rceil = 4
+\]</div>
+<p>blocks to store its KV state. A logical view might look like:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>request tokens:
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>[t1 ... t16] [t17 ... t32] [t33 ... t48] [t49 ... t53]
+</span></code></pre></div>
+<p>The corresponding block table could then point to four physical blocks:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>logical block 0 -&gt; physical block 42
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>logical block 1 -&gt; physical block 107
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>logical block 2 -&gt; physical block 18
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>logical block 3 -&gt; physical block 203
+</span></code></pre></div>
+<p>The important point is that the physical blocks do not need to be contiguous. The first three logical blocks are full, while the last one is only partially filled. That last block is where tail waste appears. If another request shares the first 32 tokens exactly, then the first two full blocks may be reused directly by prefix caching, while the partially filled tail block cannot usually be reused as a full-block cache hit.</p>
 <h3 id="prefix-caching-is-reuse-at-block-granularity">Prefix Caching Is Reuse at Block Granularity</h3>
 <p>In vLLM, automatic prefix caching does not reuse arbitrary token ranges. It reuses complete blocks. Let the block size be <span class="arithmatex">\(B\)</span>. If two requests share a common prefix of length <span class="arithmatex">\(L_{\text{shared}}\)</span>, then at most</p>
 <div class="arithmatex">\[
 \left\lfloor \frac{L_{\text{shared}}}{B} \right\rfloor
 \]</div>
 <p>complete blocks can be reused directly. A partially filled tail block usually cannot be treated as a cache hit. Therefore, the block size affects not only memory-allocation granularity but also prefix-cache reuse granularity.</p>
-<h3 id="what-preemption-means">What Preemption Means</h3>
+<p>From the perspective of the manager, prefix caching is a reuse policy over previously materialized blocks. It improves performance only when requests share enough aligned prefix structure for those blocks to be looked up and kept alive efficiently.</p>
+<h3 id="preemption-reclamation-and-memory-pressure">Preemption, Reclamation, and Memory Pressure</h3>
 <p>In vLLM, preemption means that when the GPU no longer has enough available KV blocks to satisfy the current scheduling decision, the runtime temporarily interrupts one or more in-flight requests and reclaims or migrates the KV resources they occupy so that other requests can proceed. It is fundamentally a scheduling response to memory pressure rather than a numerical property of the model.</p>
-<p>The reason preemption matters is that it marks the boundary between a healthy operating regime and a memory-stressed one. A system may remain alive after preemption begins, but repeated preemption usually indicates that concurrency has exceeded what the current KV budget can support efficiently.</p>
+<p>Preemption marks the boundary between a healthy operating regime and a memory-stressed one. A system may remain alive after preemption begins, but repeated preemption usually indicates that concurrency has exceeded what the current KV budget can support efficiently.</p>
 <p>At the systems level, preemption usually indicates that the configuration is close to or already hitting the KV-capacity wall. Typical triggers include excessive request concurrency, very long contexts, large output lengths, insufficient tensor parallelism leading to a small per-GPU KV budget, or overly aggressive settings of <code>max-num-seqs</code> or <code>max-num-batched-tokens</code>.</p>
-<h2 id="attention-and-kv-efficiency">Attention and KV Efficiency</h2>
+<h3 id="interaction-with-the-scheduler">Interaction with the Scheduler</h3>
+<p>The KV manager and the scheduler are tightly coupled. Admission-control knobs such as <code>max-num-seqs</code> and <code>max-num-batched-tokens</code> are not only scheduler parameters; they are also indirect controls on how much pressure is placed on KV allocation and reclamation. In practice, many serving pathologies that look like scheduler issues are actually symptoms of the KV manager being forced into a memory-stressed operating regime.</p>
+<h2 id="attention-variants-and-kv-cost">Attention Variants and KV Cost</h2>
 <p>In transformer models, the attention module computes:</p>
 <div class="arithmatex">\[
 \operatorname{Attention}(Q, K, V)=\operatorname{softmax}\left(\frac{Q K^T}{\sqrt{d_k}}\right) V
@@ -981,6 +1198,10 @@ K_{\text{shared}} = X W_K, \quad V_{\text{shared}} = X W_V
       <script src="../../assets/javascripts/bundle.f55a23d4.min.js"></script>
       
         <script src="../../javascripts/mathjax.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+      
+        <script src="../../javascripts/mermaid.js"></script>
       
         <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
       

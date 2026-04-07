@@ -21,6 +21,8 @@ plugins:
             Tensor Operation: 张量操作
             Neural Graphics: 神经图形
             AI Infra: AI Infra
+            Overview: 总览
+            Request Lifecycle: 请求生命周期
             Metrics: 指标
             KV Cache: KV Cache
             Serving Runtime: 推理运行时
@@ -34,6 +36,8 @@ nav:
   - Tensor Operation: tensor.md
   - Neural Graphics: neural-graphics.md
   - AI Infra:
+      - Overview: llms/overview.md
+      - Request Lifecycle: llms/request-lifecycle.md
       - Metrics: llms/metrics.md
       - KV Cache: llms/kv-cache.md
       - Serving Runtime: llms/serving-runtime.md
@@ -48,7 +52,11 @@ markdown_extensions:
       pygments_lang_class: true
   - pymdownx.inlinehilite
   - pymdownx.snippets
-  - pymdownx.superfences
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_div_format
   - pymdownx.arithmatex:
       generic: true
 extra_css:
@@ -56,5 +64,7 @@ extra_css:
   - stylesheets/basic.css
 extra_javascript:
   - javascripts/mathjax.js
+  - https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js
+  - javascripts/mermaid.js
   - https://polyfill.io/v3/polyfill.min.js?features=es6
   - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
