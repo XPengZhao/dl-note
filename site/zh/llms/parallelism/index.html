@@ -573,6 +573,57 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#8-gpu" class="md-nav__link">
+    <span class="md-ellipsis">
+      一个 8-GPU 推理例子
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="一个 8-GPU 推理例子">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#prefill-40k-1k" class="md-nav__link">
+    <span class="md-ellipsis">
+      Prefill 很长：40k + 1k
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#decode-1k-10k" class="md-nav__link">
+    <span class="md-ellipsis">
+      Decode 很长：1k + 10k
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#prefill-decode-10k-10k" class="md-nav__link">
+    <span class="md-ellipsis">
+      Prefill 和 Decode 都很长：10k + 10k
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      怎么读这个权衡
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -740,6 +791,57 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#8-gpu" class="md-nav__link">
+    <span class="md-ellipsis">
+      一个 8-GPU 推理例子
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="一个 8-GPU 推理例子">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#prefill-40k-1k" class="md-nav__link">
+    <span class="md-ellipsis">
+      Prefill 很长：40k + 1k
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#decode-1k-10k" class="md-nav__link">
+    <span class="md-ellipsis">
+      Decode 很长：1k + 10k
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#prefill-decode-10k-10k" class="md-nav__link">
+    <span class="md-ellipsis">
+      Prefill 和 Decode 都很长：10k + 10k
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      怎么读这个权衡
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -821,6 +923,60 @@ Y = \sum_{i=0}^{p-1} Y_i
 <li>增大 TP 会降低单卡权重占用并扩大单副本的 KV 预算，但 TP 过大时通信可能成为瓶颈。</li>
 </ul>
 <p>因此，推理部署中的并行决策通常是在“副本级并发能力”和“单副本内存余量”之间做权衡。</p>
+<h2 id="8-gpu">一个 8-GPU 推理例子</h2>
+<p>理解 DP 和 TP，最直接的方式是固定硬件，只改变 8 张 GPU 被组织成多少个副本。假设有一台 8-GPU 服务器，节点内互联较快，那么常见的几种组织方式是：</p>
+<ul>
+<li><code>DP8TP1</code>：8 个单 GPU 独立副本</li>
+<li><code>DP4TP2</code>：4 个副本，每个副本用 2 张 GPU</li>
+<li><code>DP2TP4</code>：2 个副本，每个副本用 4 张 GPU</li>
+<li><code>DP1TP8</code>：1 个副本，占用全部 8 张 GPU</li>
+</ul>
+<p>这个对比只有在这些布局都放得下目标模型和上下文窗口时才有意义。如果 <code>TP1</code> 下模型或 KV 状态已经放不下，那么高 DP 的方案就不是实际可选项。</p>
+<p>这里最关键的区别是：DP 把 GPU 花在“更多独立副本”上，而 TP 把 GPU 花在“把单个副本做大”上。因此，哪种方案更优，本质上取决于当前工作负载更受哪一面约束：单请求延迟、单副本内存余量，还是多请求并发。</p>
+<p>这里还有一个在长上下文 serving 里很关键、但很容易被忽略的点：TP 改变的不只是单个副本的计算模式。由于它降低了单卡权重占用，它也可能给同一个副本腾出更多 KV cache 空间。更大的 KV 预算意味着这个副本可以同时容纳更多长请求、降低 preemption 风险，并形成更大的稳定 batch。也就是说，TP 有时提升吞吐，不是因为单个 decode step 本身更快，而是因为副本终于能挂住足够多的 active work，把 GPU 真正打满。</p>
+<p>因此，在 8 张 GPU 上做推理调优时，通常是在同时平衡三个问题：</p>
+<ul>
+<li>节点应该暴露多少个独立副本？</li>
+<li>每个副本需要多大的 KV 余量？</li>
+<li>当前 workload 的瓶颈到底是通信、内存压力，还是 active work 不够？</li>
+</ul>
+<h3 id="prefill-40k-1k">Prefill 很长：<code>40k + 1k</code></h3>
+<p>这个场景的主导成本是吃入超长 prompt。真正昂贵的是 prefill，因为系统需要先处理很长的输入上下文，decode 反而不是主导项。</p>
+<ul>
+<li>在低并发下，TP 往往更有吸引力，因为多个 GPU 可以协同完成同一个长 prefill。<code>DP8TP1</code> 虽然副本多，但如果同时只有一两个请求，绝大多数副本都会闲着，而某一张 GPU 独自承担全部 prompt 成本。</li>
+<li>在高并发下，DP 又会重新变得有竞争力，因为许多长 prefill 可以分散到不同副本上并行推进。如果每个请求都已经能稳定放下，<code>DP8TP1</code> 或 <code>DP4TP2</code> 往往比很大的 TP 组具有更高的总吞吐。</li>
+<li>在这个场景里保留一定 TP，通常不是为了让 decode 更快，而是为了给单副本争取更大的内存余量。超长 prompt 会迅速消耗 KV 预算，而适度 TP 能让更长上下文真正变成可运行配置。</li>
+<li>这个内存效应也会直接改变并发能力。面对超长 prompt 时，<code>TP1</code> 可能迫使每个副本只敢接很小的 active batch，才能避免 preemption。适度增加 TP 往往能扩大单副本的 KV 预算，使它在同一时刻驻留更多 prefill 请求，从而把真实吞吐拉起来。</li>
+</ul>
+<p>因此，prefill 很重的 serving 往往容易落在中间方案，例如 <code>DP4TP2</code>。当 <code>TP1</code> 的内存已经太紧，而 <code>TP4</code> 或 <code>TP8</code> 又牺牲了太多副本数时，这类折中方案通常更稳。</p>
+<h3 id="decode-1k-10k">Decode 很长：<code>1k + 10k</code></h3>
+<p>这个场景的主导成本是长时间的自回归生成。prompt 不长，但系统要重复执行大量 decode steps。</p>
+<ul>
+<li>在高并发下，如果模型本身放得下，DP 往往是最强的选择。<code>DP8TP1</code> 最大化了独立 decoder 的数量，也避免了每个 decode step 都要支付 TP 层内集合通信。</li>
+<li>在低并发下，过大的 TP 组通常也帮不上太多，除非它们是内存所必需的。单请求 decode 的每一步都很窄，把它摊到很多 GPU 上时，同步开销常常增长得比本地计算缩短得更快。</li>
+<li>如果输出很长，以至于 KV 压力成了主导瓶颈，那么适度 TP 仍可能间接变好，因为它扩大了单副本可承载的 KV 预算，降低了 preemption 风险。但这本质上是内存收益，不是纯算力收益。</li>
+<li>这一点在工程上很重要。decode-heavy 服务从单步看往往算得不重，但如果每个副本始终被 KV 卡住，它就永远积累不起足够多的 active sequences，也很难把设备打到 compute-bound。这时增加一定 TP，虽然引入了通信，却可能通过提升稳定 decode 并发带来更高的真实吞吐。</li>
+</ul>
+<p>这也是为什么在线 decode-heavy serving 往往倾向于在内存允许的前提下尽量多做 DP。一旦模型已经放得下、KV 也稳定，继续增加 TP 通常是在用通信换掉吞吐。</p>
+<h3 id="prefill-decode-10k-10k">Prefill 和 Decode 都很长：<code>10k + 10k</code></h3>
+<p>当输入和输出都很长时，单纯用 “DP 好” 或 “TP 好” 都不够。系统既要承受长上下文带来的 prefill 成本，也要承受长输出尾巴带来的 decode 压力。</p>
+<ul>
+<li>在小并发或中等并发下，像 <code>DP4TP2</code> 这样的混合布局往往是比较稳的折中。它一方面保留了多个独立副本，另一方面又给每个副本比 <code>TP1</code> 更多的内存余量。</li>
+<li>在大并发下，判断标准通常是谁先撞墙。如果 <code>DP8TP1</code> 已经开始 preempt，或者为了不爆 KV 不得不把准入并发压得很低，那么增加 TP 反而可能提升真实吞吐，即使它引入了通信。如果 <code>DP8TP1</code> 本身已经很稳定，它通常仍然保有最高的总吞吐。</li>
+<li><code>DP1TP8</code> 一般只有在单个副本确实需要整台机器时才合理，例如模型本身很大，或者目标上下文窗口极端大。否则它牺牲的外层并发通常太多。</li>
+</ul>
+<p>这也是“纸面并发”和“有效并发”差别最大的场景。<code>DP8TP1</code> 从副本数上看并发更高，但如果每个副本为了守住 KV 预算只能把 admitted batch 压得很小，整台机器仍然可能打不到 compute-bound。副本数更少但更大的 TP 组，有时反而能维持更多真正有用的 in-flight work。</p>
+<h3 id="_3">怎么读这个权衡</h3>
+<p>对一台 8-GPU 服务器上的推理来说，常见的经验规律通常是：</p>
+<ul>
+<li>更多 DP 在“独立请求足够多，能把多个副本都喂满”时更有利。</li>
+<li>更多 TP 在“单副本太受内存限制”或“单个请求太重，需要多张 GPU 协作”时更有利。</li>
+<li>更多 TP 有时也会在“超长请求让 <code>TP1</code> 副本的 KV 预算太紧，导致挂不住足够 active work”时更有利。此时 TP 买到的是内存带来的并发，而不是单步算力加速。</li>
+<li>prefill 很重、并发又不高时，系统更容易被推向一定程度的 TP。</li>
+<li>decode 很重、并发又很高时，系统更容易被推向更多 DP。</li>
+<li>输入输出都长的场景往往落在中间地带，<code>DP4TP2</code> 或 <code>DP2TP4</code> 往往比两端更容易稳定。</li>
+</ul>
+<p>因此，推理部署里真正重要的问题通常不是抽象地问“DP 和 TP 谁更好”，而是先问：在这套硬件和这类 workload 上，系统最先撞到的墙到底是什么，是单请求延迟、单副本 KV 容量，还是整体并发能力。DP 和 TP 本质上是在用两种不同方式移动这堵墙。</p>
 
 
 

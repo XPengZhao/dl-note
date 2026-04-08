@@ -617,9 +617,81 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      主要结构特征
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      一个紧凑的结构总结
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#thinker" class="md-nav__link">
+    <span class="md-ellipsis">
+      Thinker：主多模态推理主干
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#vision-stack" class="md-nav__link">
+    <span class="md-ellipsis">
+      Vision Stack
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#audio-transformeraut" class="md-nav__link">
     <span class="md-ellipsis">
       Audio Transformer（AuT）
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#aut" class="md-nav__link">
+    <span class="md-ellipsis">
+      AuT 的系统意义
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#talkercodec-tokens-code2wav" class="md-nav__link">
+    <span class="md-ellipsis">
+      Talker、Codec Tokens 与 Code2Wav
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qwen3-omni-qwen" class="md-nav__link">
+    <span class="md-ellipsis">
+      怎么把 Qwen3-Omni 放回 Qwen 家族里理解
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      实用备注
     </span>
   </a>
   
@@ -702,9 +774,81 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      主要结构特征
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      一个紧凑的结构总结
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#thinker" class="md-nav__link">
+    <span class="md-ellipsis">
+      Thinker：主多模态推理主干
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#vision-stack" class="md-nav__link">
+    <span class="md-ellipsis">
+      Vision Stack
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#audio-transformeraut" class="md-nav__link">
     <span class="md-ellipsis">
       Audio Transformer（AuT）
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#aut" class="md-nav__link">
+    <span class="md-ellipsis">
+      AuT 的系统意义
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#talkercodec-tokens-code2wav" class="md-nav__link">
+    <span class="md-ellipsis">
+      Talker、Codec Tokens 与 Code2Wav
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qwen3-omni-qwen" class="md-nav__link">
+    <span class="md-ellipsis">
+      怎么把 Qwen3-Omni 放回 Qwen 家族里理解
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      实用备注
     </span>
   </a>
   
@@ -746,37 +890,141 @@
 <h2 id="qwen3-omni">Qwen3-Omni</h2>
 <h3 id="_2">概览</h3>
 <div align="center">
-  <img src="../../assets/images/qwen3-omni-architecture.png" alt="Architecture of Qwen3-Omni" width="600">
+  <img src="../assets/images/qwen3-omni-architecture.png" alt="Architecture of Qwen3-Omni" width="600">
 </div>
 
-<p>Qwen3-Omni 的主要特点：</p>
+<p>Qwen3-Omni-30B-A3B 值得单独整理，是因为它不是“在视觉语言模型后面再挂一个语音头”这么简单。它试图把文本、图像、音频、视频的感知，以及文本和语音生成，放进同一套部署路径里。理解这个模型时，问题不只是“多模态 backbone 长什么样”，还包括“感知和实时语音生成是如何被放进同一个系统里的”。</p>
+<p>从整体结构上看，Qwen3-Omni 采用了一个 Thinker-Talker 分工：</p>
+<ul>
+<li><strong>Thinker</strong> 是主要的多模态理解与推理主干，负责消费文本、图像、音频和视频输入，并产出用于理解和文本生成的语义表示。</li>
+<li><strong>Talker</strong> 是语音生成路径，负责自回归预测 codec tokens，再通过 <code>Code2Wav</code> 重建语音波形。</li>
+</ul>
+<p>这个分工之所以重要，是因为它把 omni-modal generation 变成了一个系统设计问题，而不只是单个 backbone 的问题。模型可以在同一条路径上完成多模态推理，同时又让语音生成链路保持适合流式输出的结构。</p>
+<h3 id="_3">主要结构特征</h3>
 <ul>
 <li>Thinker 和 Talker 都采用 Mixture-of-Experts（MoE）架构。</li>
-<li>Talker 不再使用 Thinker 的高层<strong>文本表示</strong>，而只依赖音频与视觉多模态特征。</li>
-<li>对文本内容而言，离散 token 与 embedding 在信息上可视为等价。</li>
-<li>由于文本表示解耦，Thinker 与 Talker 可使用不同系统提示词，从而分别控制 Thinker 的回复风格和 Talker 的语音风格。</li>
-<li>Talker 采用多码本自回归方案：每步生成一个 codec frame，剩余残差码本由 MTP 模块生成。</li>
-<li>Code2Wav 采用轻量级因果 ConvNet，实现更简洁的音频合成末端流程。</li>
+<li>Thinker 里的文本主干是一个 48 层 MoE decoder，包含 128 个 experts，每个 token 激活 8 个 experts。</li>
+<li>文本注意力是 <strong>GQA</strong>，不是 MHA，也不是 MLA：公开 config 给出的配置是 32 个 query heads、4 个 KV heads。</li>
+<li>Vision stack 是一个 ViT-like encoder，<code>depth = 27</code>、<code>hidden_size = 1152</code>、<code>num_heads = 16</code>，并带有 <code>deepstack_visual_indexes = [8, 16, 24]</code>。</li>
+<li>Audio tower 是一个 32 层 Transformer encoder，<code>d_model = 1280</code>、<code>encoder_attention_heads = 20</code>、<code>encoder_ffn_dim = 5120</code>。</li>
+<li>Talker 采用多 codebook 的 codec 生成路径，一共 16 个 code groups / quantizers。最终的 <code>Code2Wav</code> 不是扩散式大解码器，而是轻量级因果 ConvNet。</li>
 </ul>
+<p>这些数字直接来自 Hugging Face 上公开的 <a href="https://huggingface.co/Qwen/Qwen3-Omni-30B-A3B-Instruct/blob/main/config.json">Qwen/Qwen3-Omni-30B-A3B-Instruct 配置文件</a>。</p>
+<h3 id="_4">一个紧凑的结构总结</h3>
+<table>
+<thead>
+<tr>
+<th>模块</th>
+<th>关键结构</th>
+<th>记忆点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Thinker 文本主干</td>
+<td>48 层 MoE decoder，<code>hidden_size = 2048</code>，<code>32</code> 个 attention heads，<code>4</code> 个 KV heads，<code>128</code> 个 experts，<code>8</code> 个 active experts</td>
+<td>主干较窄，但 MoE 很重；文本注意力是 GQA</td>
+</tr>
+<tr>
+<td>Vision encoder</td>
+<td>ViT-like encoder，<code>depth = 27</code>，<code>hidden_size = 1152</code>，<code>num_heads = 16</code>，<code>patch_size = 16</code></td>
+<td>更像 Qwen3-VL 一类视觉主干，而不是轻量 side encoder</td>
+</tr>
+<tr>
+<td>Audio encoder</td>
+<td>Transformer encoder，<code>encoder_layers = 32</code>，<code>d_model = 1280</code>，<code>encoder_attention_heads = 20</code></td>
+<td>音频理解是一个单独而完整的 dense encoder</td>
+</tr>
+<tr>
+<td>Talker 文本栈</td>
+<td>20 层 MoE decoder，<code>hidden_size = 1024</code>，<code>16</code> 个 heads，<code>2</code> 个 KV heads</td>
+<td>语音生成路径有自己的 text-like stack</td>
+</tr>
+<tr>
+<td>Codec 路径</td>
+<td><code>16</code> 个 quantizers，<code>codebook_size = 2048</code>，<code>semantic_codebook_size = 4096</code>，<code>codebook_dim = 512</code></td>
+<td>语音先生成离散 codec tokens，再还原波形</td>
+</tr>
+<tr>
+<td>Code2Wav</td>
+<td><code>code2wav_config</code> 中为 8 层 decoder stack</td>
+<td>最后的波形合成刻意做得很轻</td>
+</tr>
+</tbody>
+</table>
+<h3 id="thinker">Thinker：主多模态推理主干</h3>
+<p>Thinker 是大多数人直觉里“模型本体”的部分。它承担多模态理解、通过语言主干进行推理，也是如果你只需要文本输出时最想保留的部分。</p>
+<p>从公开 config 来看，Thinker 的文本主干参数包括：</p>
+<ul>
+<li><code>num_hidden_layers = 48</code></li>
+<li><code>hidden_size = 2048</code></li>
+<li><code>num_attention_heads = 32</code></li>
+<li><code>num_key_value_heads = 4</code></li>
+<li><code>num_experts = 128</code></li>
+<li><code>num_experts_per_tok = 8</code></li>
+</ul>
+<p>这个组合本身很值得注意。对于一个名字里带有 “30B” 的模型来说，它的 backbone hidden size 并不大，但总容量被大量 MoE experts 撑了起来。因此，更合适的心智模型不是“一个很宽的 dense 30B 模型”，而是“一个相对较窄的多模态主干，后面挂着很重的 expert 容量”。这也解释了它为什么采用 GQA：模型希望在保留较多 query heads 的同时，让 KV 状态比 full MHA 更轻。</p>
+<h3 id="vision-stack">Vision Stack</h3>
+<p>Vision 侧更像一个完整的视觉编码器，而不是一个轻量 projector。公开 config 中可以看到：</p>
+<ul>
+<li><code>depth = 27</code></li>
+<li><code>hidden_size = 1152</code></li>
+<li><code>num_heads = 16</code></li>
+<li><code>intermediate_size = 4304</code></li>
+<li><code>patch_size = 16</code></li>
+<li><code>deepstack_visual_indexes = [8, 16, 24]</code></li>
+</ul>
+<p>这里的命名沿用了 CV 社区习惯，因此 <code>depth</code> 就应该读作 Transformer blocks 的层数。由于 config 里只给出了 <code>num_heads</code>，并没有单独暴露 KV-head 的配置，因此最稳妥的解释是：vision encoder 使用的是标准 MHA，而不是 GQA。</p>
+<p>这也是为什么 Qwen3-Omni 的视觉部分不应被理解成一个“很薄的前端”。它本身就是一个规模不小的 Transformer encoder，之后再与 Thinker 的隐藏空间发生多模态融合。</p>
 <h3 id="audio-transformeraut">Audio Transformer（AuT）</h3>
 <div align="center">
-  <img src="../../assets/images/aut-architecture.png" alt="Architecture of Audio Transformer" width="600">
+  <img src="../assets/images/aut-architecture.png" alt="Architecture of Audio Transformer" width="600">
 </div>
 
+<p>音频是 Qwen3-Omni 与标准 VL 模型拉开差异的关键部分。它不是在文本主干前面接了一个薄薄的 adapter，而是专门配了一整套 Transformer encoder，用来把声学输入变成 Thinker 能够推理的表示。</p>
+<p>从 config 来看，audio encoder 的关键结构是：</p>
 <ul>
-<li>Audio Transformer（AuT）是一个 attention-encoder-decoder 模型，在 2000 万小时监督音频数据上从零训练。</li>
-<li>AuT Encoder 规模约为 0.6B 参数。</li>
-<li>滤波器组特征（filter bank features）是由波形短时分析得到的时频表示。10 ms 的帧移（hop）表示分析窗口每次前进 10 ms。</li>
-<li>在 Qwen3-Omni 描述中，对于音频输入与视频中抽取的音频，会重采样至 16 kHz，并转换为 128 通道 mel-spectrogram（25 ms 窗口、10 ms hop）。这对应重叠帧，如 0–25 ms、10–35 ms、20–45 ms 等。常见计算流程为：<ul>
-<li>将波形切分为重叠帧（例如 25 ms 窗口、10 ms hop）；</li>
-<li>对每帧做 FFT（或等价 STFT）得到幅度/功率谱；</li>
-<li>应用 mel 滤波器组，将谱能量聚合到 mel 频带；</li>
-<li>可选做对数压缩（实践中常用，但论文中未必总会显式写出）。</li>
+<li><code>encoder_layers = 32</code></li>
+<li><code>d_model = 1280</code></li>
+<li><code>encoder_attention_heads = 20</code></li>
+<li><code>encoder_ffn_dim = 5120</code></li>
 </ul>
-</li>
-<li>进入 attention 层之前，音频滤波器组特征经 Conv2D 模块下采样 8 倍，从 100 Hz（10ms）到 12.5 Hz。对应地，每帧音频表示约覆盖原始信号的 80 ms。</li>
-<li>训练数据构成为：80% 中文与英文伪标注 ASR 数据，10% 其他语言 ASR 数据，10% 音频理解数据。</li>
-<li>为平衡实时 prefill cache 效率与离线音频任务表现，AuT 使用动态注意力窗口的 flash attention，可覆盖 1 到 8 秒的注意力查询模式。</li>
+<p>这意味着音频塔本身就是一个深且宽的 dense encoder。从结构直觉上看，它更像 Whisper 风格的 Transformer encoder，而不是一个简单 projection layer。</p>
+<p>在前端，Qwen3-Omni 会先把音频重采样到 16 kHz，再转换为 128 通道的 mel-spectrogram，窗口为 25 ms，hop 为 10 ms。进入 attention 层之前，这些时频特征还会先经过 Conv2D 模块做下采样。这样设计的重点在于平衡两件事：既要保留足够的声学细节供理解，又不能让后续 runtime 面对过长的原始音频序列。</p>
+<h3 id="aut">AuT 的系统意义</h3>
+<p>AuT 这一部分值得保留，因为它说明了 Qwen3-Omni 的音频路径为什么在 serving 上和文本、视觉输入不一样：</p>
+<ul>
+<li>AuT 在大规模监督音频数据上从零训练。</li>
+<li>仅 encoder 一侧规模就约有 <code>0.6B</code> 参数。</li>
+<li>输入表示是 mel-spectrogram，而不是原始 waveform token。</li>
+<li>在进入 Transformer 层前，Conv2D 模块会把时频表示下采样 <code>8x</code>，从 <code>100 Hz</code> 降到 <code>12.5 Hz</code>。</li>
+<li>为了兼顾实时 prefill cache 效率与离线音频任务表现，实现中使用了动态注意力窗口的 flash attention，覆盖大约 <code>1</code> 到 <code>8</code> 秒的查询模式。</li>
+</ul>
+<p>从系统角度看，这说明 Qwen3-Omni 不是把音频简单 token 化后喂给 LLM，而是先通过专门的声学编码器做压缩和结构化，再让下游多模态主干来接管。</p>
+<h3 id="talkercodec-tokens-code2wav">Talker、Codec Tokens 与 Code2Wav</h3>
+<p>Talker 这一侧，让 Qwen3-Omni 从“多模态理解模型”真正变成了“any-to-any 生成模型”。它并不是把 Thinker 的高层表示当作语音合成的最后格式化步骤，而是拥有一条独立的生成链路。</p>
+<p>有几个细节值得记住：</p>
+<ul>
+<li>Talker 自身也是一个 20 层的 MoE decoder。</li>
+<li>语音通过 <strong>多 codebook</strong> 方案生成，一共 <code>16</code> 个 code groups。</li>
+<li><code>codebook_size = 2048</code>，<code>semantic_codebook_size = 4096</code>，<code>codebook_dim = 512</code>。</li>
+<li>模型先预测离散 codec 结构，再通过 <code>Code2Wav</code> 恢复波形。</li>
+</ul>
+<p>这是一个很关键的设计选择。语音生成被放在 codec 抽象之后，使得自回归主路径不必直接面对 waveform 级别的生成难度，也让流式语音输出在工程上更现实。</p>
+<h3 id="qwen3-omni-qwen">怎么把 Qwen3-Omni 放回 Qwen 家族里理解</h3>
+<p>从建模角度看，Qwen3-Omni 更适合被理解为多个完整子系统的组合，而不是一个单体 decoder：</p>
+<ul>
+<li>一个用于推理的多模态 MoE 语言主干，</li>
+<li>一个真正的视觉编码器，而不是薄图像适配器，</li>
+<li>一个用于声学理解的 dense audio encoder，</li>
+<li>再加上一条基于 codec prediction 的独立语音生成链路。</li>
+</ul>
+<p>这也是为什么它的参数结构乍看会有点“反直觉”。模型之所以大，并不只是因为文本主干很宽，容量实际上被分散到了 MoE experts、视觉和音频编码器，以及语音生成路径上。</p>
+<h3 id="_5">实用备注</h3>
+<ul>
+<li>如果只需要文本输出，使用 <code>Qwen3OmniMoeThinkerForConditionalGeneration</code> 可以避免把完整语音生成路径一并加载进来。</li>
+<li>Hugging Face 当前说明，集成模型路径下的完整音频生成目前只支持 batch size <code>1</code>。</li>
+<li>像 “更像 Whisper-style” 或 “ViT-like” 这样的说法，是基于公开 config 的结构解释；真正最可信的层数和 hidden 维度信息，仍然应该以公开 config 为准。</li>
 </ul>
 <h2 id="dflash">DFlash</h2>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">SGLANG_ALLOW_OVERWRITE_LONGER_CONTEXT_LEN</span><span class="o">=</span><span class="m">1</span>
@@ -801,7 +1049,7 @@
 </span></code></pre></div>
 <p>在相同 MTBench 服务配置下（80 条提示、输出上限 1024 token、请求速率和最大并发均设为 12，后端为 OpenAI 兼容 sglang，并开启连续使用统计），我们对比了 DFlash（draft block size = 16）与 EAGLE-3（layer-16 speculation）的 speculative decoding。两者在浅层草稿位置的接受率分布相近，但 DFlash 在更深位置上保持了更高的接受概率质量，且中后段衰减更慢。<b>结果显示 DFlash 的平均接受长度更高（3.78），优于 EAGLE-3（3.49）</b>。</p>
 <div align="center">
-  <iframe src="../../assets/images/dflash-accepted-length.pdf" title="Accepted Length of DFlash vs. Eagle 3" width="700" height="500"></iframe>
+  <iframe src="../assets/images/dflash-accepted-length.pdf" title="Accepted Length of DFlash vs. Eagle 3" width="700" height="500"></iframe>
 </div>
 
 

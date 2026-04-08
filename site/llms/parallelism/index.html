@@ -573,6 +573,57 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#an-8-gpu-inference-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      An 8-GPU Inference Example
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="An 8-GPU Inference Example">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#prefill-heavy-workload-40k-1k" class="md-nav__link">
+    <span class="md-ellipsis">
+      Prefill-heavy workload: 40k + 1k
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#decode-heavy-workload-1k-10k" class="md-nav__link">
+    <span class="md-ellipsis">
+      Decode-heavy workload: 1k + 10k
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#balanced-workload-10k-10k" class="md-nav__link">
+    <span class="md-ellipsis">
+      Balanced workload: 10k + 10k
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#a-practical-reading-of-the-trade-off" class="md-nav__link">
+    <span class="md-ellipsis">
+      A Practical Reading of the Trade-off
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -740,6 +791,57 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#an-8-gpu-inference-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      An 8-GPU Inference Example
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="An 8-GPU Inference Example">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#prefill-heavy-workload-40k-1k" class="md-nav__link">
+    <span class="md-ellipsis">
+      Prefill-heavy workload: 40k + 1k
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#decode-heavy-workload-1k-10k" class="md-nav__link">
+    <span class="md-ellipsis">
+      Decode-heavy workload: 1k + 10k
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#balanced-workload-10k-10k" class="md-nav__link">
+    <span class="md-ellipsis">
+      Balanced workload: 10k + 10k
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#a-practical-reading-of-the-trade-off" class="md-nav__link">
+    <span class="md-ellipsis">
+      A Practical Reading of the Trade-off
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -820,6 +922,60 @@ Y = \sum_{i=0}^{p-1} Y_i.
 <li>Increasing TP reduces per-device weight memory and can enlarge the effective KV budget of one replica, but too much TP may turn communication into the bottleneck.</li>
 </ul>
 <p>This is why inference deployment decisions are often phrased as a trade-off between replica-level concurrency and per-replica memory headroom.</p>
+<h2 id="an-8-gpu-inference-example">An 8-GPU Inference Example</h2>
+<p>The clearest way to compare DP and TP is to hold the hardware fixed and change only how the eight GPUs are grouped into replicas. Consider one 8-GPU server with fast intra-node interconnect. The common options are:</p>
+<ul>
+<li><code>DP8TP1</code>: 8 independent single-GPU replicas</li>
+<li><code>DP4TP2</code>: 4 replicas, each spanning 2 GPUs</li>
+<li><code>DP2TP4</code>: 2 replicas, each spanning 4 GPUs</li>
+<li><code>DP1TP8</code>: 1 replica spanning all 8 GPUs</li>
+</ul>
+<p>This comparison is only meaningful when all of these layouts are memory-feasible for the target model and context window. If the model or KV state does not fit under <code>TP1</code>, then high-DP layouts are not real options.</p>
+<p>The important distinction is that DP spends GPUs on more independent replicas, while TP spends GPUs on making one replica larger. As a result, the best choice depends strongly on whether the workload is constrained by single-request latency, replica memory headroom, or multi-request concurrency.</p>
+<p>One subtle point matters a great deal in long-context serving: TP does not only change the compute pattern of one replica. By reducing per-GPU weight footprint inside that replica, it can also leave more memory available for KV cache. That larger KV budget may allow one replica to admit more long requests at the same time, avoid preemption, and form a larger stable batch. In other words, TP can sometimes improve throughput not because one decode step becomes intrinsically faster, but because the replica can sustain enough active work to keep the GPUs busy.</p>
+<p>For this reason, inference tuning on 8 GPUs is usually balancing three separate questions at once:</p>
+<ul>
+<li>How many independent replicas should the node expose?</li>
+<li>How much KV headroom does each replica need?</li>
+<li>Is the current workload limited by communication, by memory pressure, or by insufficient active work?</li>
+</ul>
+<h3 id="prefill-heavy-workload-40k-1k">Prefill-heavy workload: <code>40k + 1k</code></h3>
+<p>This workload is dominated by ingesting a very long prompt. Prefill is expensive because attention and projection work scale over a large input sequence before decode even becomes the main issue.</p>
+<ul>
+<li>Under low concurrency, TP often becomes more attractive because multiple GPUs can cooperate on the same long prefill. <code>DP8TP1</code> gives many replicas, but if only one or two requests are active, most replicas sit idle while one GPU bears the full prompt cost.</li>
+<li>Under high concurrency, DP becomes more competitive again because many long prefills can proceed in parallel on different replicas. If each request already fits comfortably, <code>DP8TP1</code> or <code>DP4TP2</code> often achieves higher aggregate throughput than very large TP groups.</li>
+<li>The main reason to keep some TP in this regime is usually not decode speed but memory headroom: very long prompts consume KV capacity quickly, and moderate TP can create a larger feasible per-request context budget.</li>
+<li>This memory effect can change concurrency as well. With ultra-long prompts, <code>TP1</code> may force each replica to admit only a very small number of active requests in order to avoid preemption. A moderate TP degree can enlarge the per-replica KV budget enough that the replica can keep a larger prefill batch resident and reach higher real throughput.</li>
+</ul>
+<p>In practice, prefill-heavy serving often favors a middle ground such as <code>DP4TP2</code> when one-GPU replicas are too tight on memory but <code>TP4</code> or <code>TP8</code> would sacrifice too much replica count.</p>
+<h3 id="decode-heavy-workload-1k-10k">Decode-heavy workload: <code>1k + 10k</code></h3>
+<p>This workload is dominated by long autoregressive generation after a relatively short prompt. The system spends most of its time stepping through decode, where each step is small and repeated many times.</p>
+<ul>
+<li>Under high concurrency, DP is usually the strongest choice if the model fits. <code>DP8TP1</code> maximizes the number of independent decoders and avoids the per-layer TP collectives that would be paid on every decode step.</li>
+<li>Under low concurrency, very large TP groups rarely help much unless they are needed for memory. The decode step for one request is narrow, so spreading it across many GPUs can increase synchronization cost faster than it reduces local compute time.</li>
+<li>If output lengths are large enough to make KV pressure the dominant bottleneck, moderate TP can still win indirectly by enlarging the feasible KV budget of one replica and reducing preemption risk. That is a memory effect, not a pure compute-speed effect.</li>
+<li>This distinction matters in practice. A decode-heavy service may look compute-light at the per-step level, but if each replica is constantly KV-constrained, it may never accumulate enough active sequences to saturate the device. In that case, adding some TP can increase stable decode concurrency even though it also adds communication.</li>
+</ul>
+<p>This is why decode-heavy online serving often prefers as much DP as memory allows. Once the model already fits and KV is stable, extra TP tends to trade throughput for communication.</p>
+<h3 id="balanced-workload-10k-10k">Balanced workload: <code>10k + 10k</code></h3>
+<p>When prefill and decode are both substantial, neither pure-DP nor pure-TP logic is sufficient. The deployment must absorb long contexts while also surviving long output tails.</p>
+<ul>
+<li>Under small or moderate concurrency, hybrid layouts such as <code>DP4TP2</code> are often a robust compromise. They preserve several independent replicas while giving each replica more memory headroom than <code>TP1</code>.</li>
+<li>Under large concurrency, the decision depends on what fails first. If <code>DP8TP1</code> starts to preempt or must severely limit admitted requests because KV is too tight, then adding TP can improve real throughput even though it increases communication. If <code>DP8TP1</code> remains stable, it often keeps the highest aggregate throughput.</li>
+<li><code>DP1TP8</code> is usually justified only when one replica truly needs the entire node, either because the model is too large or because the target context budget is extreme. Otherwise it gives up too much outer concurrency.</li>
+</ul>
+<p>This is often the regime where the distinction between logical concurrency and effective concurrency matters most. <code>DP8TP1</code> may expose more replicas on paper, but if each replica must operate with a very small admitted batch to stay within its KV budget, the system may still fail to keep the node compute-bound. A smaller number of larger TP replicas can sometimes sustain more useful work in flight.</p>
+<h3 id="a-practical-reading-of-the-trade-off">A Practical Reading of the Trade-off</h3>
+<p>For inference on one 8-GPU node, the qualitative pattern is usually:</p>
+<ul>
+<li>More DP helps when the workload has enough independent requests to keep many replicas busy.</li>
+<li>More TP helps when a single replica is too memory-constrained or when one request is so heavy that multiple GPUs should cooperate on it.</li>
+<li>More TP can also help when ultra-long requests make each <code>TP1</code> replica too KV-constrained to admit enough active work. In that case, TP is buying concurrency through memory headroom.</li>
+<li>Prefill-heavy, low-concurrency traffic pushes the system toward some TP.</li>
+<li>Decode-heavy, high-concurrency traffic pushes the system toward more DP.</li>
+<li>Balanced long-context traffic often lands in the middle, where <code>DP4TP2</code> or <code>DP2TP4</code> is easier to stabilize than either extreme.</li>
+</ul>
+<p>The most important operational question is not "is DP better than TP" in the abstract. It is "what is the first wall this workload hits on this hardware: request-level latency, per-replica KV capacity, or cluster-level concurrency?" DP and TP are two different ways of moving that wall.</p>
 
 
 
