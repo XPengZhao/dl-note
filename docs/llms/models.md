@@ -9,7 +9,7 @@
 ### Overview
 
 <div align="center">
-  <img src="../assets/images/qwen3-omni-architecture.png" alt="Architecture of Qwen3-Omni" width="600">
+  <img src="../../assets/images/qwen3-omni-architecture.png" alt="Architecture of Qwen3-Omni" width="600">
 </div>
 
 Qwen3-Omni-30B-A3B is interesting because it is not just a vision-language model with an extra speech head. It tries to unify text, image, audio, and video perception with both text and speech generation in one deployment stack. That makes it a useful model to study whenever the question is not only "how does a multimodal backbone work," but also "how are perception and real-time speech output coupled in one system."
@@ -76,7 +76,7 @@ This is also why the visual component should not be viewed as a trivial frontend
 ### Audio Stack and AuT
 
 <div align="center">
-  <img src="../assets/images/aut-architecture.png" alt="Architecture of Audio Transformer" width="600">
+  <img src="../../assets/images/aut-architecture.png" alt="Architecture of Audio Transformer" width="600">
 </div>
 
 Audio is where Qwen3-Omni becomes especially different from a standard VL model. The audio side is not a thin adapter. It is a full Transformer encoder stack that turns acoustic input into representations the Thinker can reason over.
@@ -162,5 +162,5 @@ CUDA_VISIBLE_DEVICES=4,5,6,7 python -m sglang.launch_server \
 Under the same MTBench serving configuration (80 prompts, 1024-token output cap, request rate and max concurrency both set to 12, OpenAI-compatible sglang backend with continuous usage statistics enabled), we compared speculative decoding between DFlash (draft block size = 16) and EAGLE-3 (layer-16 speculation). The position-wise acceptance distributions are similar at shallow draft positions, but DFlash consistently maintains higher acceptance mass across deeper positions, with a slower decay beyond mid-range indices. <b>It shows a higher average accepted length for DFlash (3.78) relative to EAGLE-3 (3.49)</b>.
 
 <div align="center">
-  <iframe src="../assets/images/dflash-accepted-length.pdf" title="Accepted Length of DFlash vs. Eagle 3" width="700" height="500"></iframe>
+  <iframe src="../../assets/images/dflash-accepted-length.pdf" title="Accepted Length of DFlash vs. Eagle 3" width="700" height="500"></iframe>
 </div>

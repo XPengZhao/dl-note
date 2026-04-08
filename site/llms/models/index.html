@@ -890,7 +890,7 @@
 <h2 id="qwen3-omni">Qwen3-Omni</h2>
 <h3 id="overview">Overview</h3>
 <div align="center">
-  <img src="../assets/images/qwen3-omni-architecture.png" alt="Architecture of Qwen3-Omni" width="600">
+  <img src="../../assets/images/qwen3-omni-architecture.png" alt="Architecture of Qwen3-Omni" width="600">
 </div>
 
 <p>Qwen3-Omni-30B-A3B is interesting because it is not just a vision-language model with an extra speech head. It tries to unify text, image, audio, and video perception with both text and speech generation in one deployment stack. That makes it a useful model to study whenever the question is not only "how does a multimodal backbone work," but also "how are perception and real-time speech output coupled in one system."</p>
@@ -978,7 +978,7 @@
 <p>This is also why the visual component should not be viewed as a trivial frontend. It is a substantial transformer encoder in its own right, followed by multimodal fusion into the Thinker hidden space.</p>
 <h3 id="audio-stack-and-aut">Audio Stack and AuT</h3>
 <div align="center">
-  <img src="../assets/images/aut-architecture.png" alt="Architecture of Audio Transformer" width="600">
+  <img src="../../assets/images/aut-architecture.png" alt="Architecture of Audio Transformer" width="600">
 </div>
 
 <p>Audio is where Qwen3-Omni becomes especially different from a standard VL model. The audio side is not a thin adapter. It is a full Transformer encoder stack that turns acoustic input into representations the Thinker can reason over.</p>
@@ -1049,7 +1049,7 @@
 </span></code></pre></div>
 <p>Under the same MTBench serving configuration (80 prompts, 1024-token output cap, request rate and max concurrency both set to 12, OpenAI-compatible sglang backend with continuous usage statistics enabled), we compared speculative decoding between DFlash (draft block size = 16) and EAGLE-3 (layer-16 speculation). The position-wise acceptance distributions are similar at shallow draft positions, but DFlash consistently maintains higher acceptance mass across deeper positions, with a slower decay beyond mid-range indices. <b>It shows a higher average accepted length for DFlash (3.78) relative to EAGLE-3 (3.49)</b>.</p>
 <div align="center">
-  <iframe src="../assets/images/dflash-accepted-length.pdf" title="Accepted Length of DFlash vs. Eagle 3" width="700" height="500"></iframe>
+  <iframe src="../../assets/images/dflash-accepted-length.pdf" title="Accepted Length of DFlash vs. Eagle 3" width="700" height="500"></iframe>
 </div>
 
 

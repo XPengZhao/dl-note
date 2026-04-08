@@ -9,7 +9,7 @@
 ### 概览
 
 <div align="center">
-  <img src="../assets/images/qwen3-omni-architecture.png" alt="Architecture of Qwen3-Omni" width="600">
+  <img src="../../../assets/images/qwen3-omni-architecture.png" alt="Architecture of Qwen3-Omni" width="600">
 </div>
 
 Qwen3-Omni-30B-A3B 值得单独整理，是因为它不是“在视觉语言模型后面再挂一个语音头”这么简单。它试图把文本、图像、音频、视频的感知，以及文本和语音生成，放进同一套部署路径里。理解这个模型时，问题不只是“多模态 backbone 长什么样”，还包括“感知和实时语音生成是如何被放进同一个系统里的”。
@@ -76,7 +76,7 @@ Vision 侧更像一个完整的视觉编码器，而不是一个轻量 projector
 ### Audio Transformer（AuT）
 
 <div align="center">
-  <img src="../assets/images/aut-architecture.png" alt="Architecture of Audio Transformer" width="600">
+  <img src="../../../assets/images/aut-architecture.png" alt="Architecture of Audio Transformer" width="600">
 </div>
 
 音频是 Qwen3-Omni 与标准 VL 模型拉开差异的关键部分。它不是在文本主干前面接了一个薄薄的 adapter，而是专门配了一整套 Transformer encoder，用来把声学输入变成 Thinker 能够推理的表示。
@@ -161,5 +161,5 @@ CUDA_VISIBLE_DEVICES=4,5,6,7 python -m sglang.launch_server \
 在相同 MTBench 服务配置下（80 条提示、输出上限 1024 token、请求速率和最大并发均设为 12，后端为 OpenAI 兼容 sglang，并开启连续使用统计），我们对比了 DFlash（draft block size = 16）与 EAGLE-3（layer-16 speculation）的 speculative decoding。两者在浅层草稿位置的接受率分布相近，但 DFlash 在更深位置上保持了更高的接受概率质量，且中后段衰减更慢。<b>结果显示 DFlash 的平均接受长度更高（3.78），优于 EAGLE-3（3.49）</b>。
 
 <div align="center">
-  <iframe src="../assets/images/dflash-accepted-length.pdf" title="Accepted Length of DFlash vs. Eagle 3" width="700" height="500"></iframe>
+  <iframe src="../../../assets/images/dflash-accepted-length.pdf" title="Accepted Length of DFlash vs. Eagle 3" width="700" height="500"></iframe>
 </div>
