@@ -1,0 +1,1297 @@
+
+<!doctype html>
+<html lang="zh" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://XPengZhao.github.io/dl-note/zh/llms/overview/">
+      
+      
+        <link rel="prev" href="../../neural-graphics/">
+      
+      
+        <link rel="next" href="../request-lifecycle/">
+      
+      
+        
+          <link rel="alternate" href="../../../llms/overview/" hreflang="en">
+        
+          <link rel="alternate" href="./" hreflang="zh">
+        
+      
+      
+      <link rel="icon" href="../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>总览 - DL Notes</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.484c7ddc.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../stylesheets/bootstrap.min.css">
+    
+      <link rel="stylesheet" href="../../../stylesheets/basic.css">
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#ai-infra" class="md-skip">
+          跳转至
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="页眉">
+    <a href="../../" title="DL Notes" class="md-header__button md-logo" aria-label="DL Notes" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            DL Notes
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              总览
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+      <div class="md-header__option">
+  <div class="md-select">
+    
+    <button class="md-header__button md-icon" aria-label="选择当前语言">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12.87 15.07-2.54-2.51.03-.03A17.5 17.5 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2zm-2.62 7 1.62-4.33L19.12 17z"/></svg>
+    </button>
+    <div class="md-select__inner">
+      <ul class="md-select__list">
+        
+          <li class="md-select__item">
+            <a href="../../../llms/overview/" hreflang="en" class="md-select__link">
+              English
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="./" hreflang="zh" class="md-select__link">
+              简体中文
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="搜索" placeholder="搜索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="查找">
+        
+        <button type="reset" class="md-search__icon md-icon" title="清空当前内容" aria-label="清空当前内容" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            正在初始化搜索引擎
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="导航栏" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../" title="DL Notes" class="md-nav__button md-logo" aria-label="DL Notes" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    DL Notes
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    首页
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hardware/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    硬件
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tensor/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    张量操作
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../neural-graphics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    神经图形
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AI Infra
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    AI Infra
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    总览
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    总览
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        为什么需要总览
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        两条轴线：控制面与数据面
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        推理系统的分层视图
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="推理系统的分层视图">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. 应用层
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-agent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Agent 与编排层
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. 网关与路由层
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-serving-engine" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Serving Engine 层
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. 运行时与调度层
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. 模型执行层
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#7-kernel" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. 算子与 Kernel 层
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. 系统运行时与硬件层
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#vllm-sglang" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        vLLM 和 SGLang 在哪里
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        一次请求是怎样穿过整个栈的
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        在本笔记中的阅读路径
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../request-lifecycle/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    请求生命周期
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../metrics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    指标
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../kv-cache/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    KV Cache
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../serving-runtime/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    推理运行时
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../parallelism/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    并行策略
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../decoding/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    解码与采样
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../training-objective/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    训练目标
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    模型
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    模型
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../position-encoding/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    位置编码
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    模型笔记
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        为什么需要总览
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        两条轴线：控制面与数据面
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        推理系统的分层视图
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="推理系统的分层视图">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. 应用层
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-agent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Agent 与编排层
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. 网关与路由层
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-serving-engine" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Serving Engine 层
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. 运行时与调度层
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. 模型执行层
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#7-kernel" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. 算子与 Kernel 层
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. 系统运行时与硬件层
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#vllm-sglang" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        vLLM 和 SGLang 在哪里
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        一次请求是怎样穿过整个栈的
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        在本笔记中的阅读路径
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="ai-infra">AI Infra 总览</h1>
+<p>现代推理系统是一个完整的技术栈，而不是某一个单独框架。当人们说“我们在用 vLLM”或者“我们在用 SGLang”时，通常只是在指这个大系统中的一层。真实部署里还包括应用逻辑、agent 编排、请求路由、调度策略、模型执行、算子库，以及底层的运行时和硬件支持。如果没有一个全栈视角，就很容易把瓶颈归错层，或者误判到底该由哪一层来解决问题。</p>
+<h2 id="_1">为什么需要总览</h2>
+<p>很多 AI Infra 问题表面上看起来相似，但本质上属于不同层。</p>
+<ul>
+<li>如果一个 agent workflow 很慢，瓶颈可能在 prompt 组装、工具调用延迟，或者请求 fan-out，而不一定在 serving engine 本身。</li>
+<li>如果吞吐低，问题可能在上层路由或 batching 策略，而不一定在 kernel。</li>
+<li>如果某个 engine 出现 preemption 或延迟抖动，根因可能是 KV 压力、准入控制或部署拓扑，而不一定是模型本身。</li>
+</ul>
+<p>总览的价值就在于先把这些层次拆开，再去讨论具体机制。</p>
+<h2 id="_2">两条轴线：控制面与数据面</h2>
+<p>理解这个系统，一个很有用的方法是先区分控制面和数据面。</p>
+<ul>
+<li><strong>控制面（control plane）</strong> 决定什么应该运行、在哪里运行、按什么策略运行。它包括路由、配额、自动扩缩容、准入控制、模型选择，以及 agent 级编排。</li>
+<li><strong>数据面（data plane）</strong> 负责真正执行请求。它包括 prompt 预处理、serving engine 内部调度、模型前向、kernel 执行、内存移动，以及硬件上的实际运行。</li>
+</ul>
+<p>真实系统往往横跨这两条轴线。比如上层路由是控制面决策，但它会直接影响数据面的 cache 局部性和 batch 形成方式。</p>
+<h2 id="_3">推理系统的分层视图</h2>
+<p>下面这张图是一个比较实用的分层方式：</p>
+<div class="mermaid">flowchart TD
+    A["应用层&lt;br/&gt;Chat app, API 产品, workflow service"] --&gt; B["Agent / 编排层&lt;br/&gt;工具调用, prompt assembly, 多步计划"]
+    B --&gt; C["网关 / 路由层&lt;br/&gt;负载均衡, 模型选择, sticky routing, 配额"]
+    C --&gt; D["Serving Engine 层&lt;br/&gt;vLLM, SGLang, TGI, TensorRT-LLM server"]
+    D --&gt; E["运行时 / 调度层&lt;br/&gt;Continuous batching, KV manager, admission control, prefill/decode scheduling"]
+    E --&gt; F["模型执行层&lt;br/&gt;Transformer blocks, attention, MLP, MoE, sampling"]
+    F --&gt; G["算子 / Kernel 层&lt;br/&gt;Paged attention, GEMM, all-reduce, fused ops, Triton/CUDA kernels"]
+    G --&gt; H["系统运行时 / 硬件层&lt;br/&gt;CUDA, NCCL, GPU memory, NVLink/PCIe, HBM, SMs"]</div>
+<h3 id="1">1. 应用层</h3>
+<p>这一层是最终用户直接接触到的产品形态，例如聊天系统、搜索系统、编码助手、文档处理流水线或企业 workflow。它决定什么用户行为会触发模型调用，以及系统真正关心的业务约束是什么，比如延迟目标、会话连续性或成本上限。</p>
+<h3 id="2-agent">2. Agent 与编排层</h3>
+<p>这一层负责把业务需求组织成真正的模型负载。它可能包括 prompt 组装、检索增强、工具调用、多轮记忆、分支推理或任务拆解。各种 agent framework 都属于这一层。它的主要作用不是底层执行效率，而是 workload shaping，也就是决定请求有多大、请求有多频繁，以及请求之间是否存在结构上的相似性。</p>
+<h3 id="3">3. 网关与路由层</h3>
+<p>这一层负责决定每个请求被送往哪个后端。它包括外部负载均衡、模型选择、sticky routing、流量隔离和多副本流量策略。对长上下文 serving 来说，这一层比看起来更重要，因为路由决策会直接影响 prefix cache 局部性、batch 形成方式，以及不同副本之间的公平性。</p>
+<h3 id="4-serving-engine">4. Serving Engine 层</h3>
+<p>这一层通常就是 <strong>vLLM</strong>、<strong>SGLang</strong> 这类框架所在的位置。它们提供 engine 抽象，对上接受 tokenized 或结构化请求，对外暴露 generation API。它们并不是整个系统本身，而是处在上层流量管理和下层模型执行之间的核心 serving substrate。</p>
+<p>这一层常见职责包括：</p>
+<ul>
+<li>请求准入与生命周期管理</li>
+<li>batching 与 streaming 接口</li>
+<li>KV cache 管理与 paging</li>
+<li>decode loop 编排</li>
+<li>与分布式执行的集成</li>
+</ul>
+<h3 id="5">5. 运行时与调度层</h3>
+<p>在一个 serving engine 内部，其实还有更细的一层结构，也就是 runtime。本层负责内部调度。continuous batching、chunked prefill、preemption、block 分配、准入控制和 KV 压力处理都属于这里。</p>
+<p>这一层往往决定了系统的真实性能。即使模型相同、engine 相同，不同 runtime 策略也可能导致完全不同的行为。</p>
+<h3 id="6">6. 模型执行层</h3>
+<p>这一层是模型本身的数学结构：attention blocks、MLP、MoE routing、RoPE、sampling head 和输出 logits。像“这个模型是不是 GQA”“每个 token 的 KV 状态有多大”这种问题，都属于这一层。</p>
+<h3 id="7-kernel">7. 算子与 Kernel 层</h3>
+<p>这一层负责真正的重计算：GEMM、fused kernel、paged attention、all-reduce、reduce-scatter、dispatch/combine，以及各种 Triton 或 CUDA kernel。它是抽象模型计算转化为真实设备工作量的地方。</p>
+<h3 id="8">8. 系统运行时与硬件层</h3>
+<p>最底层是 CUDA、NCCL、GPU 显存系统、NVLink/PCIe 这样的互联，以及硬件本身的执行资源。带宽、显存容量、collective 延迟和 kernel launch 开销，最终都会落到这一层。</p>
+<h2 id="vllm-sglang">vLLM 和 SGLang 在哪里</h2>
+<p>理解 vLLM 和 SGLang，一个比较准确的方式是把它们看成 <strong>带有大量内部 runtime 逻辑的 serving engine</strong>。</p>
+<ul>
+<li>它们位于应用层、agent 层和外部路由层之下。</li>
+<li>它们位于模型 kernel 和硬件执行之上。</li>
+<li>它们内部自带 scheduler、batching 逻辑、KV manager 和一整套 runtime 策略。</li>
+</ul>
+<p>所以当有人说“我们在用 vLLM”时，通常意味着：</p>
+<ol>
+<li>上层系统仍然负责决定发什么请求</li>
+<li>vLLM 负责请求执行、batching 和内部 runtime 管理</li>
+<li>下层系统仍然决定实际算子效率和硬件利用率</li>
+</ol>
+<p>这也是为什么只调 engine 参数从来不是全部答案。即使 engine 本身调得很好，如果上层 workload 形状不好，性能依然可能很差；反过来，上层策略再好，如果 runtime 调度或 kernel 效率不足，也仍然会被卡住。</p>
+<h2 id="_4">一次请求是怎样穿过整个栈的</h2>
+<p>一条在线请求通常会大致按下面的顺序流过整个系统：</p>
+<ol>
+<li>应用层或 agent 层决定需要一次模型调用。</li>
+<li>编排层组装 prompt、检索上下文、工具输出和 decoding policy。</li>
+<li>路由层选择具体的模型端点或副本。</li>
+<li>Serving engine 接收请求，并将其送入内部 scheduler。</li>
+<li>Runtime 分配 KV blocks，对 prefill 或 decode 进行 batching，并决定这个请求何时执行。</li>
+<li>模型执行层运行 transformer 计算。</li>
+<li>算子层发起 kernels 和 collectives。</li>
+<li>硬件/runtime 层执行这些 kernels 并搬运数据。</li>
+<li>生成出的 token 再沿着同一条链路向上返回。</li>
+</ol>
+<p>按照这个顺序思考问题，调试会容易很多。例如：</p>
+<ul>
+<li>TTFT 高，可能来自 prompt 组装、排队，或者 prefill 成本</li>
+<li>TPS 低，可能来自路由碎片化、batching 不充分，或者通信开销</li>
+<li>延迟不稳定，可能来自 scheduler 压力、KV 耗尽，或者上层 fan-out 行为</li>
+</ul>
+<h2 id="_5">在本笔记中的阅读路径</h2>
+<p>在这套 notebook 里，AI Infra 各页可以理解为对这条栈中间部分的逐层拆解：</p>
+<ul>
+<li><a href="../metrics/">指标</a>：系统行为如何被测量</li>
+<li><a href="../kv-cache/">KV Cache</a>：长上下文 serving 的核心内存对象</li>
+<li><a href="../serving-runtime/">推理运行时</a>：单个 engine 如何调度和稳定请求</li>
+<li><a href="../parallelism/">并行策略</a>：执行如何分布到多个设备上</li>
+<li><a href="../decoding/">解码与采样</a>：decode 行为如何被塑造</li>
+<li><a href="../training-objective/">训练目标</a>：推理输出背后的概率学基础</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": [], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}, "version": null}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+        <script src="../../../javascripts/mathjax.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+      
+        <script src="../../../javascripts/mermaid.js"></script>
+      
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>

@@ -1,0 +1,185 @@
+.md-typeset p {
+    /* Mixed Chinese-English technical prose looks better without forced justification. */
+    text-align: start;
+    text-justify: auto;
+  }
+
+p:has(+ .arithmatex) {
+    margin-bottom: 0px; /* Adjust as needed */
+  }
+
+  .md-content h1 {
+    color: #7C1823; /* Tomato color for h1 */
+    font-weight: bold;
+  }
+  .md-content h2 {
+    color: #133167; /* SteelBlue color for h2 */
+    font-weight: bold;
+  }
+  .md-content h3 {
+    color: #133167; /* LimeGreen color for h3 */
+    font-weight: bold;
+  }
+  .md-content h4,
+  .md-content h5,
+  .md-content h6 {
+    font-size: 1.15em;
+    font-weight: 600;
+    letter-spacing: -.01em;
+    line-height: 1.25;
+    margin: 1.5em 0 .8em;
+    color: #133167;
+  }
+/* Use hollow circles for nested unordered lists. */
+.md-typeset ul ul,
+.md-typeset ul ul ul {
+  list-style-type: circle;
+}
+
+/* Reusable style for bibliography/reference lines. */
+.md-typeset .doc-reference {
+  font-size: 0.85em;
+  color: #6c757d;
+  margin-top: 0.15rem;
+}
+
+.md-typeset .doc-reference-label {
+  margin-bottom: 0.1rem;
+}
+
+
+.md-typeset .doc-section-label {
+  margin-bottom: 0.1rem;
+}
+
+.md-typeset .mermaid-figure {
+  border: 1px solid rgba(19, 49, 103, 0.14);
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  margin: 1rem 0 1.25rem;
+  background: #fff;
+  overflow: auto;
+}
+
+.md-typeset .mermaid-figure__toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.4rem;
+  margin-bottom: 0.65rem;
+}
+
+.md-typeset .mermaid-figure__button,
+.md-typeset .mermaid-modal__button {
+  border: 1px solid rgba(19, 49, 103, 0.18);
+  background: #f6f8fb;
+  color: #133167;
+  border-radius: 0.35rem;
+  min-width: 2.2rem;
+  height: 2rem;
+  padding: 0 0.55rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.md-typeset .mermaid-figure__button:hover,
+.md-typeset .mermaid-modal__button:hover {
+  background: #eaf0fb;
+}
+
+.md-typeset .mermaid-figure__button {
+  width: 2rem;
+  min-width: 2rem;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.28;
+  transition: opacity 0.16s ease, background-color 0.16s ease, border-color 0.16s ease;
+}
+
+.md-typeset .mermaid-figure__button svg {
+  width: 1rem;
+  height: 1rem;
+  fill: currentColor;
+}
+
+.md-typeset .mermaid-figure:hover .mermaid-figure__button,
+.md-typeset .mermaid-figure:focus-within .mermaid-figure__button {
+  opacity: 1;
+}
+
+.md-typeset .mermaid {
+  width: 100%;
+  min-width: 0;
+  display: flex;
+  justify-content: center;
+  cursor: zoom-in;
+}
+
+.md-typeset .mermaid svg {
+  display: block;
+  max-width: min(100%, 1050px);
+  height: auto;
+}
+
+.mermaid-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: none;
+}
+
+.mermaid-modal.is-open {
+  display: block;
+}
+
+.mermaid-modal__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.56);
+}
+
+.mermaid-modal__panel {
+  position: absolute;
+  inset: 4vh 4vw;
+  background: #fff;
+  border-radius: 0.75rem;
+  box-shadow: 0 24px 80px rgba(15, 23, 42, 0.24);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.mermaid-modal__toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.45rem;
+  padding: 0.75rem 0.9rem;
+  border-bottom: 1px solid rgba(19, 49, 103, 0.12);
+  background: #fbfcfe;
+}
+
+.mermaid-modal__label {
+  min-width: 3.2rem;
+  text-align: center;
+  font-size: 0.85rem;
+  color: #495057;
+}
+
+.mermaid-modal__viewport {
+  flex: 1;
+  overflow: auto;
+  padding: 1rem;
+  background: #fff;
+}
+
+.mermaid-modal__content {
+  width: max-content;
+  min-width: 100%;
+}
+
+.mermaid-modal__content svg {
+  display: block;
+}

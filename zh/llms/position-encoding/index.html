@@ -1,0 +1,1214 @@
+
+<!doctype html>
+<html lang="zh" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://XPengZhao.github.io/dl-note/zh/llms/position-encoding/">
+      
+      
+        <link rel="prev" href="../training-objective/">
+      
+      
+        <link rel="next" href="../models/">
+      
+      
+        
+          <link rel="alternate" href="../../../llms/position-encoding/" hreflang="en">
+        
+          <link rel="alternate" href="./" hreflang="zh">
+        
+      
+      
+      <link rel="icon" href="../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>位置编码 - DL Notes</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.484c7ddc.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../stylesheets/bootstrap.min.css">
+    
+      <link rel="stylesheet" href="../../../stylesheets/basic.css">
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#_1" class="md-skip">
+          跳转至
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="页眉">
+    <a href="../../" title="DL Notes" class="md-header__button md-logo" aria-label="DL Notes" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            DL Notes
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              位置编码
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+      <div class="md-header__option">
+  <div class="md-select">
+    
+    <button class="md-header__button md-icon" aria-label="选择当前语言">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12.87 15.07-2.54-2.51.03-.03A17.5 17.5 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2zm-2.62 7 1.62-4.33L19.12 17z"/></svg>
+    </button>
+    <div class="md-select__inner">
+      <ul class="md-select__list">
+        
+          <li class="md-select__item">
+            <a href="../../../llms/position-encoding/" hreflang="en" class="md-select__link">
+              English
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="./" hreflang="zh" class="md-select__link">
+              简体中文
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="搜索" placeholder="搜索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="查找">
+        
+        <button type="reset" class="md-search__icon md-icon" title="清空当前内容" aria-label="清空当前内容" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            正在初始化搜索引擎
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="导航栏" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../" title="DL Notes" class="md-nav__button md-logo" aria-label="DL Notes" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    DL Notes
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    首页
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hardware/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    硬件
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tensor/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    张量操作
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../neural-graphics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    神经图形
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AI Infra
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    AI Infra
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    总览
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../request-lifecycle/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    请求生命周期
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../metrics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    指标
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../kv-cache/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    KV Cache
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../serving-runtime/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    推理运行时
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../parallelism/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    并行策略
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../decoding/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    解码与采样
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../training-objective/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    训练目标
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    模型
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    模型
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    位置编码
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    位置编码
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#rope" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RoPE
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#m-rope" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        M-RoPE
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tm-rope" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TM-RoPE
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        一个统一视角
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        对比
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        实际理解
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        备注
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    模型笔记
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#rope" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RoPE
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#m-rope" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        M-RoPE
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tm-rope" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TM-RoPE
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        一个统一视角
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        对比
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        实际理解
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        备注
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="_1">位置编码</h1>
+<p>当模型不再只处理文本时，位置编码就会变得更有意思。在纯语言模型里，位置是一个一维概念：每个 token 都只是在序列中占一个位置。但在视觉语言模型和 omni 模型里，这个假设不再成立。图像 token 位于二维网格上，视频 token 位于时空网格上，音频 token 又有自己的一套时间坐标。此时真正的问题不再只是“如何编码顺序”，而是“如何编码结构”。</p>
+<p>本页按这一条演化路线组织三类相关方法：</p>
+<ul>
+<li><strong>RoPE</strong>：面向一维 token 序列</li>
+<li><strong>M-RoPE</strong>：面向多模态或时空坐标</li>
+<li><strong>TM-RoPE</strong>：进一步强调跨模态时间对齐，尤其是音频与视频</li>
+</ul>
+<p>下面会保留必要的公式，但重点仍然放在每一类方法到底试图保留什么结构。</p>
+<h2 id="rope">RoPE</h2>
+<p>Rotary Position Embedding 的核心思想，是在 query 和 key 的二维子空间上做旋转，从而把位置信息直接写进 attention 的几何关系中。设</p>
+<div class="arithmatex">\[
+x \in \mathbb{R}^d
+\]</div>
+<p>并把隐藏向量按相邻两维分组：</p>
+<div class="arithmatex">\[
+x = (x_0, x_1, x_2, x_3, \ldots).
+\]</div>
+<p>对于位置 <span class="arithmatex">\(p\)</span>，第 <span class="arithmatex">\(i\)</span> 个二维子空间上的旋转角定义为</p>
+<div class="arithmatex">\[
+\theta_i(p) = p \, \omega_i,
+\]</div>
+<p>其中 <span class="arithmatex">\(\omega_i\)</span> 是第 <span class="arithmatex">\(i\)</span> 个频率分量。对应的旋转写成</p>
+<div class="arithmatex">\[
+\begin{pmatrix}
+x'_{2i} \\
+x'_{2i+1}
+\end{pmatrix}
+=
+\begin{pmatrix}
+\cos \theta_i(p) &amp; -\sin \theta_i(p) \\
+\sin \theta_i(p) &amp; \cos \theta_i(p)
+\end{pmatrix}
+\begin{pmatrix}
+x_{2i} \\
+x_{2i+1}
+\end{pmatrix}.
+\]</div>
+<p>标准的频率设计通常是几何级数：</p>
+<div class="arithmatex">\[
+\omega_i = 10000^{-2i/d}.
+\]</div>
+<p>RoPE 最重要的性质在于，它让 attention 对 <strong>相对位置</strong> 敏感。也就是说，经过旋转之后，query 和 key 的内积不再只反映内容相似性，还会自然包含它们之间的位置差。这就是 RoPE 与“把一个绝对位置向量直接加到 embedding 上”最本质的区别：它不是把位置附着在表示上，而是直接改写了表示之间的几何关系。</p>
+<p>对文本来说，这套机制非常自然，因为语言 token 本来就是一条一维序列。但一旦进入视觉和视频场景，问题就变得复杂了。图像 patch 不是只有一个序号，它还同时具有高度和宽度坐标；视频 token 更进一步，还带有时间坐标。此时如果继续用原始 RoPE 的一维位置索引，就相当于把原本有明确几何结构的时空网格压平成了一条序列。</p>
+<h2 id="m-rope">M-RoPE</h2>
+<p>M-RoPE 可以理解为把 RoPE 从一维位置推广到多维坐标。在视觉和视频模型里，一个 token 更合理的描述方式通常是</p>
+<div class="arithmatex">\[
+(t, h, w),
+\]</div>
+<p>其中 <span class="arithmatex">\(t\)</span> 表示时间，<span class="arithmatex">\(h\)</span> 表示高度，<span class="arithmatex">\(w\)</span> 表示宽度。M-RoPE 的目标，就是让 rotary position embedding 能够处理这样的多维位置。</p>
+<p>一个很自然的抽象方式，是把隐藏维度拆成多个子空间：</p>
+<div class="arithmatex">\[
+d = d_t + d_h + d_w.
+\]</div>
+<p>然后分别在这些子空间上编码不同坐标轴：</p>
+<div class="arithmatex">\[
+\mathrm{M\mbox{-}RoPE}(x; t,h,w)
+=
+\big[
+\mathrm{RoPE}_t(x_t; t),
+\mathrm{RoPE}_h(x_h; h),
+\mathrm{RoPE}_w(x_w; w)
+\big].
+\]</div>
+<p>这个表达更适合作为理解框架，而不应被视为所有模型都逐项按此实现的字面公式。它要表达的核心是：时间、垂直位置和水平位置不再共享同一个一维位置索引，而是分别进入 rotary phase。因此 attention 可以显式依赖</p>
+<div class="arithmatex">\[
+(t-t', h-h', w-w')
+\]</div>
+<p>这样的相对时空差。</p>
+<p>在 Qwen2.5-VL 这类模型里，官方文档和博客把 MRoPE 与动态分辨率、动态 FPS 采样以及视频 absolute time encoding 放在一起讨论。它的工程含义是：模型不再把视频看成一串平铺 patch，而是显式保留时间与空间结构；同时，时间位置也不只是“第几帧”，而可以尽量对齐真实采样间隔。这也是 Qwen2.5-VL 相比更早的图文模型，在视频理解上明显更像一个真正的视频模型的原因之一。</p>
+<p>不过，M-RoPE 也有自己的局限。因为总维度是固定的，一旦把维度分给时间、高度和宽度，每个坐标轴实际上只能占用部分频谱资源。原始 RoPE 中，一个位置轴可以使用完整频谱；而在 M-RoPE 中，每个坐标轴只能使用自己的那一部分。这对静态图像通常不是大问题，但对长视频来说，时间维很可能恰恰是最需要长距离建模能力的轴，如果它分到的维度和频率资源不够，就会出现时间建模偏弱的问题。</p>
+<h2 id="tm-rope">TM-RoPE</h2>
+<p>TM-RoPE 可以看作是在 M-RoPE 基础上的进一步发展，它特别面向 omni 场景下的音频与视频联合建模。到这个阶段，时间已经不再只是三个坐标轴中的一个，而是不同模态之间必须共享的参考系。</p>
+<p>Qwen2.5-Omni 的公开说明把 <strong>TMRoPE</strong> 描述为一种用于同步 video 和 audio timestamp 的机制。这一点非常关键，因为它告诉我们 TM-RoPE 的真正目标不是“再多一个维度”，而是 <strong>跨模态时间对齐</strong>。换句话说，一个来自音频流的 token 和一个来自视频帧的 token，即使它们在拼接后的序列中相距很远，只要它们对应同一物理时刻，模型就应当能够在位置空间中把它们视为相互对齐的对象。</p>
+<p>从抽象角度看，TM-RoPE 可以理解为不再把</p>
+<div class="arithmatex">\[
+(t,h,w)
+\]</div>
+<p>严格拆到彼此独立的子空间里，而是允许多个坐标轴共同参与同一个频率分量的相位生成。一个便于理解的概念形式是</p>
+<div class="arithmatex">\[
+\theta_i(t,h,w)
+=
+\alpha_i t + \beta_i h + \gamma_i w,
+\]</div>
+<p>其中 <span class="arithmatex">\(\alpha_i\)</span>、<span class="arithmatex">\(\beta_i\)</span>、<span class="arithmatex">\(\gamma_i\)</span> 决定第 <span class="arithmatex">\(i\)</span> 个频率分量如何综合时间与空间坐标。对应的旋转写成</p>
+<div class="arithmatex">\[
+R\big(\theta_i(t,h,w)\big),
+\]</div>
+<p>并作用在第 <span class="arithmatex">\(i\)</span> 个二维子空间上。</p>
+<p>这里同样要强调，这个公式更适合作为理论上的统一视角，而不是对具体实现细节的逐行复刻。它表达的是一种建模假设的变化：</p>
+<ul>
+<li>在 <strong>M-RoPE</strong> 中，不同坐标轴主要被分配到不同子空间</li>
+<li>在 <strong>TM-RoPE</strong> 中，多个坐标轴可以共同决定同一个相位</li>
+</ul>
+<p>这种变化带来两个直接好处。第一，时间维不再只能使用某一小段固定频谱，而是可以共享更完整的频率资源，因此更适合长时间跨度建模。第二，跨模态时间对齐更容易表达，因为音频 token 和视频 token 可以被映射到同一个时间参考系中，而不是各自维护一套局部位置编号。</p>
+<h2 id="_2">一个统一视角</h2>
+<p>这三类方法其实都可以放进同一个模板里理解：</p>
+<div class="arithmatex">\[
+\theta_i = \sum_k \lambda_{i,k} \, p_k,
+\]</div>
+<p>其中 <span class="arithmatex">\(p_k\)</span> 表示位置分量，<span class="arithmatex">\(\lambda_{i,k}\)</span> 表示第 <span class="arithmatex">\(i\)</span> 个频率分量如何使用这些位置分量。</p>
+<p>对标准 RoPE 来说，只有一个一维位置：</p>
+<div class="arithmatex">\[
+\theta_i = \omega_i p.
+\]</div>
+<p>对按轴拆分的 M-RoPE，可以写成</p>
+<div class="arithmatex">\[
+\theta_i =
+\begin{cases}
+\omega_i t, &amp; i \in \mathcal{I}_t \\
+\omega_i h, &amp; i \in \mathcal{I}_h \\
+\omega_i w, &amp; i \in \mathcal{I}_w
+\end{cases}
+\]</div>
+<p>对耦合式的 TM-RoPE，则可以写成</p>
+<div class="arithmatex">\[
+\theta_i = \lambda_{i,t} t + \lambda_{i,h} h + \lambda_{i,w} w.
+\]</div>
+<p>从这个角度看，三者之间的关系就很清楚了：</p>
+<ul>
+<li><strong>RoPE</strong>：一维相位编码</li>
+<li><strong>M-RoPE</strong>：按坐标轴拆分的多维相位编码</li>
+<li><strong>TM-RoPE</strong>：更强调多轴耦合和跨模态时间对齐的多维相位编码</li>
+</ul>
+<h2 id="_3">对比</h2>
+<table>
+<thead>
+<tr>
+<th>方法</th>
+<th>位置空间</th>
+<th>频谱使用方式</th>
+<th>保留的相对结构</th>
+<th>最直观的理解</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>RoPE</td>
+<td>一维序列位置</td>
+<td>一个轴使用完整频谱</td>
+<td>token 相对顺序</td>
+<td>序列旋转编码</td>
+</tr>
+<tr>
+<td>M-RoPE</td>
+<td>多维坐标，如 <span class="arithmatex">\((t,h,w)\)</span></td>
+<td>频谱按轴拆分</td>
+<td>相对时间与相对空间</td>
+<td>多轴 RoPE 扩展</td>
+</tr>
+<tr>
+<td>TM-RoPE</td>
+<td>多维且跨模态对齐的坐标</td>
+<td>更共享、更耦合的频谱使用</td>
+<td>相对时间、相对空间与跨模态时间同步</td>
+<td>统一时空相位编码</td>
+</tr>
+</tbody>
+</table>
+<h2 id="_4">实际理解</h2>
+<p>如果模型只处理文本，RoPE 已经足够，因为它只需要知道 token 在一维序列里的相对顺序。<br />
+如果模型需要处理图像和视频，M-RoPE 就变得必要，因为视觉 token 不应被看作单纯的平铺序列，而应该被看作带时空坐标的结构化对象。<br />
+如果模型进一步进入 omni 场景，需要同时处理音频和视频，并且要求两者在同一物理时间轴上对齐，那么 TM-RoPE 就会变得更自然。</p>
+<p>因此，这条演化路线不只是“位置编码越来越强”，而是“位置本身的定义在变化”：</p>
+<ul>
+<li>从序列中的顺序，</li>
+<li>到时空坐标，</li>
+<li>再到跨模态共享的时空参考系。</li>
+</ul>
+<h2 id="_5">备注</h2>
+<ul>
+<li>本页中的 RoPE 公式属于标准写法。</li>
+<li>对 M-RoPE 和 TM-RoPE，本页给出的公式是<strong>帮助理解的抽象表达</strong>，重点在于说明它们在建模层面如何从一维相位编码走向多维和跨模态相位编码。公开的 Qwen 文档明确说明了它们的作用，但不一定总以单一闭式公式的形式完整展开。</li>
+<li>与 Qwen 相关的公开参考资料主要包括：</li>
+<li><a href="https://huggingface.co/docs/transformers/en/model_doc/qwen2_5_vl">Qwen2.5-VL documentation</a></li>
+<li><a href="https://qwenlm.github.io/blog/qwen2.5-vl/">Qwen2.5-VL blog</a></li>
+<li><a href="https://github.com/QwenLM/Qwen2.5-Omni">Qwen2.5-Omni repository</a></li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": [], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}, "version": null}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+        <script src="../../../javascripts/mathjax.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+      
+        <script src="../../../javascripts/mermaid.js"></script>
+      
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>

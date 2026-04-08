@@ -1,0 +1,1257 @@
+
+<!doctype html>
+<html lang="zh" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://XPengZhao.github.io/dl-note/zh/llms/parallelism/">
+      
+      
+        <link rel="prev" href="../serving-runtime/">
+      
+      
+        <link rel="next" href="../decoding/">
+      
+      
+        
+          <link rel="alternate" href="../../../llms/parallelism/" hreflang="en">
+        
+          <link rel="alternate" href="./" hreflang="zh">
+        
+      
+      
+      <link rel="icon" href="../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>并行策略 - DL Notes</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.484c7ddc.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../stylesheets/bootstrap.min.css">
+    
+      <link rel="stylesheet" href="../../../stylesheets/basic.css">
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#_1" class="md-skip">
+          跳转至
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="页眉">
+    <a href="../../" title="DL Notes" class="md-header__button md-logo" aria-label="DL Notes" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            DL Notes
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              并行策略
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+      <div class="md-header__option">
+  <div class="md-select">
+    
+    <button class="md-header__button md-icon" aria-label="选择当前语言">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12.87 15.07-2.54-2.51.03-.03A17.5 17.5 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2zm-2.62 7 1.62-4.33L19.12 17z"/></svg>
+    </button>
+    <div class="md-select__inner">
+      <ul class="md-select__list">
+        
+          <li class="md-select__item">
+            <a href="../../../llms/parallelism/" hreflang="en" class="md-select__link">
+              English
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="./" hreflang="zh" class="md-select__link">
+              简体中文
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="搜索" placeholder="搜索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="查找">
+        
+        <button type="reset" class="md-search__icon md-icon" title="清空当前内容" aria-label="清空当前内容" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            正在初始化搜索引擎
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="导航栏" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../" title="DL Notes" class="md-nav__button md-logo" aria-label="DL Notes" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    DL Notes
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    首页
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hardware/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    硬件
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tensor/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    张量操作
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../neural-graphics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    神经图形
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AI Infra
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    AI Infra
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    总览
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../request-lifecycle/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    请求生命周期
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../metrics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    指标
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../kv-cache/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    KV Cache
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../serving-runtime/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    推理运行时
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    并行策略
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    并行策略
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#data-parallelism-dp" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        数据并行（Data Parallelism, DP）
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="数据并行（Data Parallelism, DP）">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#dp" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        与 DP 相关的集合通信
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tensor-parallelism-tp" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        张量并行（Tensor Parallelism, TP）
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="张量并行（Tensor Parallelism, TP）">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tp" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        与 TP 相关的集合通信
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        推理视角下的解释
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-gpu" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        一个 8-GPU 推理例子
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="一个 8-GPU 推理例子">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#prefill-40k-1k" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prefill 很长：40k + 1k
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#decode-1k-10k" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Decode 很长：1k + 10k
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#prefill-decode-10k-10k" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prefill 和 Decode 都很长：10k + 10k
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        权衡总结
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../decoding/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    解码与采样
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../training-objective/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    训练目标
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    模型
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    模型
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../position-encoding/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    位置编码
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    模型笔记
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#data-parallelism-dp" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        数据并行（Data Parallelism, DP）
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="数据并行（Data Parallelism, DP）">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#dp" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        与 DP 相关的集合通信
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tensor-parallelism-tp" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        张量并行（Tensor Parallelism, TP）
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="张量并行（Tensor Parallelism, TP）">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tp" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        与 TP 相关的集合通信
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        推理视角下的解释
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-gpu" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        一个 8-GPU 推理例子
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="一个 8-GPU 推理例子">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#prefill-40k-1k" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prefill 很长：40k + 1k
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#decode-1k-10k" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Decode 很长：1k + 10k
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#prefill-decode-10k-10k" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prefill 和 Decode 都很长：10k + 10k
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        权衡总结
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="_1">并行策略</h1>
+<p>本页整理 LLM 系统中最常见的并行维度，并重点从推理场景解释它们各自改变了什么。最核心的区分在于：外层维度通常复制工作负载，内层维度通常切分模型执行。</p>
+<p>写这一页的动机在于，部署决策经常被表述成 <code>DP2TP2</code>、<code>TP4</code> 这种配置标签，但这些标签背后其实对应着不同的系统问题。有些并行方式主要解决吞吐不足，有些主要解决单副本显存不够，还有一些虽然理论上能扩展，却会引入足够大的通信开销以至于收益被抵消。不把这些问题先讲清楚，并行配置就很难真正分析。</p>
+<h2 id="data-parallelism-dp">数据并行（Data Parallelism, DP）</h2>
+<p>Data Parallelism（DP）是机器学习系统中最传统、也最直观的分布式执行形式。它的核心思想很简单：在多个设备上实例化同一个模型，同时将输入工作负载分片到这些实例上。每个 worker 在不同的数据子集上执行相同的计算图。从这个意义上讲，它只改变了计算到硬件的映射方式。</p>
+<p>DP 在推理中的动机很直接：当单个副本已经放得下模型，但吞吐仍然不足以吸收请求流量时，最自然的扩容方式就是增加更多副本来并行服务请求。</p>
+<p>由于参数是复制而不是切分，DP 不会降低单个设备上的内存占用。这一特性界定了它的实际适用范围：当模型本身已经可以放入单卡显存时，DP 很有效；但如果模型本身超过单设备容量，DP 就不够用。因此，它的主要价值在于通过副本扩展吞吐和服务并发。</p>
+<p>在训练中，DP 常用于增大有效 batch size 并提升硬件利用率。每个 worker 处理 mini-batch 的一个分片，计算本地梯度，然后参与同步，使所有模型副本在优化步之后保持数值一致。在推理中，同样适用这种副本机制，但不再有梯度交换。取而代之的是，每个 worker 处理独立的请求子集或 token batch。因此在推理负载下，DP 应主要被理解为一种流量分发机制，而不是模型切分机制。</p>
+<p>在混合部署中，DP 往往与 Tensor Parallelism（TP）和 Expert Parallelism（EP）并存。在这种配置下，DP replica 不应被字面地理解为单张 GPU。一个 DP 单元本身可能是一个多 GPU 组，其内部执行由 TP 或 EP 组织。从这个视角看，DP 定义的是工作负载复制的外层结构，而 TP 与 EP 决定每个副本内部如何执行计算。</p>
+<h3 id="dp">与 DP 相关的集合通信</h3>
+<p>与 DP 相关的通信行为，本质上取决于系统是在训练还是推理。</p>
+<p>在分布式训练中，每个 DP worker 基于本地 mini-batch 分片计算梯度。由于每个 worker 都维护同一套参数，这些梯度必须在每个 step 后同步，以保证副本间一致性。用于这一目的的标准集合通信原语是对梯度执行 all-reduce。在一些实现中，也会用 reduce-scatter 后接 all-gather 来实现同样效果，但目标不变：聚合所有 DP rank 的梯度贡献，并在每个 worker 上得到一致的参数更新。</p>
+<p>相比之下，推理不涉及反向传播或优化器 step。每个 DP rank 服务于独立的一部分请求流，因此 DP 本身不会引入强制性的逐层集合通信。在推理场景下，它主要充当调度与流量切分机制，而不是同步密集型执行策略。</p>
+<p>即便如此，基于 DP 的推理系统也并非完全无通信。运行时仍需要系统级协调，例如请求分发、负载均衡、准入控制与结果收集。实践中，这类协调常依赖 all-gather 等通信模式，在各 rank 间交换元数据、状态或调度信息。这些操作属于服务框架层，而非模型数值执行本身。</p>
+<p>在混合 MoE 部署中，DP 在推理阶段通常只引入有限通信开销，而每个 DP 单元内部的并行机制往往更重通信。Tensor Parallelism 通常依赖 TP 组内的 all-reduce 或 all-gather 等集合通信，而 Expert Parallelism 会引入跨设备的 token 路由以访问不同专家。因此，分析混合系统中的通信时，应区分外层 DP 维度与内层模型并行维度：DP 负责工作负载分发，而主导通信成本的通常是 TP 或 EP。</p>
+<h2 id="tensor-parallelism-tp">张量并行（Tensor Parallelism, TP）</h2>
+<p>张量并行（TP）通过对单层计算中的权重张量进行切分，将计算分布到多个设备上，而不是在每个 rank 上复制完整的层参数。在大规模 Transformer 模型中，这种方式通常应用于注意力层和 MLP 层中的投影矩阵。其核心目标是降低单设备的参数与激活内存占用，从而能够运行那些在单个加速器上无法容纳的超大规模模型层。</p>
+<p>TP 的动机与 DP 不同。它通常在单个加速器无法舒适容纳模型，或者减少单卡权重占用能够为激活和 KV cache 腾出更多空间时才真正变得有价值。</p>
+<p>考虑一个线性变换：</p>
+<div class="arithmatex">\[
+Y = X W,
+\]</div>
+<p>其中 <span class="arithmatex">\(X \in \mathbb{R}^{B \times H}\)</span>，<span class="arithmatex">\(W \in \mathbb{R}^{H \times O}\)</span>，<span class="arithmatex">\(Y \in \mathbb{R}^{B \times O}\)</span>。在 TP 中，权重矩阵 <span class="arithmatex">\(W\)</span> 会在 <span class="arithmatex">\(p\)</span> 个 rank 构成的进程组上进行切分。常见的两种切分方式是按列切分（column-wise sharding）和按行切分（row-wise sharding）。</p>
+<p>在列切分的 TP 中，输出维度 <span class="arithmatex">\(O\)</span> 被划分，因此每个 rank 存储</p>
+<div class="arithmatex">\[
+W_i \in \mathbb{R}^{H \times O/p}
+\]</div>
+<p>每个 rank 计算一个局部输出</p>
+<div class="arithmatex">\[
+Y_i = X W_i \in \mathbb{R}^{B \times O/p}
+\]</div>
+<p>这对应于最终输出张量的一个切片。这种模式在 Transformer 的前馈网络第一层投影中非常常见，因为这些部分输出通常可以保持分布式状态，直到后续某个需要同步的阶段才进行合并。</p>
+<p>在行切分的 TP 中，输入维度 <span class="arithmatex">\(H\)</span> 被划分，因此每个 rank 存储</p>
+<div class="arithmatex">\[
+W_i \in \mathbb{R}^{H/p \times O}
+\]</div>
+<p>输入 <span class="arithmatex">\(X\)</span> 也必须按照相同方式进行切分，每个 rank 计算对最终输出的一个部分贡献：</p>
+<div class="arithmatex">\[
+Y_i = X_i W_i \in \mathbb{R}^{B \times O}
+\]</div>
+<p>由于这些结果都是对同一个输出张量的加性贡献，因此所有 rank 的结果需要进行求和才能恢复完整的 <span class="arithmatex">\(Y\)</span>。因此，行切分的 TP 天然需要一个归约步骤。</p>
+<p>在 Transformer 的实现中，TP 通常会通过在相邻投影层之间交替使用通信较轻和通信较重的布局来设计。例如，在两层 MLP 结构中，第一层线性变换通常采用列切分以扩展隐藏维度，而第二层则使用行切分将其投影回原始隐藏维度。这种组合可以避免在每个 rank 上物化完整的中间激活，同时尽量延迟通信，使大部分计算保持在本地完成。</p>
+<p>TP 的主要优势在于能够扩展模型的宽度，而无需在每个设备上复制全部参数。然而，其效率在很大程度上取决于本地矩阵乘计算与跨 rank 通信之间的平衡。随着 TP 并行度的增加，每个 rank 的 GEMM 规模会变小，而通信在整体执行时间中的占比则会上升。因此，TP 通常只在紧密连接的设备组中使用，例如同一节点内通过高带宽互联连接的 GPU。</p>
+<h3 id="tp">与 TP 相关的集合通信</h3>
+<p>TP 中的通信模式由张量的切分方式以及本地计算产生的是独立输出切片还是部分求和结果所决定。在实际系统中，TP 主要依赖三种集合通信操作：all-gather、reduce-scatter 和 all-reduce。这些通信操作不仅用于数据交换，同时也定义了张量并行执行过程中的同步边界。</p>
+<p>在列切分的线性层中，每个 rank 生成的是输出特征的一部分。如果下一个算子能够直接消费这种分布式形式的激活，则不需要立即进行通信。然而，如果后续操作需要完整的激活张量，那么所有 rank 必须执行一次 all-gather 来重建完整输出：</p>
+<div class="arithmatex">\[
+Y = [Y_0, Y_1, \ldots, Y_{p-1}]
+\]</div>
+<p>因此，all-gather 通常用于恢复在特征维度上被拆分的张量。</p>
+<p>在行切分的线性层中，每个 rank 只计算最终输出的一部分贡献。全局输出为：</p>
+<div class="arithmatex">\[
+Y = \sum_{i=0}^{p-1} Y_i
+\]</div>
+<p>这需要在 TP 组内进行求和操作。如果每个 rank 都需要完整的输出，则该操作可以表示为 all-reduce。在一些优化实现中，这个通信步骤会与后续的张量切分需求融合，并通过 reduce-scatter 实现，从而在完成求和的同时将输出重新分布为分片形式，以供下一阶段计算使用。</p>
+<p>从系统角度来看，TP 通信的成本受到消息大小、集合通信算法、进程组拓扑结构以及通信与计算的重叠程度等因素的影响。由于 TP 的集合通信是在每一层内部以较高频率触发的，其性能对通信延迟非常敏感。因此，TP 通常只在少量且拓扑接近的设备之间使用。若 TP 组跨越较慢的网络链路，集合通信延迟很容易成为性能瓶颈，从而抵消参数切分带来的收益。</p>
+<h3 id="_2">推理视角下的解释</h3>
+<p>在 serving 场景中，DP 和 TP 往往承担不同职责。</p>
+<ul>
+<li>DP 的主要作用是通过增加副本数来扩展吞吐。</li>
+<li>TP 的主要作用是通过切分参数来改善单副本的模型适配性和显存预算，但代价是引入层内集合通信。</li>
+<li>增大 DP 会复制更多权重副本，也可能打散 prefix cache 的局部性。</li>
+<li>增大 TP 会降低单卡权重占用并扩大单副本的 KV 预算，但 TP 过大时通信可能成为瓶颈。</li>
+</ul>
+<p>因此，推理部署中的并行决策通常是在“副本级并发能力”和“单副本内存余量”之间做权衡。</p>
+<h2 id="8-gpu">一个 8-GPU 推理例子</h2>
+<p>理解 DP 和 TP，最直接的方式是固定硬件，只改变 8 张 GPU 被组织成多少个副本。假设有一台 8-GPU 服务器，节点内互联较快，那么常见的几种组织方式是：</p>
+<ul>
+<li><code>DP8TP1</code>：8 个单 GPU 独立副本</li>
+<li><code>DP4TP2</code>：4 个副本，每个副本用 2 张 GPU</li>
+<li><code>DP2TP4</code>：2 个副本，每个副本用 4 张 GPU</li>
+<li><code>DP1TP8</code>：1 个副本，占用全部 8 张 GPU</li>
+</ul>
+<p>这个对比只有在这些布局都放得下目标模型和上下文窗口时才有意义。如果 <code>TP1</code> 下模型或 KV 状态已经放不下，那么高 DP 的方案就不是实际可选项。</p>
+<p>这里最关键的区别是：DP 把 GPU 花在“更多独立副本”上，而 TP 把 GPU 花在“把单个副本做大”上。因此，哪种方案更优，本质上取决于当前工作负载更受哪一面约束：单请求延迟、单副本内存余量，还是多请求并发。</p>
+<p>这里还有一个在长上下文 serving 里很关键、但很容易被忽略的点：TP 改变的不只是单个副本的计算模式。由于它降低了单卡权重占用，它也可能给同一个副本腾出更多 KV cache 空间。更大的 KV 预算意味着这个副本可以同时容纳更多长请求、降低 preemption 风险，并形成更大的稳定 batch。也就是说，TP 有时提升吞吐，不是因为单个 decode step 本身更快，而是因为副本终于能挂住足够多的 active work，把 GPU 真正打满。</p>
+<p>因此，在 8 张 GPU 上做推理调优时，通常是在同时平衡三个问题：</p>
+<ul>
+<li>节点应该暴露多少个独立副本？</li>
+<li>每个副本需要多大的 KV 余量？</li>
+<li>当前 workload 的瓶颈到底是通信、内存压力，还是 active work 不够？</li>
+</ul>
+<h3 id="prefill-40k-1k">Prefill 很长：<code>40k + 1k</code></h3>
+<p>这个场景的主导成本是吃入超长 prompt。真正昂贵的是 prefill，因为系统需要先处理很长的输入上下文，decode 反而不是主导项。</p>
+<ul>
+<li>在低并发下，TP 往往更有吸引力，因为多个 GPU 可以协同完成同一个长 prefill。<code>DP8TP1</code> 虽然副本多，但如果同时只有一两个请求，绝大多数副本都会闲着，而某一张 GPU 独自承担全部 prompt 成本。</li>
+<li>在高并发下，DP 又会重新变得有竞争力，因为许多长 prefill 可以分散到不同副本上并行推进。如果每个请求都已经能稳定放下，<code>DP8TP1</code> 或 <code>DP4TP2</code> 往往比很大的 TP 组具有更高的总吞吐。</li>
+<li>在这个场景里保留一定 TP，通常不是为了让 decode 更快，而是为了给单副本争取更大的内存余量。超长 prompt 会迅速消耗 KV 预算，而适度 TP 能让更长上下文真正变成可运行配置。</li>
+<li>这个内存效应也会直接改变并发能力。面对超长 prompt 时，<code>TP1</code> 可能迫使每个副本只敢接很小的 active batch，才能避免 preemption。适度增加 TP 往往能扩大单副本的 KV 预算，使它在同一时刻驻留更多 prefill 请求，从而把真实吞吐拉起来。</li>
+</ul>
+<p>因此，prefill 很重的 serving 往往容易落在中间方案，例如 <code>DP4TP2</code>。当 <code>TP1</code> 的内存已经太紧，而 <code>TP4</code> 或 <code>TP8</code> 又牺牲了太多副本数时，这类折中方案通常更稳。</p>
+<h3 id="decode-1k-10k">Decode 很长：<code>1k + 10k</code></h3>
+<p>这个场景的主导成本是长时间的自回归生成。prompt 不长，但系统要重复执行大量 decode steps。</p>
+<ul>
+<li>在高并发下，如果模型本身放得下，DP 往往是最强的选择。<code>DP8TP1</code> 最大化了独立 decoder 的数量，也避免了每个 decode step 都要支付 TP 层内集合通信。</li>
+<li>在低并发下，过大的 TP 组通常也帮不上太多，除非它们是内存所必需的。单请求 decode 的每一步都很窄，把它摊到很多 GPU 上时，同步开销常常增长得比本地计算缩短得更快。</li>
+<li>如果输出很长，以至于 KV 压力成了主导瓶颈，那么适度 TP 仍可能间接变好，因为它扩大了单副本可承载的 KV 预算，降低了 preemption 风险。但这本质上是内存收益，不是纯算力收益。</li>
+<li>这一点在工程上很重要。decode-heavy 服务从单步看往往算得不重，但如果每个副本始终被 KV 卡住，它就永远积累不起足够多的 active sequences，也很难把设备打到 compute-bound。这时增加一定 TP，虽然引入了通信，却可能通过提升稳定 decode 并发带来更高的真实吞吐。</li>
+</ul>
+<p>这也是为什么在线 decode-heavy serving 往往倾向于在内存允许的前提下尽量多做 DP。一旦模型已经放得下、KV 也稳定，继续增加 TP 通常是在用通信换掉吞吐。</p>
+<h3 id="prefill-decode-10k-10k">Prefill 和 Decode 都很长：<code>10k + 10k</code></h3>
+<p>当输入和输出都很长时，单纯用 “DP 好” 或 “TP 好” 都不够。系统既要承受长上下文带来的 prefill 成本，也要承受长输出尾巴带来的 decode 压力。</p>
+<ul>
+<li>在小并发或中等并发下，像 <code>DP4TP2</code> 这样的混合布局往往是比较稳的折中。它一方面保留了多个独立副本，另一方面又给每个副本比 <code>TP1</code> 更多的内存余量。</li>
+<li>在大并发下，判断标准通常是谁先撞墙。如果 <code>DP8TP1</code> 已经开始 preempt，或者为了不爆 KV 不得不把准入并发压得很低，那么增加 TP 反而可能提升真实吞吐，即使它引入了通信。如果 <code>DP8TP1</code> 本身已经很稳定，它通常仍然保有最高的总吞吐。</li>
+<li><code>DP1TP8</code> 一般只有在单个副本确实需要整台机器时才合理，例如模型本身很大，或者目标上下文窗口极端大。否则它牺牲的外层并发通常太多。</li>
+</ul>
+<p>这也是“纸面并发”和“有效并发”差别最大的场景。<code>DP8TP1</code> 从副本数上看并发更高，但如果每个副本为了守住 KV 预算只能把 admitted batch 压得很小，整台机器仍然可能打不到 compute-bound。副本数更少但更大的 TP 组，有时反而能维持更多真正有用的 in-flight work。</p>
+<h3 id="_3">权衡总结</h3>
+<p>对一台 8-GPU 服务器上的推理来说，常见的经验规律通常是：</p>
+<ul>
+<li>更多 DP 在“独立请求足够多，能把多个副本都喂满”时更有利。</li>
+<li>更多 TP 在“单副本太受内存限制”或“单个请求太重，需要多张 GPU 协作”时更有利。</li>
+<li>更多 TP 有时也会在“超长请求让 <code>TP1</code> 副本的 KV 预算太紧，导致挂不住足够 active work”时更有利。此时 TP 买到的是内存带来的并发，而不是单步算力加速。</li>
+<li>prefill 很重、并发又不高时，系统更容易被推向一定程度的 TP。</li>
+<li>decode 很重、并发又很高时，系统更容易被推向更多 DP。</li>
+<li>输入输出都长的场景往往落在中间地带，<code>DP4TP2</code> 或 <code>DP2TP4</code> 往往比两端更容易稳定。</li>
+</ul>
+<p>因此，推理部署里真正重要的问题通常不是抽象地问“DP 和 TP 谁更好”，而是先问：在这套硬件和这类 workload 上，系统最先撞到的墙到底是什么，是单请求延迟、单副本 KV 容量，还是整体并发能力。DP 和 TP 本质上是在用两种不同方式移动这堵墙。</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": [], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}, "version": null}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+        <script src="../../../javascripts/mathjax.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+      
+        <script src="../../../javascripts/mermaid.js"></script>
+      
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>

@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+    <url>
+        <loc>https://XPengZhao.github.io/dl-note/</loc>
+        <lastmod>2026-04-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://XPengZhao.github.io/dl-note/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://XPengZhao.github.io/dl-note/zh/"/>
+    </url>
+    <url>
+        <loc>https://XPengZhao.github.io/dl-note/elb/</loc>
+        <lastmod>2026-04-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://XPengZhao.github.io/dl-note/elb/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://XPengZhao.github.io/dl-note/zh/elb/"/>
+    </url>
+    <url>
+        <loc>https://XPengZhao.github.io/dl-note/hardware/</loc>
+        <lastmod>2026-04-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://XPengZhao.github.io/dl-note/hardware/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://XPengZhao.github.io/dl-note/zh/hardware/"/>
+    </url>
+    <url>
+        <loc>https://XPengZhao.github.io/dl-note/neural-graphics/</loc>
+        <lastmod>2026-04-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://XPengZhao.github.io/dl-note/neural-graphics/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://XPengZhao.github.io/dl-note/zh/neural-graphics/"/>
+    </url>
+    <url>
+        <loc>https://XPengZhao.github.io/dl-note/tensor/</loc>
+        <lastmod>2026-04-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://XPengZhao.github.io/dl-note/tensor/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://XPengZhao.github.io/dl-note/zh/tensor/"/>
+    </url>
+    <url>
+        <loc>https://XPengZhao.github.io/dl-note/llms/decoding/</loc>
+        <lastmod>2026-04-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://XPengZhao.github.io/dl-note/llms/decoding/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://XPengZhao.github.io/dl-note/zh/llms/decoding/"/>
+    </url>
+    <url>
+        <loc>https://XPengZhao.github.io/dl-note/llms/kv-cache/</loc>
+        <lastmod>2026-04-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://XPengZhao.github.io/dl-note/llms/kv-cache/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://XPengZhao.github.io/dl-note/zh/llms/kv-cache/"/>
+    </url>
+    <url>
+        <loc>https://XPengZhao.github.io/dl-note/llms/metrics/</loc>
+        <lastmod>2026-04-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://XPengZhao.github.io/dl-note/llms/metrics/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://XPengZhao.github.io/dl-note/zh/llms/metrics/"/>
+    </url>
+    <url>
+        <loc>https://XPengZhao.github.io/dl-note/llms/models/</loc>
+        <lastmod>2026-04-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://XPengZhao.github.io/dl-note/llms/models/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://XPengZhao.github.io/dl-note/zh/llms/models/"/>
+    </url>
+    <url>
+        <loc>https://XPengZhao.github.io/dl-note/llms/overview/</loc>
+        <lastmod>2026-04-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://XPengZhao.github.io/dl-note/llms/overview/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://XPengZhao.github.io/dl-note/zh/llms/overview/"/>
+    </url>
+    <url>
+        <loc>https://XPengZhao.github.io/dl-note/llms/parallelism/</loc>
+        <lastmod>2026-04-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://XPengZhao.github.io/dl-note/llms/parallelism/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://XPengZhao.github.io/dl-note/zh/llms/parallelism/"/>
+    </url>
+    <url>
+        <loc>https://XPengZhao.github.io/dl-note/llms/position-encoding/</loc>
+        <lastmod>2026-04-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://XPengZhao.github.io/dl-note/llms/position-encoding/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://XPengZhao.github.io/dl-note/zh/llms/position-encoding/"/>
+    </url>
+    <url>
+        <loc>https://XPengZhao.github.io/dl-note/llms/request-lifecycle/</loc>
+        <lastmod>2026-04-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://XPengZhao.github.io/dl-note/llms/request-lifecycle/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://XPengZhao.github.io/dl-note/zh/llms/request-lifecycle/"/>
+    </url>
+    <url>
+        <loc>https://XPengZhao.github.io/dl-note/llms/serving-runtime/</loc>
+        <lastmod>2026-04-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://XPengZhao.github.io/dl-note/llms/serving-runtime/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://XPengZhao.github.io/dl-note/zh/llms/serving-runtime/"/>
+    </url>
+    <url>
+        <loc>https://XPengZhao.github.io/dl-note/llms/training-objective/</loc>
+        <lastmod>2026-04-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://XPengZhao.github.io/dl-note/llms/training-objective/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://XPengZhao.github.io/dl-note/zh/llms/training-objective/"/>
+    </url>
+    <url>
+        <loc>https://XPengZhao.github.io/dl-note/zh/</loc>
+        <lastmod>2026-04-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://XPengZhao.github.io/dl-note/zh/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://XPengZhao.github.io/dl-note/"/>
+    </url>
+    <url>
+        <loc>https://XPengZhao.github.io/dl-note/zh/elb/</loc>
+        <lastmod>2026-04-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://XPengZhao.github.io/dl-note/zh/elb/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://XPengZhao.github.io/dl-note/elb/"/>
+    </url>
+    <url>
+        <loc>https://XPengZhao.github.io/dl-note/zh/hardware/</loc>
+        <lastmod>2026-04-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://XPengZhao.github.io/dl-note/zh/hardware/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://XPengZhao.github.io/dl-note/hardware/"/>
+    </url>
+    <url>
+        <loc>https://XPengZhao.github.io/dl-note/zh/neural-graphics/</loc>
+        <lastmod>2026-04-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://XPengZhao.github.io/dl-note/zh/neural-graphics/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://XPengZhao.github.io/dl-note/neural-graphics/"/>
+    </url>
+    <url>
+        <loc>https://XPengZhao.github.io/dl-note/zh/tensor/</loc>
+        <lastmod>2026-04-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://XPengZhao.github.io/dl-note/zh/tensor/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://XPengZhao.github.io/dl-note/tensor/"/>
+    </url>
+    <url>
+        <loc>https://XPengZhao.github.io/dl-note/zh/llms/decoding/</loc>
+        <lastmod>2026-04-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://XPengZhao.github.io/dl-note/zh/llms/decoding/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://XPengZhao.github.io/dl-note/llms/decoding/"/>
+    </url>
+    <url>
+        <loc>https://XPengZhao.github.io/dl-note/zh/llms/kv-cache/</loc>
+        <lastmod>2026-04-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://XPengZhao.github.io/dl-note/zh/llms/kv-cache/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://XPengZhao.github.io/dl-note/llms/kv-cache/"/>
+    </url>
+    <url>
+        <loc>https://XPengZhao.github.io/dl-note/zh/llms/metrics/</loc>
+        <lastmod>2026-04-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://XPengZhao.github.io/dl-note/zh/llms/metrics/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://XPengZhao.github.io/dl-note/llms/metrics/"/>
+    </url>
+    <url>
+        <loc>https://XPengZhao.github.io/dl-note/zh/llms/models/</loc>
+        <lastmod>2026-04-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://XPengZhao.github.io/dl-note/zh/llms/models/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://XPengZhao.github.io/dl-note/llms/models/"/>
+    </url>
+    <url>
+        <loc>https://XPengZhao.github.io/dl-note/zh/llms/overview/</loc>
+        <lastmod>2026-04-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://XPengZhao.github.io/dl-note/zh/llms/overview/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://XPengZhao.github.io/dl-note/llms/overview/"/>
+    </url>
+    <url>
+        <loc>https://XPengZhao.github.io/dl-note/zh/llms/parallelism/</loc>
+        <lastmod>2026-04-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://XPengZhao.github.io/dl-note/zh/llms/parallelism/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://XPengZhao.github.io/dl-note/llms/parallelism/"/>
+    </url>
+    <url>
+        <loc>https://XPengZhao.github.io/dl-note/zh/llms/position-encoding/</loc>
+        <lastmod>2026-04-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://XPengZhao.github.io/dl-note/zh/llms/position-encoding/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://XPengZhao.github.io/dl-note/llms/position-encoding/"/>
+    </url>
+    <url>
+        <loc>https://XPengZhao.github.io/dl-note/zh/llms/request-lifecycle/</loc>
+        <lastmod>2026-04-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://XPengZhao.github.io/dl-note/zh/llms/request-lifecycle/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://XPengZhao.github.io/dl-note/llms/request-lifecycle/"/>
+    </url>
+    <url>
+        <loc>https://XPengZhao.github.io/dl-note/zh/llms/serving-runtime/</loc>
+        <lastmod>2026-04-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://XPengZhao.github.io/dl-note/zh/llms/serving-runtime/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://XPengZhao.github.io/dl-note/llms/serving-runtime/"/>
+    </url>
+    <url>
+        <loc>https://XPengZhao.github.io/dl-note/zh/llms/training-objective/</loc>
+        <lastmod>2026-04-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://XPengZhao.github.io/dl-note/zh/llms/training-objective/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://XPengZhao.github.io/dl-note/llms/training-objective/"/>
+    </url>
+</urlset>

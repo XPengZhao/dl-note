@@ -1,0 +1,1304 @@
+
+<!doctype html>
+<html lang="zh" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://XPengZhao.github.io/dl-note/zh/llms/request-lifecycle/">
+      
+      
+        <link rel="prev" href="../overview/">
+      
+      
+        <link rel="next" href="../metrics/">
+      
+      
+        
+          <link rel="alternate" href="../../../llms/request-lifecycle/" hreflang="en">
+        
+          <link rel="alternate" href="./" hreflang="zh">
+        
+      
+      
+      <link rel="icon" href="../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>请求生命周期 - DL Notes</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.484c7ddc.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../stylesheets/bootstrap.min.css">
+    
+      <link rel="stylesheet" href="../../../stylesheets/basic.css">
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#_1" class="md-skip">
+          跳转至
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="页眉">
+    <a href="../../" title="DL Notes" class="md-header__button md-logo" aria-label="DL Notes" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            DL Notes
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              请求生命周期
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+      <div class="md-header__option">
+  <div class="md-select">
+    
+    <button class="md-header__button md-icon" aria-label="选择当前语言">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12.87 15.07-2.54-2.51.03-.03A17.5 17.5 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2zm-2.62 7 1.62-4.33L19.12 17z"/></svg>
+    </button>
+    <div class="md-select__inner">
+      <ul class="md-select__list">
+        
+          <li class="md-select__item">
+            <a href="../../../llms/request-lifecycle/" hreflang="en" class="md-select__link">
+              English
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="./" hreflang="zh" class="md-select__link">
+              简体中文
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="搜索" placeholder="搜索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="查找">
+        
+        <button type="reset" class="md-search__icon md-icon" title="清空当前内容" aria-label="清空当前内容" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            正在初始化搜索引擎
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="导航栏" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../" title="DL Notes" class="md-nav__button md-logo" aria-label="DL Notes" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    DL Notes
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    首页
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hardware/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    硬件
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tensor/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    张量操作
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../neural-graphics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    神经图形
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AI Infra
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    AI Infra
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    总览
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    请求生命周期
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    请求生命周期
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        为什么要看生命周期
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        先看请求经过了哪些层
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="先看请求经过了哪些层">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-workload" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. 应用 / 编排层决定进入系统的 workload 长什么样
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-serving-api" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Serving 系统把一个 API 请求变成可管理的执行对象
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Serving 系统把一个 API 请求变成可管理的执行对象">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#router-gateway" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Router / Gateway
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#serving-engine" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Serving Engine
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#scheduler-kv-manager" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scheduler 和 KV Manager
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#model-executor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Model Executor
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. 硬件执行层完成真正的计算
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-token" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. 输出 token 再沿着这条路径返回
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        再用时序图看一遍
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        把常见问题映射到生命周期
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ai-infra" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        与其它 AI Infra 页面之间的关系
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../metrics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    指标
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../kv-cache/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    KV Cache
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../serving-runtime/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    推理运行时
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../parallelism/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    并行策略
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../decoding/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    解码与采样
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../training-objective/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    训练目标
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    模型
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    模型
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../position-encoding/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    位置编码
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    模型笔记
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        为什么要看生命周期
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        先看请求经过了哪些层
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="先看请求经过了哪些层">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-workload" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. 应用 / 编排层决定进入系统的 workload 长什么样
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-serving-api" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Serving 系统把一个 API 请求变成可管理的执行对象
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Serving 系统把一个 API 请求变成可管理的执行对象">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#router-gateway" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Router / Gateway
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#serving-engine" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Serving Engine
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#scheduler-kv-manager" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scheduler 和 KV Manager
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#model-executor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Model Executor
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. 硬件执行层完成真正的计算
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-token" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. 输出 token 再沿着这条路径返回
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        再用时序图看一遍
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        把常见问题映射到生命周期
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ai-infra" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        与其它 AI Infra 页面之间的关系
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="_1">推理请求生命周期</h1>
+<p>在线推理请求一旦表现出“慢”或“不稳定”，根因往往并不显然，因为一条请求在真正产出 token 之前，需要穿过很多层。理解系统时，一个很有用的视角不是只看分层结构，还要看时间顺序：什么先发生，什么在等待什么，延迟和吞吐是在哪一段被消耗掉的。</p>
+<p>本页沿着一条请求，从应用层一直跟到 GPU 执行，再回到用户，目的是把抽象的系统分层和真实的执行路径对应起来，让性能分析更具体。</p>
+<h2 id="_2">为什么要看生命周期</h2>
+<p>从请求生命周期的角度看问题，是因为很多在 API 边界上看起来相同的现象，底层根因其实完全不同。</p>
+<ul>
+<li>TTFT 高，可能来自 prompt 组装、排队、prefill 成本，或者 runtime 准入延迟。</li>
+<li>吞吐低，可能来自路由碎片化、batch 不成形、KV 压力，或者 kernel 效率不高。</li>
+<li>延迟抖动，可能来自上层 fan-out、runtime preemption，或者通信不均衡。</li>
+</ul>
+<p>如果只看最终响应时间，这些差异会被全部压扁。生命周期视角的价值，就是把时间花在哪里、由哪一层负责，重新摊开来看。</p>
+<h2 id="_3">先看请求经过了哪些层</h2>
+<p>理解这条生命周期，最自然的方式通常不是一上来就看细粒度时序，而是先看请求在系统中的路径。一次推理请求从应用层发起，向下进入 serving 系统，再落到硬件执行层，最后携带着输出 token 沿着同一条链路返回。光是这条路径，本身就已经说明了很多问题：谁在塑造 workload，谁在决定它何时运行，谁在管理状态，谁在真正做计算。</p>
+<div class="mermaid">flowchart TB
+
+    subgraph L1["应用 / 编排层"]
+        U["用户 / 应用"]
+        A["Agent / Orchestrator"]
+    end
+
+    subgraph L2["Serving 系统"]
+        R["Router / Gateway"]
+        E["Serving Engine"]
+        S["Scheduler"]
+        K["KV Manager"]
+        M["Model Executor"]
+    end
+
+    subgraph L3["硬件执行层"]
+        G["GPU / Kernels"]
+    end
+
+    U --&gt; A
+    A --&gt; R
+    R --&gt; E
+    E --&gt; S
+    S --&gt; K
+    S --&gt; M
+    K --&gt; M
+    M --&gt; G
+    G --&gt; M
+    M --&gt; S
+    S --&gt; E
+    E --&gt; R
+    R --&gt; A
+    A --&gt; U</div>
+<p>这张图有一个好处，它把现实里很容易混在一起的几类职责拆开了。</p>
+<h3 id="1-workload">1. 应用 / 编排层决定进入系统的 workload 长什么样</h3>
+<p>生命周期真正的起点，其实并不在 serving engine，而是在更上层。聊天系统、编码助手、搜索产品或 workflow service 决定当前是否需要一次模型调用。在 agent 系统里，这里还可能包含工具规划、检索、多轮记忆和 prompt 模板化。</p>
+<p>这一层之所以重要，是因为它直接决定了下游要处理什么样的请求。过长的 prompt、激进的 fan-out、重复的检索上下文，或者组织得很差的工具轨迹，都会把负担提前压给下面的 serving system。请求如果在这里就已经膨胀，后面的 scheduler 或 kernel 再高效，也只能是在更重的 workload 上工作。</p>
+<h3 id="2-serving-api">2. Serving 系统把一个 API 请求变成可管理的执行对象</h3>
+<p>真正的系统复杂度，大多集中在中间这一层。请求到了这里以后，就不再只是一个 payload，而会变成一个需要被路由、调度、分配状态、执行并流式返回的运行时对象。</p>
+<h4 id="router-gateway">Router / Gateway</h4>
+<p>路由层决定请求应该被送往哪个模型端点、哪个副本组或哪个 engine 实例。它影响的不只是基础设施利用率，也会直接影响 cache 局部性和 batch 的形成方式。两个前缀相同的请求，是否真的能从 prefix cache 里受益，很大程度上取决于它们有没有被送到同一个 backend。</p>
+<h4 id="serving-engine">Serving Engine</h4>
+<p>像 vLLM、SGLang 这样的框架，会在这一层接收请求并把它变成内部 engine 对象。从这里开始，外部 API 的责任就结束了，serving framework 自己的运行时生命周期开始接管。engine 负责请求准入、生命周期追踪和流式输出。</p>
+<h4 id="scheduler-kv-manager">Scheduler 和 KV Manager</h4>
+<p>进入 engine 之后，请求什么时候真正开始运行，要由 scheduler 决定。它可能立刻进入 prefill，也可能先在队列里等待，或者在 continuous batching 下与别的请求交错执行。很多延迟现象之所以难以直觉判断，就是因为请求虽然已经“进了 engine”，却还没有真正推进。</p>
+<p>scheduler 也不是单独工作的。它依赖 KV manager 去分配、挂接、复用和回收 KV 状态。prefill 会物化新的 KV blocks，decode 会继续扩展或复用已有 blocks。在内存压力高的时候，scheduler 和 KV manager 之间的边界会变成系统里最关键的控制点之一，因为它决定了 engine 还能不能继续接纳更多工作，还是必须转向更保守的策略。</p>
+<h4 id="model-executor">Model Executor</h4>
+<p>model executor 负责把 runtime 的决策真正翻译成模型执行。它拿到 scheduler 形成的 batch、KV manager 准备好的状态，然后发起 prefill 或 decode。也正是在这一层，调度策略、batch 形状和内存管理开始具体地表现为执行形状。</p>
+<h3 id="3">3. 硬件执行层完成真正的计算</h3>
+<p>最底部才是设备上的真实工作：GEMM、attention kernel、通信 collectives、fused ops、sampling kernels，以及各种内存搬运。算子效率、互联带宽和 kernel launch 开销，都会在这一层体现成最终性能。</p>
+<p>如果这一层利用率不高，根因却不一定就在这一层。每个 decode step 工作量太小、并行策略带来过多同步，或者请求流本身始终无法形成高效 batch，都可能最终表现成 GPU 利用率偏低，即使 kernels 本身写得并不差。</p>
+<h3 id="4-token">4. 输出 token 再沿着这条路径返回</h3>
+<p>每个 decode step 结束后，输出会从 model executor 回到 engine，从 engine 回到 router，再回到应用层，最后送达用户。对流式产品来说，这条返回路径本身就是用户体验的一部分，因为用户感知到的不是“一次性完成”，而是一串带着节奏感的 token。</p>
+<h2 id="_4">再用时序图看一遍</h2>
+<p>分层流图回答的是一个结构问题：请求会经过哪些组件。时序图回答的是另一个问题：这些组件在一次请求里是按什么顺序协同工作的。</p>
+<div class="mermaid">sequenceDiagram
+    participant U as 用户 / 应用
+    participant A as Agent / 编排层
+    participant R as 网关 / 路由层
+    participant E as Serving Engine
+    participant S as Runtime Scheduler
+    participant K as KV Manager
+    participant M as Model Executor
+    participant G as GPU / Kernels
+
+    U-&gt;&gt;A: 提交任务或查询
+    A-&gt;&gt;A: 组装 prompt, 检索上下文, 调用工具
+    A-&gt;&gt;R: 发送模型请求
+    R-&gt;&gt;R: 选择模型 / 副本 / 路由
+    R-&gt;&gt;E: 转发请求
+    E-&gt;&gt;S: 将请求送入 engine 内部
+    S-&gt;&gt;K: 申请 KV blocks / 准备元数据
+    S-&gt;&gt;M: 调度 prefill 或 decode
+    M-&gt;&gt;G: 发起 kernels 和 collectives
+    G--&gt;&gt;M: 返回 logits / 更新状态
+    M--&gt;&gt;S: 本轮执行结束
+    S--&gt;&gt;E: 输出 token 或继续 decode
+    E--&gt;&gt;R: 返回部分结果
+    R--&gt;&gt;A: 转发响应
+    A--&gt;&gt;U: 输出 token / 最终结果</div>
+<p>把这两张图放在一起看，会更容易建立稳定的心智模型。分层流图给出的是系统的固定骨架，时序图给出的是一次请求如何穿过这套骨架。性能问题出现时，更实用的问题通常不是“这一页里提到了哪些组件”，而是“流程图里的哪一个节点出了问题，以及它是在时序上的哪一步开始主导延迟或吞吐”。</p>
+<h2 id="_5">把常见问题映射到生命周期</h2>
+<p>同一套生命周期视角，也可以直接用于调试。</p>
+<ul>
+<li><strong>TTFT 高</strong> 往往来自编排开销、排队、prefill 成本或准入延迟。</li>
+<li><strong>TPS 低</strong> 往往指向 batch 不成形、KV 压力、通信开销或 kernel 填充不足。</li>
+<li><strong>Preemption</strong> 通常说明问题出在 scheduler 和 KV manager 的交互边界。</li>
+<li><strong>Prefix cache 收益差</strong> 常常源于上层路由，而不只是 cache 机制本身。</li>
+<li><strong>GPU 利用率低</strong> 可能是 decode step 太小、并行拓扑通信太重，或者请求流本身无法形成高效 batch。</li>
+</ul>
+<h2 id="ai-infra">与其它 AI Infra 页面之间的关系</h2>
+<p>这个生命周期视角并不是为了替代总览页，而是与总览页互补。</p>
+<ul>
+<li><a href="../overview/">总览</a> 解释每个组件在系统里处于哪一层。</li>
+<li><a href="../metrics/">指标</a> 解释这条生命周期最终如何被测量。</li>
+<li><a href="../kv-cache/">KV Cache</a> 解释 prefill 和 decode 中持续携带的核心状态对象。</li>
+<li><a href="../serving-runtime/">推理运行时</a> 解释 scheduler 和 runtime policy 如何改变请求推进方式。</li>
+<li><a href="../parallelism/">并行策略</a> 解释请求进入模型计算之后，执行如何分布到多个设备上。</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": [], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}, "version": null}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+        <script src="../../../javascripts/mathjax.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+      
+        <script src="../../../javascripts/mermaid.js"></script>
+      
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>

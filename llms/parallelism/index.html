@@ -1,0 +1,1256 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://XPengZhao.github.io/dl-note/llms/parallelism/">
+      
+      
+        <link rel="prev" href="../serving-runtime/">
+      
+      
+        <link rel="next" href="../decoding/">
+      
+      
+        
+          <link rel="alternate" href="./" hreflang="en">
+        
+          <link rel="alternate" href="../../zh/llms/parallelism/" hreflang="zh">
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Parallelism - DL Notes</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../stylesheets/bootstrap.min.css">
+    
+      <link rel="stylesheet" href="../../stylesheets/basic.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#parallelism" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="DL Notes" class="md-header__button md-logo" aria-label="DL Notes" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            DL Notes
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Parallelism
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+      <div class="md-header__option">
+  <div class="md-select">
+    
+    <button class="md-header__button md-icon" aria-label="Select language">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12.87 15.07-2.54-2.51.03-.03A17.5 17.5 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2zm-2.62 7 1.62-4.33L19.12 17z"/></svg>
+    </button>
+    <div class="md-select__inner">
+      <ul class="md-select__list">
+        
+          <li class="md-select__item">
+            <a href="./" hreflang="en" class="md-select__link">
+              English
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="../../zh/llms/parallelism/" hreflang="zh" class="md-select__link">
+              简体中文
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="DL Notes" class="md-nav__button md-logo" aria-label="DL Notes" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    DL Notes
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hardware/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hardware
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tensor/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tensor Operation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../neural-graphics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Neural Graphics
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AI Infra
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    AI Infra
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../request-lifecycle/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Request Lifecycle
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../metrics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Metrics
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../kv-cache/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    KV Cache
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../serving-runtime/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Serving Runtime
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Parallelism
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Parallelism
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#data-parallelism-dp" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Data Parallelism (DP)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Data Parallelism (DP)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-collective-communication-related-to-dp" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The Collective Communication Related to DP
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tensor-parallelism-tp" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tensor Parallelism (TP)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Tensor Parallelism (TP)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-collective-communication-related-to-tp" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The Collective Communication Related to TP
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#inference-interpretation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Inference Interpretation
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-gpu-inference-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8-GPU Inference Example
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="8-GPU Inference Example">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#prefill-heavy-workload-40k-1k" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prefill-heavy workload: 40k + 1k
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#decode-heavy-workload-1k-10k" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Decode-heavy workload: 1k + 10k
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#balanced-workload-10k-10k" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Balanced workload: 10k + 10k
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#trade-off-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Trade-off Summary
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../decoding/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Decoding
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../training-objective/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Training Objective
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Models
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Models
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../position-encoding/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Position Encoding
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Model Notes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#data-parallelism-dp" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Data Parallelism (DP)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Data Parallelism (DP)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-collective-communication-related-to-dp" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The Collective Communication Related to DP
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tensor-parallelism-tp" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tensor Parallelism (TP)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Tensor Parallelism (TP)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-collective-communication-related-to-tp" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The Collective Communication Related to TP
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#inference-interpretation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Inference Interpretation
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-gpu-inference-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8-GPU Inference Example
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="8-GPU Inference Example">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#prefill-heavy-workload-40k-1k" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prefill-heavy workload: 40k + 1k
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#decode-heavy-workload-1k-10k" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Decode-heavy workload: 1k + 10k
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#balanced-workload-10k-10k" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Balanced workload: 10k + 10k
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#trade-off-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Trade-off Summary
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="parallelism">Parallelism</h1>
+<p>Deployment decisions are often framed as configuration choices such as <code>DP2TP2</code> versus <code>TP4</code>, but those labels are only shorthand for deeper systems trade-offs. Some forms of parallelism primarily solve a throughput problem, some solve a memory-fit problem, and some introduce communication overhead large enough to erase their theoretical benefit. Parallelism becomes much easier to reason about once those underlying problems are separated.</p>
+<h2 id="data-parallelism-dp">Data Parallelism (DP)</h2>
+<p>Data Parallelism (DP) is the most conventional and intuitive form of distributed execution in machine learning systems. Its central idea is simple: the same model is instantiated on multiple devices, while the input workload is partitioned across those instances. Each worker executes an identical computation graph on a different subset of data. In this sense, it changes only the mapping of computation to hardware.</p>
+<p>When one model replica is already memory-feasible but cannot absorb enough request load, the natural way to increase system capacity is to add more replicas.</p>
+<p>Because the parameters are duplicated rather than partitioned, DP does not reduce the memory footprint on any individual device. This property defines its practical scope: DP is effective when the model already fits within the memory budget of a single GPU, but it is insufficient when the model itself exceeds per-device capacity. Its primary value therefore lies in scaling throughput and serving concurrency through replication.</p>
+<p>In training, DP is commonly used to increase effective batch size and improve hardware utilization. Each worker processes a shard of the mini-batch, computes local gradients, and then participates in synchronization so that all model copies remain numerically consistent after the optimization step. In inference, the same replication principle still applies, but without gradient exchange. Instead, each worker handles an independent subset of requests or token batches. Under inference workloads, DP should therefore be understood mainly as a mechanism for traffic distribution rather than model partitioning.</p>
+<p>In hybrid deployments, DP often coexists with Tensor Parallelism (TP) and Expert Parallelism (EP). Under such configurations, a DP replica should not be interpreted too literally as a single GPU. Rather, one DP unit may itself be a multi-GPU group whose internal execution is organized by TP or EP. From this perspective, DP defines the outer structure of workload replication, while TP and EP determine how computation is carried out within each replica.</p>
+<h3 id="the-collective-communication-related-to-dp">The Collective Communication Related to DP</h3>
+<p>The communication behavior associated with DP depends fundamentally on whether the system is performing training or inference.</p>
+<p>During distributed training, each DP worker computes gradients from its local mini-batch shard. Since every worker maintains the same parameter set, these gradients must be synchronized after each step to preserve consistency across replicas. The standard collective primitive for this purpose is all-reduce over gradients. In some implementations, the same effect is realized through reduce-scatter followed by all-gather, but the objective remains unchanged: to aggregate gradient contributions from all DP ranks and produce identical parameter updates on every worker.</p>
+<p>By contrast, inference does not involve backward propagation or optimizer steps. Each DP rank serves an independent portion of the request stream, so DP itself introduces no mandatory per-layer collective communication. Under inference, it functions primarily as a scheduling and traffic-partitioning mechanism rather than a synchronization-intensive execution strategy.</p>
+<p>That said, a DP-based inference system is not entirely communication-free. The runtime still requires system-level coordination for request dispatch, load balancing, admission control, and result collection. In practice, such coordination often relies on communication patterns such as all-gather to exchange metadata, state, or scheduling information across ranks. These operations belong to the serving framework rather than the model's numerical execution.</p>
+<p>In hybrid MoE deployments, DP usually contributes limited communication overhead during inference, while the parallel mechanisms inside each DP unit are often more communication-intensive. Tensor Parallelism typically relies on collectives such as all-reduce or all-gather within a TP group, whereas Expert Parallelism introduces token routing across devices that host different experts. Accordingly, communication analysis in a hybrid system should separate the outer DP dimension from the inner model-parallel dimensions: DP governs workload distribution, while the dominant communication cost usually comes from TP or EP.</p>
+<h2 id="tensor-parallelism-tp">Tensor Parallelism (TP)</h2>
+<p>TP partitions the computation of a single layer across multiple devices by sharding the layer's weight tensors, rather than replicating the full layer on every rank. In large transformer models, this is typically applied to the projection matrices in attention and MLP blocks. The core objective is to reduce the per-device memory footprint and enable execution of layers whose parameters or activations would otherwise exceed the capacity of a single accelerator.</p>
+<p>TP becomes interesting when one accelerator cannot comfortably host the model or when reducing per-device weight footprint creates more room for activations and KV cache inside a single replica.</p>
+<p>Consider a linear transformation</p>
+<div class="arithmatex">\[
+Y = X W,
+\]</div>
+<p>where <span class="arithmatex">\(X \in \mathbb{R}^{B \times H}\)</span>, <span class="arithmatex">\(W \in \mathbb{R}^{H \times O}\)</span>, and <span class="arithmatex">\(Y \in \mathbb{R}^{B \times O}\)</span>. Under TP, <span class="arithmatex">\(W\)</span> is divided across a process group of <span class="arithmatex">\(p\)</span> ranks. Two common decompositions are column-wise sharding and row-wise sharding.</p>
+<p>In column-wise TP, the output dimension <span class="arithmatex">\(O\)</span> is partitioned, so each rank stores</p>
+<div class="arithmatex">\[
+W_i \in \mathbb{R}^{H \times O/p}
+\]</div>
+<p>Each rank computes a partial output</p>
+<div class="arithmatex">\[
+Y_i = X W_i \in \mathbb{R}^{B \times O/p}
+\]</div>
+<p>which corresponds to a slice of the final output tensor. This pattern is natural for the first projection in transformer feed-forward blocks, because the partial outputs can often remain distributed until a later synchronization point.</p>
+<p>In row-wise TP, the input dimension <span class="arithmatex">\(H\)</span> is partitioned, so each rank stores</p>
+<div class="arithmatex">\[
+W_i \in \mathbb{R}^{H/p \times O}
+\]</div>
+<p>The input <span class="arithmatex">\(X\)</span> must then be partitioned consistently, and each rank computes a partial contribution to the full output:</p>
+<div class="arithmatex">\[
+Y_i = X_i W_i \in \mathbb{R}^{B \times O}
+\]</div>
+<p>Since these are additive contributions to the same output tensor, the ranks must sum them to recover <span class="arithmatex">\(Y\)</span>. This makes row-wise TP naturally coupled with a reduction step.</p>
+<p>For transformer layers, TP is usually designed so that adjacent projections alternate between communication-light and communication-heavy layouts. A standard example is the two-layer MLP block. The first linear layer expands the hidden state and is often implemented with column-wise TP, while the second projects back to the hidden dimension using row-wise TP. This pairing avoids unnecessary materialization of full intermediate activations on every rank and keeps most of the computation local until the boundary where the distributed partial results must be merged.</p>
+<p>The main advantage of TP is that it scales model width without requiring full parameter replication. However, its efficiency depends strongly on the balance between local matrix multiplication and inter-rank communication. As TP degree increases, per-rank GEMM sizes become smaller and communication becomes a larger fraction of the step time. For this reason, TP is usually effective only within a tightly coupled device group, such as GPUs connected by high-bandwidth intra-node interconnects.</p>
+<h3 id="the-collective-communication-related-to-tp">The Collective Communication Related to TP</h3>
+<p>The communication pattern in TP is determined by how tensors are sharded and whether the local computation produces disjoint output slices or partial sums. In practice, TP relies primarily on three collective patterns: all-gather, reduce-scatter, and all-reduce. Their role is not incidental; they define the synchronization boundaries of tensor-parallel execution.</p>
+<p>In a column-wise partitioned linear layer, each rank produces a distinct shard of the output features. If the next operator can consume the activation in sharded form, no immediate communication is required. This is one of the main reasons column-wise sharding is attractive. However, when a subsequent operation expects the full activation tensor, the ranks must perform an all-gather to assemble</p>
+<div class="arithmatex">\[
+Y = [Y_0, Y_1, \ldots, Y_{p-1}]
+\]</div>
+<p>Thus, all-gather is associated with reconstructing a feature dimension that was split across ranks.</p>
+<p>In a row-wise partitioned linear layer, each rank computes only a partial contribution to the same output tensor. The global result is</p>
+<div class="arithmatex">\[
+Y = \sum_{i=0}^{p-1} Y_i.
+\]</div>
+<p>This requires a summation across the TP group. Conceptually, this is an all-reduce if every rank needs the full output. In optimized implementations, the communication may instead be fused with downstream sharding requirements and expressed as a reduce-scatter, which both sums the partial results and redistributes the output into shards for the next stage.</p>
+<p>At the systems level, the cost of TP communication is shaped by message size, collective algorithm, process-group topology, and overlap with computation. Since TP collectives are invoked at fine granularity inside individual layers, their latency sensitivity is high. This is why TP is typically constrained to a small number of nearby devices: the communication volume may be moderate, but the synchronization frequency is high. Once the TP group spans slower links, collective latency can dominate the runtime and erase the gains from parameter sharding. A practical interpretation is that TP converts a single large matrix multiplication into several smaller local GEMMs plus structured collectives. Its performance therefore depends on whether the reduction in memory pressure and per-rank compute fits outweighs the repeated cost of all-gather, reduce-scatter, and all-reduce across the tensor-parallel group.</p>
+<h3 id="inference-interpretation">Inference Interpretation</h3>
+<p>For serving workloads, DP and TP usually play different roles.</p>
+<ul>
+<li>DP primarily scales throughput by creating more replicas that can serve independent requests.</li>
+<li>TP primarily improves model fit and per-replica memory budget by sharding parameters, but it introduces intra-layer collectives.</li>
+<li>Increasing DP duplicates model weights and may fragment prefix-cache locality across replicas.</li>
+<li>Increasing TP reduces per-device weight memory and can enlarge the effective KV budget of one replica, but too much TP may turn communication into the bottleneck.</li>
+</ul>
+<p>This is why inference deployment decisions are often phrased as a trade-off between replica-level concurrency and per-replica memory headroom.</p>
+<h2 id="8-gpu-inference-example">8-GPU Inference Example</h2>
+<p>The clearest way to compare DP and TP is to hold the hardware fixed and change only how the eight GPUs are grouped into replicas. Consider one 8-GPU server with fast intra-node interconnect. The common options are:</p>
+<ul>
+<li><code>DP8TP1</code>: 8 independent single-GPU replicas</li>
+<li><code>DP4TP2</code>: 4 replicas, each spanning 2 GPUs</li>
+<li><code>DP2TP4</code>: 2 replicas, each spanning 4 GPUs</li>
+<li><code>DP1TP8</code>: 1 replica spanning all 8 GPUs</li>
+</ul>
+<p>This comparison is only meaningful when all of these layouts are memory-feasible for the target model and context window. If the model or KV state does not fit under <code>TP1</code>, then high-DP layouts are not real options.</p>
+<p>The important distinction is that DP spends GPUs on more independent replicas, while TP spends GPUs on making one replica larger. As a result, the best choice depends strongly on whether the workload is constrained by single-request latency, replica memory headroom, or multi-request concurrency.</p>
+<p>One subtle point matters a great deal in long-context serving: TP does not only change the compute pattern of one replica. By reducing per-GPU weight footprint inside that replica, it can also leave more memory available for KV cache. That larger KV budget may allow one replica to admit more long requests at the same time, avoid preemption, and form a larger stable batch. In other words, TP can sometimes improve throughput not because one decode step becomes intrinsically faster, but because the replica can sustain enough active work to keep the GPUs busy.</p>
+<p>For this reason, inference tuning on 8 GPUs is usually balancing three separate questions at once:</p>
+<ul>
+<li>How many independent replicas should the node expose?</li>
+<li>How much KV headroom does each replica need?</li>
+<li>Is the current workload limited by communication, by memory pressure, or by insufficient active work?</li>
+</ul>
+<h3 id="prefill-heavy-workload-40k-1k">Prefill-heavy workload: <code>40k + 1k</code></h3>
+<p>This workload is dominated by ingesting a very long prompt. Prefill is expensive because attention and projection work scale over a large input sequence before decode even becomes the main issue.</p>
+<ul>
+<li>Under low concurrency, TP often becomes more attractive because multiple GPUs can cooperate on the same long prefill. <code>DP8TP1</code> gives many replicas, but if only one or two requests are active, most replicas sit idle while one GPU bears the full prompt cost.</li>
+<li>Under high concurrency, DP becomes more competitive again because many long prefills can proceed in parallel on different replicas. If each request already fits comfortably, <code>DP8TP1</code> or <code>DP4TP2</code> often achieves higher aggregate throughput than very large TP groups.</li>
+<li>The main reason to keep some TP in this regime is usually not decode speed but memory headroom: very long prompts consume KV capacity quickly, and moderate TP can create a larger feasible per-request context budget.</li>
+<li>This memory effect can change concurrency as well. With ultra-long prompts, <code>TP1</code> may force each replica to admit only a very small number of active requests in order to avoid preemption. A moderate TP degree can enlarge the per-replica KV budget enough that the replica can keep a larger prefill batch resident and reach higher real throughput.</li>
+</ul>
+<p>In practice, prefill-heavy serving often favors a middle ground such as <code>DP4TP2</code> when one-GPU replicas are too tight on memory but <code>TP4</code> or <code>TP8</code> would sacrifice too much replica count.</p>
+<h3 id="decode-heavy-workload-1k-10k">Decode-heavy workload: <code>1k + 10k</code></h3>
+<p>This workload is dominated by long autoregressive generation after a relatively short prompt. The system spends most of its time stepping through decode, where each step is small and repeated many times.</p>
+<ul>
+<li>Under high concurrency, DP is usually the strongest choice if the model fits. <code>DP8TP1</code> maximizes the number of independent decoders and avoids the per-layer TP collectives that would be paid on every decode step.</li>
+<li>Under low concurrency, very large TP groups rarely help much unless they are needed for memory. The decode step for one request is narrow, so spreading it across many GPUs can increase synchronization cost faster than it reduces local compute time.</li>
+<li>If output lengths are large enough to make KV pressure the dominant bottleneck, moderate TP can still win indirectly by enlarging the feasible KV budget of one replica and reducing preemption risk. That is a memory effect, not a pure compute-speed effect.</li>
+<li>This distinction matters in practice. A decode-heavy service may look compute-light at the per-step level, but if each replica is constantly KV-constrained, it may never accumulate enough active sequences to saturate the device. In that case, adding some TP can increase stable decode concurrency even though it also adds communication.</li>
+</ul>
+<p>This is why decode-heavy online serving often prefers as much DP as memory allows. Once the model already fits and KV is stable, extra TP tends to trade throughput for communication.</p>
+<h3 id="balanced-workload-10k-10k">Balanced workload: <code>10k + 10k</code></h3>
+<p>When prefill and decode are both substantial, neither pure-DP nor pure-TP logic is sufficient. The deployment must absorb long contexts while also surviving long output tails.</p>
+<ul>
+<li>Under small or moderate concurrency, hybrid layouts such as <code>DP4TP2</code> are often a robust compromise. They preserve several independent replicas while giving each replica more memory headroom than <code>TP1</code>.</li>
+<li>Under large concurrency, the decision depends on what fails first. If <code>DP8TP1</code> starts to preempt or must severely limit admitted requests because KV is too tight, then adding TP can improve real throughput even though it increases communication. If <code>DP8TP1</code> remains stable, it often keeps the highest aggregate throughput.</li>
+<li><code>DP1TP8</code> is usually justified only when one replica truly needs the entire node, either because the model is too large or because the target context budget is extreme. Otherwise it gives up too much outer concurrency.</li>
+</ul>
+<p>This is often the regime where the distinction between logical concurrency and effective concurrency matters most. <code>DP8TP1</code> may expose more replicas on paper, but if each replica must operate with a very small admitted batch to stay within its KV budget, the system may still fail to keep the node compute-bound. A smaller number of larger TP replicas can sometimes sustain more useful work in flight.</p>
+<h3 id="trade-off-summary">Trade-off Summary</h3>
+<p>For inference on one 8-GPU node, the qualitative pattern is usually:</p>
+<ul>
+<li>More DP helps when the workload has enough independent requests to keep many replicas busy.</li>
+<li>More TP helps when a single replica is too memory-constrained or when one request is so heavy that multiple GPUs should cooperate on it.</li>
+<li>More TP can also help when ultra-long requests make each <code>TP1</code> replica too KV-constrained to admit enough active work. In that case, TP is buying concurrency through memory headroom.</li>
+<li>Prefill-heavy, low-concurrency traffic pushes the system toward some TP.</li>
+<li>Decode-heavy, high-concurrency traffic pushes the system toward more DP.</li>
+<li>Balanced long-context traffic often lands in the middle, where <code>DP4TP2</code> or <code>DP2TP4</code> is easier to stabilize than either extreme.</li>
+</ul>
+<p>The most important operational question is not "is DP better than TP" in the abstract. It is "what is the first wall this workload hits on this hardware: request-level latency, per-replica KV capacity, or cluster-level concurrency?" DP and TP are two different ways of moving that wall.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": [], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+        <script src="../../javascripts/mathjax.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+      
+        <script src="../../javascripts/mermaid.js"></script>
+      
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>
