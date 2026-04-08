@@ -613,7 +613,7 @@
           <li class="md-nav__item">
   <a href="#_3" class="md-nav__link">
     <span class="md-ellipsis">
-      怎么读这个权衡
+      权衡总结
     </span>
   </a>
   
@@ -831,7 +831,7 @@
           <li class="md-nav__item">
   <a href="#_3" class="md-nav__link">
     <span class="md-ellipsis">
-      怎么读这个权衡
+      权衡总结
     </span>
   </a>
   
@@ -966,7 +966,7 @@ Y = \sum_{i=0}^{p-1} Y_i
 <li><code>DP1TP8</code> 一般只有在单个副本确实需要整台机器时才合理，例如模型本身很大，或者目标上下文窗口极端大。否则它牺牲的外层并发通常太多。</li>
 </ul>
 <p>这也是“纸面并发”和“有效并发”差别最大的场景。<code>DP8TP1</code> 从副本数上看并发更高，但如果每个副本为了守住 KV 预算只能把 admitted batch 压得很小，整台机器仍然可能打不到 compute-bound。副本数更少但更大的 TP 组，有时反而能维持更多真正有用的 in-flight work。</p>
-<h3 id="_3">怎么读这个权衡</h3>
+<h3 id="_3">权衡总结</h3>
 <p>对一台 8-GPU 服务器上的推理来说，常见的经验规律通常是：</p>
 <ul>
 <li>更多 DP 在“独立请求足够多，能把多个副本都喂满”时更有利。</li>

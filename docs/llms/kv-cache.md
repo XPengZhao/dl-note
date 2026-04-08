@@ -74,7 +74,7 @@ Because one request is mapped to a list of physical blocks rather than one conti
 
 The choice of block size matters because it sets the allocation granularity of the manager. Small blocks reduce tail waste and allow finer-grained reuse, but they make the block table longer and can increase management overhead. Large blocks simplify metadata and can be friendlier to some kernels, but they waste more space at the tail and make reuse coarser.
 
-### A Concrete Example
+### Example
 
 Suppose the block size is 16 tokens and one request currently has 53 tokens in context. The runtime will need
 

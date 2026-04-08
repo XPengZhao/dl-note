@@ -617,27 +617,27 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#main-architectural-features" class="md-nav__link">
+  <a href="#architectural-features" class="md-nav__link">
     <span class="md-ellipsis">
-      Main Architectural Features
+      Architectural Features
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#a-compact-structural-summary" class="md-nav__link">
+  <a href="#structural-summary" class="md-nav__link">
     <span class="md-ellipsis">
-      A Compact Structural Summary
+      Structural Summary
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#thinker-the-main-multimodal-backbone" class="md-nav__link">
+  <a href="#thinker-multimodal-backbone" class="md-nav__link">
     <span class="md-ellipsis">
-      Thinker: The Main Multimodal Backbone
+      Thinker: Multimodal Backbone
     </span>
   </a>
   
@@ -689,9 +689,9 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#practical-notes" class="md-nav__link">
+  <a href="#notes" class="md-nav__link">
     <span class="md-ellipsis">
-      Practical Notes
+      Notes
     </span>
   </a>
   
@@ -774,27 +774,27 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#main-architectural-features" class="md-nav__link">
+  <a href="#architectural-features" class="md-nav__link">
     <span class="md-ellipsis">
-      Main Architectural Features
+      Architectural Features
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#a-compact-structural-summary" class="md-nav__link">
+  <a href="#structural-summary" class="md-nav__link">
     <span class="md-ellipsis">
-      A Compact Structural Summary
+      Structural Summary
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#thinker-the-main-multimodal-backbone" class="md-nav__link">
+  <a href="#thinker-multimodal-backbone" class="md-nav__link">
     <span class="md-ellipsis">
-      Thinker: The Main Multimodal Backbone
+      Thinker: Multimodal Backbone
     </span>
   </a>
   
@@ -846,9 +846,9 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#practical-notes" class="md-nav__link">
+  <a href="#notes" class="md-nav__link">
     <span class="md-ellipsis">
-      Practical Notes
+      Notes
     </span>
   </a>
   
@@ -900,7 +900,7 @@
 <li>The <strong>Talker</strong> is the speech generation side. It predicts codec tokens autoregressively and then reconstructs waveform through <code>Code2Wav</code>.</li>
 </ul>
 <p>This separation matters because it turns omni-modal generation into a systems problem rather than only a backbone problem. The model can reason over multiple modalities while keeping the speech synthesis path optimized for streaming.</p>
-<h3 id="main-architectural-features">Main Architectural Features</h3>
+<h3 id="architectural-features">Architectural Features</h3>
 <ul>
 <li>Both the Thinker and Talker use Mixture-of-Experts (MoE) designs.</li>
 <li>The text backbone in the Thinker is a 48-layer MoE decoder with 128 experts and 8 active experts per token.</li>
@@ -910,7 +910,7 @@
 <li>The Talker uses a multi-codebook codec generation path with 16 code groups / quantizers. <code>Code2Wav</code> is a lightweight causal ConvNet rather than a heavier diffusion-style decoder.</li>
 </ul>
 <p>These numbers come directly from the public Hugging Face config for <a href="https://huggingface.co/Qwen/Qwen3-Omni-30B-A3B-Instruct/blob/main/config.json">Qwen/Qwen3-Omni-30B-A3B-Instruct</a>.</p>
-<h3 id="a-compact-structural-summary">A Compact Structural Summary</h3>
+<h3 id="structural-summary">Structural Summary</h3>
 <table>
 <thead>
 <tr>
@@ -952,7 +952,7 @@
 </tr>
 </tbody>
 </table>
-<h3 id="thinker-the-main-multimodal-backbone">Thinker: The Main Multimodal Backbone</h3>
+<h3 id="thinker-multimodal-backbone">Thinker: Multimodal Backbone</h3>
 <p>The Thinker is the part most readers intuitively expect to be "the model." It performs multimodal understanding, routes information through the language backbone, and is also the component you would keep if you only wanted text output.</p>
 <p>From the public config, the Thinker text backbone has:</p>
 <ul>
@@ -1020,7 +1020,7 @@
 <li>and a separate speech-generation stack based on codec prediction.</li>
 </ul>
 <p>That is why its parameter story can look unusual at first glance. The model is not "large" only because the text backbone is wide. Capacity is spread across MoE experts, visual and audio encoders, and the speech generation stack.</p>
-<h3 id="practical-notes">Practical Notes</h3>
+<h3 id="notes">Notes</h3>
 <ul>
 <li>If only text output is needed, using <code>Qwen3OmniMoeThinkerForConditionalGeneration</code> avoids loading the entire speech generation path.</li>
 <li>Hugging Face notes that full audio generation currently supports only batch size <code>1</code> in the integrated model path.</li>

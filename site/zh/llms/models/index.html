@@ -619,7 +619,7 @@
           <li class="md-nav__item">
   <a href="#_3" class="md-nav__link">
     <span class="md-ellipsis">
-      主要结构特征
+      结构特征
     </span>
   </a>
   
@@ -628,7 +628,7 @@
           <li class="md-nav__item">
   <a href="#_4" class="md-nav__link">
     <span class="md-ellipsis">
-      一个紧凑的结构总结
+      结构总结
     </span>
   </a>
   
@@ -691,7 +691,7 @@
           <li class="md-nav__item">
   <a href="#_5" class="md-nav__link">
     <span class="md-ellipsis">
-      实用备注
+      备注
     </span>
   </a>
   
@@ -776,7 +776,7 @@
           <li class="md-nav__item">
   <a href="#_3" class="md-nav__link">
     <span class="md-ellipsis">
-      主要结构特征
+      结构特征
     </span>
   </a>
   
@@ -785,7 +785,7 @@
           <li class="md-nav__item">
   <a href="#_4" class="md-nav__link">
     <span class="md-ellipsis">
-      一个紧凑的结构总结
+      结构总结
     </span>
   </a>
   
@@ -848,7 +848,7 @@
           <li class="md-nav__item">
   <a href="#_5" class="md-nav__link">
     <span class="md-ellipsis">
-      实用备注
+      备注
     </span>
   </a>
   
@@ -900,7 +900,7 @@
 <li><strong>Talker</strong> 是语音生成路径，负责自回归预测 codec tokens，再通过 <code>Code2Wav</code> 重建语音波形。</li>
 </ul>
 <p>这个分工之所以重要，是因为它把 omni-modal generation 变成了一个系统设计问题，而不只是单个 backbone 的问题。模型可以在同一条路径上完成多模态推理，同时又让语音生成链路保持适合流式输出的结构。</p>
-<h3 id="_3">主要结构特征</h3>
+<h3 id="_3">结构特征</h3>
 <ul>
 <li>Thinker 和 Talker 都采用 Mixture-of-Experts（MoE）架构。</li>
 <li>Thinker 里的文本主干是一个 48 层 MoE decoder，包含 128 个 experts，每个 token 激活 8 个 experts。</li>
@@ -910,7 +910,7 @@
 <li>Talker 采用多 codebook 的 codec 生成路径，一共 16 个 code groups / quantizers。最终的 <code>Code2Wav</code> 不是扩散式大解码器，而是轻量级因果 ConvNet。</li>
 </ul>
 <p>这些数字直接来自 Hugging Face 上公开的 <a href="https://huggingface.co/Qwen/Qwen3-Omni-30B-A3B-Instruct/blob/main/config.json">Qwen/Qwen3-Omni-30B-A3B-Instruct 配置文件</a>。</p>
-<h3 id="_4">一个紧凑的结构总结</h3>
+<h3 id="_4">结构总结</h3>
 <table>
 <thead>
 <tr>
@@ -1020,7 +1020,7 @@
 <li>再加上一条基于 codec prediction 的独立语音生成链路。</li>
 </ul>
 <p>这也是为什么它的参数结构乍看会有点“反直觉”。模型之所以大，并不只是因为文本主干很宽，容量实际上被分散到了 MoE experts、视觉和音频编码器，以及语音生成路径上。</p>
-<h3 id="_5">实用备注</h3>
+<h3 id="_5">备注</h3>
 <ul>
 <li>如果只需要文本输出，使用 <code>Qwen3OmniMoeThinkerForConditionalGeneration</code> 可以避免把完整语音生成路径一并加载进来。</li>
 <li>Hugging Face 当前说明，集成模型路径下的完整音频生成目前只支持 batch size <code>1</code>。</li>

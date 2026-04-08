@@ -574,13 +574,13 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#an-8-gpu-inference-example" class="md-nav__link">
+  <a href="#8-gpu-inference-example" class="md-nav__link">
     <span class="md-ellipsis">
-      An 8-GPU Inference Example
+      8-GPU Inference Example
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="An 8-GPU Inference Example">
+    <nav class="md-nav" aria-label="8-GPU Inference Example">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -611,9 +611,9 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#a-practical-reading-of-the-trade-off" class="md-nav__link">
+  <a href="#trade-off-summary" class="md-nav__link">
     <span class="md-ellipsis">
-      A Practical Reading of the Trade-off
+      Trade-off Summary
     </span>
   </a>
   
@@ -792,13 +792,13 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#an-8-gpu-inference-example" class="md-nav__link">
+  <a href="#8-gpu-inference-example" class="md-nav__link">
     <span class="md-ellipsis">
-      An 8-GPU Inference Example
+      8-GPU Inference Example
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="An 8-GPU Inference Example">
+    <nav class="md-nav" aria-label="8-GPU Inference Example">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -829,9 +829,9 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#a-practical-reading-of-the-trade-off" class="md-nav__link">
+  <a href="#trade-off-summary" class="md-nav__link">
     <span class="md-ellipsis">
-      A Practical Reading of the Trade-off
+      Trade-off Summary
     </span>
   </a>
   
@@ -922,7 +922,7 @@ Y = \sum_{i=0}^{p-1} Y_i.
 <li>Increasing TP reduces per-device weight memory and can enlarge the effective KV budget of one replica, but too much TP may turn communication into the bottleneck.</li>
 </ul>
 <p>This is why inference deployment decisions are often phrased as a trade-off between replica-level concurrency and per-replica memory headroom.</p>
-<h2 id="an-8-gpu-inference-example">An 8-GPU Inference Example</h2>
+<h2 id="8-gpu-inference-example">8-GPU Inference Example</h2>
 <p>The clearest way to compare DP and TP is to hold the hardware fixed and change only how the eight GPUs are grouped into replicas. Consider one 8-GPU server with fast intra-node interconnect. The common options are:</p>
 <ul>
 <li><code>DP8TP1</code>: 8 independent single-GPU replicas</li>
@@ -965,7 +965,7 @@ Y = \sum_{i=0}^{p-1} Y_i.
 <li><code>DP1TP8</code> is usually justified only when one replica truly needs the entire node, either because the model is too large or because the target context budget is extreme. Otherwise it gives up too much outer concurrency.</li>
 </ul>
 <p>This is often the regime where the distinction between logical concurrency and effective concurrency matters most. <code>DP8TP1</code> may expose more replicas on paper, but if each replica must operate with a very small admitted batch to stay within its KV budget, the system may still fail to keep the node compute-bound. A smaller number of larger TP replicas can sometimes sustain more useful work in flight.</p>
-<h3 id="a-practical-reading-of-the-trade-off">A Practical Reading of the Trade-off</h3>
+<h3 id="trade-off-summary">Trade-off Summary</h3>
 <p>For inference on one 8-GPU node, the qualitative pattern is usually:</p>
 <ul>
 <li>More DP helps when the workload has enough independent requests to keep many replicas busy.</li>

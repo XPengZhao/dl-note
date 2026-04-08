@@ -571,9 +571,9 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#a-concrete-example" class="md-nav__link">
+  <a href="#example" class="md-nav__link">
     <span class="md-ellipsis">
-      A Concrete Example
+      Example
     </span>
   </a>
   
@@ -919,9 +919,9 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#a-concrete-example" class="md-nav__link">
+  <a href="#example" class="md-nav__link">
     <span class="md-ellipsis">
-      A Concrete Example
+      Example
     </span>
   </a>
   
@@ -1070,7 +1070,7 @@ N_{\text{blocks}} = \left\lceil \frac{L}{B} \right\rceil
 <h3 id="block-table-and-allocation-granularity">Block Table and Allocation Granularity</h3>
 <p>Because one request is mapped to a list of physical blocks rather than one contiguous region, the runtime needs metadata that records this mapping. The block table serves this role: it translates logical sequence positions into the physical blocks that actually hold the KV tensors.</p>
 <p>The choice of block size matters because it sets the allocation granularity of the manager. Small blocks reduce tail waste and allow finer-grained reuse, but they make the block table longer and can increase management overhead. Large blocks simplify metadata and can be friendlier to some kernels, but they waste more space at the tail and make reuse coarser.</p>
-<h3 id="a-concrete-example">A Concrete Example</h3>
+<h3 id="example">Example</h3>
 <p>Suppose the block size is 16 tokens and one request currently has 53 tokens in context. The runtime will need</p>
 <div class="arithmatex">\[
 \left\lceil \frac{53}{16} \right\rceil = 4

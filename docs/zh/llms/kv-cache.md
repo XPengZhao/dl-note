@@ -74,7 +74,7 @@ KV cache 关注“存了什么”，KV manager 关注“这些状态在运行时
 
 block 大小之所以重要，是因为它决定了 manager 的分配粒度。block 较小时，尾部浪费更少、复用更细；但 block table 更长，管理开销也可能更高。block 较大时，元数据更简单，对某些 kernel 也更友好；但尾部浪费更大，复用粒度也更粗。
 
-### 一个具体例子
+### 例子
 
 假设 block size 是 16 tokens，而某个 request 当前上下文里一共有 53 个 tokens，那么运行时需要
 

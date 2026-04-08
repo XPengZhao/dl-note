@@ -105,7 +105,7 @@ For serving workloads, DP and TP usually play different roles.
 
 This is why inference deployment decisions are often phrased as a trade-off between replica-level concurrency and per-replica memory headroom.
 
-## An 8-GPU Inference Example
+## 8-GPU Inference Example
 
 The clearest way to compare DP and TP is to hold the hardware fixed and change only how the eight GPUs are grouped into replicas. Consider one 8-GPU server with fast intra-node interconnect. The common options are:
 
@@ -158,7 +158,7 @@ When prefill and decode are both substantial, neither pure-DP nor pure-TP logic 
 
 This is often the regime where the distinction between logical concurrency and effective concurrency matters most. `DP8TP1` may expose more replicas on paper, but if each replica must operate with a very small admitted batch to stay within its KV budget, the system may still fail to keep the node compute-bound. A smaller number of larger TP replicas can sometimes sustain more useful work in flight.
 
-### A Practical Reading of the Trade-off
+### Trade-off Summary
 
 For inference on one 8-GPU node, the qualitative pattern is usually:
 

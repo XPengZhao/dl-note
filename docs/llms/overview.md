@@ -94,7 +94,7 @@ So when someone says "we use vLLM", that typically means:
 
 This is why engine-level tuning alone is never the whole story. A well-tuned engine can still underperform if the upper layer creates poor workload shape, and an excellent application policy can still be constrained by weak runtime scheduling or kernel efficiency.
 
-## A Request Walkthrough
+## Request Walkthrough
 
 A single online request usually flows through the stack in roughly this order:
 
@@ -114,7 +114,7 @@ Thinking in this sequence makes debugging easier because it localizes failure mo
 - low TPS may come from routing fragmentation, poor batching, or communication overhead
 - unstable latency may come from scheduler pressure, KV exhaustion, or upper-layer fan-out behavior
 
-## A Practical Reading Map
+## Reading Map
 
 Within this notebook, the AI Infra pages can be read as a top-down decomposition of the middle of this stack:
 

@@ -573,7 +573,7 @@
           <li class="md-nav__item">
   <a href="#_3" class="md-nav__link">
     <span class="md-ellipsis">
-      一个具体例子
+      例子
     </span>
   </a>
   
@@ -921,7 +921,7 @@
           <li class="md-nav__item">
   <a href="#_3" class="md-nav__link">
     <span class="md-ellipsis">
-      一个具体例子
+      例子
     </span>
   </a>
   
@@ -1070,7 +1070,7 @@ N_{\text{blocks}} = \left\lceil \frac{L}{B} \right\rceil
 <h3 id="block-table">Block Table 与分配粒度</h3>
 <p>由于一个 request 对应的是一串 physical blocks，而不是单段连续显存，运行时必须维护一份记录这种映射关系的元数据。block table 就承担了这个职责：它将逻辑序列位置映射到真正保存 KV 状态的 physical blocks。</p>
 <p>block 大小之所以重要，是因为它决定了 manager 的分配粒度。block 较小时，尾部浪费更少、复用更细；但 block table 更长，管理开销也可能更高。block 较大时，元数据更简单，对某些 kernel 也更友好；但尾部浪费更大，复用粒度也更粗。</p>
-<h3 id="_3">一个具体例子</h3>
+<h3 id="_3">例子</h3>
 <p>假设 block size 是 16 tokens，而某个 request 当前上下文里一共有 53 个 tokens，那么运行时需要</p>
 <div class="arithmatex">\[
 \left\lceil \frac{53}{16} \right\rceil = 4

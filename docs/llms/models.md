@@ -21,7 +21,7 @@ At a high level, Qwen3-Omni uses a Thinker-Talker split:
 
 This separation matters because it turns omni-modal generation into a systems problem rather than only a backbone problem. The model can reason over multiple modalities while keeping the speech synthesis path optimized for streaming.
 
-### Main Architectural Features
+### Architectural Features
 
 - Both the Thinker and Talker use Mixture-of-Experts (MoE) designs.
 - The text backbone in the Thinker is a 48-layer MoE decoder with 128 experts and 8 active experts per token.
@@ -32,7 +32,7 @@ This separation matters because it turns omni-modal generation into a systems pr
 
 These numbers come directly from the public Hugging Face config for [Qwen/Qwen3-Omni-30B-A3B-Instruct](https://huggingface.co/Qwen/Qwen3-Omni-30B-A3B-Instruct/blob/main/config.json).
 
-### A Compact Structural Summary
+### Structural Summary
 
 | Module | Key structure | What to remember |
 | --- | --- | --- |
@@ -43,7 +43,7 @@ These numbers come directly from the public Hugging Face config for [Qwen/Qwen3-
 | Codec path | `16` quantizers, `codebook_size = 2048`, `semantic_codebook_size = 4096`, `codebook_dim = 512` | Speech is generated as discrete codec tokens rather than waveform directly |
 | Code2Wav | 8-layer decoder stack in `code2wav_config` | Final waveform synthesis is intentionally lightweight |
 
-### Thinker: The Main Multimodal Backbone
+### Thinker: Multimodal Backbone
 
 The Thinker is the part most readers intuitively expect to be "the model." It performs multimodal understanding, routes information through the language backbone, and is also the component you would keep if you only wanted text output.
 
@@ -128,7 +128,7 @@ From a modeling perspective, Qwen3-Omni is best read as a composition of several
 
 That is why its parameter story can look unusual at first glance. The model is not "large" only because the text backbone is wide. Capacity is spread across MoE experts, visual and audio encoders, and the speech generation stack.
 
-### Practical Notes
+### Notes
 
 - If only text output is needed, using `Qwen3OmniMoeThinkerForConditionalGeneration` avoids loading the entire speech generation path.
 - Hugging Face notes that full audio generation currently supports only batch size `1` in the integrated model path.

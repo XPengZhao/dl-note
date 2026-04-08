@@ -516,18 +516,18 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#a-request-walkthrough" class="md-nav__link">
+  <a href="#request-walkthrough" class="md-nav__link">
     <span class="md-ellipsis">
-      A Request Walkthrough
+      Request Walkthrough
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#a-practical-reading-map" class="md-nav__link">
+  <a href="#reading-map" class="md-nav__link">
     <span class="md-ellipsis">
-      A Practical Reading Map
+      Reading Map
     </span>
   </a>
   
@@ -873,18 +873,18 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#a-request-walkthrough" class="md-nav__link">
+  <a href="#request-walkthrough" class="md-nav__link">
     <span class="md-ellipsis">
-      A Request Walkthrough
+      Request Walkthrough
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#a-practical-reading-map" class="md-nav__link">
+  <a href="#reading-map" class="md-nav__link">
     <span class="md-ellipsis">
-      A Practical Reading Map
+      Reading Map
     </span>
   </a>
   
@@ -972,7 +972,7 @@
 <li>lower layers still determine the actual operator efficiency and hardware utilization</li>
 </ol>
 <p>This is why engine-level tuning alone is never the whole story. A well-tuned engine can still underperform if the upper layer creates poor workload shape, and an excellent application policy can still be constrained by weak runtime scheduling or kernel efficiency.</p>
-<h2 id="a-request-walkthrough">A Request Walkthrough</h2>
+<h2 id="request-walkthrough">Request Walkthrough</h2>
 <p>A single online request usually flows through the stack in roughly this order:</p>
 <ol>
 <li>The application or agent layer decides that a model call is needed.</li>
@@ -991,7 +991,7 @@
 <li>low TPS may come from routing fragmentation, poor batching, or communication overhead</li>
 <li>unstable latency may come from scheduler pressure, KV exhaustion, or upper-layer fan-out behavior</li>
 </ul>
-<h2 id="a-practical-reading-map">A Practical Reading Map</h2>
+<h2 id="reading-map">Reading Map</h2>
 <p>Within this notebook, the AI Infra pages can be read as a top-down decomposition of the middle of this stack:</p>
 <ul>
 <li><a href="../metrics/">Metrics</a>: how behavior is measured</li>
