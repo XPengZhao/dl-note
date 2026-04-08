@@ -78,6 +78,13 @@
         <xhtml:link rel="alternate" hreflang="zh" href="https://XPengZhao.github.io/dl-note/zh/llms/parallelism/"/>
     </url>
     <url>
+        <loc>https://XPengZhao.github.io/dl-note/llms/position-encoding/</loc>
+        <lastmod>2026-04-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://XPengZhao.github.io/dl-note/llms/position-encoding/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://XPengZhao.github.io/dl-note/zh/llms/position-encoding/"/>
+    </url>
+    <url>
         <loc>https://XPengZhao.github.io/dl-note/llms/request-lifecycle/</loc>
         <lastmod>2026-04-08</lastmod>
         <changefreq>daily</changefreq>
@@ -174,6 +181,13 @@
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh" href="https://XPengZhao.github.io/dl-note/zh/llms/parallelism/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://XPengZhao.github.io/dl-note/llms/parallelism/"/>
+    </url>
+    <url>
+        <loc>https://XPengZhao.github.io/dl-note/zh/llms/position-encoding/</loc>
+        <lastmod>2026-04-08</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://XPengZhao.github.io/dl-note/zh/llms/position-encoding/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://XPengZhao.github.io/dl-note/llms/position-encoding/"/>
     </url>
     <url>
         <loc>https://XPengZhao.github.io/dl-note/zh/llms/request-lifecycle/</loc>

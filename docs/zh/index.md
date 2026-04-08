@@ -16,8 +16,9 @@
 8. [并行策略](llms/parallelism.md) - 从显存、吞吐与通信理解 DP/TP
 9. [解码与采样](llms/decoding.md) - 采样策略与 speculative decoding
 10. [训练目标](llms/training-objective.md) - 自回归预训练目标
-11. [模型笔记](llms/models.md) - Qwen3-Omni 与 DFlash 的结构和实践命令
-12. [神经图形](neural-graphics.md) - NeRF 与 Flow Matching 基础
+11. [位置编码](llms/position-encoding.md) - 从 RoPE、M-RoPE 到 TM-RoPE 的建模演进
+12. [模型笔记](llms/models.md) - Qwen3-Omni 与 DFlash 的结构和实践命令
+13. [神经图形](neural-graphics.md) - NeRF 与 Flow Matching 基础
 
 ## 文档目录
 
@@ -39,6 +40,7 @@
 
 ### 模型
 
+- [位置编码](llms/position-encoding.md)
 - [模型笔记](llms/models.md)
 
 ### 图形与生成建模

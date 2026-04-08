@@ -8,13 +8,13 @@
       
       
       
-        <link rel="canonical" href="https://XPengZhao.github.io/dl-note/llms/training-objective/">
+        <link rel="canonical" href="https://XPengZhao.github.io/dl-note/llms/position-encoding/">
       
       
-        <link rel="prev" href="../decoding/">
+        <link rel="prev" href="../training-objective/">
       
       
-        <link rel="next" href="../position-encoding/">
+        <link rel="next" href="../models/">
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
@@ -22,7 +22,7 @@
     
     
       
-        <title>Training Objective - DL Notes</title>
+        <title>Position Encoding - DL Notes</title>
       
     
     
@@ -68,7 +68,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#training-objective" class="md-skip">
+        <a href="#position-encoding" class="md-skip">
           Skip to content
         </a>
       
@@ -104,7 +104,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Training Objective
+              Position Encoding
             
           </span>
         </div>
@@ -131,7 +131,7 @@
           </li>
         
           <li class="md-select__item">
-            <a href="../../zh/llms/training-objective/" hreflang="zh" class="md-select__link">
+            <a href="../../zh/llms/position-encoding/" hreflang="zh" class="md-select__link">
               简体中文
             </a>
           </li>
@@ -311,20 +311,18 @@
       
   
   
-    
   
   
-  
     
     
     
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
         
           
           <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
@@ -340,7 +338,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_5">
             <span class="md-nav__icon md-icon"></span>
             AI Infra
@@ -512,6 +510,76 @@
                 
   
   
+  
+  
+    <li class="md-nav__item">
+      <a href="../training-objective/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Training Objective
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Models
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            Models
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
     
   
   
@@ -529,7 +597,7 @@
   
   
   <span class="md-ellipsis">
-    Training Objective
+    Position Encoding
     
   </span>
   
@@ -542,7 +610,7 @@
   
   
   <span class="md-ellipsis">
-    Training Objective
+    Position Encoding
     
   </span>
   
@@ -565,9 +633,63 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#pre-training-objective-of-llms" class="md-nav__link">
+  <a href="#rope" class="md-nav__link">
     <span class="md-ellipsis">
-      Pre-Training Objective of LLMs
+      RoPE
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#m-rope" class="md-nav__link">
+    <span class="md-ellipsis">
+      M-RoPE
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tm-rope" class="md-nav__link">
+    <span class="md-ellipsis">
+      TM-RoPE
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#a-unified-view" class="md-nav__link">
+    <span class="md-ellipsis">
+      A Unified View
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#comparison" class="md-nav__link">
+    <span class="md-ellipsis">
+      Comparison
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#practical-interpretation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Practical Interpretation
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#notes" class="md-nav__link">
+    <span class="md-ellipsis">
+      Notes
     </span>
   </a>
   
@@ -577,74 +699,6 @@
   
 </nav>
       
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
-    
-    
-    
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
-        
-          
-          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    Models
-    
-  </span>
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_6">
-            <span class="md-nav__icon md-icon"></span>
-            Models
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../position-encoding/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    Position Encoding
-    
-  </span>
-  
-
-      </a>
     </li>
   
 
@@ -707,9 +761,63 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#pre-training-objective-of-llms" class="md-nav__link">
+  <a href="#rope" class="md-nav__link">
     <span class="md-ellipsis">
-      Pre-Training Objective of LLMs
+      RoPE
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#m-rope" class="md-nav__link">
+    <span class="md-ellipsis">
+      M-RoPE
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tm-rope" class="md-nav__link">
+    <span class="md-ellipsis">
+      TM-RoPE
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#a-unified-view" class="md-nav__link">
+    <span class="md-ellipsis">
+      A Unified View
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#comparison" class="md-nav__link">
+    <span class="md-ellipsis">
+      Comparison
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#practical-interpretation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Practical Interpretation
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#notes" class="md-nav__link">
+    <span class="md-ellipsis">
+      Notes
     </span>
   </a>
   
@@ -731,24 +839,182 @@
 
 
 
-<h1 id="training-objective">Training Objective</h1>
-<p>This page records the basic autoregressive objective used in pre-training large language models. It sits somewhat outside serving and systems runtime behavior, but it remains useful background because many inference-time quantities are defined with respect to the same token-level factorization. Terms such as logits, token probabilities, next-token prediction, and sampling all inherit their meaning from the autoregressive objective.</p>
-<h2 id="pre-training-objective-of-llms">Pre-Training Objective of LLMs</h2>
-<p>A large language model trained from scratch is optimized using maximum likelihood estimation (MLE) over a large text corpus.</p>
-<p>The core problem is to train one model that assigns high probability to realistic continuations of text. The standard autoregressive objective solves this by reducing language modeling to repeated next-token prediction over large corpora.</p>
-<p>Given a sequence of tokens <span class="arithmatex">\((t_1, t_2, \ldots, t_n)\)</span> sampled from the data distribution <span class="arithmatex">\(p_\text{data}\)</span>, the model defines an autoregressive factorization:</p>
+<h1 id="position-encoding">Position Encoding</h1>
+<p>Position encoding becomes more interesting once the model is no longer reading only text. In a pure language model, position is a one-dimensional notion: each token has a place in a sequence. In a vision-language or omni model, that assumption breaks down. Image tokens live on a 2D grid, video tokens live on a spatiotemporal grid, and audio tokens carry their own notion of time. The design question is no longer only how to encode order, but how to encode structure.</p>
+<p>This page organizes three related ideas in that progression:</p>
+<ul>
+<li><strong>RoPE</strong> for one-dimensional token sequences</li>
+<li><strong>M-RoPE</strong> for multimodal or spatiotemporal coordinates</li>
+<li><strong>TM-RoPE</strong> for tighter time alignment across modalities, especially audio and video</li>
+</ul>
+<p>The formalism below keeps the essential equations, but the emphasis is on what each method is trying to preserve.</p>
+<h2 id="rope">RoPE</h2>
+<p>Rotary Position Embedding encodes position by rotating the query and key vectors in paired two-dimensional subspaces. Let</p>
 <div class="arithmatex">\[
-p_\theta(t_1, t_2, \ldots, t_n) = \prod_{i=1}^n p_\theta(t_i | t_1, t_2, \ldots, t_{i-1})
+x \in \mathbb{R}^d
 \]</div>
-<p>The training objective is to maximize the log-likelihood of the data, which is equivalent to minimizing the negative log-likelihood (NLL):</p>
+<p>and split its dimensions into pairs:</p>
 <div class="arithmatex">\[
-\mathcal{L}(\theta) = - \mathbb{E}_{(t_1, t_2, \ldots, t_i) \sim p_\text{data}} \left[ \log p_\theta(t_i | t_1, t_2, \ldots, t_{i-1}) \right]
+x = (x_0, x_1, x_2, x_3, \ldots).
 \]</div>
-<p>In practice, this loss is implemented as token-level cross-entropy with one-hot targets:</p>
+<p>For position <span class="arithmatex">\(p\)</span>, the <span class="arithmatex">\(i\)</span>-th two-dimensional block is rotated by an angle</p>
 <div class="arithmatex">\[
-\mathcal{L} = -\frac{1}{N} \sum_{\text{tokens}} \log p_\theta(t_i | t_1, t_2, \ldots, t_{i-1})
+\theta_i(p) = p \, \omega_i,
 \]</div>
-<p>This objective corresponds to minimizing the cross-entropy between the empirical data distribution and the model distribution, or equivalently, minimizing <span class="arithmatex">\(KL(p_\text{data} || p_\theta)\)</span>.</p>
+<p>where <span class="arithmatex">\(\omega_i\)</span> is the frequency assigned to that block. The rotated block is</p>
+<div class="arithmatex">\[
+\begin{pmatrix}
+x'_{2i} \\
+x'_{2i+1}
+\end{pmatrix}
+=
+\begin{pmatrix}
+\cos \theta_i(p) &amp; -\sin \theta_i(p) \\
+\sin \theta_i(p) &amp; \cos \theta_i(p)
+\end{pmatrix}
+\begin{pmatrix}
+x_{2i} \\
+x_{2i+1}
+\end{pmatrix}.
+\]</div>
+<p>The standard frequency schedule is geometric:</p>
+<div class="arithmatex">\[
+\omega_i = 10000^{-2i/d}.
+\]</div>
+<p>The appeal of RoPE is that it makes attention depend naturally on <strong>relative position</strong>. If <span class="arithmatex">\(q\)</span> and <span class="arithmatex">\(k\)</span> are rotated at positions <span class="arithmatex">\(p\)</span> and <span class="arithmatex">\(p'\)</span>, then their dot product depends on <span class="arithmatex">\(p-p'\)</span> rather than only on the two absolute indices. This is why RoPE is more than an additive absolute position vector: it changes the geometry of the query-key interaction itself.</p>
+<p>For text, this is a very natural fit. Tokens form a one-dimensional sequence, and the model mainly needs to know which token is earlier or later and by how much. The limitation appears when the input is no longer intrinsically 1D.</p>
+<h2 id="m-rope">M-RoPE</h2>
+<p>In multimodal models such as Qwen2.5-VL, one token may correspond not only to a sequence index, but also to a location on a visual grid or to a frame in a video. A patch token is better described by coordinates such as</p>
+<div class="arithmatex">\[
+(t, h, w),
+\]</div>
+<p>where <span class="arithmatex">\(t\)</span> is time, <span class="arithmatex">\(h\)</span> is height, and <span class="arithmatex">\(w\)</span> is width. M-RoPE extends RoPE to that setting.</p>
+<p>One useful abstract way to view M-RoPE is to split the hidden dimensions into subspaces assigned to different axes:</p>
+<div class="arithmatex">\[
+d = d_t + d_h + d_w.
+\]</div>
+<p>Then the model applies separate rotary encodings to different slices of the hidden state:</p>
+<div class="arithmatex">\[
+\mathrm{M\mbox{-}RoPE}(x; t,h,w)
+=
+\big[
+\mathrm{RoPE}_t(x_t; t),
+\mathrm{RoPE}_h(x_h; h),
+\mathrm{RoPE}_w(x_w; w)
+\big].
+\]</div>
+<p>This expression should be read as a conceptual decomposition rather than the exact implementation detail of every model. The key idea is that different coordinate axes receive different rotary phases, so the attention score can depend on</p>
+<div class="arithmatex">\[
+(t-t', h-h', w-w').
+\]</div>
+<p>That is the modeling jump from RoPE to M-RoPE: the position signal is no longer a scalar, but a structured coordinate.</p>
+<p>In the Qwen2.5-VL family, the official documentation describes MRoPE together with dynamic resolution for images, dynamic FPS sampling for video, and absolute-time handling for temporal positions. In practical terms, this means the model does not treat a video as only a flat sequence of patches. It keeps track of temporal and spatial layout explicitly, and the temporal identifiers can be aligned to real sampling intervals rather than only frame count. This is one of the reasons Qwen2.5-VL behaves much more like a video model than a text model with images appended to it.</p>
+<p>The main limitation of the split-subspace view is that the available frequency spectrum is also split. If each axis gets only part of the hidden dimensions, then each axis also gets only part of the usable frequencies. For short images this is usually acceptable. For long videos, especially when temporal understanding matters more than static spatial detail, this can become a real modeling constraint.</p>
+<h2 id="tm-rope">TM-RoPE</h2>
+<p>TM-RoPE is best understood as the next step after M-RoPE, motivated by omni settings in which the model must reason jointly over video and audio. At that point, time is no longer just one coordinate among several. It becomes the axis along which different modalities must be synchronized.</p>
+<p>The Qwen2.5-Omni project describes <strong>TMRoPE</strong> as a mechanism introduced to synchronize video and audio timestamps when the two modalities are interleaved in one sequence. That description is important because it tells us what problem TM-RoPE is solving: not merely "more dimensions," but <strong>cross-modal temporal alignment</strong>. In other words, an audio token and a video token that originate from the same physical time should remain close in the temporal position space even if their tokenization patterns are very different.</p>
+<p>At an abstract level, TM-RoPE can be viewed as moving away from a strictly partitioned encoding of</p>
+<div class="arithmatex">\[
+(t,h,w)
+\]</div>
+<p>and toward a denser, shared phase construction. A convenient conceptual form is</p>
+<div class="arithmatex">\[
+\theta_i(t,h,w)
+=
+\alpha_i t + \beta_i h + \gamma_i w,
+\]</div>
+<p>where <span class="arithmatex">\(\alpha_i\)</span>, <span class="arithmatex">\(\beta_i\)</span>, and <span class="arithmatex">\(\gamma_i\)</span> distribute each frequency block across multiple axes rather than assigning that block to only one axis. The corresponding rotation becomes</p>
+<div class="arithmatex">\[
+R\big(\theta_i(t,h,w)\big),
+\]</div>
+<p>applied to the <span class="arithmatex">\(i\)</span>-th two-dimensional block.</p>
+<p>This formula should again be read as a conceptual summary rather than as a claim that every implementation literally uses this exact parameterization. The point is the change in modeling assumption:</p>
+<ul>
+<li>in <strong>M-RoPE</strong>, different coordinate axes are largely encoded in different subspaces</li>
+<li>in <strong>TM-RoPE</strong>, temporal and spatial coordinates can contribute jointly to the same rotary phase</li>
+</ul>
+<p>That shift matters for two reasons. First, the temporal dimension is no longer restricted to a small, dedicated slice of the spectrum. Second, time alignment across modalities becomes easier to express, because audio and video can be mapped into a shared temporal reference instead of only being assigned separate local position ids.</p>
+<h2 id="a-unified-view">A Unified View</h2>
+<p>All three methods can be placed in one common template:</p>
+<div class="arithmatex">\[
+\theta_i = \sum_k \lambda_{i,k} \, p_k,
+\]</div>
+<p>where <span class="arithmatex">\(p_k\)</span> are position components and <span class="arithmatex">\(\lambda_{i,k}\)</span> determine how each frequency block uses them.</p>
+<p>For standard RoPE, there is only one position component:</p>
+<div class="arithmatex">\[
+\theta_i = \omega_i p.
+\]</div>
+<p>For a split-axis view of M-RoPE, each block primarily serves one coordinate:</p>
+<div class="arithmatex">\[
+\theta_i =
+\begin{cases}
+\omega_i t, &amp; i \in \mathcal{I}_t \\
+\omega_i h, &amp; i \in \mathcal{I}_h \\
+\omega_i w, &amp; i \in \mathcal{I}_w
+\end{cases}
+\]</div>
+<p>For a coupled view such as TM-RoPE, one frequency block can mix several coordinates:</p>
+<div class="arithmatex">\[
+\theta_i = \lambda_{i,t} t + \lambda_{i,h} h + \lambda_{i,w} w.
+\]</div>
+<p>This is the cleanest way to compare them:</p>
+<ul>
+<li><strong>RoPE</strong>: one-dimensional phase encoding</li>
+<li><strong>M-RoPE</strong>: multi-dimensional phase encoding by axis decomposition</li>
+<li><strong>TM-RoPE</strong>: multi-dimensional phase encoding with stronger cross-axis and cross-modal coupling</li>
+</ul>
+<h2 id="comparison">Comparison</h2>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Position space</th>
+<th>Frequency use</th>
+<th>Relative structure preserved</th>
+<th>Best mental model</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>RoPE</td>
+<td>1D sequence index</td>
+<td>Full spectrum for one axis</td>
+<td>Relative token order</td>
+<td>Sequence rotation</td>
+</tr>
+<tr>
+<td>M-RoPE</td>
+<td>Multi-axis coordinates such as <span class="arithmatex">\((t,h,w)\)</span></td>
+<td>Spectrum partitioned across axes</td>
+<td>Relative time and space</td>
+<td>Axis-wise rotary extension</td>
+</tr>
+<tr>
+<td>TM-RoPE</td>
+<td>Multi-axis and cross-modal time-aligned coordinates</td>
+<td>More shared or coupled use of spectrum</td>
+<td>Relative time, space, and cross-modal temporal alignment</td>
+<td>Unified spatiotemporal phase encoding</td>
+</tr>
+</tbody>
+</table>
+<h2 id="practical-interpretation">Practical Interpretation</h2>
+<p>RoPE is enough when the model only needs to know where a token sits in a text sequence. M-RoPE becomes necessary once the model sees images and videos as genuine structured inputs rather than as flattened lists of tokens. TM-RoPE becomes attractive when the system must align modalities that evolve on the same physical timeline, especially audio and video.</p>
+<p>From that perspective, the progression is not merely a story of "better position encoding." It is a story of how the notion of position itself changes:</p>
+<ul>
+<li>from order in a sequence,</li>
+<li>to coordinates in space-time,</li>
+<li>to synchronized coordinates shared across modalities.</li>
+</ul>
+<h2 id="notes">Notes</h2>
+<ul>
+<li>The RoPE equations above are standard.</li>
+<li>The M-RoPE and TM-RoPE formulas in this page are <strong>conceptual abstractions</strong> used to explain the design space. Official Qwen documentation describes the role of MRoPE and TMRoPE clearly, but does not always expose a single canonical closed-form equation for every implementation detail.</li>
+<li>For Qwen-specific references, the most relevant public sources are:</li>
+<li><a href="https://huggingface.co/docs/transformers/en/model_doc/qwen2_5_vl">Qwen2.5-VL documentation</a></li>
+<li><a href="https://qwenlm.github.io/blog/qwen2.5-vl/">Qwen2.5-VL blog</a></li>
+<li><a href="https://github.com/QwenLM/Qwen2.5-Omni">Qwen2.5-Omni repository</a></li>
+</ul>
 
 
 

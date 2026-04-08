@@ -15,8 +15,9 @@ A focused knowledge base for modern deep learning systems, from hardware fundame
 8. [Parallelism](llms/parallelism.md) - DP and TP from the perspective of memory, throughput, and communication
 9. [Decoding and Sampling](llms/decoding.md) - sampling policies and speculative decoding
 10. [Training Objective](llms/training-objective.md) - autoregressive pre-training objective
-11. [Models](llms/models.md) - model-specific notes (Qwen3-Omni, DFlash) and practical serving commands
-12. [Neural Graphics](neural-graphics.md) - NeRF and Flow Matching foundations
+11. [Position Encoding](llms/position-encoding.md) - RoPE, M-RoPE, and TM-RoPE from sequence to multimodal space-time
+12. [Models](llms/models.md) - model-specific notes (Qwen3-Omni, DFlash) and practical serving commands
+13. [Neural Graphics](neural-graphics.md) - NeRF and Flow Matching foundations
 
 ## Documentation Map
 
@@ -38,6 +39,7 @@ A focused knowledge base for modern deep learning systems, from hardware fundame
 
 ### Models
 
+- [Position Encoding](llms/position-encoding.md)
 - [Models](llms/models.md)
 
 ### Graphics and Generative Modeling

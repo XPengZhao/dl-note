@@ -31,6 +31,8 @@ plugins:
             Decoding: 解码与采样
             Training Objective: 训练目标
             Models: 模型
+            Position Encoding: 位置编码
+            Model Notes: 模型笔记
 nav:
   - Home: index.md
   - Hardware: hardware.md
@@ -45,7 +47,9 @@ nav:
       - Parallelism: llms/parallelism.md
       - Decoding: llms/decoding.md
       - Training Objective: llms/training-objective.md
-  - Models: llms/models.md
+  - Models:
+      - Position Encoding: llms/position-encoding.md
+      - Model Notes: llms/models.md
 markdown_extensions:
   - pymdownx.highlight:
       anchor_linenums: true
