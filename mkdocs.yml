@@ -1,4 +1,5 @@
 site_name: DL Notes
+site_url: https://XPengZhao.github.io/dl-note/
 theme:
   name: material
 plugins:
