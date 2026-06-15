@@ -36,6 +36,13 @@
         <xhtml:link rel="alternate" hreflang="zh" href="https://XPengZhao.github.io/dl-note/zh/tensor/"/>
     </url>
     <url>
+        <loc>https://XPengZhao.github.io/dl-note/llms/data-movement/</loc>
+        <lastmod>2026-06-15</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://XPengZhao.github.io/dl-note/llms/data-movement/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://XPengZhao.github.io/dl-note/zh/llms/data-movement/"/>
+    </url>
+    <url>
         <loc>https://XPengZhao.github.io/dl-note/llms/decoding/</loc>
         <lastmod>2026-06-15</lastmod>
         <changefreq>daily</changefreq>
@@ -92,6 +99,13 @@
         <xhtml:link rel="alternate" hreflang="zh" href="https://XPengZhao.github.io/dl-note/zh/llms/request-lifecycle/"/>
     </url>
     <url>
+        <loc>https://XPengZhao.github.io/dl-note/llms/roofline/</loc>
+        <lastmod>2026-06-15</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://XPengZhao.github.io/dl-note/llms/roofline/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://XPengZhao.github.io/dl-note/zh/llms/roofline/"/>
+    </url>
+    <url>
         <loc>https://XPengZhao.github.io/dl-note/llms/serving-runtime/</loc>
         <lastmod>2026-06-15</lastmod>
         <changefreq>daily</changefreq>
@@ -139,6 +153,13 @@
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh" href="https://XPengZhao.github.io/dl-note/zh/tensor/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://XPengZhao.github.io/dl-note/tensor/"/>
+    </url>
+    <url>
+        <loc>https://XPengZhao.github.io/dl-note/zh/llms/data-movement/</loc>
+        <lastmod>2026-06-15</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://XPengZhao.github.io/dl-note/zh/llms/data-movement/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://XPengZhao.github.io/dl-note/llms/data-movement/"/>
     </url>
     <url>
         <loc>https://XPengZhao.github.io/dl-note/zh/llms/decoding/</loc>
@@ -195,6 +216,13 @@
         <changefreq>daily</changefreq>
         <xhtml:link rel="alternate" hreflang="zh" href="https://XPengZhao.github.io/dl-note/zh/llms/request-lifecycle/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://XPengZhao.github.io/dl-note/llms/request-lifecycle/"/>
+    </url>
+    <url>
+        <loc>https://XPengZhao.github.io/dl-note/zh/llms/roofline/</loc>
+        <lastmod>2026-06-15</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://XPengZhao.github.io/dl-note/zh/llms/roofline/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://XPengZhao.github.io/dl-note/llms/roofline/"/>
     </url>
     <url>
         <loc>https://XPengZhao.github.io/dl-note/zh/llms/serving-runtime/</loc>

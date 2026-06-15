@@ -25,6 +25,8 @@ plugins:
             Overview: 总览
             Request Lifecycle: 请求生命周期
             Metrics: 指标
+            Roofline Model: Roofline 模型
+            Data Movement and Communication: 数据搬运与通信
             KV Cache: KV Cache
             Serving Runtime: 推理运行时
             Parallelism: 并行策略
@@ -42,6 +44,8 @@ nav:
       - Overview: llms/overview.md
       - Request Lifecycle: llms/request-lifecycle.md
       - Metrics: llms/metrics.md
+      - Roofline Model: llms/roofline.md
+      - Data Movement and Communication: llms/data-movement.md
       - KV Cache: llms/kv-cache.md
       - Serving Runtime: llms/serving-runtime.md
       - Parallelism: llms/parallelism.md

@@ -8,13 +8,13 @@
       
       
       
-        <link rel="canonical" href="https://XPengZhao.github.io/dl-note/zh/llms/overview/">
+        <link rel="canonical" href="https://XPengZhao.github.io/dl-note/zh/llms/roofline/">
       
       
-        <link rel="prev" href="../../neural-graphics/">
+        <link rel="prev" href="../metrics/">
       
       
-        <link rel="next" href="../request-lifecycle/">
+        <link rel="next" href="../data-movement/">
       
       
       <link rel="icon" href="../../../assets/images/favicon.png">
@@ -22,7 +22,7 @@
     
     
       
-        <title>总览 - DL Notes</title>
+        <title>Roofline 模型 - DL Notes</title>
       
     
     
@@ -68,7 +68,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#ai-infra" class="md-skip">
+        <a href="#roofline-model" class="md-skip">
           跳转至
         </a>
       
@@ -104,7 +104,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              总览
+              Roofline 模型
             
           </span>
         </div>
@@ -125,7 +125,7 @@
       <ul class="md-select__list">
         
           <li class="md-select__item">
-            <a href="../../../llms/overview/" hreflang="en" class="md-select__link">
+            <a href="../../../llms/roofline/" hreflang="en" class="md-select__link">
               English
             </a>
           </li>
@@ -351,32 +351,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    总览
-    
-  </span>
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../overview/" class="md-nav__link">
         
   
   
@@ -387,158 +365,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="目录">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      目录
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#_1" class="md-nav__link">
-    <span class="md-ellipsis">
-      为什么需要总览
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#_2" class="md-nav__link">
-    <span class="md-ellipsis">
-      两条轴线：控制面与数据面
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#_3" class="md-nav__link">
-    <span class="md-ellipsis">
-      推理系统的分层视图
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="推理系统的分层视图">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#1" class="md-nav__link">
-    <span class="md-ellipsis">
-      1. 应用层
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#2-agent" class="md-nav__link">
-    <span class="md-ellipsis">
-      2. Agent 与编排层
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#3" class="md-nav__link">
-    <span class="md-ellipsis">
-      3. 网关与路由层
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#4-serving-engine" class="md-nav__link">
-    <span class="md-ellipsis">
-      4. Serving Engine 层
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#5" class="md-nav__link">
-    <span class="md-ellipsis">
-      5. 运行时与调度层
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#6" class="md-nav__link">
-    <span class="md-ellipsis">
-      6. 模型执行层
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#7-kernel" class="md-nav__link">
-    <span class="md-ellipsis">
-      7. 算子与 Kernel 层
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#8" class="md-nav__link">
-    <span class="md-ellipsis">
-      8. 系统运行时与硬件层
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#vllm-sglang" class="md-nav__link">
-    <span class="md-ellipsis">
-      vLLM 和 SGLang 在哪里
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#_4" class="md-nav__link">
-    <span class="md-ellipsis">
-      一次请求是怎样穿过整个栈的
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#_5" class="md-nav__link">
-    <span class="md-ellipsis">
-      在本笔记中的阅读路径
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -594,10 +420,32 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../roofline/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    Roofline 模型
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -608,6 +456,197 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#roofline" class="md-nav__link">
+    <span class="md-ellipsis">
+      为什么 Roofline 重要
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      基本模型
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="基本模型">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#memory-bound" class="md-nav__link">
+    <span class="md-ellipsis">
+      Memory-Bound 区间
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#compute-bound" class="md-nav__link">
+    <span class="md-ellipsis">
+      Compute-Bound 区间
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#arithmetic-intensity" class="md-nav__link">
+    <span class="md-ellipsis">
+      Arithmetic Intensity
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#roofline_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      把 Roofline 映射到推理
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="把 Roofline 映射到推理">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#prefill" class="md-nav__link">
+    <span class="md-ellipsis">
+      Prefill
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#decode" class="md-nav__link">
+    <span class="md-ellipsis">
+      Decode
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#roofline_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      Roofline 能解释什么，不能解释什么
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#roofline_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      用 Roofline 理解常见推理优化
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="用 Roofline 理解常见推理优化">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#kv-cache" class="md-nav__link">
+    <span class="md-ellipsis">
+      KV Cache 与内存流量
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#batching" class="md-nav__link">
+    <span class="md-ellipsis">
+      Batching 与更宽的执行形状
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#quantization" class="md-nav__link">
+    <span class="md-ellipsis">
+      Quantization
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#speculative-decoding" class="md-nav__link">
+    <span class="md-ellipsis">
+      Speculative Decoding
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#roofline_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      超出单设备 Roofline 的部分
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      实际分析时该问什么
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      相关页面
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -876,100 +915,37 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#roofline" class="md-nav__link">
+    <span class="md-ellipsis">
+      为什么 Roofline 重要
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      为什么需要总览
+      基本模型
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#_2" class="md-nav__link">
-    <span class="md-ellipsis">
-      两条轴线：控制面与数据面
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#_3" class="md-nav__link">
-    <span class="md-ellipsis">
-      推理系统的分层视图
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="推理系统的分层视图">
+    <nav class="md-nav" aria-label="基本模型">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#1" class="md-nav__link">
+  <a href="#memory-bound" class="md-nav__link">
     <span class="md-ellipsis">
-      1. 应用层
+      Memory-Bound 区间
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#2-agent" class="md-nav__link">
+  <a href="#compute-bound" class="md-nav__link">
     <span class="md-ellipsis">
-      2. Agent 与编排层
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#3" class="md-nav__link">
-    <span class="md-ellipsis">
-      3. 网关与路由层
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#4-serving-engine" class="md-nav__link">
-    <span class="md-ellipsis">
-      4. Serving Engine 层
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#5" class="md-nav__link">
-    <span class="md-ellipsis">
-      5. 运行时与调度层
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#6" class="md-nav__link">
-    <span class="md-ellipsis">
-      6. 模型执行层
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#7-kernel" class="md-nav__link">
-    <span class="md-ellipsis">
-      7. 算子与 Kernel 层
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#8" class="md-nav__link">
-    <span class="md-ellipsis">
-      8. 系统运行时与硬件层
+      Compute-Bound 区间
     </span>
   </a>
   
@@ -981,27 +957,129 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#vllm-sglang" class="md-nav__link">
+  <a href="#arithmetic-intensity" class="md-nav__link">
     <span class="md-ellipsis">
-      vLLM 和 SGLang 在哪里
+      Arithmetic Intensity
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#_4" class="md-nav__link">
+  <a href="#roofline_1" class="md-nav__link">
     <span class="md-ellipsis">
-      一次请求是怎样穿过整个栈的
+      把 Roofline 映射到推理
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="把 Roofline 映射到推理">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#prefill" class="md-nav__link">
+    <span class="md-ellipsis">
+      Prefill
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#decode" class="md-nav__link">
+    <span class="md-ellipsis">
+      Decode
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#roofline_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      Roofline 能解释什么，不能解释什么
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#_5" class="md-nav__link">
+  <a href="#roofline_3" class="md-nav__link">
     <span class="md-ellipsis">
-      在本笔记中的阅读路径
+      用 Roofline 理解常见推理优化
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="用 Roofline 理解常见推理优化">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#kv-cache" class="md-nav__link">
+    <span class="md-ellipsis">
+      KV Cache 与内存流量
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#batching" class="md-nav__link">
+    <span class="md-ellipsis">
+      Batching 与更宽的执行形状
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#quantization" class="md-nav__link">
+    <span class="md-ellipsis">
+      Quantization
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#speculative-decoding" class="md-nav__link">
+    <span class="md-ellipsis">
+      Speculative Decoding
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#roofline_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      超出单设备 Roofline 的部分
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      实际分析时该问什么
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      相关页面
     </span>
   </a>
   
@@ -1023,100 +1101,138 @@
 
 
 
-<h1 id="ai-infra">AI Infra 总览</h1>
-<p>现代推理系统是一个完整的技术栈，而不是某一个单独框架。当人们说“我们在用 vLLM”或者“我们在用 SGLang”时，通常只是在指这个大系统中的一层。真实部署里还包括应用逻辑、agent 编排、请求路由、调度策略、模型执行、算子库，以及底层的运行时和硬件支持。如果没有一个全栈视角，就很容易把瓶颈归错层，或者误判到底该由哪一层来解决问题。</p>
-<h2 id="_1">为什么需要总览</h2>
-<p>很多 AI Infra 问题表面上看起来相似，但本质上属于不同层。</p>
+<h1 id="roofline-model">推理系统中的 Roofline Model</h1>
+<p>延迟和吞吐指标告诉我们用户最终看到了什么，但它们本身并不能解释为什么某个 serving 配置在继续调优后还是提不上去。一个系统可能表现为 TPOT 很高、TPS 很低，或者 batch 变大后扩展性依然很差，但这些现象背后仍然有一个核心问题没有被回答：当前 workload 主要受限于算力，还是受限于数据搬运？<code>Roofline model</code> 正是用来回答这个问题的一种紧凑方法。</p>
+<p>在推理场景里，这一点尤其重要，因为不同阶段对硬件的施压方式并不相同。Prefill 和 decode 可以运行在同一个模型、同一张 GPU 上，却落在完全不同的性能区间里。很多实际优化，包括 batching、KV 压缩、量化和 speculative decoding，本质上都可以理解为试图把 workload 从一个更低的 ceiling 推向一个更高的 ceiling。</p>
+<h2 id="roofline">为什么 Roofline 重要</h2>
+<p>当人们说某个推理优化“提升了利用率”时，这句话往往还不够完整。利用率提高，可能来自完全不同的原因：</p>
 <ul>
-<li>如果一个 agent workflow 很慢，瓶颈可能在 prompt 组装、工具调用延迟，或者请求 fan-out，而不一定在 serving engine 本身。</li>
-<li>如果吞吐低，问题可能在上层路由或 batching 策略，而不一定在 kernel。</li>
-<li>如果某个 engine 出现 preemption 或延迟抖动，根因可能是 KV 压力、准入控制或部署拓扑，而不一定是模型本身。</li>
+<li>同样的数据搬运量上做了更多计算</li>
+<li>为得到同样的数学结果，搬运的数据更少了</li>
+<li>固定运行时开销被更宽的一步摊薄了</li>
+<li>原来的主瓶颈被解除，系统转而受另一个 ceiling 限制</li>
 </ul>
-<p>总览的价值就在于先把这些层次拆开，再去讨论具体机制。</p>
-<h2 id="_2">两条轴线：控制面与数据面</h2>
-<p>理解这个系统，一个很有用的方法是先区分控制面和数据面。</p>
+<p><code>Roofline model</code> 的价值，就在于它为这些情况提供了一套共同语言。它不会替代 request-level 分析、scheduler 分析或通信分析，但它提供了一个从硬件第一性原理出发的设备侧性能上界视角。</p>
+<h2 id="_1">基本模型</h2>
+<p>经典 roofline model 把可达到性能与两个硬件上限联系起来：</p>
 <ul>
-<li><strong>控制面（control plane）</strong> 决定什么应该运行、在哪里运行、按什么策略运行。它包括路由、配额、自动扩缩容、准入控制、模型选择，以及 agent 级编排。</li>
-<li><strong>数据面（data plane）</strong> 负责真正执行请求。它包括 prompt 预处理、serving engine 内部调度、模型前向、kernel 执行、内存移动，以及硬件上的实际运行。</li>
+<li>峰值计算吞吐</li>
+<li>峰值内存带宽</li>
 </ul>
-<p>真实系统往往横跨这两条轴线。比如上层路由是控制面决策，但它会直接影响数据面的 cache 局部性和 batch 形成方式。</p>
-<h2 id="_3">推理系统的分层视图</h2>
-<p>下面这张图是一个比较实用的分层方式：</p>
-<div class="mermaid">flowchart TD
-    A["应用层&lt;br/&gt;Chat app, API 产品, workflow service"] --&gt; B["Agent / 编排层&lt;br/&gt;工具调用, prompt assembly, 多步计划"]
-    B --&gt; C["网关 / 路由层&lt;br/&gt;负载均衡, 模型选择, sticky routing, 配额"]
-    C --&gt; D["Serving Engine 层&lt;br/&gt;vLLM, SGLang, TGI, TensorRT-LLM server"]
-    D --&gt; E["运行时 / 调度层&lt;br/&gt;Continuous batching, KV manager, admission control, prefill/decode scheduling"]
-    E --&gt; F["模型执行层&lt;br/&gt;Transformer blocks, attention, MLP, MoE, sampling"]
-    F --&gt; G["算子 / Kernel 层&lt;br/&gt;Paged attention, GEMM, all-reduce, fused ops, Triton/CUDA kernels"]
-    G --&gt; H["系统运行时 / 硬件层&lt;br/&gt;CUDA, NCCL, GPU memory, NVLink/PCIe, HBM, SMs"]</div>
-<h3 id="1">1. 应用层</h3>
-<p>这一层是最终用户直接接触到的产品形态，例如聊天系统、搜索系统、编码助手、文档处理流水线或企业 workflow。它决定什么用户行为会触发模型调用，以及系统真正关心的业务约束是什么，比如延迟目标、会话连续性或成本上限。</p>
-<h3 id="2-agent">2. Agent 与编排层</h3>
-<p>这一层负责把业务需求组织成真正的模型负载。它可能包括 prompt 组装、检索增强、工具调用、多轮记忆、分支推理或任务拆解。各种 agent framework 都属于这一层。它的主要作用不是底层执行效率，而是 workload shaping，也就是决定请求有多大、请求有多频繁，以及请求之间是否存在结构上的相似性。</p>
-<h3 id="3">3. 网关与路由层</h3>
-<p>这一层负责决定每个请求被送往哪个后端。它包括外部负载均衡、模型选择、sticky routing、流量隔离和多副本流量策略。对长上下文 serving 来说，这一层比看起来更重要，因为路由决策会直接影响 prefix cache 局部性、batch 形成方式，以及不同副本之间的公平性。</p>
-<h3 id="4-serving-engine">4. Serving Engine 层</h3>
-<p>这一层通常就是 <strong>vLLM</strong>、<strong>SGLang</strong> 这类框架所在的位置。它们提供 engine 抽象，对上接受 tokenized 或结构化请求，对外暴露 generation API。它们并不是整个系统本身，而是处在上层流量管理和下层模型执行之间的核心 serving substrate。</p>
-<p>这一层常见职责包括：</p>
+<p>记：</p>
 <ul>
-<li>请求准入与生命周期管理</li>
-<li>batching 与 streaming 接口</li>
-<li>KV cache 管理与 paging</li>
-<li>decode loop 编排</li>
-<li>与分布式执行的集成</li>
+<li><span class="arithmatex">\(P\)</span> 为实际达到的性能，单位可写为 FLOPs/s</li>
+<li><span class="arithmatex">\(P_{\max}\)</span> 为峰值计算吞吐</li>
+<li><span class="arithmatex">\(B_{\max}\)</span> 为峰值内存带宽，单位为 bytes/s</li>
+<li><span class="arithmatex">\(I\)</span> 为 arithmetic intensity，即每搬运 1 byte 数据对应的 FLOPs</li>
 </ul>
-<h3 id="5">5. 运行时与调度层</h3>
-<p>在一个 serving engine 内部，其实还有更细的一层结构，也就是 runtime。本层负责内部调度。continuous batching、chunked prefill、preemption、block 分配、准入控制和 KV 压力处理都属于这里。</p>
-<p>这一层往往决定了系统的真实性能。即使模型相同、engine 相同，不同 runtime 策略也可能导致完全不同的行为。</p>
-<h3 id="6">6. 模型执行层</h3>
-<p>这一层是模型本身的数学结构：attention blocks、MLP、MoE routing、RoPE、sampling head 和输出 logits。像“这个模型是不是 GQA”“每个 token 的 KV 状态有多大”这种问题，都属于这一层。</p>
-<h3 id="7-kernel">7. 算子与 Kernel 层</h3>
-<p>这一层负责真正的重计算：GEMM、fused kernel、paged attention、all-reduce、reduce-scatter、dispatch/combine，以及各种 Triton 或 CUDA kernel。它是抽象模型计算转化为真实设备工作量的地方。</p>
-<h3 id="8">8. 系统运行时与硬件层</h3>
-<p>最底层是 CUDA、NCCL、GPU 显存系统、NVLink/PCIe 这样的互联，以及硬件本身的执行资源。带宽、显存容量、collective 延迟和 kernel launch 开销，最终都会落到这一层。</p>
-<h2 id="vllm-sglang">vLLM 和 SGLang 在哪里</h2>
-<p>理解 vLLM 和 SGLang，一个比较准确的方式是把它们看成 <strong>带有大量内部 runtime 逻辑的 serving engine</strong>。</p>
+<p>则可达到性能满足：</p>
+<div class="arithmatex">\[
+P \le \min \left(P_{\max},\; I \cdot B_{\max}\right)
+\]</div>
+<p>这个表达式把系统分成两个典型区间。</p>
+<h3 id="memory-bound">Memory-Bound 区间</h3>
+<p>当 arithmetic intensity <span class="arithmatex">\(I\)</span> 较小时，<span class="arithmatex">\(I \cdot B_{\max}\)</span> 会低于峰值算力，此时性能主要受限于数据搬运速度：</p>
+<div class="arithmatex">\[
+P \approx I \cdot B_{\max}
+\]</div>
+<p>在这个区间里，单纯提高理论算力通常帮助不大，除非带宽本身提高了，或者 workload 的 arithmetic intensity 提高了。</p>
+<h3 id="compute-bound">Compute-Bound 区间</h3>
+<p>当 arithmetic intensity 足够高时，由带宽导出的上界会上升到峰值算力之上：</p>
+<div class="arithmatex">\[
+I \cdot B_{\max} \ge P_{\max}
+\]</div>
+<p>这时 workload 更接近计算 roof：</p>
+<div class="arithmatex">\[
+P \approx P_{\max}
+\]</div>
+<p>在这个区间里，性能提升更依赖 kernel 效率、tensor core 利用率和并行执行质量，而不只是减少内存流量。</p>
+<h2 id="arithmetic-intensity">Arithmetic Intensity</h2>
+<p>Arithmetic intensity 是连接 workload 结构与硬件上限的桥梁：</p>
+<div class="arithmatex">\[
+I = \frac{\text{FLOPs}}{\text{Bytes moved}}
+\]</div>
+<p>这里的重点并不是为每一个 kernel 都精确算出一个完美值，而是判断某个 workload 相对于它必须读写的数据量，到底做了多少数学计算。</p>
+<p>Arithmetic intensity 较低的 workload 往往会：</p>
 <ul>
-<li>它们位于应用层、agent 层和外部路由层之下。</li>
-<li>它们位于模型 kernel 和硬件执行之上。</li>
-<li>它们内部自带 scheduler、batching 逻辑、KV manager 和一整套 runtime 策略。</li>
+<li>大量时间耗在等待内存流量上</li>
+<li>难以从更高的峰值 FLOPs 中直接受益</li>
+<li>更依赖减少 bytes moved 或提升数据复用的技术</li>
 </ul>
-<p>所以当有人说“我们在用 vLLM”时，通常意味着：</p>
+<p>Arithmetic intensity 较高的 workload 往往会：</p>
+<ul>
+<li>更容易用好 tensor cores 或 SIMD 单元</li>
+<li>更直接地受益于更强的 kernel 和更多可用算力</li>
+<li>在 batch 或 step width 增加时，不那么快出现收益展平</li>
+</ul>
+<h2 id="roofline_1">把 Roofline 映射到推理</h2>
+<p>Roofline 在 AI Infra 里的价值，不在于那张抽象图本身，而在于它解释了为什么不同推理阶段会有完全不同的性能表现。</p>
+<h3 id="prefill">Prefill</h3>
+<p>Prefill 会成批处理整个 prompt。序列长度更大，矩阵形状更宽，硬件在单次执行中通常也能拿到更多并行工作。因此，prefill 往往比 decode 更接近 compute-bound 一侧，尤其是在 prompt 较长或 batch 较大时。</p>
+<p>这并不意味着 prefill 总是 compute-bound。小 batch、多模态预处理开销，或分布式通信压力都可能让其它 ceiling 更早成为主导。更稳妥的说法是：prefill 通常比 decode 更有利于计算单元被充分利用。</p>
+<h3 id="decode">Decode</h3>
+<p>Decode 每次只执行一步自回归迭代。每一步都很窄、对延迟敏感，而且会反复访问之前所有 token 积累下来的 KV 状态。因此在实际 serving 中，decode 更容易落入 memory-bound 或 overhead-dominated 区间。</p>
+<p>这也是在线推理常常让人感觉反直觉的原因：数学上更“小”的阶段，反而可能成为系统级主瓶颈。每个 decode step 的总计算量虽然比 prefill 小得多，但由于工作过窄、串行性太强，设备往往并没有被真正喂饱。</p>
+<h2 id="roofline_2">Roofline 能解释什么，不能解释什么</h2>
+<p>Roofline 很有用，但它并不是完整的 serving 模型。</p>
+<p>它比较擅长解释：</p>
+<ul>
+<li>一个设备侧 workload 主要是受算力约束还是受内存流量约束</li>
+<li>为什么更宽的 batch shape 往往能带来更好的性能</li>
+<li>为什么有些优化在 decode 中更有效，而在 prefill 中不明显</li>
+<li>为什么减少 bytes moved 有时和减少 FLOPs 一样重要</li>
+</ul>
+<p>它不能完整解释：</p>
+<ul>
+<li>request queueing 和 scheduler delay</li>
+<li>多副本之间 prefix routing 碎片化</li>
+<li>kernel 视角之外的 host-device synchronization 开销</li>
+<li>分布式执行中的跨 GPU 通信 ceiling</li>
+<li>应用层 fan-out 和编排开销</li>
+</ul>
+<p>因此，更合理的使用方式是：把 roofline 当作更大 request lifecycle 里的一个局部性能模型，而不是用它去替代整个 lifecycle 分析。</p>
+<h2 id="roofline_3">用 Roofline 理解常见推理优化</h2>
+<p>一旦有了 roofline 视角，很多优化点就更容易归类了。</p>
+<h3 id="kv-cache">KV Cache 与内存流量</h3>
+<p>Decode 往往需要读取大量缓存下来的 attention 状态，而单步新引入的计算却相对有限，这会把 arithmetic intensity 向下拉。KV 量化、更好的 cache layout，以及更高效的 block 复用之所以重要，正是因为它们可以在已经接近带宽 ceiling 的区间里降低内存压力或提高有效复用。</p>
+<h3 id="batching">Batching 与更宽的执行形状</h3>
+<p>更大的有效 batch 往往能提高利用率，因为 kernel 会更宽，固定开销也更容易被摊薄。从 roofline 角度看，batching 往往会把 workload 推向一个更有利于计算单元发挥的区间，并让实际性能点更接近上方的 envelope。</p>
+<p>这也解释了为什么 batching 的收益最终会递减。一旦 workload 已经接近当前的主 roof，再继续加宽，边际收益就会明显变小。</p>
+<h3 id="quantization">Quantization</h3>
+<p>量化有时被说成是计算优化，有时又被说成是内存优化。在推理场景里，它往往两者都是，但主收益取决于原始瓶颈在哪里。如果 workload 本来就是 memory-bound，那么更小的 activations、weights 或 KV tensors 往往能直接降低带宽压力和容量压力；如果 workload 已经接近 compute roof，那么除非低精度 kernel 也显著提升了实际计算吞吐，否则最终收益可能远小于理论想象。</p>
+<h3 id="speculative-decoding">Speculative Decoding</h3>
+<p>更合适的理解方式，是把 speculative decoding 看成对 target model 工作粒度的一次改变。普通自回归 decode 中，target model 需要执行很多次窄而串行的 step；而 speculative decoding 会把多个候选 token 的验证合并成更宽的一步。</p>
+<p>它可能带来收益，主要有两个相关原因：</p>
+<ul>
+<li>固定开销被更多有效工作摊薄了</li>
+<li>更宽的 verification step 往往比许多孤立的窄 step 更容易让硬件跑得高效</li>
+</ul>
+<p>但这并不意味着 speculative decoding 可以被简化成“提高 arithmetic intensity”这一句话。更准确的说法是：它减少了 target-side 昂贵的串行 decode 次数，并且在基线 decode 路径本来就喂不饱硬件时，可能改善 target-side utilization。当 serving batch 本来就已经很大、target 路径已经接近其有效 roof 时，这种收益就会明显缩小。</p>
+<h2 id="roofline_4">超出单设备 Roofline 的部分</h2>
+<p>经典 roofline model 最自然的适用对象是一台设备或一类 kernel。真实推理系统往往还会撞上更高一层的 ceiling。</p>
+<p>在分布式或 MoE serving 中，实际吞吐不仅可能受 HBM 带宽和单设备算力约束，还可能受以下因素限制：</p>
+<ul>
+<li>all-reduce 或 all-to-all 带宽</li>
+<li>collective start-up latency</li>
+<li>pipeline bubbles</li>
+<li>scheduler 层面的准入和 preemption 行为</li>
+</ul>
+<p>因此，roofline 更适合被介绍成“第一层有用的 ceiling model”，而不是最终模型。它回答的是局部计算究竟更偏 bandwidth-limited 还是 compute-limited；而更广义的系统分析还需要继续判断：通信、runtime policy 或 workload shaping 是否施加了一个更低的 ceiling。</p>
+<h2 id="_2">实际分析时该问什么</h2>
+<p>当一个推理优化声称自己能提速时，用 roofline 视角去读它，最先应该问的是四个问题：</p>
 <ol>
-<li>上层系统仍然负责决定发什么请求</li>
-<li>vLLM 负责请求执行、batching 和内部 runtime 管理</li>
-<li>下层系统仍然决定实际算子效率和硬件利用率</li>
+<li>它减少的是 FLOPs、减少的是 bytes moved，还是主要在摊薄固定开销？</li>
+<li>它改善的是 prefill、decode，还是两者都有？</li>
+<li>当前基线 workload 是 memory-bound、compute-bound，还是被更高层的系统 ceiling 卡住？</li>
+<li>这个优化是解除了当前主瓶颈，还是只是把瓶颈转移到了别处？</li>
 </ol>
-<p>这也是为什么只调 engine 参数从来不是全部答案。即使 engine 本身调得很好，如果上层 workload 形状不好，性能依然可能很差；反过来，上层策略再好，如果 runtime 调度或 kernel 效率不足，也仍然会被卡住。</p>
-<h2 id="_4">一次请求是怎样穿过整个栈的</h2>
-<p>一条在线请求通常会大致按下面的顺序流过整个系统：</p>
-<ol>
-<li>应用层或 agent 层决定需要一次模型调用。</li>
-<li>编排层组装 prompt、检索上下文、工具输出和 decoding policy。</li>
-<li>路由层选择具体的模型端点或副本。</li>
-<li>Serving engine 接收请求，并将其送入内部 scheduler。</li>
-<li>Runtime 分配 KV blocks，对 prefill 或 decode 进行 batching，并决定这个请求何时执行。</li>
-<li>模型执行层运行 transformer 计算。</li>
-<li>算子层发起 kernels 和 collectives。</li>
-<li>硬件/runtime 层执行这些 kernels 并搬运数据。</li>
-<li>生成出的 token 再沿着同一条链路向上返回。</li>
-</ol>
-<p>按照这个顺序思考问题，调试会容易很多。例如：</p>
+<p>这些问题往往比抽象地讨论某个技巧“好不好”更有用。一个 serving 优化只有在真正抬高了当前 workload 所受的活动 ceiling 时，才算在系统里产生了实际价值。</p>
+<h2 id="_3">相关页面</h2>
 <ul>
-<li>TTFT 高，可能来自 prompt 组装、排队，或者 prefill 成本</li>
-<li>TPS 低，可能来自路由碎片化、batching 不充分，或者通信开销</li>
-<li>延迟不稳定，可能来自 scheduler 压力、KV 耗尽，或者上层 fan-out 行为</li>
-</ul>
-<h2 id="_5">在本笔记中的阅读路径</h2>
-<p>在这套 notebook 里，AI Infra 各页可以理解为对这条栈中间部分的逐层拆解：</p>
-<ul>
-<li><a href="../metrics/">指标</a>：系统行为如何被测量</li>
-<li><a href="../kv-cache/">KV Cache</a>：长上下文 serving 的核心内存对象</li>
-<li><a href="../serving-runtime/">推理运行时</a>：单个 engine 如何调度和稳定请求</li>
-<li><a href="../parallelism/">并行策略</a>：执行如何分布到多个设备上</li>
-<li><a href="../decoding/">解码与采样</a>：decode 行为如何被塑造</li>
-<li><a href="../training-objective/">训练目标</a>：推理输出背后的概率学基础</li>
+<li><a href="../metrics/">指标</a> 定义 TTFT、TPOT 和 TPS，它们描述的是用户可见现象。</li>
+<li><a href="../kv-cache/">KV Cache</a> 解释为什么 decode 往往伴随明显的内存压力。</li>
+<li><a href="../serving-runtime/">推理运行时</a> 讨论 roofline 本身无法捕获的调度与准入效应。</li>
+<li><a href="../decoding/">解码与采样</a> 将 speculative decoding 作为改变 decode 工作形状的一个具体例子展开。</li>
 </ul>
 
 

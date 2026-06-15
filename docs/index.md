@@ -10,14 +10,16 @@ A focused knowledge base for modern deep learning systems, from hardware fundame
 3. [AI Infra Overview](llms/overview.md) - the layered structure of an end-to-end inference system
 4. [Inference Request Lifecycle](llms/request-lifecycle.md) - how one request moves through the whole online system
 5. [AI Infra Metrics](llms/metrics.md) - TTFT, TPOT, and TPS
-6. [KV Cache](llms/kv-cache.md) - KV memory semantics, paged blocks, and prefix reuse
-7. [Serving Runtime](llms/serving-runtime.md) - chunked prefill, admission control, and runtime-side stability
-8. [Parallelism](llms/parallelism.md) - DP and TP from the perspective of memory, throughput, and communication
-9. [Decoding and Sampling](llms/decoding.md) - sampling policies and speculative decoding
-10. [Training Objective](llms/training-objective.md) - autoregressive pre-training objective
-11. [Position Encoding](llms/position-encoding.md) - RoPE, M-RoPE, and TM-RoPE from sequence to multimodal space-time
-12. [Models](llms/models.md) - model-specific notes (Qwen3-Omni, DFlash) and practical serving commands
-13. [Neural Graphics](neural-graphics.md) - NeRF and Flow Matching foundations
+6. [Roofline Model for Inference](llms/roofline.md) - compute ceilings, bandwidth ceilings, and how optimizations move bottlenecks
+7. [Data Movement and Communication](llms/data-movement.md) - memory hierarchy, runtime state flow, and cross-device tensor exchange
+8. [KV Cache](llms/kv-cache.md) - KV memory semantics, paged blocks, and prefix reuse
+9. [Serving Runtime](llms/serving-runtime.md) - chunked prefill, admission control, and runtime-side stability
+10. [Parallelism](llms/parallelism.md) - DP and TP from the perspective of memory, throughput, and communication
+11. [Decoding and Sampling](llms/decoding.md) - sampling policies and speculative decoding
+12. [Training Objective](llms/training-objective.md) - autoregressive pre-training objective
+13. [Position Encoding](llms/position-encoding.md) - RoPE, M-RoPE, and TM-RoPE from sequence to multimodal space-time
+14. [Models](llms/models.md) - model-specific notes (Qwen3-Omni, DFlash) and practical serving commands
+15. [Neural Graphics](neural-graphics.md) - NeRF and Flow Matching foundations
 
 ## Documentation Map
 
@@ -31,6 +33,8 @@ A focused knowledge base for modern deep learning systems, from hardware fundame
 - [Overview](llms/overview.md)
 - [Request Lifecycle](llms/request-lifecycle.md)
 - [Metrics](llms/metrics.md)
+- [Roofline Model for Inference](llms/roofline.md)
+- [Data Movement and Communication](llms/data-movement.md)
 - [KV Cache](llms/kv-cache.md)
 - [Serving Runtime](llms/serving-runtime.md)
 - [Parallelism](llms/parallelism.md)

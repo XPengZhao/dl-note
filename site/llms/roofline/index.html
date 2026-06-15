@@ -8,13 +8,13 @@
       
       
       
-        <link rel="canonical" href="https://XPengZhao.github.io/dl-note/llms/kv-cache/">
+        <link rel="canonical" href="https://XPengZhao.github.io/dl-note/llms/roofline/">
       
       
-        <link rel="prev" href="../data-movement/">
+        <link rel="prev" href="../metrics/">
       
       
-        <link rel="next" href="../serving-runtime/">
+        <link rel="next" href="../data-movement/">
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
@@ -22,7 +22,7 @@
     
     
       
-        <title>KV Cache - DL Notes</title>
+        <title>Roofline Model - DL Notes</title>
       
     
     
@@ -68,7 +68,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#kv-cache" class="md-skip">
+        <a href="#roofline-model-for-inference" class="md-skip">
           Skip to content
         </a>
       
@@ -104,7 +104,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              KV Cache
+              Roofline Model
             
           </span>
         </div>
@@ -131,7 +131,7 @@
           </li>
         
           <li class="md-select__item">
-            <a href="../../zh/llms/kv-cache/" hreflang="zh" class="md-select__link">
+            <a href="../../zh/llms/roofline/" hreflang="zh" class="md-select__link">
               简体中文
             </a>
           </li>
@@ -420,10 +420,32 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../roofline/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    Roofline Model
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -434,6 +456,197 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#why-roofline-matters" class="md-nav__link">
+    <span class="md-ellipsis">
+      Why Roofline Matters
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-basic-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      The Basic Model
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="The Basic Model">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#memory-bound-regime" class="md-nav__link">
+    <span class="md-ellipsis">
+      Memory-Bound Regime
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#compute-bound-regime" class="md-nav__link">
+    <span class="md-ellipsis">
+      Compute-Bound Regime
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#arithmetic-intensity" class="md-nav__link">
+    <span class="md-ellipsis">
+      Arithmetic Intensity
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#mapping-roofline-to-inference" class="md-nav__link">
+    <span class="md-ellipsis">
+      Mapping Roofline to Inference
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Mapping Roofline to Inference">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#prefill" class="md-nav__link">
+    <span class="md-ellipsis">
+      Prefill
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#decode" class="md-nav__link">
+    <span class="md-ellipsis">
+      Decode
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-roofline-explains-and-what-it-does-not" class="md-nav__link">
+    <span class="md-ellipsis">
+      What Roofline Explains and What It Does Not
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#reading-common-inference-optimizations-through-roofline" class="md-nav__link">
+    <span class="md-ellipsis">
+      Reading Common Inference Optimizations Through Roofline
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Reading Common Inference Optimizations Through Roofline">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#kv-cache-and-memory-traffic" class="md-nav__link">
+    <span class="md-ellipsis">
+      KV Cache and Memory Traffic
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#batching-and-wider-execution" class="md-nav__link">
+    <span class="md-ellipsis">
+      Batching and Wider Execution
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#quantization" class="md-nav__link">
+    <span class="md-ellipsis">
+      Quantization
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#speculative-decoding" class="md-nav__link">
+    <span class="md-ellipsis">
+      Speculative Decoding
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#beyond-single-device-roofline" class="md-nav__link">
+    <span class="md-ellipsis">
+      Beyond Single-Device Roofline
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#practical-questions-to-ask" class="md-nav__link">
+    <span class="md-ellipsis">
+      Practical Questions to Ask
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#related" class="md-nav__link">
+    <span class="md-ellipsis">
+      Related
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -466,32 +679,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    KV Cache
-    
-  </span>
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../kv-cache/" class="md-nav__link">
         
   
   
@@ -502,218 +693,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#kv-memory" class="md-nav__link">
-    <span class="md-ellipsis">
-      KV Memory
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="KV Memory">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#memory-cost" class="md-nav__link">
-    <span class="md-ellipsis">
-      Memory Cost
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#logical-vs-physical-view" class="md-nav__link">
-    <span class="md-ellipsis">
-      Logical vs Physical View
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Logical vs Physical View">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#requests-tokens-blocks-and-pages" class="md-nav__link">
-    <span class="md-ellipsis">
-      Requests, Tokens, Blocks, and Pages
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#pagedattention" class="md-nav__link">
-    <span class="md-ellipsis">
-      PagedAttention
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="PagedAttention">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#why-pagedattention-is-needed" class="md-nav__link">
-    <span class="md-ellipsis">
-      Why PagedAttention Is Needed
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#contiguous-within-a-block-non-contiguous-across-blocks" class="md-nav__link">
-    <span class="md-ellipsis">
-      Contiguous Within a Block, Non-Contiguous Across Blocks
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#kv-manager" class="md-nav__link">
-    <span class="md-ellipsis">
-      KV Manager
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="KV Manager">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#block-table-and-allocation-granularity" class="md-nav__link">
-    <span class="md-ellipsis">
-      Block Table and Allocation Granularity
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#example" class="md-nav__link">
-    <span class="md-ellipsis">
-      Example
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#prefix-caching-is-reuse-at-block-granularity" class="md-nav__link">
-    <span class="md-ellipsis">
-      Prefix Caching Is Reuse at Block Granularity
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#preemption-reclamation-and-memory-pressure" class="md-nav__link">
-    <span class="md-ellipsis">
-      Preemption, Reclamation, and Memory Pressure
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#interaction-with-the-scheduler" class="md-nav__link">
-    <span class="md-ellipsis">
-      Interaction with the Scheduler
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#attention-variants-and-kv-cost" class="md-nav__link">
-    <span class="md-ellipsis">
-      Attention Variants and KV Cost
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Attention Variants and KV Cost">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#mha-multi-head-attention" class="md-nav__link">
-    <span class="md-ellipsis">
-      MHA: Multi-Head Attention
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#mqa-multi-query-attention" class="md-nav__link">
-    <span class="md-ellipsis">
-      MQA: Multi-Query Attention
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#gqa-grouped-query-attention" class="md-nav__link">
-    <span class="md-ellipsis">
-      GQA: Grouped-Query Attention
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#related" class="md-nav__link">
-    <span class="md-ellipsis">
-      Related
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -936,19 +915,37 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#kv-memory" class="md-nav__link">
+  <a href="#why-roofline-matters" class="md-nav__link">
     <span class="md-ellipsis">
-      KV Memory
+      Why Roofline Matters
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="KV Memory">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-basic-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      The Basic Model
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="The Basic Model">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#memory-cost" class="md-nav__link">
+  <a href="#memory-bound-regime" class="md-nav__link">
     <span class="md-ellipsis">
-      Memory Cost
+      Memory-Bound Regime
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#compute-bound-regime" class="md-nav__link">
+    <span class="md-ellipsis">
+      Compute-Bound Regime
     </span>
   </a>
   
@@ -960,19 +957,37 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#logical-vs-physical-view" class="md-nav__link">
+  <a href="#arithmetic-intensity" class="md-nav__link">
     <span class="md-ellipsis">
-      Logical vs Physical View
+      Arithmetic Intensity
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Logical vs Physical View">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#mapping-roofline-to-inference" class="md-nav__link">
+    <span class="md-ellipsis">
+      Mapping Roofline to Inference
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Mapping Roofline to Inference">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#requests-tokens-blocks-and-pages" class="md-nav__link">
+  <a href="#prefill" class="md-nav__link">
     <span class="md-ellipsis">
-      Requests, Tokens, Blocks, and Pages
+      Prefill
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#decode" class="md-nav__link">
+    <span class="md-ellipsis">
+      Decode
     </span>
   </a>
   
@@ -984,28 +999,55 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#pagedattention" class="md-nav__link">
+  <a href="#what-roofline-explains-and-what-it-does-not" class="md-nav__link">
     <span class="md-ellipsis">
-      PagedAttention
+      What Roofline Explains and What It Does Not
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="PagedAttention">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#reading-common-inference-optimizations-through-roofline" class="md-nav__link">
+    <span class="md-ellipsis">
+      Reading Common Inference Optimizations Through Roofline
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Reading Common Inference Optimizations Through Roofline">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#why-pagedattention-is-needed" class="md-nav__link">
+  <a href="#kv-cache-and-memory-traffic" class="md-nav__link">
     <span class="md-ellipsis">
-      Why PagedAttention Is Needed
+      KV Cache and Memory Traffic
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#contiguous-within-a-block-non-contiguous-across-blocks" class="md-nav__link">
+  <a href="#batching-and-wider-execution" class="md-nav__link">
     <span class="md-ellipsis">
-      Contiguous Within a Block, Non-Contiguous Across Blocks
+      Batching and Wider Execution
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#quantization" class="md-nav__link">
+    <span class="md-ellipsis">
+      Quantization
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#speculative-decoding" class="md-nav__link">
+    <span class="md-ellipsis">
+      Speculative Decoding
     </span>
   </a>
   
@@ -1017,104 +1059,20 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#kv-manager" class="md-nav__link">
+  <a href="#beyond-single-device-roofline" class="md-nav__link">
     <span class="md-ellipsis">
-      KV Manager
+      Beyond Single-Device Roofline
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="KV Manager">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#block-table-and-allocation-granularity" class="md-nav__link">
-    <span class="md-ellipsis">
-      Block Table and Allocation Granularity
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#example" class="md-nav__link">
-    <span class="md-ellipsis">
-      Example
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#prefix-caching-is-reuse-at-block-granularity" class="md-nav__link">
-    <span class="md-ellipsis">
-      Prefix Caching Is Reuse at Block Granularity
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#preemption-reclamation-and-memory-pressure" class="md-nav__link">
-    <span class="md-ellipsis">
-      Preemption, Reclamation, and Memory Pressure
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#interaction-with-the-scheduler" class="md-nav__link">
-    <span class="md-ellipsis">
-      Interaction with the Scheduler
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#attention-variants-and-kv-cost" class="md-nav__link">
+  <a href="#practical-questions-to-ask" class="md-nav__link">
     <span class="md-ellipsis">
-      Attention Variants and KV Cost
+      Practical Questions to Ask
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="Attention Variants and KV Cost">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#mha-multi-head-attention" class="md-nav__link">
-    <span class="md-ellipsis">
-      MHA: Multi-Head Attention
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#mqa-multi-query-attention" class="md-nav__link">
-    <span class="md-ellipsis">
-      MQA: Multi-Query Attention
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#gqa-grouped-query-attention" class="md-nav__link">
-    <span class="md-ellipsis">
-      GQA: Grouped-Query Attention
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -1143,123 +1101,138 @@
 
 
 
-<h1 id="kv-cache">KV Cache</h1>
-<p>In long-context serving, the main bottleneck is often not model weights but the memory required to keep attention state alive. As prompts grow and concurrency rises, KV cache quickly becomes the dominant systems object: it limits how many requests can stay active, determines when preemption occurs, and strongly shapes deployment choices such as DP versus TP. Many serving optimizations exist precisely because this memory budget is tight.</p>
-<h2 id="kv-memory">KV Memory</h2>
-<h3 id="memory-cost">Memory Cost</h3>
-<p>The first question is why KV cache becomes expensive so quickly. The answer is that it scales with every token that remains in context and with every transformer layer, so even moderate sequence lengths can translate into multi-gigabyte memory footprints per request.</p>
-<p>The KV-cache size can be approximated as:</p>
-<div class="arithmatex">\[
-\text{KV size} = 2 \times \text{num layers} \times \text{num heads} \times \text{seq len} \times \text{head dim}
-\]</div>
-<p>Assume:</p>
+<h1 id="roofline-model-for-inference">Roofline Model for Inference</h1>
+<p>Latency and throughput metrics tell us what users observe, but they do not by themselves explain why a serving configuration stops improving. A system may show high TPOT, low TPS, or weak scaling under larger batch sizes, yet those symptoms still leave one core question unresolved: is the workload limited mainly by compute or by data movement? The roofline model is a compact way to answer that question.</p>
+<p>For inference, this matters because not all stages stress hardware in the same way. Prefill and decode can run on the same model and the same GPU while sitting in very different performance regimes. Many practical optimizations, including batching, KV compression, quantization, and speculative decoding, are best understood as attempts to move the workload away from one limiting roof and toward a higher one.</p>
+<h2 id="why-roofline-matters">Why Roofline Matters</h2>
+<p>When people say an inference optimization "improves utilization," the statement is often incomplete. Utilization can improve for different reasons:</p>
 <ul>
-<li>32 layers, 80 heads, <code>head_dim = 128</code>, <code>seq_len = 4K</code></li>
-<li>FP16 KV cache: <span class="arithmatex">\(2 \times 32 \times 80 \times 4K \times 128 \times 2\)</span> bytes <span class="arithmatex">\(\approx 5.2\)</span> GB per sample</li>
-<li>int8 KV cache: approximately half of that, or about 2.6 GB per sample</li>
+<li>the workload performs more math per byte moved</li>
+<li>the workload moves fewer bytes for the same mathematical result</li>
+<li>fixed runtime overhead is amortized over a wider step</li>
+<li>the original bottleneck is removed and a different one becomes dominant</li>
 </ul>
-<h2 id="logical-vs-physical-view">Logical vs Physical View</h2>
-<p>Understanding KV cache requires separating the logical object seen by the model from the physical object managed by the runtime. Logically, a request is a growing token sequence with saved attention state. Physically, that state is stored as many fixed-size memory objects that can be allocated, mapped, reused, and reclaimed over time.</p>
-<h3 id="requests-tokens-blocks-and-pages">Requests, Tokens, Blocks, and Pages</h3>
-<p>In a serving system, a request is the application-level object, a token is the sequence-level object, and a KV block is the runtime-level memory object used to manage the KV cache. A request corresponds to one logical token sequence. As prefill and decode proceed, every token in that sequence produces keys and values at every layer, and those tensors are appended to the request's KV cache. If the runtime uses a block size of <span class="arithmatex">\(B\)</span> tokens, then a request of length <span class="arithmatex">\(L\)</span> requires approximately</p>
-<div class="arithmatex">\[
-N_{\text{blocks}} = \left\lceil \frac{L}{B} \right\rceil
-\]</div>
-<p>KV blocks to store its context state.</p>
-<p>Accordingly, a request is not mapped to one monolithic contiguous KV allocation. It is mapped to a list of blocks:</p>
-<div class="arithmatex">\[
-\text{request} \rightarrow \text{token sequence} \rightarrow \text{KV blocks}
-\]</div>
-<p>The final block is often only partially filled, so the block size determines the granularity of tail waste.</p>
-<p>In the vLLM context, page is primarily a description of this organization style rather than a distinct object above blocks. A paged KV cache means that the KV state of one request is assembled from many fixed-size blocks rather than one contiguous physical segment. In this sense, page refers to the paged organization, while block refers to the actual allocation unit.</p>
-<h2 id="pagedattention">PagedAttention</h2>
-<h3 id="why-pagedattention-is-needed">Why PagedAttention Is Needed</h3>
-<p>PagedAttention is not mainly about how data are laid out inside one block. Its central purpose is to define how a growing request is represented by multiple blocks while preserving a logically contiguous KV address space.</p>
-<p>The underlying problem is that a naive contiguous-allocation design does not match the way serving workloads evolve. Requests arrive with different lengths, they grow during decoding, and they leave at different times. A memory manager that insists on large contiguous allocations will fragment quickly and force costly data movement.</p>
-<p>First, it avoids reserving one large contiguous memory region for each request. If the KV cache for a request had to remain physically contiguous, mixed long and short requests would quickly create external fragmentation.</p>
-<p>Second, it avoids expensive data movement when a request grows. During autoregressive decoding, new tokens are appended to the context one by one. Under a contiguous-allocation scheme, a request that outgrows its original region would require copying its existing KV tensors to a larger contiguous region. Under PagedAttention, the runtime only needs to attach new blocks.</p>
-<p>Third, it makes sharing, eviction, and scheduling naturally block-granular. Prefix caching reuses complete blocks, and memory reclamation or scheduler-driven eviction also operates at block granularity.</p>
-<h3 id="contiguous-within-a-block-non-contiguous-across-blocks">Contiguous Within a Block, Non-Contiguous Across Blocks</h3>
-<p>PagedAttention does not imply that the GPU reads KV tensors in a fully random way. A more precise description is contiguous within a block and potentially non-contiguous across blocks. The runtime maintains a block table that maps logical sequence positions to physical blocks. The attention kernel then uses this mapping to locate the physical blocks associated with a request and performs reads and computation block by block.</p>
-<p>The indirection introduced by PagedAttention is therefore block-level rather than token-level. A block can still use a regular memory layout favorable to vectorized access and high-bandwidth reads, while non-contiguity appears mainly in the list of physical blocks that together form one request.</p>
-<h2 id="kv-manager">KV Manager</h2>
-<p>KV cache describes what is stored; a KV manager describes how that storage is allocated, mapped, reused, reclaimed, and protected under load. Once serving enters the long-context or high-concurrency regime, this manager effectively becomes one of the central runtime components.</p>
-<h3 id="block-table-and-allocation-granularity">Block Table and Allocation Granularity</h3>
-<p>Because one request is mapped to a list of physical blocks rather than one contiguous region, the runtime needs metadata that records this mapping. The block table serves this role: it translates logical sequence positions into the physical blocks that actually hold the KV tensors.</p>
-<p>The choice of block size matters because it sets the allocation granularity of the manager. Small blocks reduce tail waste and allow finer-grained reuse, but they make the block table longer and can increase management overhead. Large blocks simplify metadata and can be friendlier to some kernels, but they waste more space at the tail and make reuse coarser.</p>
-<h3 id="example">Example</h3>
-<p>Suppose the block size is 16 tokens and one request currently has 53 tokens in context. The runtime will need</p>
-<div class="arithmatex">\[
-\left\lceil \frac{53}{16} \right\rceil = 4
-\]</div>
-<p>blocks to store its KV state. A logical view might look like:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>request tokens:
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>[t1 ... t16] [t17 ... t32] [t33 ... t48] [t49 ... t53]
-</span></code></pre></div>
-<p>The corresponding block table could then point to four physical blocks:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>logical block 0 -&gt; physical block 42
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>logical block 1 -&gt; physical block 107
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>logical block 2 -&gt; physical block 18
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>logical block 3 -&gt; physical block 203
-</span></code></pre></div>
-<p>The important point is that the physical blocks do not need to be contiguous. The first three logical blocks are full, while the last one is only partially filled. That last block is where tail waste appears. If another request shares the first 32 tokens exactly, then the first two full blocks may be reused directly by prefix caching, while the partially filled tail block cannot usually be reused as a full-block cache hit.</p>
-<h3 id="prefix-caching-is-reuse-at-block-granularity">Prefix Caching Is Reuse at Block Granularity</h3>
-<p>In vLLM, automatic prefix caching does not reuse arbitrary token ranges. It reuses complete blocks. Let the block size be <span class="arithmatex">\(B\)</span>. If two requests share a common prefix of length <span class="arithmatex">\(L_{\text{shared}}\)</span>, then at most</p>
-<div class="arithmatex">\[
-\left\lfloor \frac{L_{\text{shared}}}{B} \right\rfloor
-\]</div>
-<p>complete blocks can be reused directly. A partially filled tail block usually cannot be treated as a cache hit. Therefore, the block size affects not only memory-allocation granularity but also prefix-cache reuse granularity.</p>
-<p>From the perspective of the manager, prefix caching is a reuse policy over previously materialized blocks. It improves performance only when requests share enough aligned prefix structure for those blocks to be looked up and kept alive efficiently.</p>
-<h3 id="preemption-reclamation-and-memory-pressure">Preemption, Reclamation, and Memory Pressure</h3>
-<p>In vLLM, preemption means that when the GPU no longer has enough available KV blocks to satisfy the current scheduling decision, the runtime temporarily interrupts one or more in-flight requests and reclaims or migrates the KV resources they occupy so that other requests can proceed. It is fundamentally a scheduling response to memory pressure rather than a numerical property of the model.</p>
-<p>Preemption marks the boundary between a healthy operating regime and a memory-stressed one. A system may remain alive after preemption begins, but repeated preemption usually indicates that concurrency has exceeded what the current KV budget can support efficiently.</p>
-<p>At the systems level, preemption usually indicates that the configuration is close to or already hitting the KV-capacity wall. Typical triggers include excessive request concurrency, very long contexts, large output lengths, insufficient tensor parallelism leading to a small per-GPU KV budget, or overly aggressive settings of <code>max-num-seqs</code> or <code>max-num-batched-tokens</code>.</p>
-<h3 id="interaction-with-the-scheduler">Interaction with the Scheduler</h3>
-<p>The KV manager and the scheduler are tightly coupled. Admission-control knobs such as <code>max-num-seqs</code> and <code>max-num-batched-tokens</code> are not only scheduler parameters; they are also indirect controls on how much pressure is placed on KV allocation and reclamation. In practice, many serving pathologies that look like scheduler issues are actually symptoms of the KV manager being forced into a memory-stressed operating regime.</p>
-<h2 id="attention-variants-and-kv-cost">Attention Variants and KV Cost</h2>
-<p>In transformer models, the attention module computes:</p>
-<div class="arithmatex">\[
-\operatorname{Attention}(Q, K, V)=\operatorname{softmax}\left(\frac{Q K^T}{\sqrt{d_k}}\right) V
-\]</div>
-<p>Every token produces:</p>
+<p>The roofline model gives a common language for separating these cases. It does not replace request-level analysis, scheduler analysis, or communication analysis. It provides a first-principles upper-bound view of device-side performance.</p>
+<h2 id="the-basic-model">The Basic Model</h2>
+<p>The classical roofline model relates achieved performance to two hardware limits:</p>
 <ul>
-<li><strong>Q (Query)</strong>, derived from the current token's hidden state</li>
-<li><strong>K (Key)</strong> and <strong>V (Value)</strong>, derived from the context and stored in the KV cache</li>
+<li>peak compute throughput</li>
+<li>peak memory bandwidth</li>
 </ul>
-<p>The difference among MHA, MQA, and GQA lies in how many Key/Value projections are used relative to the number of Query heads.</p>
-<p>In inference, MHA, MQA, and GQA are not only architectural details; they directly change how much KV state must be stored per token, which in turn changes feasible context length and concurrency.</p>
-<h3 id="mha-multi-head-attention">MHA: Multi-Head Attention</h3>
-<p>Each attention head has its own set of projections:</p>
-<div class="arithmatex">\[
-Q_i = X W_{Q, i}, \quad K_i = X W_{K, i}, \quad V_i = X W_{V, i}
-\]</div>
+<p>Let:</p>
 <ul>
-<li>The number of Q, K, and V heads is the same.</li>
+<li><span class="arithmatex">\(P\)</span> be achieved performance in FLOPs/s</li>
+<li><span class="arithmatex">\(P_{\max}\)</span> be peak compute throughput</li>
+<li><span class="arithmatex">\(B_{\max}\)</span> be peak memory bandwidth in bytes/s</li>
+<li><span class="arithmatex">\(I\)</span> be arithmetic intensity in FLOPs per byte moved</li>
 </ul>
-<h3 id="mqa-multi-query-attention">MQA: Multi-Query Attention</h3>
-<p>All heads share one K projection and one V projection:</p>
+<p>Then the attainable performance is bounded by:</p>
 <div class="arithmatex">\[
-K_{\text{shared}} = X W_K, \quad V_{\text{shared}} = X W_V
+P \le \min \left(P_{\max},\; I \cdot B_{\max}\right)
 \]</div>
-<ul>
-<li>There are multiple Q heads but only one shared K/V pair.</li>
-<li>The same K/V tensors are reused by all heads during inference.</li>
-<li>KV-cache size is reduced substantially relative to standard MHA.</li>
-</ul>
-<h3 id="gqa-grouped-query-attention">GQA: Grouped-Query Attention</h3>
-<p>Queries are split into groups, and each group shares its own K/V:</p>
+<p>This expression separates two regimes.</p>
+<h3 id="memory-bound-regime">Memory-Bound Regime</h3>
+<p>When arithmetic intensity <span class="arithmatex">\(I\)</span> is small, the product <span class="arithmatex">\(I \cdot B_{\max}\)</span> stays below peak compute. In this region, performance is limited mainly by how fast data can be moved:</p>
 <div class="arithmatex">\[
-\text{Group } g: \quad Q_{g, *}, K_g, V_g
+P \approx I \cdot B_{\max}
 \]</div>
+<p>Increasing raw compute capability alone does not help much here unless bandwidth or arithmetic intensity also improves.</p>
+<h3 id="compute-bound-regime">Compute-Bound Regime</h3>
+<p>When arithmetic intensity is high enough, the bandwidth-derived ceiling rises above peak compute:</p>
+<div class="arithmatex">\[
+I \cdot B_{\max} \ge P_{\max}
+\]</div>
+<p>The workload then approaches the compute roof:</p>
+<div class="arithmatex">\[
+P \approx P_{\max}
+\]</div>
+<p>In this region, performance gains come mainly from improving kernel efficiency, tensor-core utilization, or parallel execution quality rather than from reducing memory traffic alone.</p>
+<h2 id="arithmetic-intensity">Arithmetic Intensity</h2>
+<p>Arithmetic intensity is the bridge between workload structure and hardware limits:</p>
+<div class="arithmatex">\[
+I = \frac{\text{FLOPs}}{\text{Bytes moved}}
+\]</div>
+<p>The point is not to compute this value with perfect precision for every kernel. The point is to reason about whether a workload performs a large amount of math relative to the memory it must read and write.</p>
+<p>A workload with low arithmetic intensity tends to:</p>
 <ul>
-<li>K/V heads are fewer than Q heads.</li>
-<li>GQA is a compromise between the representational flexibility of MHA and the memory efficiency of MQA.</li>
+<li>spend much of its time waiting on memory traffic</li>
+<li>show limited gains from higher peak FLOPs alone</li>
+<li>benefit from techniques that reduce bytes moved or improve reuse</li>
 </ul>
+<p>A workload with high arithmetic intensity tends to:</p>
+<ul>
+<li>make better use of tensor cores or SIMD units</li>
+<li>benefit more directly from better kernels and more available compute</li>
+<li>flatten less quickly when the batch or step width increases</li>
+</ul>
+<h2 id="mapping-roofline-to-inference">Mapping Roofline to Inference</h2>
+<p>The main value of roofline in AI Infra is not the abstract diagram. The main value is that it explains why different inference stages behave differently.</p>
+<h3 id="prefill">Prefill</h3>
+<p>Prefill processes the prompt in bulk. Sequence length is large, matrix shapes are wider, and the hardware usually has more parallel work available in one pass. As a result, prefill is often closer to the compute-bound side than decode, especially when prompt length or batch size is substantial.</p>
+<p>This does not mean prefill is always compute-bound. Under small batches, multimodal preprocessing overhead, or distributed communication pressure, other ceilings can dominate. The safer statement is that prefill is usually more compute-favorable than decode.</p>
+<h3 id="decode">Decode</h3>
+<p>Decode runs one autoregressive step at a time. Each step is narrow, latency-sensitive, and repeatedly touches KV state accumulated from all previous tokens. In practical serving, decode is therefore much more likely to fall into a memory-bound or overhead-dominated regime.</p>
+<p>This is why online serving often feels counterintuitive: the mathematically smaller phase can become the operational bottleneck. Decode may perform less total work per step than prefill, yet achieve worse hardware efficiency because the work is too narrow and too sequential to fully utilize the device.</p>
+<h2 id="what-roofline-explains-and-what-it-does-not">What Roofline Explains and What It Does Not</h2>
+<p>Roofline is useful, but it is not the whole serving story.</p>
+<p>It explains well:</p>
+<ul>
+<li>whether a device-side workload is primarily constrained by compute or by memory traffic</li>
+<li>why wider batch shapes often improve performance</li>
+<li>why some optimizations help more in decode than in prefill</li>
+<li>why reducing bytes moved can matter as much as reducing FLOPs</li>
+</ul>
+<p>It does not fully explain:</p>
+<ul>
+<li>request queueing and scheduler delay</li>
+<li>prefix-routing fragmentation across replicas</li>
+<li>host-device synchronization overhead outside the kernel view</li>
+<li>inter-GPU communication ceilings in distributed execution</li>
+<li>application-layer fan-out and orchestration overhead</li>
+</ul>
+<p>So the right way to use roofline is as a local performance model within a larger request lifecycle, not as a substitute for the lifecycle itself.</p>
+<h2 id="reading-common-inference-optimizations-through-roofline">Reading Common Inference Optimizations Through Roofline</h2>
+<p>Once the roofline view is in place, many optimizations become easier to classify.</p>
+<h3 id="kv-cache-and-memory-traffic">KV Cache and Memory Traffic</h3>
+<p>Decode often reads large amounts of cached attention state relative to the amount of new computation introduced by one token step. That pushes arithmetic intensity downward. Techniques such as KV quantization, better cache layout, or more efficient block reuse matter because they reduce memory pressure or improve effective reuse in a regime that is already close to a bandwidth ceiling.</p>
+<h3 id="batching-and-wider-execution">Batching and Wider Execution</h3>
+<p>Larger effective batches usually improve utilization because they make kernels wider and amortize fixed overhead. In roofline terms, batching can move a workload toward a more compute-favorable regime by improving reuse and making the achieved performance point climb closer to the upper envelope.</p>
+<p>The same logic also explains why batching eventually shows diminishing returns. Once the workload is already near the relevant roof, further widening helps less.</p>
+<h3 id="quantization">Quantization</h3>
+<p>Quantization is sometimes described as a compute optimization and sometimes as a memory optimization. In inference, it is often both, but the dominant benefit depends on the original bottleneck. If the workload is memory-bound, smaller activations, weights, or KV tensors can reduce bandwidth pressure and capacity pressure. If the workload is already close to the compute roof, the realized gain may be much smaller unless the lower-precision kernels also increase achieved compute throughput.</p>
+<h3 id="speculative-decoding">Speculative Decoding</h3>
+<p>Speculative decoding is best understood as a change in target-model work granularity. In ordinary autoregressive decode, the target model performs many narrow sequential steps. In speculative decoding, the target model verifies multiple proposed tokens in a wider step.</p>
+<p>This can help for two related reasons:</p>
+<ul>
+<li>fixed overhead is amortized over more useful work</li>
+<li>the wider verification step often uses the hardware more efficiently than many isolated narrow steps</li>
+</ul>
+<p>That does not mean speculative decoding should be reduced to a single phrase such as "it increases arithmetic intensity." A more accurate statement is that it reduces the number of expensive target-side sequential steps and may improve target-side utilization if the baseline decode path is underfilled. The gain shrinks when the baseline serving batch is already large and the target path is already close to its effective roof.</p>
+<h2 id="beyond-single-device-roofline">Beyond Single-Device Roofline</h2>
+<p>The classical roofline model is most natural for one device or one kernel family. Real inference systems often hit additional ceilings above that level.</p>
+<p>In distributed or MoE serving, achieved throughput may be bounded not only by HBM bandwidth and on-device compute, but also by:</p>
+<ul>
+<li>all-reduce or all-to-all bandwidth</li>
+<li>collective start-up latency</li>
+<li>pipeline bubbles</li>
+<li>scheduler-level admission and preemption behavior</li>
+</ul>
+<p>For that reason, roofline should be introduced as the first useful ceiling model, not the final one. It tells us whether the local computation is bandwidth-limited or compute-limited. Then the broader system analysis asks whether communication, runtime policy, or workload shaping imposes an even lower ceiling.</p>
+<h2 id="practical-questions-to-ask">Practical Questions to Ask</h2>
+<p>When an inference optimization claims to improve performance, a roofline-oriented reading starts with four questions:</p>
+<ol>
+<li>Does it reduce FLOPs, reduce bytes moved, or mainly amortize fixed overhead?</li>
+<li>Does it help prefill, decode, or both?</li>
+<li>Is the baseline workload memory-bound, compute-bound, or dominated by a higher-level system ceiling?</li>
+<li>Does the optimization remove the current bottleneck, or merely shift the bottleneck elsewhere?</li>
+</ol>
+<p>Those questions are often more useful than asking whether a technique is "good" in the abstract. A serving optimization is valuable only if it lifts the active ceiling for the workload that actually matters.</p>
 <h2 id="related">Related</h2>
 <ul>
-<li><a href="../metrics/">Metrics</a> defines TTFT, TPOT, and TPS.</li>
-<li><a href="../serving-runtime/">Serving Runtime</a> covers scheduler behavior once KV memory becomes the bottleneck.</li>
-<li><a href="../parallelism/">Parallelism</a> explains how DP and TP change memory budget, throughput, and communication.</li>
+<li><a href="../metrics/">Metrics</a> defines TTFT, TPOT, and TPS, which describe the user-visible symptoms.</li>
+<li><a href="../kv-cache/">KV Cache</a> explains why decode often experiences strong memory pressure.</li>
+<li><a href="../serving-runtime/">Serving Runtime</a> explains scheduler and admission effects that roofline alone does not capture.</li>
+<li><a href="../decoding/">Decoding and Sampling</a> discusses speculative decoding as one concrete example of changing decode-side work shape.</li>
 </ul>
 
 
