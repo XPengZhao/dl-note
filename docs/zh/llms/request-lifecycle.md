@@ -27,7 +27,7 @@ flowchart TB
     end
 
     subgraph L2["Serving 系统"]
-        R["Router / Gateway"]
+        R["Edge LB / Router / Gateway / API Proxy"]
         E["Serving Engine"]
         S["Scheduler"]
         K["KV Manager"]
@@ -68,7 +68,26 @@ flowchart TB
 
 #### Router / Gateway
 
+当 **LiteLLM** 被用作统一模型 API 层或模型代理时，它通常就位于这里。
+
+在这条路径更外侧的位置，还常常会先有一个基础设施负载均衡器，比如 **ELB**，它先把流量分发到多台 LiteLLM 或 API gateway 实例上。
+
 路由层决定请求应该被送往哪个模型端点、哪个副本组或哪个 engine 实例。它影响的不只是基础设施利用率，也会直接影响 cache 局部性和 batch 的形成方式。两个前缀相同的请求，是否真的能从 prefix cache 里受益，很大程度上取决于它们有没有被送到同一个 backend。
+
+在实践里，LiteLLM 通常位于 **serving engine 之上**、**应用或 agent 层之下**：
+
+- 它向上层应用提供一个统一的 OpenAI-compatible 或统一模型 API。
+- 它负责在多个模型 provider 或后端之间做请求适配与参数归一化。
+- 它还可以承载路由策略、fallback、限流、日志、鉴权或成本控制。
+
+但 LiteLLM 通常**不负责真正执行模型 step**。一旦它把请求转发给 vLLM、SGLang、OpenAI、Anthropic 或其它后端，下面的 serving/runtime 层才会继续负责请求准入、batching、KV 管理和 GPU 执行。
+
+所以在这条 lifecycle 里，LiteLLM 属于 **Router / Gateway / API Proxy**，而不属于 **Serving Engine**、**Scheduler** 或 **Model Executor**。
+
+像 ELB 这样的组件则还要更外一层。它通常负责通用的网络流量分发或 HTTP 入口负载均衡，而不是理解模型语义本身。换句话说：
+
+- **ELB** 决定一个连接或请求先落到哪台 gateway 实例。
+- **LiteLLM** 决定这个模型请求最终应该转发到哪个模型后端或 provider。
 
 #### Serving Engine
 
@@ -102,7 +121,7 @@ model executor 负责把 runtime 的决策真正翻译成模型执行。它拿�
 sequenceDiagram
     participant U as 用户 / 应用
     participant A as Agent / 编排层
-    participant R as 网关 / 路由层
+    participant R as ELB / 网关 / 路由层 / LiteLLM
     participant E as Serving Engine
     participant S as Runtime Scheduler
     participant K as KV Manager
@@ -112,7 +131,7 @@ sequenceDiagram
     U->>A: 提交任务或查询
     A->>A: 组装 prompt, 检索上下文, 调用工具
     A->>R: 发送模型请求
-    R->>R: 选择模型 / 副本 / 路由
+    R->>R: 负载分发, API 归一化, 应用策略, 选择路由
     R->>E: 转发请求
     E->>S: 将请求送入 engine 内部
     S->>K: 申请 KV blocks / 准备元数据
@@ -127,6 +146,41 @@ sequenceDiagram
 ```
 
 把这两张图放在一起看，会更容易建立稳定的心智模型。分层流图给出的是系统的固定骨架，时序图给出的是一次请求如何穿过这套骨架。性能问题出现时，更实用的问题通常不是“这一页里提到了哪些组件”，而是“流程图里的哪一个节点出了问题，以及它是在时序上的哪一步开始主导延迟或吞吐”。
+
+## LiteLLM 在哪里
+
+更合适的理解方式，是把 LiteLLM 看成一个 **统一模型访问层 / 代理层**。它向上层应用暴露一致的接口，把下游多个 provider 或 serving backend 的差异隐藏起来。
+
+在请求路径里，它最自然的位置是：
+
+`Application / Agent -> LiteLLM -> serving backend (vLLM, SGLang, OpenAI API, Anthropic API, etc.)`
+
+这意味着 LiteLLM 属于推理请求进入系统时的 **南北向入口路径**，而不属于推理系统内部真正执行 prefill/decode 的那一段内循环。
+
+- 如果 LiteLLM 做了 retry、fallback 或 provider 选择，它影响的是请求路由行为和尾延迟。
+- 如果 LiteLLM 承担了观测、鉴权、预算或配额控制，它扮演的是推理外围的 control-plane middleware。
+- 如果真正慢的是下游 backend 的排队、KV 压力或 GPU 利用率不足，那么问题就在 LiteLLM 之下。
+
+这个边界在调试时很重要。API 边界看到的“慢”或“不稳定”，可能来自 LiteLLM 自己的策略和转发逻辑，也可能来自请求已经被转发之后的 serving engine 与硬件执行路径。
+
+## ELB 和 LiteLLM 的关系
+
+ELB 和 LiteLLM 有关系，但通常不在同一层。
+
+更常见的部署链路是：
+
+`Client / Application -> ELB -> LiteLLM -> serving backend`
+
+如果后端是混合 provider，也经常是：
+
+`Client / Application -> ELB -> LiteLLM -> vLLM / SGLang / OpenAI / Anthropic / other providers`
+
+两者的职责并不一样：
+
+- **ELB** 通常是基础设施层的负载均衡器。它把进入系统的流量分发到多台 LiteLLM 或 gateway 实例上，解决的是可用性、水平扩展和入口流量管理问题。
+- **LiteLLM** 是理解模型语义的网关层。它知道模型名、provider 差异、重试、fallback、鉴权、限流、日志，以及按成本或策略做路由。
+
+把这两层拆开有一个直接好处：网络流量均衡和模型路由决策不会混在一起。如果一台 LiteLLM 实例压力过高，ELB 可以把流量导向别的实例；如果某个模型 provider 出现退化、限额或成本不合适，LiteLLM 则可以在不改上游应用集成方式的情况下切换后端。
 
 ## 把常见问题映射到生命周期
 

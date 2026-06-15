@@ -538,6 +538,24 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#where-litellm-sits" class="md-nav__link">
+    <span class="md-ellipsis">
+      Where LiteLLM Sits
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#elb-and-litellm" class="md-nav__link">
+    <span class="md-ellipsis">
+      ELB and LiteLLM
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#where-bottlenecks-usually-show-up" class="md-nav__link">
     <span class="md-ellipsis">
       Where Bottlenecks Usually Show Up
@@ -938,6 +956,24 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#where-litellm-sits" class="md-nav__link">
+    <span class="md-ellipsis">
+      Where LiteLLM Sits
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#elb-and-litellm" class="md-nav__link">
+    <span class="md-ellipsis">
+      ELB and LiteLLM
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#where-bottlenecks-usually-show-up" class="md-nav__link">
     <span class="md-ellipsis">
       Where Bottlenecks Usually Show Up
@@ -992,7 +1028,7 @@
     end
 
     subgraph L2["Serving System"]
-        R["Router / Gateway"]
+        R["Edge LB / Router / Gateway / API Proxy"]
         E["Serving Engine"]
         S["Scheduler"]
         K["KV Manager"]
@@ -1024,7 +1060,22 @@
 <h3 id="2-the-serving-system-turns-an-api-call-into-managed-execution">2. The Serving System Turns an API Call into Managed Execution</h3>
 <p>Most of the operational complexity lives in the middle layer. The request is no longer just a payload; it becomes a scheduled object with routing decisions, KV state, execution steps, and streaming outputs.</p>
 <h4 id="router-gateway">Router / Gateway</h4>
+<p>This is also where a component such as <strong>LiteLLM</strong> typically fits when it is used as a unified API layer or model proxy.</p>
+<p>At the outer edge of the path, an infrastructure load balancer such as <strong>ELB</strong> may sit even earlier and distribute traffic across multiple LiteLLM or API gateway instances.</p>
 <p>The router decides which model endpoint, replica group, or engine instance will receive the request. This affects not only infrastructure utilization but also cache locality and batch formation. Two requests with the same prefix may or may not benefit from prefix caching depending on whether they are routed to the same backend.</p>
+<p>In practice, LiteLLM usually sits <strong>above</strong> the serving engine and <strong>below</strong> the application or agent layer:</p>
+<ul>
+<li>It presents one OpenAI-compatible or unified API to the application.</li>
+<li>It translates or normalizes requests across multiple model providers or backends.</li>
+<li>It can enforce routing policy, fallback, rate limits, logging, or cost/account controls.</li>
+</ul>
+<p>What it usually does <strong>not</strong> do is execute the model step itself. Once LiteLLM forwards the request to vLLM, SGLang, OpenAI, Anthropic, or another backend, the lower serving/runtime layers take over request admission, batching, KV management, and GPU execution.</p>
+<p>So in this lifecycle, LiteLLM belongs to the <strong>Router / Gateway / API Proxy</strong> position, not to the <strong>Serving Engine</strong>, <strong>Scheduler</strong>, or <strong>Model Executor</strong> positions.</p>
+<p>An ELB-like component belongs even farther outward. It is usually responsible for generic network-level or HTTP-level traffic distribution, not for model-aware routing semantics. In other words:</p>
+<ul>
+<li><strong>ELB</strong> decides which gateway instance receives the connection or request.</li>
+<li><strong>LiteLLM</strong> decides which model backend or provider should serve the request.</li>
+</ul>
 <h4 id="serving-engine">Serving Engine</h4>
 <p>Frameworks such as vLLM or SGLang receive the request and convert it into an internal engine object. At this point the external API boundary ends and the serving framework's own runtime lifecycle begins. The engine owns request admission, lifecycle tracking, and output streaming.</p>
 <h4 id="scheduler-and-kv-manager">Scheduler and KV Manager</h4>
@@ -1042,7 +1093,7 @@
 <div class="mermaid">sequenceDiagram
     participant U as User / App
     participant A as Agent / Orchestrator
-    participant R as Gateway / Router
+    participant R as ELB / Gateway / Router / LiteLLM
     participant E as Serving Engine
     participant S as Runtime Scheduler
     participant K as KV Manager
@@ -1052,7 +1103,7 @@
     U-&gt;&gt;A: Submit task or query
     A-&gt;&gt;A: Build prompt, retrieve context, call tools
     A-&gt;&gt;R: Send model request
-    R-&gt;&gt;R: Select model / replica / route
+    R-&gt;&gt;R: Balance traffic, normalize API, apply policy, select route
     R-&gt;&gt;E: Forward request
     E-&gt;&gt;S: Admit request into engine
     S-&gt;&gt;K: Request KV blocks / metadata setup
@@ -1065,6 +1116,29 @@
     R--&gt;&gt;A: Forward response
     A--&gt;&gt;U: Deliver token / final output</div>
 <p>Reading both diagrams together makes the control flow easier to interpret. The flowchart gives the stable structure of the system. The sequence diagram shows one concrete traversal of that structure. When a latency or throughput problem appears, the practical debugging question is usually: which node in the flowchart is responsible, and at what point in the sequence does it start to dominate?</p>
+<h2 id="where-litellm-sits">Where LiteLLM Sits</h2>
+<p>LiteLLM is best understood as a <strong>unified model access and proxy layer</strong>. It gives the upper application a consistent API while hiding differences among downstream providers or serving backends.</p>
+<p>In the request path, its most natural location is:</p>
+<p><code>Application / Agent -&gt; LiteLLM -&gt; serving backend (vLLM, SGLang, OpenAI API, Anthropic API, etc.)</code></p>
+<p>That means LiteLLM is part of the <strong>north-south request entry path</strong> into inference, not the inner execution loop of inference itself.</p>
+<ul>
+<li>If LiteLLM adds retries, fallback, or provider selection, it changes request routing behavior and tail latency.</li>
+<li>If LiteLLM adds observability, auth, budgets, or quotas, it acts as control-plane middleware around inference.</li>
+<li>If the backend itself is slow because of queueing, KV pressure, or GPU underutilization, that is below LiteLLM in the stack.</li>
+</ul>
+<p>This distinction matters during debugging. A bad experience seen at the API boundary might come from LiteLLM-side routing or policy logic, or from the downstream serving engine and hardware path after the request has already been forwarded.</p>
+<h2 id="elb-and-litellm">ELB and LiteLLM</h2>
+<p>ELB and LiteLLM are related, but they usually operate at different levels of the request path.</p>
+<p>The common deployment pattern is:</p>
+<p><code>Client / Application -&gt; ELB -&gt; LiteLLM -&gt; serving backend</code></p>
+<p>or, in a provider-mixed setup:</p>
+<p><code>Client / Application -&gt; ELB -&gt; LiteLLM -&gt; vLLM / SGLang / OpenAI / Anthropic / other providers</code></p>
+<p>Their responsibilities are different:</p>
+<ul>
+<li><strong>ELB</strong> is typically an infrastructure load balancer. It spreads incoming traffic across multiple LiteLLM or gateway instances and helps with availability, horizontal scaling, and entry-point traffic management.</li>
+<li><strong>LiteLLM</strong> is a model-aware gateway. It understands model names, provider differences, retries, fallback, auth policy, rate limits, logging, and cost-aware routing.</li>
+</ul>
+<p>This separation is useful because it keeps network-level balancing distinct from model-level decision making. If one LiteLLM instance is overloaded, ELB can steer traffic elsewhere. If one model provider is degraded or too expensive, LiteLLM can choose a different backend without changing the application's upstream integration.</p>
 <h2 id="where-bottlenecks-usually-show-up">Where Bottlenecks Usually Show Up</h2>
 <p>The same request-lifecycle view is useful for debugging.</p>
 <ul>
@@ -1141,8 +1215,6 @@
         <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
       
         <script src="../../javascripts/mermaid.js"></script>
-      
-        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
       
         <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
       

@@ -27,7 +27,7 @@ flowchart TB
     end
 
     subgraph L2["Serving System"]
-        R["Router / Gateway"]
+        R["Edge LB / Router / Gateway / API Proxy"]
         E["Serving Engine"]
         S["Scheduler"]
         K["KV Manager"]
@@ -68,7 +68,26 @@ Most of the operational complexity lives in the middle layer. The request is no 
 
 #### Router / Gateway
 
+This is also where a component such as **LiteLLM** typically fits when it is used as a unified API layer or model proxy.
+
+At the outer edge of the path, an infrastructure load balancer such as **ELB** may sit even earlier and distribute traffic across multiple LiteLLM or API gateway instances.
+
 The router decides which model endpoint, replica group, or engine instance will receive the request. This affects not only infrastructure utilization but also cache locality and batch formation. Two requests with the same prefix may or may not benefit from prefix caching depending on whether they are routed to the same backend.
+
+In practice, LiteLLM usually sits **above** the serving engine and **below** the application or agent layer:
+
+- It presents one OpenAI-compatible or unified API to the application.
+- It translates or normalizes requests across multiple model providers or backends.
+- It can enforce routing policy, fallback, rate limits, logging, or cost/account controls.
+
+What it usually does **not** do is execute the model step itself. Once LiteLLM forwards the request to vLLM, SGLang, OpenAI, Anthropic, or another backend, the lower serving/runtime layers take over request admission, batching, KV management, and GPU execution.
+
+So in this lifecycle, LiteLLM belongs to the **Router / Gateway / API Proxy** position, not to the **Serving Engine**, **Scheduler**, or **Model Executor** positions.
+
+An ELB-like component belongs even farther outward. It is usually responsible for generic network-level or HTTP-level traffic distribution, not for model-aware routing semantics. In other words:
+
+- **ELB** decides which gateway instance receives the connection or request.
+- **LiteLLM** decides which model backend or provider should serve the request.
 
 #### Serving Engine
 
@@ -102,7 +121,7 @@ The flowchart answers one question: which layers and components does a request p
 sequenceDiagram
     participant U as User / App
     participant A as Agent / Orchestrator
-    participant R as Gateway / Router
+    participant R as ELB / Gateway / Router / LiteLLM
     participant E as Serving Engine
     participant S as Runtime Scheduler
     participant K as KV Manager
@@ -112,7 +131,7 @@ sequenceDiagram
     U->>A: Submit task or query
     A->>A: Build prompt, retrieve context, call tools
     A->>R: Send model request
-    R->>R: Select model / replica / route
+    R->>R: Balance traffic, normalize API, apply policy, select route
     R->>E: Forward request
     E->>S: Admit request into engine
     S->>K: Request KV blocks / metadata setup
@@ -127,6 +146,41 @@ sequenceDiagram
 ```
 
 Reading both diagrams together makes the control flow easier to interpret. The flowchart gives the stable structure of the system. The sequence diagram shows one concrete traversal of that structure. When a latency or throughput problem appears, the practical debugging question is usually: which node in the flowchart is responsible, and at what point in the sequence does it start to dominate?
+
+## Where LiteLLM Sits
+
+LiteLLM is best understood as a **unified model access and proxy layer**. It gives the upper application a consistent API while hiding differences among downstream providers or serving backends.
+
+In the request path, its most natural location is:
+
+`Application / Agent -> LiteLLM -> serving backend (vLLM, SGLang, OpenAI API, Anthropic API, etc.)`
+
+That means LiteLLM is part of the **north-south request entry path** into inference, not the inner execution loop of inference itself.
+
+- If LiteLLM adds retries, fallback, or provider selection, it changes request routing behavior and tail latency.
+- If LiteLLM adds observability, auth, budgets, or quotas, it acts as control-plane middleware around inference.
+- If the backend itself is slow because of queueing, KV pressure, or GPU underutilization, that is below LiteLLM in the stack.
+
+This distinction matters during debugging. A bad experience seen at the API boundary might come from LiteLLM-side routing or policy logic, or from the downstream serving engine and hardware path after the request has already been forwarded.
+
+## ELB and LiteLLM
+
+ELB and LiteLLM are related, but they usually operate at different levels of the request path.
+
+The common deployment pattern is:
+
+`Client / Application -> ELB -> LiteLLM -> serving backend`
+
+or, in a provider-mixed setup:
+
+`Client / Application -> ELB -> LiteLLM -> vLLM / SGLang / OpenAI / Anthropic / other providers`
+
+Their responsibilities are different:
+
+- **ELB** is typically an infrastructure load balancer. It spreads incoming traffic across multiple LiteLLM or gateway instances and helps with availability, horizontal scaling, and entry-point traffic management.
+- **LiteLLM** is a model-aware gateway. It understands model names, provider differences, retries, fallback, auth policy, rate limits, logging, and cost-aware routing.
+
+This separation is useful because it keeps network-level balancing distinct from model-level decision making. If one LiteLLM instance is overloaded, ELB can steer traffic elsewhere. If one model provider is degraded or too expensive, LiteLLM can choose a different backend without changing the application's upstream integration.
 
 ## Where Bottlenecks Usually Show Up
 
