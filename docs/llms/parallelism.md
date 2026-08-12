@@ -105,6 +105,77 @@ For serving workloads, DP and TP usually play different roles.
 
 This is why inference deployment decisions are often phrased as a trade-off between replica-level concurrency and per-replica memory headroom.
 
+## Case Study: GLM-5.2 with TP8 and EP8
+
+The generic description of TP becomes more concrete in a sparse MoE model such as GLM-5.2. The mapping below reflects the current vLLM implementation of `GlmMoeDsaForCausalLM`, which reuses the DeepSeek-V2/V3-style MLA and sparse-attention execution path. It describes a single replica configured with `TP8` and with expert parallelism enabled across the same eight ranks.
+
+All eight TP ranks process the same request and the same token batch. TP therefore differs from request-level parallelism: it partitions selected model tensors and operators inside one forward pass, while every request still occupies the entire TP group.
+
+| Component | Placement under TP8 | Main communication |
+| --- | --- | --- |
+| Query heads and MLA B projections | Split across eight ranks | Local attention followed by output reduction |
+| Attention output projection | Row-sharded | TP all-reduce |
+| Dense MLP gate/up projection | Column-sharded | Usually none at the expansion boundary |
+| Dense MLP down projection | Row-sharded | TP all-reduce |
+| Token embedding and LM head | Vocabulary-sharded | Gather/reduction around logits as required |
+| RMSNorm, RoPE, and residual operations | Replicated | None or fused with neighboring operations |
+| MLA A projections | Replicated | None |
+| DSA indexer | Largely replicated | Index-selection-specific synchronization |
+| Routed MoE experts with EP enabled | Experts partitioned across EP ranks | Token all-to-all and result exchange |
+| MLA and indexer KV state | Full token range retained per TP rank | Not sequence-sharded by TP |
+
+### MLA Attention
+
+Let the model have $H$ query heads and let the TP degree be $p=8$. Each rank computes
+
+$$
+H_{\mathrm{local}} = \frac{H}{8}
+$$
+
+query heads. In vLLM, `q_b_proj` and `kv_b_proj` are column-parallel projections: their output dimensions are partitioned so that each rank produces the Q/K/V features for its local heads. The attention kernel then operates on those local heads. The output projection is row-parallel, and its partial contributions are summed across the TP group with an all-reduce before the hidden state proceeds to the next block.
+
+MLA also contains low-rank A projections before the head-wise B projections. The current implementation represents `q_a_proj` and `kv_a_proj_with_mqa` as replicated linear layers. Every rank therefore stores the same A-projection weights and repeats this part of the computation. TP8 reduces the head-wise B projections and the local attention work, but it does not divide every attention operation by eight.
+
+### Dense MLP Layers
+
+Dense MLP layers use the usual paired TP layout. The gate and up projections are fused into a column-parallel linear layer, which partitions the intermediate dimension across ranks. The down projection is row-parallel and combines the local partial outputs with a TP reduction. The intermediate activation can remain sharded between the two projections, avoiding an unnecessary all-gather at the expansion boundary.
+
+This layout reduces the per-rank MLP parameter footprint and GEMM size. Its scaling efficiency falls as TP grows because each local GEMM becomes narrower while the down-projection reduction remains on the critical path.
+
+### DSA Indexer and KV State
+
+The sparse-attention indexer is an important exception to the head-wise TP pattern. In the current implementation, its query projection is replicated and the fused key/weight projection explicitly disables TP. Each rank therefore performs largely the same indexer projection and top-$k$ selection work.
+
+The same distinction applies to KV memory. MLA stores a compressed latent vector for every cached token. Local query heads on every TP rank need access to the complete historical token range, so each rank keeps the compressed MLA state for that range. The indexer cache is similarly maintained over the full sequence. TP8 does not turn one 160k-token KV history into eight independent 20k-token shards.
+
+Consequently, TP and context parallelism solve different problems. TP partitions heads and projection matrices, while DCP/CP partitions the sequence or KV dimension. A TP8 deployment can leave more HBM for KV cache by reducing the per-rank weight footprint, but the eight GPUs do not pool their KV capacity into an eight-times-longer context merely because TP is enabled.
+
+### MoE Layers with Expert Parallelism
+
+When expert parallelism is enabled, routed experts follow a different placement rule from attention and dense MLP layers. The router is replicated so that ranks make consistent routing decisions, while the physical routed experts are distributed across the EP group. Tokens are sent to the ranks that own their selected experts, processed by local expert GEMMs, and returned to their original execution ranks.
+
+For `TP8 + EP8`, the resulting execution structure is therefore:
+
+- attention projections and heads use TP8;
+- dense MLP layers use TP8;
+- routed experts are partitioned with EP8;
+- the router, MLA A projections, and most indexer work are replicated;
+- shared experts normally retain a tensor-parallel path unless a backend fuses them into the MoE implementation.
+
+This hybrid structure introduces two communication patterns inside the same transformer layer. Attention and dense projections invoke TP collectives, whereas routed MoE computation invokes token all-to-all exchange. Increasing TP or EP changes only the portions assigned to that parallel dimension; replicated operators and communication boundaries remain and prevent single-request latency from scaling linearly with the number of GPUs.
+
+### Serving Implications
+
+The placement above leads to several operational consequences:
+
+- One request consumes all eight GPUs; TP8 does not provide eight independent request slots.
+- Attention-head and large projection work becomes smaller per rank, but replicated MLA and indexer work limits compute scaling.
+- TP collectives are paid at fine granularity during every decode step, so low-concurrency decode often scales less efficiently than prefill.
+- EP reduces routed-expert parameter replication, but token routing adds all-to-all traffic and may suffer from expert-load imbalance.
+- MLA KV capacity remains a per-rank constraint. Higher active-context capacity requires more free HBM per rank, a lower-precision KV representation, sequence/context parallelism, or an offloading design that supports active KV state.
+
+AWQ or other weight quantization changes the storage and kernel used for the sharded matrices, but it does not fundamentally change this parallel placement.
+
 ## 8-GPU Inference Example
 
 The clearest way to compare DP and TP is to hold the hardware fixed and change only how the eight GPUs are grouped into replicas. Consider one 8-GPU server with fast intra-node interconnect. The common options are:

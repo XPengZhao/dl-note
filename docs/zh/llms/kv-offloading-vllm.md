@@ -36,6 +36,7 @@ KVConnectorBase_V1
           └── wraps multiple KV connectors
 ```
 
+- `OffloadingConnector`：vLLM 原生 CPU offloading，用于把 KV data offload 到 CPU memory。如果用于P/D间KV传输，`OffloadingConnector` 没有 `MooncakeConnector` 那种 P/D 间 direct P2P KV 传输语义。它的路径更像：P 端先把 KV store 到 CPU/secondary tier，D 端再从这个 tier load KV。
 
 ### Prefill/Decode KV Offload 需求
 

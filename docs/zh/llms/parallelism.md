@@ -34,67 +34,142 @@ DP 在推理中的动机很直接：当单个副本已经放得下模型，但�
 
 TP 的动机与 DP 不同。它通常在单个加速器无法舒适容纳模型，或者减少单卡权重占用能够为激活和 KV cache 腾出更多空间时才真正变得有价值。
 
-考虑一个线性变换：
+### Row Parallel 与 Column Parallel
+
+考虑线性变换：
 
 $$
-Y = X W,
+Y=XW,
 $$
 
-其中 $X \in \mathbb{R}^{B \times H}$，$W \in \mathbb{R}^{H \times O}$，$Y \in \mathbb{R}^{B \times O}$。在 TP 中，权重矩阵 $W$ 会在 $p$ 个 rank 构成的进程组上进行切分。常见的两种切分方式是按列切分（column-wise sharding）和按行切分（row-wise sharding）。
+其中 $X\in\mathbb{R}^{N\times H_{\mathrm{in}}}$，$W\in\mathbb{R}^{H_{\mathrm{in}}\times H_{\mathrm{out}}}$，$Y\in\mathbb{R}^{N\times H_{\mathrm{out}}}$。$N$ 可以表示本轮参与计算的 token 数量。Row Parallel 和 Column Parallel 描述的是逻辑权重矩阵 $W$ 的切分方向。
 
-在列切分的 TP 中，输出维度 $O$ 被划分，因此每个 rank 存储
+PyTorch 的 `Linear` 通常把权重保存为 $[H_{\mathrm{out}},H_{\mathrm{in}}]$，前向计算实际使用 $W^\mathsf{T}$。因此，代码中参数张量的行列方向看起来可能与数学定义相反。判断切分方式时，更可靠的标准是看它切分输入维度还是输出维度。
 
-$$
-W_i \in \mathbb{R}^{H \times O/p}
-$$
+| 布局 | $W$ 的逻辑切分 | 输入布局 | 每个 rank 的输出 | 常见前向通信 |
+| --- | --- | --- | --- | --- |
+| Column Parallel | 切分 $H_{\mathrm{out}}$ | $X$ 通常复制 | 不同的输出特征切片 | 通常无通信，需要完整输出时 all-gather |
+| Row Parallel | 切分 $H_{\mathrm{in}}$ | $X$ 按输入特征切分 | 同一个完整输出的部分贡献 | all-reduce，或 sequence parallel 下 reduce-scatter |
 
-每个 rank 计算一个局部输出
-
-$$
-Y_i = X W_i \in \mathbb{R}^{B \times O/p}
-$$
-
-这对应于最终输出张量的一个切片。这种模式在 Transformer 的前馈网络第一层投影中非常常见，因为这些部分输出通常可以保持分布式状态，直到后续某个需要同步的阶段才进行合并。
-
-在行切分的 TP 中，输入维度 $H$ 被划分，因此每个 rank 存储
+Column Parallel 沿输出维度切分 $W$：
 
 $$
-W_i \in \mathbb{R}^{H/p \times O}
+W=[W^{(0)},W^{(1)},\ldots,W^{(p-1)}],
+\qquad
+W^{(r)}\in\mathbb{R}^{H_{\mathrm{in}}\times H_{\mathrm{out}}/p}.
 $$
 
-输入 $X$ 也必须按照相同方式进行切分，每个 rank 计算对最终输出的一个部分贡献：
+每个 rank 接收相同的 $X$，只计算一部分输出特征：
 
 $$
-Y_i = X_i W_i \in \mathbb{R}^{B \times O}
+Y^{(r)}=XW^{(r)}
+\in\mathbb{R}^{N\times H_{\mathrm{out}}/p}.
 $$
 
-由于这些结果都是对同一个输出张量的加性贡献，因此所有 rank 的结果需要进行求和才能恢复完整的 $Y$。因此，行切分的 TP 天然需要一个归约步骤。
-
-在 Transformer 的实现中，TP 通常会通过在相邻投影层之间交替使用通信较轻和通信较重的布局来设计。例如，在两层 MLP 结构中，第一层线性变换通常采用列切分以扩展隐藏维度，而第二层则使用行切分将其投影回原始隐藏维度。这种组合可以避免在每个 rank 上物化完整的中间激活，同时尽量延迟通信，使大部分计算保持在本地完成。
-
-TP 的主要优势在于能够扩展模型的宽度，而无需在每个设备上复制全部参数。然而，其效率在很大程度上取决于本地矩阵乘计算与跨 rank 通信之间的平衡。随着 TP 并行度的增加，每个 rank 的 GEMM 规模会变小，而通信在整体执行时间中的占比则会上升。因此，TP 通常只在紧密连接的设备组中使用，例如同一节点内通过高带宽互联连接的 GPU。
-
-### 与 TP 相关的集合通信
-
-TP 中的通信模式由张量的切分方式以及本地计算产生的是独立输出切片还是部分求和结果所决定。在实际系统中，TP 主要依赖三种集合通信操作：all-gather、reduce-scatter 和 all-reduce。这些通信操作不仅用于数据交换，同时也定义了张量并行执行过程中的同步边界。
-
-在列切分的线性层中，每个 rank 生成的是输出特征的一部分。如果下一个算子能够直接消费这种分布式形式的激活，则不需要立即进行通信。然而，如果后续操作需要完整的激活张量，那么所有 rank 必须执行一次 all-gather 来重建完整输出：
+这些局部结果是 $Y$ 的不同切片，不需要彼此求和：
 
 $$
-Y = [Y_0, Y_1, \ldots, Y_{p-1}]
+Y=[Y^{(0)},Y^{(1)},\ldots,Y^{(p-1)}].
 $$
 
-因此，all-gather 通常用于恢复在特征维度上被拆分的张量。
+如果下一个算子能够直接消费分片后的输出，Column Parallel 后不需要通信。只有后续计算要求每个 rank 都获得完整 $Y$ 时，才需要通过 all-gather 拼接这些切片。
 
-在行切分的线性层中，每个 rank 只计算最终输出的一部分贡献。全局输出为：
+Row Parallel 沿输入维度切分 $W$。输入 $X$ 也沿相同维度切分：
 
 $$
-Y = \sum_{i=0}^{p-1} Y_i
+X=[X^{(0)},X^{(1)},\ldots,X^{(p-1)}],
 $$
 
-这需要在 TP 组内进行求和操作。如果每个 rank 都需要完整的输出，则该操作可以表示为 all-reduce。在一些优化实现中，这个通信步骤会与后续的张量切分需求融合，并通过 reduce-scatter 实现，从而在完成求和的同时将输出重新分布为分片形式，以供下一阶段计算使用。
+$$
+W=
+\begin{bmatrix}
+W^{(0)}\\
+W^{(1)}\\
+\vdots\\
+W^{(p-1)}
+\end{bmatrix},
+\qquad
+W^{(r)}\in\mathbb{R}^{H_{\mathrm{in}}/p\times H_{\mathrm{out}}}.
+$$
 
-从系统角度来看，TP 通信的成本受到消息大小、集合通信算法、进程组拓扑结构以及通信与计算的重叠程度等因素的影响。由于 TP 的集合通信是在每一层内部以较高频率触发的，其性能对通信延迟非常敏感。因此，TP 通常只在少量且拓扑接近的设备之间使用。若 TP 组跨越较慢的网络链路，集合通信延迟很容易成为性能瓶颈，从而抵消参数切分带来的收益。
+每个 rank 计算：
+
+$$
+Z^{(r)}=X^{(r)}W^{(r)}
+\in\mathbb{R}^{N\times H_{\mathrm{out}}}.
+$$
+
+$Z^{(r)}$ 不是最终输出的特征切片，而是每个输出元素的一部分贡献。完整结果为：
+
+$$
+Y=\sum_{r=0}^{p-1}Z^{(r)}.
+$$
+
+如果后续计算要求每个 rank 都持有完整 $Y$，这里需要一次 all-reduce。如果系统希望下一阶段沿 token 维度保持 sequence-parallel 状态，则可以使用 reduce-scatter，在完成求和的同时把不同 token 分给不同 rank。
+
+### Transformer 中的成对布局
+
+Transformer 通常把 Column Parallel 和 Row Parallel 成对使用，使两个线性层之间的中间激活保持分片状态。这样可以避免先 all-gather，再为下一层重新切分。
+
+Attention 中的典型路径为：
+
+```text
+完整 hidden state
+    -> Column Parallel QKV projection
+    -> 每个 rank 得到一部分 attention heads
+    -> 本地 attention
+    -> Row Parallel output projection
+    -> all-reduce
+    -> 完整 hidden state
+```
+
+Column Parallel QKV 投影按输出 heads 切分。每个 rank 可以直接在本地 heads 上计算 attention，不需要先恢复全部 heads。输出投影再以 Row Parallel 方式消费这些本地结果。各 rank 经过输出投影得到的是同一个 hidden state 的部分贡献，因此通过 all-reduce 求和。
+
+这里相加的不是不同 attention heads 的原始输出。设拼接后的多头输出为：
+
+$$
+A=[A^{(0)},A^{(1)},\ldots,A^{(p-1)}],
+$$
+
+输出投影权重按输入维度切分为：
+
+$$
+W_O=
+\begin{bmatrix}
+W_O^{(0)}\\
+W_O^{(1)}\\
+\vdots\\
+W_O^{(p-1)}
+\end{bmatrix}.
+$$
+
+分块矩阵乘法满足：
+
+$$
+AW_O=\sum_{r=0}^{p-1}A^{(r)}W_O^{(r)}.
+$$
+
+all-reduce 合并的是各 rank 经过 $W_O^{(r)}$ 投影后的部分结果。这与单卡上先拼接全部 heads，再执行完整输出投影在数学上等价。
+
+FFN 使用相同的配对方式：
+
+```text
+完整 hidden state
+    -> Column Parallel gate/up projection
+    -> 分片的 intermediate state
+    -> 本地激活函数
+    -> Row Parallel down projection
+    -> all-reduce
+    -> 完整 hidden state
+```
+
+第一层投影沿 intermediate dimension 切分。激活函数可以在每个 rank 的局部切片上独立执行。`down_proj` 随后计算完整 hidden state 的部分贡献，并通过 all-reduce 恢复完整输出。Attention 和 FFN 都只在成对布局的末端通信一次，而不需要在两个投影之间物化完整的中间激活。
+
+### TP 的通信边界
+
+只看推理前向计算，Column Parallel 本身不必然对应 all-gather。它产生的是输出特征切片，能否省略通信取决于下一算子是否支持这种布局。Row Parallel 通常对应 all-reduce，因为各 rank 产生的是同一输出的部分和。启用 sequence parallel 后，Row Parallel 末端也可能使用 reduce-scatter。
+
+TP 的性能取决于本地矩阵乘与集合通信之间的平衡。随着 TP degree 增大，每个 rank 的权重和 GEMM 规模都会减小，但每层 Attention 和 FFN 末端的同步仍位于执行关键路径。TP 通常部署在同一节点或高带宽互联的设备组内。若 TP group 跨越较慢的网络，集合通信延迟很容易抵消参数切分带来的收益。
 
 ### 推理视角下的解释
 
@@ -106,6 +181,77 @@ $$
 - 增大 TP 会降低单卡权重占用并扩大单副本的 KV 预算，但 TP 过大时通信可能成为瓶颈。
 
 因此，推理部署中的并行决策通常是在“副本级并发能力”和“单副本内存余量”之间做权衡。
+
+## 案例：GLM-5.2 的 TP8 与 EP8
+
+在 GLM-5.2 这类稀疏 MoE 模型中，TP 的实际边界比标准 Transformer 更复杂。下面的映射对应当前 vLLM 中 `GlmMoeDsaForCausalLM` 的实现，该实现复用了 DeepSeek-V2/V3 风格的 MLA 与稀疏注意力路径。这里考虑一个由 8 个 rank 组成的单副本，同时配置 `TP8` 并在同一组 rank 上启用 Expert Parallelism（EP）。
+
+8 个 TP rank 会处理同一条请求和同一个 token batch。TP 不是请求级并行：它切分一次 forward 内部的部分模型张量与算子，而每条请求仍会占用整个 TP group。
+
+| 模块 | TP8 下的放置方式 | 主要通信 |
+| --- | --- | --- |
+| Query heads 与 MLA B 投影 | 在 8 个 rank 间切分 | 本地 attention 后归约输出 |
+| Attention 输出投影 | Row-sharded | TP all-reduce |
+| Dense MLP gate/up 投影 | Column-sharded | 扩展边界通常无通信 |
+| Dense MLP down 投影 | Row-sharded | TP all-reduce |
+| Token embedding 与 LM head | 按词表切分 | 按 logits 处理需要进行 gather 或归约 |
+| RMSNorm、RoPE 与残差运算 | 复制 | 无通信或与相邻算子融合 |
+| MLA A 投影 | 复制 | 无通信 |
+| DSA indexer | 大部分计算复制 | 与索引选择相关的同步 |
+| 开启 EP 后的 routed experts | 按 EP rank 切分专家 | Token all-to-all 与结果回传 |
+| MLA 与 indexer KV 状态 | 每个 TP rank 保留完整 token 范围 | TP 不沿序列维切分 |
+
+### MLA Attention
+
+设模型共有 $H$ 个 query heads，TP degree 为 $p=8$，则每个 rank 计算
+
+$$
+H_{\mathrm{local}} = \frac{H}{8}
+$$
+
+个 query heads。在 vLLM 中，`q_b_proj` 和 `kv_b_proj` 使用 column-parallel 投影，其输出维度被切分，每个 rank 只生成本地 heads 所需的 Q/K/V 特征。随后，attention kernel 在本地 heads 上执行。输出投影使用 row-parallel 布局，各 rank 产生的部分结果通过 all-reduce 求和，恢复完整 hidden state 后再进入下一个 block。
+
+MLA 在按 head 展开的 B 投影之前，还包含低秩 A 投影。当前实现中的 `q_a_proj` 和 `kv_a_proj_with_mqa` 都是 replicated linear。每个 rank 保存相同的 A 投影权重，并重复执行这部分计算。因此，TP8 切分了按 head 组织的 B 投影和本地 attention，但不会把所有 attention 计算都缩小为原来的八分之一。
+
+### Dense MLP 层
+
+Dense MLP 使用标准的成对 TP 布局。Gate 与 up 投影融合为 column-parallel linear，沿 intermediate dimension 切分；down 投影使用 row-parallel 布局，并通过 TP 归约合并各 rank 的部分输出。两个投影之间的中间激活可以保持分片状态，从而避免在扩展边界执行不必要的 all-gather。
+
+这种布局降低了每个 rank 的 MLP 参数占用和 GEMM 规模。随着 TP degree 增大，本地 GEMM 逐渐变窄，而 down projection 后的归约仍位于执行关键路径，因此扩展效率会逐步下降。
+
+### DSA Indexer 与 KV 状态
+
+稀疏注意力的 indexer 是按 head 切分模式中的一个例外。当前实现中，indexer 的 query 投影采用复制布局，融合后的 key/weight 投影也显式关闭了 TP。因此，各 rank 会执行大致相同的 indexer 投影和 top-$k$ 选择。
+
+KV 内存也存在相同边界。MLA 为每个缓存 token 保存一个压缩 latent vector。每个 TP rank 上的本地 query heads 都需要访问完整历史 token 范围，因此各 rank 都会为该范围保存压缩 MLA 状态；indexer cache 同样覆盖完整序列。TP8 不会把一段 160k token 的 KV 历史自动变成 8 份彼此独立的 20k token 分片。
+
+因此，TP 与 Context Parallelism 解决的是不同问题。TP 切分 heads 和投影矩阵，DCP/CP 则沿 sequence 或 KV 维度切分。TP8 可以通过降低单 rank 权重占用，为 KV cache 留出更多 HBM，但不会仅凭 TP 就把 8 张 GPU 的 KV 容量合并为 8 倍上下文长度。
+
+### Expert Parallelism 下的 MoE 层
+
+启用 EP 后，routed experts 的放置规则与 attention 和 dense MLP 不同。Router 采用复制布局，以便各 rank 得到一致的路由决策；物理 routed experts 则分布到 EP group 中。Token 会被发送到持有所选专家的 rank，在本地完成 expert GEMM，再返回原执行 rank。
+
+对 `TP8 + EP8` 而言，整体执行结构为：
+
+- attention 投影与 heads 使用 TP8；
+- dense MLP 层使用 TP8；
+- routed experts 使用 EP8 进行专家切分；
+- router、MLA A 投影和大部分 indexer 计算保持复制；
+- shared experts 通常仍采用 tensor-parallel 路径，除非后端将其融合进 MoE 实现。
+
+同一个 Transformer layer 中由此存在两类通信：attention 与 dense projection 触发 TP collectives，routed MoE 则触发 token all-to-all。提高 TP 或 EP degree 只会改变该并行维度负责的部分；复制算子和通信边界仍然存在，因此单请求延迟不会随 GPU 数量线性下降。
+
+### Serving 层面的影响
+
+上述放置方式带来以下运行特征：
+
+- 一条请求会占用 8 张 GPU，TP8 不会提供 8 个独立请求槽位。
+- Attention heads 和大矩阵投影在每个 rank 上的计算规模减小，但复制的 MLA 与 indexer 计算限制了扩展效率。
+- 每个 decode step 都需要执行细粒度 TP collectives，因此低并发 decode 通常比 prefill 更难随 TP 扩展。
+- EP 减少 routed-expert 参数复制，但 token routing 会引入 all-to-all，并受到专家负载不均衡的影响。
+- MLA KV 容量仍然受单 rank 约束。若要增加 active context 容量，需要为每个 rank 留出更多 HBM、降低 KV 精度、采用 sequence/context parallelism，或者使用能够处理 active KV state 的 offloading 方案。
+
+AWQ 等权重量化会改变分片矩阵的存储形式和执行 kernel，但不会从根本上改变上述并行放置关系。
 
 ## 一个 8-GPU 推理例子
 

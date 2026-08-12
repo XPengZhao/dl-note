@@ -35,6 +35,7 @@ plugins:
             Models: 模型
             Position Encoding: 位置编码
             Model Notes: 模型笔记
+            GLM-5.2 Inference Path: GLM-5.2 推理路径
 nav:
   - Home: index.md
   - Hardware: hardware.md
@@ -54,6 +55,7 @@ nav:
   - Models:
       - Position Encoding: llms/position-encoding.md
       - Model Notes: llms/models.md
+      - GLM-5.2 Inference Path: llms/glm-5.2-inference-path.md
 markdown_extensions:
   - pymdownx.highlight:
       anchor_linenums: true

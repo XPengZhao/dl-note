@@ -1,0 +1,1770 @@
+
+<!doctype html>
+<html lang="zh" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://XPengZhao.github.io/dl-note/zh/llms/kv-offloading-vllm/">
+      
+      
+      
+      
+      <link rel="icon" href="../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.21">
+    
+    
+      
+        <title>vLLM KV Cache Offloading 源码梳理 - DL Notes</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.2a3383ac.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../stylesheets/bootstrap.min.css">
+    
+      <link rel="stylesheet" href="../../../stylesheets/basic.css">
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#vllm-kv-cache-offloading" class="md-skip">
+          跳转至
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="页眉">
+    <a href="../../" title="DL Notes" class="md-header__button md-logo" aria-label="DL Notes" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            DL Notes
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              vLLM KV Cache Offloading 源码梳理
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+      <div class="md-header__option">
+  <div class="md-select">
+    
+    <button class="md-header__button md-icon" aria-label="选择当前语言">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12.87 15.07-2.54-2.51.03-.03A17.5 17.5 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2zm-2.62 7 1.62-4.33L19.12 17z"/></svg>
+    </button>
+    <div class="md-select__inner">
+      <ul class="md-select__list">
+        
+          <li class="md-select__item">
+            <a href="/dl-note/" hreflang="en" class="md-select__link">
+              English
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="./" hreflang="zh" class="md-select__link">
+              简体中文
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="搜索" placeholder="搜索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="查找">
+        
+        <button type="reset" class="md-search__icon md-icon" title="清空当前内容" aria-label="清空当前内容" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            正在初始化搜索引擎
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="导航栏" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../" title="DL Notes" class="md-nav__button md-logo" aria-label="DL Notes" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    DL Notes
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    首页
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hardware/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    硬件
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tensor/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    张量操作
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../neural-graphics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    神经图形
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    AI Infra
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            AI Infra
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    总览
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../request-lifecycle/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    请求生命周期
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../metrics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    指标
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../roofline/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Roofline 模型
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../data-movement/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    数据搬运与通信
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../kv-cache/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    KV Cache
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../serving-runtime/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    推理运行时
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../parallelism/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    并行策略
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../decoding/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    解码与采样
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../training-objective/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    训练目标
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    模型
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            模型
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../position-encoding/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    位置编码
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    模型笔记
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      背景
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="背景">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#prefilldecode-kv-offload" class="md-nav__link">
+    <span class="md-ellipsis">
+      Prefill/Decode KV Offload 需求
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#50k-prompt-kv" class="md-nav__link">
+    <span class="md-ellipsis">
+      性能估算：50k prompt 的 KV 传输量
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="性能估算：50k prompt 的 KV 传输量">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#dram-offloading" class="md-nav__link">
+    <span class="md-ellipsis">
+      DRAM offloading 时间下界
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#vllm-step" class="md-nav__link">
+    <span class="md-ellipsis">
+      与 vLLM step 的重叠关系
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      总览
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      存储单位与寻址
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#request" class="md-nav__link">
+    <span class="md-ellipsis">
+      Request 生命周期
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#store" class="md-nav__link">
+    <span class="md-ellipsis">
+      Store 触发模型
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#offloading-policy" class="md-nav__link">
+    <span class="md-ellipsis">
+      Offloading Policy
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Offloading Policy">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#block_level" class="md-nav__link">
+    <span class="md-ellipsis">
+      BLOCK_LEVEL
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#request_level" class="md-nav__link">
+    <span class="md-ellipsis">
+      REQUEST_LEVEL
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#load-path" class="md-nav__link">
+    <span class="md-ellipsis">
+      Load Path
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#store-path" class="md-nav__link">
+    <span class="md-ellipsis">
+      Store Path
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#worker" class="md-nav__link">
+    <span class="md-ellipsis">
+      Worker 侧数据拷贝
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      传输机制与通信影响
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#multi-tier-offloading" class="md-nav__link">
+    <span class="md-ellipsis">
+      Multi-tier Offloading
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Multi-tier Offloading">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      初始化
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cascade-primary-secondary" class="md-nav__link">
+    <span class="md-ellipsis">
+      Cascade: primary -&gt; secondary
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#promotion-secondary-primary" class="md-nav__link">
+    <span class="md-ellipsis">
+      Promotion: secondary -&gt; primary
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filesystem-sharing" class="md-nav__link">
+    <span class="md-ellipsis">
+      Filesystem sharing
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#completion" class="md-nav__link">
+    <span class="md-ellipsis">
+      Completion 与状态回收
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#end-to-end-flow" class="md-nav__link">
+    <span class="md-ellipsis">
+      End-to-End Flow
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      阅读入口
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="vllm-kv-cache-offloading">vLLM KV Cache Offloading 源码梳理</h1>
+<h2 id="_1">背景</h2>
+<p>KV offloading 关注的是 completed KV blocks 的生命周期管理。一个请求执行过程中会在 GPU HBM 中生成大量 KV blocks。当其中一些 blocks 已经完成写入并具有复用价值时，系统可以将其移到 CPU 或更低层级存储中保存。后续请求命中相同 prefix 时，再将对应 KV blocks promotion/load 回 GPU，用数据传输替代重复 prefill 计算。从系统效果上看，offloading 扩展的是 prefix cache 的有效容量。</p>
+<p>为了实现 KV offloading 和 prefix hit 后的 KV 复用，vLLM 在 KV connector 路径中抽象了 offload/load、内容寻址、多层存储 tier、异步 GPU/CPU transfer，以及 ready state 和 ref-count 等状态管理。原生 <code>OffloadingConnector</code> 提供了一套基于 CPU primary tier 和可选 secondary tier 的实现，使 completed KV blocks 可以在 GPU 外继续被管理和复用。</p>
+<p>原生 offloading 首先服务于单实例内的 prefix reuse。CPU-only offloading 会把 completed KV blocks 保存到当前 vLLM instance 管理的 CPU tier 中，因此后续复用也主要发生在同一实例内。若 secondary tier 使用 shared filesystem，多个实例可以在相同 <code>root_dir</code> 和一致 hash 配置下发现并读取已保存的 KV blocks，从而支持一定程度的跨实例复用。</p>
+<p>MooncakeStore 和 LMCache 可以理解为更外部化的 KV cache layer。它们通过 connector 接入 vLLM，将 KV blocks 放到跨实例可见的 distributed store 或 memory pool 中，进一步支持多实例之间的 KV 发现、传输和生命周期管理。</p>
+<p>当前vLLM下Connector结构如下：</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>KVConnectorBase_V1
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    ├── OffloadingConnector
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    │     ├── OffloadingConnectorScheduler
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    │     └── OffloadingConnectorWorker
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    │
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    ├── MooncakeConnector
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    │     ├── MooncakeConnectorScheduler
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    │     └── MooncakeConnectorWorker
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    │
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>    ├── MooncakeStoreConnector
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>    │     └── MooncakeDistributedStore integration
+</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>    │
+</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>    ├── LMCacheConnector
+</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>    │     └── LMCache integration
+</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>    │
+</span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>    ├── NixlConnector
+</span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>    │     └── NIXL transfer integration
+</span><span id="__span-0-18"><a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>    │
+</span><span id="__span-0-19"><a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>    └── MultiConnector
+</span><span id="__span-0-20"><a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a>          └── wraps multiple KV connectors
+</span></code></pre></div>
+<ul>
+<li><code>OffloadingConnector</code>：vLLM 原生 CPU offloading，用于把 KV data offload 到 CPU memory。如果用于P/D间KV传输，<code>OffloadingConnector</code> 没有 <code>MooncakeConnector</code> 那种 P/D 间 direct P2P KV 传输语义。它的路径更像：P 端先把 KV store 到 CPU/secondary tier，D 端再从这个 tier load KV。</li>
+</ul>
+<h3 id="prefilldecode-kv-offload">Prefill/Decode KV Offload 需求</h3>
+<p>一个长 prompt 经过 prefill 后，会一次性生成大量 KV blocks。Prefill KV offloading 的目标主要是用后续 load 替代重复 prefill，因此更接近 prefix cache extension。它的瓶颈主要有四类。</p>
+<ol>
+<li>
+<p><strong>Store bandwidth</strong>：Prefill 后的 KV blocks 需要从 GPU 拷到 CPU DRAM 或 secondary tier。Store path 虽然可以异步后台化，但仍会占用 copy engine、PCIe/C2C、host memory bandwidth 等通信资源，并可能干扰 decode。</p>
+</li>
+<li>
+<p><strong>Load latency</strong>：Cache hit 只有在 load path 明显快于 recompute 时才有收益。这里的开销不只是数据搬运，还包括 lookup、metadata 处理、load 任务构造、DMA launch 和同步等待。</p>
+</li>
+<li>
+<p><strong>Cache admission</strong>：并不是所有 prefix 都值得 offload。一次性 prompt 没有复用收益，只会消耗带宽和 cache 空间。更适合 offload 的是长 prompt、公共 system prompt、多轮会话历史和高复用模板。</p>
+</li>
+<li>
+<p><strong>Layout / block 粒度</strong>：如果 KV 的物理布局不连续，或者一个逻辑 block 对应多个分散片段，D2H/H2D copy 会退化成大量小拷贝，实际吞吐会明显下降。</p>
+</li>
+</ol>
+<p>Decode KV offloading 面对的是另一类瓶颈。Decode 阶段关注 TPOT、P95/P99 token latency 和 jitter。相比 prefill 的大块批量 store/load，decode 如果按 block 粒度 offload，单次搬运的数据量通常更小，因此它不一定首先受限于总带宽，而是更容易受限于固定开销和同步抖动。</p>
+<p>具体来说，decode offloading 的 overhead 主要来自四部分。</p>
+<ol>
+<li>
+<p><strong>Metadata overhead</strong>：包括 block lookup、block table 查询、offload tier 状态检查、load/store spec 构造和 eviction 状态更新。Decode 单次搬运粒度小，这些固定开销更难摊薄。</p>
+</li>
+<li>
+<p><strong>DMA launch overhead</strong>：小 block 高频搬运时，每次 copy 的 stream enqueue、地址准备、DMA launch 和事件依赖管理都会变得明显。此时瓶颈可能不是带宽打满，而是搬运粒度过细。</p>
+</li>
+<li>
+<p><strong>Synchronization overhead</strong>：这是 decode 最敏感的部分。Active KV 必须在 attention 使用前 ready，因此异步 load 最终可能变成 event wait 或 stream sync。Prefill load 主要影响 TTFT，而 decode load 会直接影响 TPOT。</p>
+</li>
+<li>
+<p><strong>Copy-resource contention</strong>：Decode load/store 会和 prefill store、GPU-CPU 数据交换、通信操作以及其他 background transfer 竞争 copy engine、PCIe/C2C 和 host memory bandwidth。即使单次搬运量不大，只要排队发生在 token step 前，就会制造 P95/P99 latency spike。</p>
+</li>
+</ol>
+<p>因此，prefill offloading 更偏 <strong>bandwidth-amortized optimization</strong>：用带宽换重复 prefill 计算，关键是复用收益能否摊薄 store/load 成本。Decode offloading 更偏 <strong>overhead-sensitive state management</strong>：关键不是单次搬运量，而是避免 active KV 的跨 tier transfer 进入 token-level critical path。实际系统中，active decode KV 应尽量驻留 GPU，offloading 更适合 request pause、preemption、turn boundary 或容量压力下的 inactive KV。</p>
+<h2 id="50k-prompt-kv">性能估算：50k prompt 的 KV 传输量</h2>
+<p>Offloading 传输的是 KV cache，不是模型权重。因此“模型 int8 量化”不等价于“KV cache int8 传输”。如果 <code>--kv-cache-dtype=auto</code>，KV cache 可能仍是 bf16/fp16；只有显式使用 int8/fp8/fp8-ds-mla 等 KV cache dtype 时，offload 传输量才会按对应 KV layout 下降。</p>
+<p>普通 GQA/MHA attention 的 KV 体积可以按下式估算。设输入 token 数为 <code>T</code>，层数为 <code>L</code>，每层 KV head 数为 <code>H_kv</code>，head dim 为 <code>D</code>，每个元素字节数为 <code>s</code>：</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>B_std = T * L * 2 * H_kv * D * s
+</span></code></pre></div>
+<p>其中 <code>2</code> 对应 K 和 V。vLLM 的 <code>AttentionSpec.real_page_size_bytes</code> 也是按这个结构计算。</p>
+<p>GLM-5.1 这类 DSA/MLA 路线更接近 latent KV cache。vLLM 的 MLA cache 存储的不是展开后的 full K/V，而是压缩表示：</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>B_mla = T * L * (kv_lora_rank + qk_rope_head_dim) * s
+</span></code></pre></div>
+<p>如果按常见 MLA/DSA 形态估算，取：</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>kv_lora_rank = 512
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>qk_rope_head_dim = 64
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>head_size = 576
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>T = 50,000
+</span></code></pre></div>
+<p>则每层 KV 体积约为：</p>
+<table>
+<thead>
+<tr>
+<th>KV cache layout</th>
+<th style="text-align: right;">每层 50k token KV</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>bf16/fp16 MLA KV</td>
+<td style="text-align: right;"><code>50,000 * 576 * 2 = 57.6 MB</code></td>
+</tr>
+<tr>
+<td>int8/fp8 MLA KV</td>
+<td style="text-align: right;"><code>50,000 * 576 * 1 = 28.8 MB</code></td>
+</tr>
+<tr>
+<td><code>fp8_ds_mla</code> 特殊布局</td>
+<td style="text-align: right;"><code>50,000 * 656 = 32.8 MB</code></td>
+</tr>
+</tbody>
+</table>
+<p>总量还需要乘以 layer 数。以 80 层为例：</p>
+<table>
+<thead>
+<tr>
+<th>KV cache layout</th>
+<th style="text-align: right;">50k prompt 总 KV</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>bf16/fp16 MLA KV</td>
+<td style="text-align: right;">4.61 GB</td>
+</tr>
+<tr>
+<td>int8/fp8 MLA KV</td>
+<td style="text-align: right;">2.30 GB</td>
+</tr>
+<tr>
+<td><code>fp8_ds_mla</code></td>
+<td style="text-align: right;">2.62 GB</td>
+</tr>
+</tbody>
+</table>
+<p>如果实际 GLM-5.1 配置的层数或 KV layout 不同，应直接替换公式里的 <code>L</code>、<code>kv_lora_rank</code>、<code>qk_rope_head_dim</code> 和 <code>s</code>。这个估算是每个 worker/rank 视角的传输量；多 GPU 部署时，系统还要承受聚合 PCIe/C2C、host memory 和 NUMA 压力。</p>
+<h3 id="dram-offloading">DRAM offloading 时间下界</h3>
+<p>DRAM-only offloading 的 GPU/CPU 传输时间下界可以按带宽估算：</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>transfer_time = bytes / effective_bandwidth
+</span></code></pre></div>
+<p>常见有效带宽可粗略取：</p>
+<table>
+<thead>
+<tr>
+<th>链路</th>
+<th style="text-align: right;">经验有效带宽</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PCIe Gen4 x16</td>
+<td style="text-align: right;">24-28 GB/s</td>
+</tr>
+<tr>
+<td>PCIe Gen5 x16</td>
+<td style="text-align: right;">45-55 GB/s</td>
+</tr>
+<tr>
+<td>NVLink-C2C / coherent CPU-GPU interconnect</td>
+<td style="text-align: right;">100+ GB/s，取决于平台</td>
+</tr>
+</tbody>
+</table>
+<p>仍以 80 层、50k prompt 为例：</p>
+<table>
+<thead>
+<tr>
+<th>KV cache layout</th>
+<th style="text-align: right;">25 GB/s</th>
+<th style="text-align: right;">50 GB/s</th>
+<th style="text-align: right;">100 GB/s</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>bf16/fp16, 4.61 GB</td>
+<td style="text-align: right;">184 ms</td>
+<td style="text-align: right;">92 ms</td>
+<td style="text-align: right;">46 ms</td>
+</tr>
+<tr>
+<td>int8/fp8, 2.30 GB</td>
+<td style="text-align: right;">92 ms</td>
+<td style="text-align: right;">46 ms</td>
+<td style="text-align: right;">23 ms</td>
+</tr>
+<tr>
+<td><code>fp8_ds_mla</code>, 2.62 GB</td>
+<td style="text-align: right;">105 ms</td>
+<td style="text-align: right;">52 ms</td>
+<td style="text-align: right;">26 ms</td>
+</tr>
+</tbody>
+</table>
+<p>这些数值只是链路带宽下界。真实时间还会受 pinned memory、NUMA、PCIe switch、descriptor 数量、其他 GPU 并发 copy、CPU memory bandwidth 以及 copy engine/SM 竞争影响。</p>
+<h3 id="vllm-step">与 vLLM step 的重叠关系</h3>
+<p>对于 store path，当前实现不要求在产生 store job 的同一个 scheduler step 内完成：</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>step N:
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>  prefill/decode compute
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>  build_connector_meta()
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>  _build_store_jobs()
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>  worker.prepare_store_kv(): 只缓存 job，不立即 copy
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>
+</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>step N+1 开始:
+</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>  worker.start_kv_transfers()
+</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>  transfer_async()
+</span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a>  独立 stream 上执行 GPU -&gt; CPU copy
+</span></code></pre></div>
+<p>GPU -&gt; CPU store 的 transfer stream 会先 <code>wait_stream(current_stream())</code>，确保模型计算已经写完 GPU KV，再从 HBM 读出。多个 transfer job 在 handler 内部按提交顺序串行化：新的 transfer 会等待上一个 transfer 的 end event。</p>
+<p>因此，store 一般不是 Python 同步阻塞，也不要求在当前 step 内完成。它可以跨多个 engine step 在后台继续传输。后台传输完成后，worker 通过 <code>OffloadingWorkerMetadata.completed_jobs</code> 上报；scheduler 在 <code>update_connector_output()</code> 中调用 <code>complete_store()</code>，CPU tier 中对应 block 才从 not-ready 变成 ready。</p>
+<p>传输到一半时，语义是 job 级 not-ready：</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>CPU slot 已分配
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>OffloadKey 已插入 manager
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>BlockStatus.ref_cnt = -1
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>lookup(key) -&gt; None
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>不能被作为 cache hit 读取
+</span></code></pre></div>
+<p>如果后续 request 查到这个 key，scheduler 会看到 pending，而不是读取半成品。如果源 GPU block 即将被复用、request 被 preempt、cache reset，或者所有请求都已结束而没有后续 step 触发 completion，scheduler 会把相关 job 放入 <code>jobs_to_flush</code>，worker 调用 <code>wait()</code> 等传输完成，避免从已被覆盖的 GPU block 继续读。</p>
+<p>Load path 的语义更严格。Load 是当前 request 的关键路径：scheduler 必须先分配 GPU KV blocks，再提交 CPU -&gt; GPU load；load 完成前 request 不能把这段 prefix 当作已计算状态继续执行。因此，长 prefix load 的收益来自用几十毫秒级的数据传输替代更昂贵的 prefill recompute；短 prefix 则可能被 transfer overhead 吞掉收益。</p>
+<h2 id="_2">总览</h2>
+<p>这条 offloading 路径更像“外部 prefix/KV cache 扩展”，而不是传统意义上的 HBM pressure driven paging。</p>
+<ul>
+<li>Store 触发由 scheduler step 驱动，不是等 HBM 放不下时临时换出。</li>
+<li>Store 是拷贝 KV block 到 offload tier，不等价于立刻释放 GPU KV block；GPU block 的分配、复用、抢占仍由 vLLM scheduler/KV cache manager 管理。</li>
+<li>Worker 侧主要负责 GPU KV cache 与 CPU primary tier 之间的 tensor copy。</li>
+<li>CPU primary tier 与 secondary tier 之间的 transfer 由 scheduler-side tier manager 提交异步任务，不是 <code>OffloadingWorker</code> 的 GPU copy handler 在执行。</li>
+<li>Multi-tier 中，新写入 CPU primary 的 blocks 默认 cascade 到所有配置的 secondary tiers；是否已存在、容量淘汰等由 secondary tier 自己处理。</li>
+</ul>
+<p>整体路径如下：</p>
+<div class="mermaid">flowchart TB
+    subgraph Scheduler["Scheduler process: metadata and tier state"]
+        S[vLLM Scheduler]
+        CS[OffloadingConnectorScheduler]
+        M[OffloadingManager / TieringOffloadingManager]
+        PState[CPU Primary Tier State]
+        STier[SecondaryTierManager&lt;br/&gt;FS / OBJ / custom]
+        S --&gt; CS --&gt; M
+        M --&gt; PState
+        M --&gt; STier
+    end
+
+    subgraph Worker["Worker process: GPU &lt;-&gt; CPU data copy"]
+        CW[OffloadingConnectorWorker]
+        OW[OffloadingWorker]
+        H[CPU/GPU OffloadingHandler]
+        CW --&gt; OW --&gt; H
+    end
+
+    subgraph Data["Data plane"]
+        G[GPU KV Cache]
+        C[CPU Primary Tier]
+        D[Secondary Tier&lt;br/&gt;filesystem / object store]
+        G &lt;--&gt; |worker transfer job| C
+        C &lt;--&gt; |secondary tier async job| D
+    end
+
+    CS --&gt; |OffloadingConnectorMetadata&lt;br/&gt;load_jobs / store_jobs / flush| CW
+    CW --&gt; |OffloadingWorkerMetadata&lt;br/&gt;completed_jobs| CS
+    H -. copy .-&gt; G
+    H -. copy .-&gt; C
+    STier -. submit_store / submit_load .-&gt; D
+    PState -. alloc / ref_cnt / ready .-&gt; C</div>
+<p>源码依据：</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1"># vllm/distributed/kv_transfer/kv_connector/v1/offloading/worker.py</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="k">def</span><span class="w"> </span><span class="nf">_register_handlers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kv_caches</span><span class="p">:</span> <span class="n">CanonicalKVCaches</span><span class="p">):</span>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>    <span class="k">for</span> <span class="n">src_cls</span><span class="p">,</span> <span class="n">dst_cls</span><span class="p">,</span> <span class="n">handler</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">spec</span><span class="o">.</span><span class="n">get_handlers</span><span class="p">(</span><span class="n">kv_caches</span><span class="p">):</span>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">worker</span><span class="o">.</span><span class="n">register_handler</span><span class="p">(</span><span class="n">src_cls</span><span class="p">,</span> <span class="n">dst_cls</span><span class="p">,</span> <span class="n">handler</span><span class="p">)</span>
+</span></code></pre></div>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="c1"># vllm/v1/kv_offload/tiering/base.py</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="k">class</span><span class="w"> </span><span class="nc">SecondaryTierManager</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="sd">    Secondary tiers cannot directly access GPU memory. All data transfers</span>
+</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="sd">    must go through the CPU (primary) tier:</span>
+</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="sd">      - Store: GPU -&gt; CPU (primary) -&gt; secondary  (cascade)</span>
+</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="sd">      - Load:  secondary -&gt; CPU (primary) -&gt; GPU  (promotion)</span>
+</span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a>
+</span><span id="__span-8-9"><a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a><span class="sd">    IMPORTANT: All methods run in the Scheduler process and must be</span>
+</span><span id="__span-8-10"><a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a><span class="sd">    lightweight and non-blocking.</span>
+</span><span id="__span-8-11"><a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a><span class="sd">    &quot;&quot;&quot;</span>
+</span></code></pre></div>
+<h2 id="_3">存储单位与寻址</h2>
+<p>Offloading cache 按 KV block 做内容寻址。最终 key 由 block hash 和 KV cache group id 组成：</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>OffloadKey = block_hash + kv_group_idx
+</span></code></pre></div>
+<p>实现位置：<code>vllm/v1/kv_offload/base.py</code></p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="n">OffloadKey</span> <span class="o">=</span> <span class="n">NewType</span><span class="p">(</span><span class="s2">&quot;OffloadKey&quot;</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">)</span>
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="k">def</span><span class="w"> </span><span class="nf">make_offload_key</span><span class="p">(</span><span class="n">block_hash</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span> <span class="n">group_idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OffloadKey</span><span class="p">:</span>
+</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Pack a block hash and group index into an `OffloadKey`.&quot;&quot;&quot;</span>
+</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>    <span class="k">return</span> <span class="n">OffloadKey</span><span class="p">(</span><span class="n">block_hash</span> <span class="o">+</span> <span class="n">group_idx</span><span class="o">.</span><span class="n">to_bytes</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;big&quot;</span><span class="p">,</span> <span class="n">signed</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+</span></code></pre></div>
+<p><code>block_hash</code> 是链式 hash。当前 block 的 key 不只取决于当前 block token ids，也取决于 parent block hash。因此只有完整 prefix 一致的 blocks 才能共享 offload entry。</p>
+<p>实现位置：<code>vllm/v1/core/kv_cache_utils.py</code></p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">hash_block_tokens</span><span class="p">(</span>
+</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>    <span class="n">hash_function</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">],</span> <span class="nb">bytes</span><span class="p">],</span>
+</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>    <span class="n">parent_block_hash</span><span class="p">:</span> <span class="n">BlockHash</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>    <span class="n">curr_block_token_ids</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>    <span class="n">extra_keys</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-11-6"><a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BlockHash</span><span class="p">:</span>
+</span><span id="__span-11-7"><a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="n">parent_block_hash</span><span class="p">:</span>
+</span><span id="__span-11-8"><a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a>        <span class="n">parent_block_hash</span> <span class="o">=</span> <span class="n">NONE_HASH</span>
+</span><span id="__span-11-9"><a id="__codelineno-11-9" name="__codelineno-11-9" href="#__codelineno-11-9"></a>
+</span><span id="__span-11-10"><a id="__codelineno-11-10" name="__codelineno-11-10" href="#__codelineno-11-10"></a>    <span class="n">curr_block_token_ids_tuple</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">curr_block_token_ids</span><span class="p">)</span>
+</span><span id="__span-11-11"><a id="__codelineno-11-11" name="__codelineno-11-11" href="#__codelineno-11-11"></a>    <span class="k">return</span> <span class="n">BlockHash</span><span class="p">(</span>
+</span><span id="__span-11-12"><a id="__codelineno-11-12" name="__codelineno-11-12" href="#__codelineno-11-12"></a>        <span class="n">hash_function</span><span class="p">((</span><span class="n">parent_block_hash</span><span class="p">,</span> <span class="n">curr_block_token_ids_tuple</span><span class="p">,</span> <span class="n">extra_keys</span><span class="p">))</span>
+</span><span id="__span-11-13"><a id="__codelineno-11-13" name="__codelineno-11-13" href="#__codelineno-11-13"></a>    <span class="p">)</span>
+</span></code></pre></div>
+<p>示例：</p>
+<div class="mermaid">flowchart LR
+    A1["req1: h1(t1)"] --&gt; A2["h2(t2)"] --&gt; A3["h3(t3)"] --&gt; A4["h4(t4)"]
+    B1["req2: h1(t1)"] --&gt; B2["h2(t2)"] --&gt; B3["h3(t3)"] --&gt; B4["h4'(s4)"]
+    A1 -. shared .- B1
+    A2 -. shared .- B2
+    A3 -. shared .- B3</div>
+<p><code>req1: t1 t2 t3 t4...</code> 与 <code>req2: t1 t2 t3 s4...</code> 共享前三个 block；从第 4 个 block 开始 hash 链分叉。后续 request 不会覆盖已有 request 的 KV。容量不足时发生的是 cache eviction。</p>
+<p>KV cache group id 用作命名空间。Hybrid model 可能同时有 full attention、sliding-window、Mamba 等不同 KV cache group；相同 prefix 在不同 group 下对应不同 KV 数据，因此 offload key 必须包含 <code>group_idx</code>。</p>
+<p>Scheduler 侧将 <code>request.block_hashes</code> 转为 group-specific <code>OffloadKey</code>：</p>
+<p>实现位置：<code>vllm/distributed/kv_transfer/kv_connector/v1/offloading/scheduler.py</code></p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">update_offload_keys</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>    <span class="o">...</span>
+</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>    <span class="n">group_state</span><span class="o">.</span><span class="n">offload_keys</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+</span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a>        <span class="n">make_offload_key</span><span class="p">(</span><span class="n">req_block_hash</span><span class="p">,</span> <span class="n">group_config</span><span class="o">.</span><span class="n">group_idx</span><span class="p">)</span>
+</span><span id="__span-12-5"><a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a>    <span class="p">)</span>
+</span></code></pre></div>
+<h2 id="request">Request 生命周期</h2>
+<p>Request 进入 scheduler 后，offloading connector 会保存 request-level 状态：</p>
+<p>实现位置：<code>vllm/distributed/kv_transfer/kv_connector/v1/offloading/scheduler.py</code></p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">on_new_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>    <span class="n">req_context</span> <span class="o">=</span> <span class="n">_create_req_context</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>    <span class="n">offloading_context</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">manager</span><span class="o">.</span><span class="n">on_new_request</span><span class="p">(</span><span class="n">req_context</span><span class="p">)</span>
+</span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>    <span class="n">req_status</span> <span class="o">=</span> <span class="n">RequestOffloadState</span><span class="p">(</span>
+</span><span id="__span-13-5"><a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a>        <span class="n">config</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span>
+</span><span id="__span-13-6"><a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a>        <span class="n">req</span><span class="o">=</span><span class="n">request</span><span class="p">,</span>
+</span><span id="__span-13-7"><a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a>        <span class="n">req_context</span><span class="o">=</span><span class="n">req_context</span><span class="p">,</span>
+</span><span id="__span-13-8"><a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a>        <span class="n">offloading_context</span><span class="o">=</span><span class="n">offloading_context</span><span class="p">,</span>
+</span><span id="__span-13-9"><a id="__codelineno-13-9" name="__codelineno-13-9" href="#__codelineno-13-9"></a>    <span class="p">)</span>
+</span><span id="__span-13-10"><a id="__codelineno-13-10" name="__codelineno-13-10" href="#__codelineno-13-10"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_req_status</span><span class="p">[</span><span class="n">request</span><span class="o">.</span><span class="n">request_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">req_status</span>
+</span></code></pre></div>
+<p><code>ReqContext</code> 只携带 request id 和 request-level <code>kv_transfer_params</code>：</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">_create_req_context</span><span class="p">(</span><span class="n">req</span><span class="p">:</span> <span class="n">Request</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ReqContext</span><span class="p">:</span>
+</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>    <span class="k">return</span> <span class="n">ReqContext</span><span class="p">(</span>
+</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>        <span class="n">req_id</span><span class="o">=</span><span class="n">req</span><span class="o">.</span><span class="n">request_id</span><span class="p">,</span>
+</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a>        <span class="n">kv_transfer_params</span><span class="o">=</span><span class="n">req</span><span class="o">.</span><span class="n">kv_transfer_params</span><span class="p">,</span>
+</span><span id="__span-14-5"><a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a>    <span class="p">)</span>
+</span></code></pre></div>
+<p><code>offloading_context</code> 是 manager 返回的 request-level offloading 状态，目前主要是 <code>policy</code>。</p>
+<p>查询 offload hit 时，scheduler 先更新 offload keys，再逐 block lookup：</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_num_new_matched_tokens</span><span class="p">(</span>
+</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>    <span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">,</span> <span class="n">num_computed_tokens</span><span class="p">:</span> <span class="nb">int</span>
+</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="nb">bool</span><span class="p">]:</span>
+</span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a>    <span class="n">req_status</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_req_status</span><span class="p">[</span><span class="n">request</span><span class="o">.</span><span class="n">request_id</span><span class="p">]</span>
+</span><span id="__span-15-5"><a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a>    <span class="n">req_status</span><span class="o">.</span><span class="n">update_offload_keys</span><span class="p">()</span>
+</span><span id="__span-15-6"><a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a>    <span class="n">req_status</span><span class="o">.</span><span class="n">num_locally_computed_tokens</span> <span class="o">=</span> <span class="n">num_computed_tokens</span>
+</span><span id="__span-15-7"><a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a>
+</span><span id="__span-15-8"><a id="__codelineno-15-8" name="__codelineno-15-8" href="#__codelineno-15-8"></a>    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">skip_reading_prefix_cache</span><span class="p">:</span>
+</span><span id="__span-15-9"><a id="__codelineno-15-9" name="__codelineno-15-9" href="#__codelineno-15-9"></a>        <span class="n">num_hit_tokens</span> <span class="o">=</span> <span class="mi">0</span>
+</span><span id="__span-15-10"><a id="__codelineno-15-10" name="__codelineno-15-10" href="#__codelineno-15-10"></a>    <span class="k">else</span><span class="p">:</span>
+</span><span id="__span-15-11"><a id="__codelineno-15-11" name="__codelineno-15-11" href="#__codelineno-15-11"></a>        <span class="n">num_hit_tokens</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lookup</span><span class="p">(</span><span class="n">req_status</span><span class="p">)</span>
+</span></code></pre></div>
+<p>lookup 的底层单位是 <code>OffloadKey</code>：</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
+</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>    <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">manager</span><span class="o">.</span><span class="n">lookup</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">req_context</span><span class="p">)</span>
+</span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a>    <span class="k">if</span> <span class="n">result</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+</span><span id="__span-16-4"><a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a>        <span class="k">break</span>
+</span><span id="__span-16-5"><a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a>    <span class="k">if</span> <span class="n">result</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="__span-16-6"><a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a>        <span class="k">return</span> <span class="kc">None</span>
+</span><span id="__span-16-7"><a id="__codelineno-16-7" name="__codelineno-16-7" href="#__codelineno-16-7"></a>    <span class="n">num_hit_blocks</span> <span class="o">+=</span> <span class="mi">1</span>
+</span></code></pre></div>
+<p>返回值语义：</p>
+<ul>
+<li><code>True</code>：block 已存在且 ready。</li>
+<li><code>False</code>：block 不存在。</li>
+<li><code>None</code>：block 存在但暂不可读，例如 primary 正在写入、secondary promotion 中或 secondary lookup 尚未完成。</li>
+</ul>
+<p>Full attention 通常查最长 prefix；sliding-window/Mamba 按窗口或 suffix 逻辑查询。</p>
+<h2 id="store">Store 触发模型</h2>
+<p>Store 不是 request finish 时统一发生，也不是 HBM 不够时临时触发。它发生在每个 scheduler step 末尾，由 <code>build_connector_meta()</code> 构造 store metadata。</p>
+<div class="mermaid">sequenceDiagram
+    participant Sch as Scheduler step N
+    participant CS as OffloadingConnectorScheduler
+    participant CW as OffloadingConnectorWorker
+    participant H as GPU/CPU Handler
+
+    Sch-&gt;&gt;CS: build_connector_meta(scheduler_output)
+    CS-&gt;&gt;CS: _build_store_jobs()
+    CS--&gt;&gt;CW: store_jobs metadata
+    CW-&gt;&gt;CW: prepare_store_kv(): defer jobs
+    Note over CW: no immediate GPU-&gt;CPU copy
+    Sch-&gt;&gt;CW: next step start_load_kv()
+    CW-&gt;&gt;H: transfer_async(deferred store)
+    H--&gt;&gt;H: async GPU -&gt; CPU copy</div>
+<p>实现位置：<code>vllm/distributed/kv_transfer/kv_connector/v1/offloading/scheduler.py</code></p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="n">meta</span> <span class="o">=</span> <span class="n">OffloadingConnectorMetadata</span><span class="p">(</span>
+</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>    <span class="n">load_jobs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_current_batch_load_jobs</span><span class="p">,</span>
+</span><span id="__span-17-3"><a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a>    <span class="n">store_jobs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_build_store_jobs</span><span class="p">(</span><span class="n">scheduler_output</span><span class="p">),</span>
+</span><span id="__span-17-4"><a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a>    <span class="n">jobs_to_flush</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_current_batch_jobs_to_flush</span><span class="p">,</span>
+</span><span id="__span-17-5"><a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a><span class="p">)</span>
+</span></code></pre></div>
+<p><code>_build_store_jobs()</code> 只扫描本 step 被调度的 requests：</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="k">for</span> <span class="n">req_id</span> <span class="ow">in</span> <span class="n">scheduler_output</span><span class="o">.</span><span class="n">num_scheduled_tokens</span><span class="p">:</span>
+</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>    <span class="n">num_scheduled_tokens</span> <span class="o">=</span> <span class="n">scheduler_output</span><span class="o">.</span><span class="n">num_scheduled_tokens</span><span class="p">[</span><span class="n">req_id</span><span class="p">]</span>
+</span><span id="__span-18-3"><a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a>    <span class="n">num_tokens_after_batch</span> <span class="o">=</span> <span class="n">req</span><span class="o">.</span><span class="n">num_computed_tokens</span> <span class="o">+</span> <span class="n">num_scheduled_tokens</span>
+</span><span id="__span-18-4"><a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a>    <span class="n">num_offloadable_tokens</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">num_tokens_after_batch</span><span class="p">,</span> <span class="n">req</span><span class="o">.</span><span class="n">num_tokens</span><span class="p">)</span>
+</span></code></pre></div>
+<p>只有完整 offloaded block 才能进入 candidate 范围：</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="n">num_blocks</span> <span class="o">=</span> <span class="n">num_offloadable_tokens</span> <span class="o">//</span> <span class="n">group_config</span><span class="o">.</span><span class="n">offloaded_block_size</span>
+</span><span id="__span-19-2"><a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="n">start_block_idx</span> <span class="o">=</span> <span class="n">group_state</span><span class="o">.</span><span class="n">next_stored_block_idx</span>
+</span><span id="__span-19-3"><a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a><span class="k">if</span> <span class="n">num_blocks</span> <span class="o">&lt;=</span> <span class="n">start_block_idx</span><span class="p">:</span>
+</span><span id="__span-19-4"><a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a>    <span class="k">continue</span>
+</span></code></pre></div>
+<p>主要过滤条件：</p>
+<ul>
+<li>不完整 block 等后续 step 补齐。</li>
+<li><code>offload_prompt_only</code> 会把 store 范围限制到 prompt。</li>
+<li><code>BLOCK_LEVEL</code> 跳过 prefix-hit blocks。</li>
+<li>sliding-window/Mamba/HMA 可能跳过 null block 或 load path 不可达 blocks。</li>
+<li>manager 会过滤已经存在的 keys。</li>
+</ul>
+<p>Worker 侧会延迟 store jobs：</p>
+<p>实现位置：<code>vllm/distributed/kv_transfer/kv_connector/v1/offloading/worker.py</code></p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">prepare_store_kv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metadata</span><span class="p">:</span> <span class="n">OffloadingConnectorMetadata</span><span class="p">):</span>
+</span><span id="__span-20-2"><a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a>    <span class="k">for</span> <span class="n">job_id</span><span class="p">,</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">metadata</span><span class="o">.</span><span class="n">store_jobs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+</span><span id="__span-20-3"><a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_unsubmitted_store_jobs</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">job_id</span><span class="p">,</span> <span class="n">entry</span><span class="o">.</span><span class="n">transfer_spec</span><span class="p">))</span>
+</span></code></pre></div>
+<p>下一 step 开始再提交：</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">start_kv_transfers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metadata</span><span class="p">:</span> <span class="n">OffloadingConnectorMetadata</span><span class="p">):</span>
+</span><span id="__span-21-2"><a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a>    <span class="k">for</span> <span class="n">job_id</span><span class="p">,</span> <span class="n">transfer_spec</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_unsubmitted_store_jobs</span><span class="p">:</span>
+</span><span id="__span-21-3"><a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a>        <span class="n">success</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">worker</span><span class="o">.</span><span class="n">transfer_async</span><span class="p">(</span><span class="n">job_id</span><span class="p">,</span> <span class="n">transfer_spec</span><span class="p">)</span>
+</span><span id="__span-21-4"><a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a>        <span class="k">assert</span> <span class="n">success</span>
+</span><span id="__span-21-5"><a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_unsubmitted_store_jobs</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+</span></code></pre></div>
+<p>Request finish 不是常规补写点。源码中仍保留 TODO：</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-22-1"><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="c1"># TODO(orozery): possibly kickoff offload for last block</span>
+</span><span id="__span-22-2"><a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a><span class="c1"># which may have been deferred due to async scheduling</span>
+</span></code></pre></div>
+<p>finish 阶段主要处理 pending store 的 block 保护，避免 request 结束后 GPU block 被复用而 store 尚未完成：</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-23-1"><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="c1"># Pending stores will outlive the request&#39;s block ownership.</span>
+</span><span id="__span-23-2"><a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a><span class="c1"># Register them so future block reuse triggers a flush.</span>
+</span><span id="__span-23-3"><a id="__codelineno-23-3" name="__codelineno-23-3" href="#__codelineno-23-3"></a><span class="k">for</span> <span class="n">job_id</span> <span class="ow">in</span> <span class="n">req_status</span><span class="o">.</span><span class="n">transfer_jobs</span><span class="p">:</span>
+</span><span id="__span-23-4"><a id="__codelineno-23-4" name="__codelineno-23-4" href="#__codelineno-23-4"></a>    <span class="n">job_status</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_jobs</span><span class="p">[</span><span class="n">job_id</span><span class="p">]</span>
+</span><span id="__span-23-5"><a id="__codelineno-23-5" name="__codelineno-23-5" href="#__codelineno-23-5"></a>    <span class="k">for</span> <span class="n">bid</span> <span class="ow">in</span> <span class="n">job_status</span><span class="o">.</span><span class="n">non_sliding_window_block_ids</span> <span class="ow">or</span> <span class="p">():</span>
+</span><span id="__span-23-6"><a id="__codelineno-23-6" name="__codelineno-23-6" href="#__codelineno-23-6"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_block_id_to_pending_jobs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">bid</span><span class="p">,</span> <span class="nb">set</span><span class="p">())</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">job_id</span><span class="p">)</span>
+</span></code></pre></div>
+<h2 id="offloading-policy">Offloading Policy</h2>
+<p>定义位置：<code>vllm/v1/kv_offload/base.py</code></p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-24-1"><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">OffloadPolicy</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+</span><span id="__span-24-2"><a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a>    <span class="n">BLOCK_LEVEL</span> <span class="o">=</span> <span class="s2">&quot;block_level&quot;</span>
+</span><span id="__span-24-3"><a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a>    <span class="n">REQUEST_LEVEL</span> <span class="o">=</span> <span class="s2">&quot;request_level&quot;</span>
+</span></code></pre></div>
+<h3 id="block_level"><code>BLOCK_LEVEL</code></h3>
+<p>默认策略。只 store 当前 request 新计算出的 blocks；prefix-hit blocks 不重复 store。</p>
+<p>实现位置：<code>vllm/distributed/kv_transfer/kv_connector/v1/offloading/scheduler.py</code></p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-25-1"><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="k">if</span> <span class="n">req_status</span><span class="o">.</span><span class="n">offloading_context</span><span class="o">.</span><span class="n">policy</span> <span class="o">==</span> <span class="n">OffloadPolicy</span><span class="o">.</span><span class="n">BLOCK_LEVEL</span><span class="p">:</span>
+</span><span id="__span-25-2"><a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a>    <span class="n">group_state</span><span class="o">.</span><span class="n">next_stored_block_idx</span> <span class="o">=</span> <span class="n">num_blocks</span>
+</span></code></pre></div>
+<p>后续 <code>_build_store_jobs()</code> 从 <code>next_stored_block_idx</code> 开始选择 candidate keys：</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-26-1"><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="n">start_block_idx</span> <span class="o">=</span> <span class="n">group_state</span><span class="o">.</span><span class="n">next_stored_block_idx</span>
+</span><span id="__span-26-2"><a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a><span class="n">offload_keys</span> <span class="o">=</span> <span class="n">group_state</span><span class="o">.</span><span class="n">offload_keys</span><span class="p">[</span><span class="n">start_block_idx</span><span class="p">:</span><span class="n">num_blocks</span><span class="p">]</span>
+</span></code></pre></div>
+<h3 id="request_level"><code>REQUEST_LEVEL</code></h3>
+<p>用于需要完整 request KV 上下文的 secondary tier。任一 secondary tier 返回 <code>REQUEST_LEVEL</code> 时，该 request 的 scheduler-side policy 变为 <code>REQUEST_LEVEL</code>。</p>
+<p>实现位置：<code>vllm/v1/kv_offload/tiering/manager.py</code></p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-27-1"><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a><span class="k">for</span> <span class="n">tier</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">secondary_tiers</span><span class="p">:</span>
+</span><span id="__span-27-2"><a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a>    <span class="n">tier_ctx</span> <span class="o">=</span> <span class="n">tier</span><span class="o">.</span><span class="n">on_new_request</span><span class="p">(</span><span class="n">req_context</span><span class="p">)</span>
+</span><span id="__span-27-3"><a id="__codelineno-27-3" name="__codelineno-27-3" href="#__codelineno-27-3"></a>    <span class="k">if</span> <span class="n">tier_ctx</span><span class="o">.</span><span class="n">policy</span> <span class="o">==</span> <span class="n">OffloadPolicy</span><span class="o">.</span><span class="n">REQUEST_LEVEL</span><span class="p">:</span>
+</span><span id="__span-27-4"><a id="__codelineno-27-4" name="__codelineno-27-4" href="#__codelineno-27-4"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_request_level_tiers</span><span class="p">[</span><span class="n">req_context</span><span class="o">.</span><span class="n">req_id</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">tier</span><span class="p">)</span>
+</span></code></pre></div>
+<p>如果 prefix-hit blocks 已经在 CPU primary 中，multi-tier manager 不重复写 primary，而是只向 request-level secondary tiers cascade：</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-28-1"><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a><span class="n">keys_already_in_primary</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span>
+</span><span id="__span-28-2"><a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a>    <span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">keys</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">keys_to_store_set</span>
+</span><span id="__span-28-3"><a id="__codelineno-28-3" name="__codelineno-28-3" href="#__codelineno-28-3"></a><span class="p">)</span>
+</span><span id="__span-28-4"><a id="__codelineno-28-4" name="__codelineno-28-4" href="#__codelineno-28-4"></a><span class="k">if</span> <span class="n">keys_already_in_primary</span><span class="p">:</span>
+</span><span id="__span-28-5"><a id="__codelineno-28-5" name="__codelineno-28-5" href="#__codelineno-28-5"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_cascade_existing_blocks_to_request_level_tiers</span><span class="p">(</span>
+</span><span id="__span-28-6"><a id="__codelineno-28-6" name="__codelineno-28-6" href="#__codelineno-28-6"></a>        <span class="n">keys_already_in_primary</span><span class="p">,</span> <span class="n">req_context</span><span class="p">,</span> <span class="n">request_level_tiers</span>
+</span><span id="__span-28-7"><a id="__codelineno-28-7" name="__codelineno-28-7" href="#__codelineno-28-7"></a>    <span class="p">)</span>
+</span></code></pre></div>
+<h2 id="load-path">Load Path</h2>
+<p>Offload hit 需要先分配 GPU KV blocks，然后构造 CPU primary -&gt; GPU 的 load job。</p>
+<div class="mermaid">flowchart LR
+    A[lookup hit in offload cache]
+    B[KV cache manager allocates GPU blocks]
+    C[update_state_after_alloc]
+    D[manager.prepare_load]
+    E[load_jobs metadata]
+    F[worker transfer_async]
+    G[CPU primary -&gt; GPU KV cache]
+
+    A --&gt; B --&gt; C --&gt; D --&gt; E --&gt; F --&gt; G</div>
+<p>实现位置：<code>vllm/distributed/kv_transfer/kv_connector/v1/offloading/scheduler.py</code></p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-29-1"><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a><span class="n">src_spec</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">manager</span><span class="o">.</span><span class="n">prepare_load</span><span class="p">(</span><span class="n">keys_to_load</span><span class="p">,</span> <span class="n">req_status</span><span class="o">.</span><span class="n">req_context</span><span class="p">)</span>
+</span><span id="__span-29-2"><a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a><span class="n">dst_spec</span> <span class="o">=</span> <span class="n">GPULoadStoreSpec</span><span class="p">(</span>
+</span><span id="__span-29-3"><a id="__codelineno-29-3" name="__codelineno-29-3" href="#__codelineno-29-3"></a>    <span class="n">dst_block_ids</span><span class="p">,</span> <span class="n">group_sizes</span><span class="o">=</span><span class="n">group_sizes</span><span class="p">,</span> <span class="n">block_indices</span><span class="o">=</span><span class="n">block_indices</span>
+</span><span id="__span-29-4"><a id="__codelineno-29-4" name="__codelineno-29-4" href="#__codelineno-29-4"></a><span class="p">)</span>
+</span></code></pre></div>
+<p>CPU tier 的 <code>prepare_load()</code> 会增加 <code>ref_cnt</code>，防止 block 在传输期间被淘汰：</p>
+<p>实现位置：<code>vllm/v1/kv_offload/cpu/manager.py</code></p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-30-1"><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a><span class="n">block</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_policy</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+</span><span id="__span-30-2"><a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a><span class="k">assert</span> <span class="n">block</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;Block </span><span class="si">{</span><span class="n">key</span><span class="si">!r}</span><span class="s2"> not found in cache&quot;</span>
+</span><span id="__span-30-3"><a id="__codelineno-30-3" name="__codelineno-30-3" href="#__codelineno-30-3"></a><span class="k">assert</span> <span class="n">block</span><span class="o">.</span><span class="n">is_ready</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;Block </span><span class="si">{</span><span class="n">key</span><span class="si">!r}</span><span class="s2"> is not ready for reading&quot;</span>
+</span><span id="__span-30-4"><a id="__codelineno-30-4" name="__codelineno-30-4" href="#__codelineno-30-4"></a><span class="n">block</span><span class="o">.</span><span class="n">ref_cnt</span> <span class="o">+=</span> <span class="mi">1</span>
+</span></code></pre></div>
+<p>完成后，scheduler 在 <code>update_connector_output()</code> 中调用 <code>complete_load()</code>，释放这层保护：</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-31-1"><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a><span class="k">if</span> <span class="n">job_status</span><span class="o">.</span><span class="n">is_store</span><span class="p">:</span>
+</span><span id="__span-31-2"><a id="__codelineno-31-2" name="__codelineno-31-2" href="#__codelineno-31-2"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">manager</span><span class="o">.</span><span class="n">complete_store</span><span class="p">(</span><span class="n">job_status</span><span class="o">.</span><span class="n">keys</span><span class="p">,</span> <span class="n">req_status</span><span class="o">.</span><span class="n">req_context</span><span class="p">)</span>
+</span><span id="__span-31-3"><a id="__codelineno-31-3" name="__codelineno-31-3" href="#__codelineno-31-3"></a><span class="k">else</span><span class="p">:</span>
+</span><span id="__span-31-4"><a id="__codelineno-31-4" name="__codelineno-31-4" href="#__codelineno-31-4"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">manager</span><span class="o">.</span><span class="n">complete_load</span><span class="p">(</span><span class="n">job_status</span><span class="o">.</span><span class="n">keys</span><span class="p">,</span> <span class="n">req_status</span><span class="o">.</span><span class="n">req_context</span><span class="p">)</span>
+</span></code></pre></div>
+<h2 id="store-path">Store Path</h2>
+<p>Store path 的作用是将满足条件的新 KV blocks 从 GPU 拷贝到 CPU primary。对 DRAM-only offloading，到 CPU primary 即结束；对 multi-tier，primary store 完成后还会 cascade 到 secondary tiers。</p>
+<div class="mermaid">flowchart LR
+    A[step-end _build_store_jobs]
+    B[manager.prepare_store]
+    C[CPU primary allocates slots]
+    D[store_jobs metadata]
+    E[next step worker transfer]
+    F[GPU -&gt; CPU primary]
+    G[manager.complete_store]
+
+    A --&gt; B --&gt; C --&gt; D --&gt; E --&gt; F --&gt; G</div>
+<p>实现位置：<code>vllm/distributed/kv_transfer/kv_connector/v1/offloading/scheduler.py</code></p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-32-1"><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a><span class="n">store_output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">manager</span><span class="o">.</span><span class="n">prepare_store</span><span class="p">(</span>
+</span><span id="__span-32-2"><a id="__codelineno-32-2" name="__codelineno-32-2" href="#__codelineno-32-2"></a>    <span class="n">new_offload_keys</span><span class="p">,</span> <span class="n">req_status</span><span class="o">.</span><span class="n">req_context</span>
+</span><span id="__span-32-3"><a id="__codelineno-32-3" name="__codelineno-32-3" href="#__codelineno-32-3"></a><span class="p">)</span>
+</span></code></pre></div>
+<p>CPU tier 会过滤已存在 keys：</p>
+<p>实现位置：<code>vllm/v1/kv_offload/cpu/manager.py</code></p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-33-1"><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a><span class="n">keys_to_store</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">keys</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_policy</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">]</span>
+</span></code></pre></div>
+<p>DRAM-only <code>store_threshold</code> 可按 lookup 次数过滤低复用 blocks；<code>TieringOffloadingSpec</code> 不支持该参数：</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-34-1"><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a><span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">counts</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="__span-34-2"><a id="__codelineno-34-2" name="__codelineno-34-2" href="#__codelineno-34-2"></a>    <span class="n">keys</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">keys</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">counts</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">store_threshold</span><span class="p">]</span>
+</span></code></pre></div>
+<p>新 key 分配 CPU block 并插入 cache policy：</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-35-1"><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a><span class="n">blocks</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_allocate_blocks</span><span class="p">(</span><span class="n">keys_to_store</span><span class="p">)</span>
+</span><span id="__span-35-2"><a id="__codelineno-35-2" name="__codelineno-35-2" href="#__codelineno-35-2"></a><span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">block</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">keys_to_store</span><span class="p">,</span> <span class="n">blocks</span><span class="p">):</span>
+</span><span id="__span-35-3"><a id="__codelineno-35-3" name="__codelineno-35-3" href="#__codelineno-35-3"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">_policy</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">block</span><span class="p">)</span>
+</span></code></pre></div>
+<p>空间不足时由 LRU/ARC policy 决定 eviction。<code>protected = set(keys)</code> 避免本次 store 相关 keys 被同一轮淘汰。</p>
+<h2 id="worker">Worker 侧数据拷贝</h2>
+<p>Scheduler 只生成 transfer metadata。Worker 根据 <code>(src.medium(), dst.medium())</code> 分发到对应 handler：</p>
+<p>实现位置：<code>vllm/v1/kv_offload/worker/worker.py</code></p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-36-1"><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a><span class="n">src</span><span class="p">,</span> <span class="n">dst</span> <span class="o">=</span> <span class="n">spec</span>
+</span><span id="__span-36-2"><a id="__codelineno-36-2" name="__codelineno-36-2" href="#__codelineno-36-2"></a><span class="n">transfer_type</span> <span class="o">=</span> <span class="p">(</span><span class="n">src</span><span class="o">.</span><span class="n">medium</span><span class="p">(),</span> <span class="n">dst</span><span class="o">.</span><span class="n">medium</span><span class="p">())</span>
+</span><span id="__span-36-3"><a id="__codelineno-36-3" name="__codelineno-36-3" href="#__codelineno-36-3"></a><span class="n">handler</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transfer_type_to_handler</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">transfer_type</span><span class="p">)</span>
+</span><span id="__span-36-4"><a id="__codelineno-36-4" name="__codelineno-36-4" href="#__codelineno-36-4"></a><span class="n">success</span> <span class="o">=</span> <span class="n">handler</span><span class="o">.</span><span class="n">transfer_async</span><span class="p">(</span><span class="n">job_id</span><span class="p">,</span> <span class="n">spec</span><span class="p">)</span>
+</span></code></pre></div>
+<p>GPU/CPU handler 在独立 stream 上执行 block copy：</p>
+<p>实现位置：<code>vllm/v1/kv_offload/cpu/gpu_worker.py</code></p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-37-1"><a id="__codelineno-37-1" name="__codelineno-37-1" href="#__codelineno-37-1"></a><span class="k">with</span> <span class="n">current_platform</span><span class="o">.</span><span class="n">stream</span><span class="p">(</span><span class="n">stream</span><span class="p">):</span>
+</span><span id="__span-37-2"><a id="__codelineno-37-2" name="__codelineno-37-2" href="#__codelineno-37-2"></a>    <span class="n">start_event</span><span class="o">.</span><span class="n">record</span><span class="p">(</span><span class="n">stream</span><span class="p">)</span>
+</span><span id="__span-37-3"><a id="__codelineno-37-3" name="__codelineno-37-3" href="#__codelineno-37-3"></a>    <span class="k">if</span> <span class="n">num_copy_ops</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+</span><span id="__span-37-4"><a id="__codelineno-37-4" name="__codelineno-37-4" href="#__codelineno-37-4"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_swap_blocks_batch</span><span class="p">(</span>
+</span><span id="__span-37-5"><a id="__codelineno-37-5" name="__codelineno-37-5" href="#__codelineno-37-5"></a>            <span class="n">src</span><span class="p">,</span>
+</span><span id="__span-37-6"><a id="__codelineno-37-6" name="__codelineno-37-6" href="#__codelineno-37-6"></a>            <span class="n">dst</span><span class="p">,</span>
+</span><span id="__span-37-7"><a id="__codelineno-37-7" name="__codelineno-37-7" href="#__codelineno-37-7"></a>            <span class="n">sizes</span><span class="p">,</span>
+</span><span id="__span-37-8"><a id="__codelineno-37-8" name="__codelineno-37-8" href="#__codelineno-37-8"></a>            <span class="n">is_src_access_order_any</span><span class="o">=</span><span class="n">is_src_access_order_any</span><span class="p">,</span>
+</span><span id="__span-37-9"><a id="__codelineno-37-9" name="__codelineno-37-9" href="#__codelineno-37-9"></a>        <span class="p">)</span>
+</span><span id="__span-37-10"><a id="__codelineno-37-10" name="__codelineno-37-10" href="#__codelineno-37-10"></a>    <span class="n">end_event</span><span class="o">.</span><span class="n">record</span><span class="p">(</span><span class="n">stream</span><span class="p">)</span>
+</span></code></pre></div>
+<p>Copy function 选择逻辑：</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-38-1"><a id="__codelineno-38-1" name="__codelineno-38-1" href="#__codelineno-38-1"></a><span class="k">if</span> <span class="n">gpu_to_cpu</span><span class="p">:</span>
+</span><span id="__span-38-2"><a id="__codelineno-38-2" name="__codelineno-38-2" href="#__codelineno-38-2"></a>    <span class="k">return</span> <span class="n">ops</span><span class="o">.</span><span class="n">swap_blocks_batch</span>
+</span><span id="__span-38-3"><a id="__codelineno-38-3" name="__codelineno-38-3" href="#__codelineno-38-3"></a><span class="k">if</span> <span class="ow">not</span> <span class="n">HAS_TRITON</span> <span class="ow">or</span> <span class="n">current_platform</span><span class="o">.</span><span class="n">is_xpu</span><span class="p">():</span>
+</span><span id="__span-38-4"><a id="__codelineno-38-4" name="__codelineno-38-4" href="#__codelineno-38-4"></a>    <span class="k">return</span> <span class="n">ops</span><span class="o">.</span><span class="n">swap_blocks_batch</span>
+</span><span id="__span-38-5"><a id="__codelineno-38-5" name="__codelineno-38-5" href="#__codelineno-38-5"></a><span class="k">if</span> <span class="ow">not</span> <span class="n">page_sizes</span> <span class="ow">or</span> <span class="nb">max</span><span class="p">(</span><span class="n">page_sizes</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">THRESHOLD_BYTES</span> <span class="ow">or</span> <span class="nb">any</span><span class="p">(</span><span class="n">s</span> <span class="o">%</span> <span class="mi">8</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">page_sizes</span><span class="p">):</span>
+</span><span id="__span-38-6"><a id="__codelineno-38-6" name="__codelineno-38-6" href="#__codelineno-38-6"></a>    <span class="k">return</span> <span class="n">ops</span><span class="o">.</span><span class="n">swap_blocks_batch</span>
+</span><span id="__span-38-7"><a id="__codelineno-38-7" name="__codelineno-38-7" href="#__codelineno-38-7"></a><span class="k">return</span> <span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span><span class="n">swap_blocks_batch</span><span class="p">,</span> <span class="n">bytes_per_chunk</span><span class="o">=</span><span class="n">chunk</span><span class="p">)</span>
+</span></code></pre></div>
+<p>含义：</p>
+<ul>
+<li>GPU -&gt; CPU store：走 <code>ops.swap_blocks_batch</code>，即 C++ batched memcpy / DMA path。</li>
+<li>CPU -&gt; GPU load：满足 Triton 可用、非 XPU、小 page、8-byte 对齐且 descriptor 数量足够时，走 Triton kernel；否则回退到 <code>ops.swap_blocks_batch</code>。</li>
+<li>Triton path 使用 GPU SM 从 CPU pinned/UVA memory load，再 store 到 HBM；不是 copy engine DMA。</li>
+</ul>
+<h2 id="_4">传输机制与通信影响</h2>
+<p>DRAM/FS offloading 的 GPU/CPU 传输不使用 NCCL、NIXL 或 RDMA。它是本节点内 GPU HBM 与 CPU memory 之间的 copy。</p>
+<div class="mermaid">flowchart LR
+    subgraph DMA["ops.swap_blocks_batch"]
+        C[CPU pinned DRAM]
+        P[PCIe / C2C]
+        CE[GPU copy engine / DMA]
+        H[GPU HBM]
+        C &lt;--&gt; P &lt;--&gt; CE &lt;--&gt; H
+    end
+
+    subgraph Triton["CPU -&gt; GPU Triton fast path"]
+        SM[GPU SM]
+        Host[CPU pinned/UVA memory]
+        HBM[GPU HBM]
+        SM --&gt; |tl.load over PCIe/C2C| Host
+        SM --&gt; |tl.store| HBM
+    end</div>
+<p>硬件链路取决于平台拓扑：</p>
+<ul>
+<li>普通 x86 + PCIe GPU：CPU DRAM 与 GPU HBM 之间通常走 PCIe。</li>
+<li>Grace Hopper 等平台：CPU/GPU 之间可能走 NVLink-C2C 或 coherent interconnect。</li>
+<li>NCCL 不是这条 CPU/GPU copy 的执行机制。</li>
+</ul>
+<p>是否影响 NCCL 取决于 NCCL 实际选路：</p>
+<ul>
+<li>NCCL 也走 PCIe 或 GPUDirect RDMA/NIC 时，offload DMA 可能竞争 PCIe switch、root complex、NIC 或 GPU copy engine。</li>
+<li>NCCL 主要走 NVLink/NVSwitch，而 offload 走 PCIe/C2C 时，链路层直接冲突较小，但仍可能争用 GPU copy engine、L2/memory subsystem、host memory bandwidth 或 NUMA 链路。</li>
+<li>CPU -&gt; GPU Triton fast path 会占用 SM，因此可能与计算 kernel 或 NCCL kernel 产生执行资源竞争。</li>
+</ul>
+<p>Filesystem secondary 不直接访问 GPU。它读写 CPU primary memory view：</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-39-1"><a id="__codelineno-39-1" name="__codelineno-39-1" href="#__codelineno-39-1"></a>CPU DRAM -&gt; filesystem / block device IO -&gt; local NVMe or shared filesystem
+</span></code></pre></div>
+<p>实现位置：</p>
+<ul>
+<li><code>vllm/v1/kv_offload/tiering/fs/manager.py</code></li>
+<li><code>vllm/v1/kv_offload/tiering/fs/io.py</code></li>
+</ul>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-40-1"><a id="__codelineno-40-1" name="__codelineno-40-1" href="#__codelineno-40-1"></a><span class="n">fd</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">tmp_path</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">O_CREAT</span> <span class="o">|</span> <span class="n">os</span><span class="o">.</span><span class="n">O_EXCL</span> <span class="o">|</span> <span class="n">os</span><span class="o">.</span><span class="n">O_WRONLY</span> <span class="o">|</span> <span class="n">os</span><span class="o">.</span><span class="n">O_TRUNC</span> <span class="o">|</span> <span class="n">O_DIRECT</span><span class="p">)</span>
+</span><span id="__span-40-2"><a id="__codelineno-40-2" name="__codelineno-40-2" href="#__codelineno-40-2"></a><span class="n">written</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">fd</span><span class="p">,</span> <span class="n">view_slice</span><span class="p">)</span>
+</span><span id="__span-40-3"><a id="__codelineno-40-3" name="__codelineno-40-3" href="#__codelineno-40-3"></a><span class="o">...</span>
+</span><span id="__span-40-4"><a id="__codelineno-40-4" name="__codelineno-40-4" href="#__codelineno-40-4"></a><span class="n">fd</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">source_path</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">O_RDONLY</span> <span class="o">|</span> <span class="n">O_DIRECT</span><span class="p">)</span>
+</span><span id="__span-40-5"><a id="__codelineno-40-5" name="__codelineno-40-5" href="#__codelineno-40-5"></a><span class="n">bytes_read</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">readv</span><span class="p">(</span><span class="n">fd</span><span class="p">,</span> <span class="p">[</span><span class="n">view_slice</span><span class="p">])</span>
+</span></code></pre></div>
+<p>Object-store secondary 是例外：<code>vllm/v1/kv_offload/tiering/obj/manager.py</code> 使用 NIXL OBJ backend 在 CPU DRAM 与对象存储之间传输。因此“offloading 不用 NIXL”只适用于 DRAM-only 和 filesystem secondary。</p>
+<h2 id="multi-tier-offloading">Multi-tier Offloading</h2>
+<p>Multi-tier 数据路径：</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-41-1"><a id="__codelineno-41-1" name="__codelineno-41-1" href="#__codelineno-41-1"></a>GPU KV cache &lt;-&gt; CPU primary tier &lt;-&gt; secondary tier
+</span></code></pre></div>
+<h3 id="_5">初始化</h3>
+<p>实现位置：<code>vllm/v1/kv_offload/tiering/spec.py</code></p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-42-1"><a id="__codelineno-42-1" name="__codelineno-42-1" href="#__codelineno-42-1"></a><span class="n">primary_tier</span> <span class="o">=</span> <span class="n">CPUPrimaryTierOffloadingManager</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+</span><span id="__span-42-2"><a id="__codelineno-42-2" name="__codelineno-42-2" href="#__codelineno-42-2"></a><span class="n">tier</span> <span class="o">=</span> <span class="n">SecondaryTierFactory</span><span class="o">.</span><span class="n">create_secondary_tier</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+</span><span id="__span-42-3"><a id="__codelineno-42-3" name="__codelineno-42-3" href="#__codelineno-42-3"></a><span class="n">tiering_manager</span> <span class="o">=</span> <span class="n">TieringOffloadingManager</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+</span></code></pre></div>
+<h3 id="cascade-primary-secondary">Cascade: primary -&gt; secondary</h3>
+<p>通过 scheduler/primary 过滤并成功写入 CPU primary 的新 blocks，会默认提交给所有 configured secondary tiers。</p>
+<p>实现位置：<code>vllm/v1/kv_offload/tiering/manager.py</code></p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-43-1"><a id="__codelineno-43-1" name="__codelineno-43-1" href="#__codelineno-43-1"></a><span class="bp">self</span><span class="o">.</span><span class="n">primary_tier</span><span class="o">.</span><span class="n">complete_store</span><span class="p">(</span><span class="n">keys</span><span class="p">,</span> <span class="n">req_context</span><span class="p">,</span> <span class="n">success</span><span class="p">)</span>
+</span><span id="__span-43-2"><a id="__codelineno-43-2" name="__codelineno-43-2" href="#__codelineno-43-2"></a><span class="k">if</span> <span class="ow">not</span> <span class="n">success</span><span class="p">:</span>
+</span><span id="__span-43-3"><a id="__codelineno-43-3" name="__codelineno-43-3" href="#__codelineno-43-3"></a>    <span class="k">return</span>
+</span><span id="__span-43-4"><a id="__codelineno-43-4" name="__codelineno-43-4" href="#__codelineno-43-4"></a>
+</span><span id="__span-43-5"><a id="__codelineno-43-5" name="__codelineno-43-5" href="#__codelineno-43-5"></a><span class="k">for</span> <span class="n">tier</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">secondary_tiers</span><span class="p">:</span>
+</span><span id="__span-43-6"><a id="__codelineno-43-6" name="__codelineno-43-6" href="#__codelineno-43-6"></a>    <span class="n">primary_blocks_spec</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">primary_tier</span><span class="o">.</span><span class="n">prepare_read</span><span class="p">(</span><span class="n">keys</span><span class="p">,</span> <span class="n">req_context</span><span class="p">)</span>
+</span><span id="__span-43-7"><a id="__codelineno-43-7" name="__codelineno-43-7" href="#__codelineno-43-7"></a>    <span class="o">...</span>
+</span><span id="__span-43-8"><a id="__codelineno-43-8" name="__codelineno-43-8" href="#__codelineno-43-8"></a>    <span class="n">tier</span><span class="o">.</span><span class="n">submit_store</span><span class="p">(</span><span class="n">job_metadata</span><span class="p">)</span>
+</span></code></pre></div>
+<p>这不是基于 HBM pressure 的冷热选择。更早的 scheduler 过滤决定哪些 blocks 进入 offload system；secondary tier 自己可以在 <code>submit_store()</code> 中去重、淘汰或分配后端空间。</p>
+<h3 id="promotion-secondary-primary">Promotion: secondary -&gt; primary</h3>
+<p>CPU primary miss 且 secondary hit 时，manager 启动 promotion。Promotion 先在 CPU primary 分配目标 slot，再提交 secondary -&gt; primary load。</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-44-1"><a id="__codelineno-44-1" name="__codelineno-44-1" href="#__codelineno-44-1"></a><span class="n">primary_hit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">primary_tier</span><span class="o">.</span><span class="n">lookup</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">req_context</span><span class="p">)</span>
+</span><span id="__span-44-2"><a id="__codelineno-44-2" name="__codelineno-44-2" href="#__codelineno-44-2"></a><span class="k">if</span> <span class="n">primary_hit</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+</span><span id="__span-44-3"><a id="__codelineno-44-3" name="__codelineno-44-3" href="#__codelineno-44-3"></a>    <span class="k">return</span> <span class="kc">True</span>
+</span><span id="__span-44-4"><a id="__codelineno-44-4" name="__codelineno-44-4" href="#__codelineno-44-4"></a>
+</span><span id="__span-44-5"><a id="__codelineno-44-5" name="__codelineno-44-5" href="#__codelineno-44-5"></a><span class="k">for</span> <span class="n">tier</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">secondary_tiers</span><span class="p">:</span>
+</span><span id="__span-44-6"><a id="__codelineno-44-6" name="__codelineno-44-6" href="#__codelineno-44-6"></a>    <span class="n">result</span> <span class="o">=</span> <span class="n">tier</span><span class="o">.</span><span class="n">lookup</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">req_context</span><span class="p">)</span>
+</span><span id="__span-44-7"><a id="__codelineno-44-7" name="__codelineno-44-7" href="#__codelineno-44-7"></a>    <span class="k">if</span> <span class="n">result</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+</span><span id="__span-44-8"><a id="__codelineno-44-8" name="__codelineno-44-8" href="#__codelineno-44-8"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initiate_promotion</span><span class="p">(</span><span class="n">tier</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">req_context</span><span class="p">):</span>
+</span><span id="__span-44-9"><a id="__codelineno-44-9" name="__codelineno-44-9" href="#__codelineno-44-9"></a>            <span class="k">return</span> <span class="kc">False</span>
+</span><span id="__span-44-10"><a id="__codelineno-44-10" name="__codelineno-44-10" href="#__codelineno-44-10"></a>        <span class="k">return</span> <span class="kc">None</span>
+</span></code></pre></div>
+<p>Promotion 请求按 <code>(tier, request)</code> 聚合，并在 <code>on_schedule_end()</code> flush：</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-45-1"><a id="__codelineno-45-1" name="__codelineno-45-1" href="#__codelineno-45-1"></a><span class="n">tier_pending</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pending_load_submissions</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">tier</span><span class="p">,</span> <span class="p">{})</span>
+</span><span id="__span-45-2"><a id="__codelineno-45-2" name="__codelineno-45-2" href="#__codelineno-45-2"></a><span class="o">...</span>
+</span><span id="__span-45-3"><a id="__codelineno-45-3" name="__codelineno-45-3" href="#__codelineno-45-3"></a><span class="n">tier</span><span class="o">.</span><span class="n">submit_load</span><span class="p">(</span><span class="n">job_metadata</span><span class="p">)</span>
+</span></code></pre></div>
+<p>不同 request 分别生成 promotion job。</p>
+<h3 id="filesystem-sharing">Filesystem sharing</h3>
+<p>Filesystem tier 通过 block hash 映射文件名。跨进程共享 filesystem cache 时需要固定 <code>PYTHONHASHSEED</code>；否则 <code>NONE_HASH</code> 随进程随机化，相同 token 内容可能映射到不同文件名。</p>
+<h2 id="completion">Completion 与状态回收</h2>
+<p>Worker 完成 GPU/CPU transfer 后，将 job id 写入 <code>OffloadingWorkerMetadata</code>；scheduler 在 <code>update_connector_output()</code> 中消费完成事件。</p>
+<p>实现位置：<code>vllm/distributed/kv_transfer/kv_connector/v1/offloading/scheduler.py</code></p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-46-1"><a id="__codelineno-46-1" name="__codelineno-46-1" href="#__codelineno-46-1"></a><span class="k">if</span> <span class="n">job_status</span><span class="o">.</span><span class="n">is_store</span><span class="p">:</span>
+</span><span id="__span-46-2"><a id="__codelineno-46-2" name="__codelineno-46-2" href="#__codelineno-46-2"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">manager</span><span class="o">.</span><span class="n">complete_store</span><span class="p">(</span><span class="n">job_status</span><span class="o">.</span><span class="n">keys</span><span class="p">,</span> <span class="n">req_status</span><span class="o">.</span><span class="n">req_context</span><span class="p">)</span>
+</span><span id="__span-46-3"><a id="__codelineno-46-3" name="__codelineno-46-3" href="#__codelineno-46-3"></a><span class="k">else</span><span class="p">:</span>
+</span><span id="__span-46-4"><a id="__codelineno-46-4" name="__codelineno-46-4" href="#__codelineno-46-4"></a>    <span class="bp">self</span><span class="o">.</span><span class="n">manager</span><span class="o">.</span><span class="n">complete_load</span><span class="p">(</span><span class="n">job_status</span><span class="o">.</span><span class="n">keys</span><span class="p">,</span> <span class="n">req_status</span><span class="o">.</span><span class="n">req_context</span><span class="p">)</span>
+</span></code></pre></div>
+<p>CPU tier 中：</p>
+<ul>
+<li><code>complete_load()</code> 降低 <code>ref_cnt</code>，允许后续 eviction。</li>
+<li><code>complete_store()</code> 将 block 标记为 ready。</li>
+</ul>
+<p>Secondary tier completion 由 <code>TieringOffloadingManager._maybe_process_finished_jobs()</code> 轮询 secondary tier 的 <code>get_finished_jobs()</code>，然后更新 primary 的 read/write 状态。</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-47-1"><a id="__codelineno-47-1" name="__codelineno-47-1" href="#__codelineno-47-1"></a><span class="k">for</span> <span class="n">tier</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">secondary_tiers</span><span class="p">:</span>
+</span><span id="__span-47-2"><a id="__codelineno-47-2" name="__codelineno-47-2" href="#__codelineno-47-2"></a>    <span class="k">for</span> <span class="n">completed_job</span> <span class="ow">in</span> <span class="n">tier</span><span class="o">.</span><span class="n">get_finished_jobs</span><span class="p">():</span>
+</span><span id="__span-47-3"><a id="__codelineno-47-3" name="__codelineno-47-3" href="#__codelineno-47-3"></a>        <span class="n">job_metadata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_transfer_jobs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">job_id</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+</span><span id="__span-47-4"><a id="__codelineno-47-4" name="__codelineno-47-4" href="#__codelineno-47-4"></a>        <span class="o">...</span>
+</span></code></pre></div>
+<h2 id="end-to-end-flow">End-to-End Flow</h2>
+<div class="mermaid">sequenceDiagram
+    participant Req as Request
+    participant Sch as Scheduler
+    participant CS as OffloadingConnectorScheduler
+    participant M as OffloadingManager/TieringManager
+    participant CW as OffloadingConnectorWorker
+    participant H as GPU/CPU Handler
+    participant ST as SecondaryTierManager
+
+    Req-&gt;&gt;Sch: arrive / scheduled
+    Sch-&gt;&gt;CS: on_new_request()
+    CS-&gt;&gt;M: on_new_request(req_context)
+
+    Sch-&gt;&gt;CS: get_num_new_matched_tokens()
+    CS-&gt;&gt;M: lookup(OffloadKey)
+    M--&gt;&gt;CS: hit / miss / pending
+
+    alt load hit
+        Sch-&gt;&gt;CS: update_state_after_alloc()
+        CS-&gt;&gt;M: prepare_load(keys)
+        CS--&gt;&gt;CW: load_jobs metadata
+        CW-&gt;&gt;H: transfer_async(CPU -&gt; GPU)
+    end
+
+    Sch-&gt;&gt;CS: build_connector_meta()
+    CS-&gt;&gt;M: prepare_store(keys)
+    CS--&gt;&gt;CW: store_jobs metadata
+    CW-&gt;&gt;CW: defer store jobs
+    CW-&gt;&gt;H: next step transfer_async(GPU -&gt; CPU)
+    CW--&gt;&gt;CS: completed_jobs
+    CS-&gt;&gt;M: complete_store(keys)
+
+    opt multi-tier
+        M-&gt;&gt;ST: submit_store(primary -&gt; secondary)
+        ST--&gt;&gt;M: get_finished_jobs()
+        M-&gt;&gt;ST: submit_load(secondary -&gt; primary) on promotion
+    end</div>
+<h2 id="_6">阅读入口</h2>
+<ol>
+<li>
+<p><code>vllm/v1/kv_offload/base.py</code>
+   <code>OffloadKey</code>、<code>ReqContext</code>、<code>OffloadPolicy</code>、<code>OffloadingManager</code>。</p>
+</li>
+<li>
+<p><code>vllm/v1/core/kv_cache_utils.py</code>
+   <code>hash_block_tokens()</code>、<code>get_request_block_hasher()</code>。</p>
+</li>
+<li>
+<p><code>vllm/distributed/kv_transfer/kv_connector/v1/offloading/scheduler.py</code>
+   <code>on_new_request()</code>、<code>get_num_new_matched_tokens()</code>、<code>update_state_after_alloc()</code>、<code>_build_store_jobs()</code>、<code>update_connector_output()</code>。</p>
+</li>
+<li>
+<p><code>vllm/distributed/kv_transfer/kv_connector/v1/offloading/worker.py</code>
+   load/store jobs 的 worker 侧提交。</p>
+</li>
+<li>
+<p><code>vllm/v1/kv_offload/worker/worker.py</code>
+   transfer handler 分发。</p>
+</li>
+<li>
+<p><code>vllm/v1/kv_offload/cpu/manager.py</code>
+   DRAM tier 索引、去重、eviction、ref count。</p>
+</li>
+<li>
+<p><code>vllm/v1/kv_offload/cpu/gpu_worker.py</code>
+   GPU &lt;-&gt; CPU block copy。</p>
+</li>
+<li>
+<p><code>vllm/v1/kv_offload/tiering/manager.py</code>
+   CPU primary + secondary tier promotion/cascade。</p>
+</li>
+<li>
+<p><code>vllm/v1/kv_offload/tiering/base.py</code>
+   secondary tier 抽象接口与 scheduler-side 约束。</p>
+</li>
+<li>
+<p><code>vllm/v1/kv_offload/tiering/fs/manager.py</code>
+    filesystem secondary tier。</p>
+</li>
+</ol>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      <script id="__config" type="application/json">{"base": "../../..", "features": [], "search": "../../../assets/javascripts/workers/search.973d3a69.min.js", "tags": null, "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}, "version": null}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.f55a23d4.min.js"></script>
+      
+        <script src="../../../javascripts/mathjax.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+      
+        <script src="../../../javascripts/mermaid.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>

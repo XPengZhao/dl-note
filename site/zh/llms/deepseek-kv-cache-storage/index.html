@@ -8,13 +8,9 @@
       
       
       
-        <link rel="canonical" href="https://XPengZhao.github.io/dl-note/zh/llms/overview/">
+        <link rel="canonical" href="https://XPengZhao.github.io/dl-note/zh/llms/deepseek-kv-cache-storage/">
       
       
-        <link rel="prev" href="../../neural-graphics/">
-      
-      
-        <link rel="next" href="../request-lifecycle/">
       
       
       <link rel="icon" href="../../../assets/images/favicon.png">
@@ -22,7 +18,7 @@
     
     
       
-        <title>总览 - DL Notes</title>
+        <title>DeepSeek KV Cache 存储方案 - DL Notes</title>
       
     
     
@@ -68,7 +64,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#ai-infra" class="md-skip">
+        <a href="#deepseek-kv-cache" class="md-skip">
           跳转至
         </a>
       
@@ -104,7 +100,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              总览
+              DeepSeek KV Cache 存储方案
             
           </span>
         </div>
@@ -125,7 +121,7 @@
       <ul class="md-select__list">
         
           <li class="md-select__item">
-            <a href="../../../llms/overview/" hreflang="en" class="md-select__link">
+            <a href="/dl-note/" hreflang="en" class="md-select__link">
               English
             </a>
           </li>
@@ -311,20 +307,18 @@
       
   
   
-    
   
   
-  
     
     
     
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
         
           
           <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
@@ -340,7 +334,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_5">
             <span class="md-nav__icon md-icon"></span>
             AI Infra
@@ -351,32 +345,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    总览
-    
-  </span>
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../overview/" class="md-nav__link">
         
   
   
@@ -387,167 +359,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="目录">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      目录
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#_1" class="md-nav__link">
-    <span class="md-ellipsis">
-      序言
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#_2" class="md-nav__link">
-    <span class="md-ellipsis">
-      为什么需要总览
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#_3" class="md-nav__link">
-    <span class="md-ellipsis">
-      两条轴线：控制面与数据面
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#_4" class="md-nav__link">
-    <span class="md-ellipsis">
-      推理系统的分层视图
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="推理系统的分层视图">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#1" class="md-nav__link">
-    <span class="md-ellipsis">
-      1. 应用层
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#2-agent" class="md-nav__link">
-    <span class="md-ellipsis">
-      2. Agent 与编排层
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#3" class="md-nav__link">
-    <span class="md-ellipsis">
-      3. 网关与路由层
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#4-serving-engine" class="md-nav__link">
-    <span class="md-ellipsis">
-      4. Serving Engine 层
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#5" class="md-nav__link">
-    <span class="md-ellipsis">
-      5. 运行时与调度层
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#6" class="md-nav__link">
-    <span class="md-ellipsis">
-      6. 模型执行层
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#7-kernel" class="md-nav__link">
-    <span class="md-ellipsis">
-      7. 算子与 Kernel 层
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#8" class="md-nav__link">
-    <span class="md-ellipsis">
-      8. 系统运行时与硬件层
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#vllm-sglang" class="md-nav__link">
-    <span class="md-ellipsis">
-      vLLM 和 SGLang 在哪里
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#_5" class="md-nav__link">
-    <span class="md-ellipsis">
-      一次请求是怎样穿过整个栈的
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#_6" class="md-nav__link">
-    <span class="md-ellipsis">
-      在本笔记中的阅读路径
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -885,109 +696,73 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#_1" class="md-nav__link">
+  <a href="#1" class="md-nav__link">
     <span class="md-ellipsis">
-      序言
+      1. 问题定义
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#_2" class="md-nav__link">
+  <a href="#2-swa-full-kv-baseline" class="md-nav__link">
     <span class="md-ellipsis">
-      为什么需要总览
+      2. SWA Full KV Baseline
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#_3" class="md-nav__link">
+  <a href="#3-checkpoint" class="md-nav__link">
     <span class="md-ellipsis">
-      两条轴线：控制面与数据面
+      3. Checkpoint 作为恢复锚点
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#_4" class="md-nav__link">
+  <a href="#4" class="md-nav__link">
     <span class="md-ellipsis">
-      推理系统的分层视图
+      4. 重算对象
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="推理系统的分层视图">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5" class="md-nav__link">
+    <span class="md-ellipsis">
+      5. 层间依赖链
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-deepseek" class="md-nav__link">
+    <span class="md-ellipsis">
+      6. DeepSeek 路线中的保存对象与恢复对象
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6. DeepSeek 路线中的保存对象与恢复对象">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#1" class="md-nav__link">
+  <a href="#61" class="md-nav__link">
     <span class="md-ellipsis">
-      1. 应用层
+      6.1 长期保存对象
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#2-agent" class="md-nav__link">
+  <a href="#62" class="md-nav__link">
     <span class="md-ellipsis">
-      2. Agent 与编排层
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#3" class="md-nav__link">
-    <span class="md-ellipsis">
-      3. 网关与路由层
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#4-serving-engine" class="md-nav__link">
-    <span class="md-ellipsis">
-      4. Serving Engine 层
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#5" class="md-nav__link">
-    <span class="md-ellipsis">
-      5. 运行时与调度层
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#6" class="md-nav__link">
-    <span class="md-ellipsis">
-      6. 模型执行层
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#7-kernel" class="md-nav__link">
-    <span class="md-ellipsis">
-      7. 算子与 Kernel 层
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#8" class="md-nav__link">
-    <span class="md-ellipsis">
-      8. 系统运行时与硬件层
+      6.2 当前步恢复对象
     </span>
   </a>
   
@@ -999,27 +774,18 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#vllm-sglang" class="md-nav__link">
+  <a href="#7" class="md-nav__link">
     <span class="md-ellipsis">
-      vLLM 和 SGLang 在哪里
+      7. 存储与恢复的平衡
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#_5" class="md-nav__link">
+  <a href="#8" class="md-nav__link">
     <span class="md-ellipsis">
-      一次请求是怎样穿过整个栈的
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#_6" class="md-nav__link">
-    <span class="md-ellipsis">
-      在本笔记中的阅读路径
+      8. 总结
     </span>
   </a>
   
@@ -1041,103 +807,148 @@
 
 
 
-<h1 id="ai-infra">AI Infra 总览</h1>
-<h2 id="_1">序言</h2>
-<p>当我在2025年3月5号第一次从Wireless Systems 不知道多少度调转车头开始接触 AI Infra 这个领域时，我</p>
-<p>现代推理系统是一个完整的技术栈，而不是某一个单独框架。当人们说“我们在用 vLLM”或者“我们在用 SGLang”时，通常只是在指这个大系统中的一层。真实部署里还包括应用逻辑、agent 编排、请求路由、调度策略、模型执行、算子库，以及底层的运行时和硬件支持。如果没有一个全栈视角，就很容易把瓶颈归错层，或者误判到底该由哪一层来解决问题。</p>
-<h2 id="_2">为什么需要总览</h2>
-<p>很多 AI Infra 问题表面上看起来相似，但本质上属于不同层。</p>
+<h1 id="deepseek-kv-cache">DeepSeek KV Cache 存储方案</h1>
+<h2 id="1">1. 问题定义</h2>
+<p>设已命中的前缀长度为 <span class="arithmatex">\(N\)</span>，现在模型要根据前缀最后一个位置预测下一个 token，即 <span class="arithmatex">\(token_{N+1}\)</span>。模型共有 <span class="arithmatex">\(L\)</span> 层，并采用 sliding window attention（SWA）。这里约定窗口大小 <span class="arithmatex">\(W\)</span> 包含当前参与计算的位置本身；因此在位置 <span class="arithmatex">\(N\)</span> 计算用于预测 <span class="arithmatex">\(token_{N+1}\)</span> 的表示时，第 <span class="arithmatex">\(\ell\)</span> 层访问的窗口范围为</p>
+<div class="arithmatex">\[
+\mathcal{W}_N = \{N-W+1,\dots,N\}
+\]</div>
+<p>若 <span class="arithmatex">\(N &lt; W\)</span>，则窗口退化为 <span class="arithmatex">\(\{1,\dots,N\}\)</span>。记：</p>
 <ul>
-<li>如果一个 agent workflow 很慢，瓶颈可能在 prompt 组装、工具调用延迟，或者请求 fan-out，而不一定在 serving engine 本身。</li>
-<li>如果吞吐低，问题可能在上层路由或 batching 策略，而不一定在 kernel。</li>
-<li>如果某个 engine 出现 preemption 或延迟抖动，根因可能是 KV 压力、准入控制或部署拓扑，而不一定是模型本身。</li>
+<li>第 <span class="arithmatex">\(\ell\)</span> 层、位置 <span class="arithmatex">\(t\)</span> 的 hidden state 为 <span class="arithmatex">\(h_t^{(\ell)}\)</span></li>
+<li>第 <span class="arithmatex">\(\ell\)</span> 层、位置 <span class="arithmatex">\(t\)</span> 的 key/value 为 <span class="arithmatex">\(K_t^{(\ell)}, V_t^{(\ell)}\)</span></li>
+<li>输入 embedding 记为 <span class="arithmatex">\(h_t^{(0)}\)</span></li>
 </ul>
-<p>总览的价值就在于先把这些层次拆开，再去讨论具体机制。</p>
-<h2 id="_3">两条轴线：控制面与数据面</h2>
-<p>理解这个系统，一个很有用的方法是先区分控制面和数据面。</p>
-<ul>
-<li><strong>控制面（control plane）</strong> 决定什么应该运行、在哪里运行、按什么策略运行。它包括路由、配额、自动扩缩容、准入控制、模型选择，以及 agent 级编排。</li>
-<li><strong>数据面（data plane）</strong> 负责真正执行请求。它包括 prompt 预处理、serving engine 内部调度、模型前向、kernel 执行、内存移动，以及硬件上的实际运行。</li>
-</ul>
-<p>真实系统往往横跨这两条轴线。比如上层路由是控制面决策，但它会直接影响数据面的 cache 局部性和 batch 形成方式。</p>
-<h2 id="_4">推理系统的分层视图</h2>
-<p>下面这张图是一个比较实用的分层方式：</p>
-<div class="mermaid">flowchart TD
-    A["应用层&lt;br/&gt;Chat app, API 产品, workflow service"] --&gt; B["Agent / 编排层&lt;br/&gt;工具调用, prompt assembly, 多步计划"]
-    B --&gt; C["网关 / 路由层&lt;br/&gt;负载均衡, 模型选择, sticky routing, 配额"]
-    C --&gt; D["Serving Engine 层&lt;br/&gt;vLLM, SGLang, TGI, TensorRT-LLM server"]
-    D --&gt; E["运行时 / 调度层&lt;br/&gt;Continuous batching, KV manager, admission control, prefill/decode scheduling"]
-    E --&gt; F["模型执行层&lt;br/&gt;Transformer blocks, attention, MLP, MoE, sampling"]
-    F --&gt; G["算子 / Kernel 层&lt;br/&gt;Paged attention, GEMM, all-reduce, fused ops, Triton/CUDA kernels"]
-    G --&gt; H["系统运行时 / 硬件层&lt;br/&gt;CUDA, NCCL, GPU memory, NVLink/PCIe, HBM, SMs"]</div>
-<h3 id="1">1. 应用层</h3>
-<p>这一层是最终用户直接接触到的产品形态，例如聊天系统、搜索系统、编码助手、文档处理流水线或企业 workflow。它决定什么用户行为会触发模型调用，以及系统真正关心的业务约束是什么，比如延迟目标、会话连续性或成本上限。</p>
-<h3 id="2-agent">2. Agent 与编排层</h3>
-<p>这一层负责把业务需求组织成真正的模型负载。它可能包括 prompt 组装、检索增强、工具调用、多轮记忆、分支推理或任务拆解。各种 agent framework 都属于这一层。它的主要作用不是底层执行效率，而是 workload shaping，也就是决定请求有多大、请求有多频繁，以及请求之间是否存在结构上的相似性。</p>
-<h3 id="3">3. 网关与路由层</h3>
-<p>这一层负责决定每个请求被送往哪个后端。它包括外部负载均衡、模型选择、sticky routing、流量隔离和多副本流量策略。对长上下文 serving 来说，这一层比看起来更重要，因为路由决策会直接影响 prefix cache 局部性、batch 形成方式，以及不同副本之间的公平性。</p>
-<h3 id="4-serving-engine">4. Serving Engine 层</h3>
-<p>这一层通常就是 <strong>vLLM</strong>、<strong>SGLang</strong> 这类框架所在的位置。它们提供 engine 抽象，对上接受 tokenized 或结构化请求，对外暴露 generation API。它们并不是整个系统本身，而是处在上层流量管理和下层模型执行之间的核心 serving substrate。</p>
-<p>这一层常见职责包括：</p>
-<ul>
-<li>请求准入与生命周期管理</li>
-<li>batching 与 streaming 接口</li>
-<li>KV cache 管理与 paging</li>
-<li>decode loop 编排</li>
-<li>与分布式执行的集成</li>
-</ul>
-<h3 id="5">5. 运行时与调度层</h3>
-<p>在一个 serving engine 内部，其实还有更细的一层结构，也就是 runtime。本层负责内部调度。continuous batching、chunked prefill、preemption、block 分配、准入控制和 KV 压力处理都属于这里。</p>
-<p>这一层往往决定了系统的真实性能。即使模型相同、engine 相同，不同 runtime 策略也可能导致完全不同的行为。</p>
-<h3 id="6">6. 模型执行层</h3>
-<p>这一层是模型本身的数学结构：attention blocks、MLP、MoE routing、RoPE、sampling head 和输出 logits。像“这个模型是不是 GQA”“每个 token 的 KV 状态有多大”这种问题，都属于这一层。</p>
-<h3 id="7-kernel">7. 算子与 Kernel 层</h3>
-<p>这一层负责真正的重计算：GEMM、fused kernel、paged attention、all-reduce、reduce-scatter、dispatch/combine，以及各种 Triton 或 CUDA kernel。它是抽象模型计算转化为真实设备工作量的地方。</p>
-<h3 id="8">8. 系统运行时与硬件层</h3>
-<p>最底层是 CUDA、NCCL、GPU 显存系统、NVLink/PCIe 这样的互联，以及硬件本身的执行资源。带宽、显存容量、collective 延迟和 kernel launch 开销，最终都会落到这一层。</p>
-<h2 id="vllm-sglang">vLLM 和 SGLang 在哪里</h2>
-<p>理解 vLLM 和 SGLang，一个比较准确的方式是把它们看成 <strong>带有大量内部 runtime 逻辑的 serving engine</strong>。</p>
-<ul>
-<li>它们位于应用层、agent 层和外部路由层之下。</li>
-<li>它们位于模型 kernel 和硬件执行之上。</li>
-<li>它们内部自带 scheduler、batching 逻辑、KV manager 和一整套 runtime 策略。</li>
-</ul>
-<p>所以当有人说“我们在用 vLLM”时，通常意味着：</p>
+<p>位置 <span class="arithmatex">\(N\)</span> 的顶层表示为</p>
+<div class="arithmatex">\[
+h_N^{(L)}
+\]</div>
+<p>它经过 LM head 后用于预测 <span class="arithmatex">\(token_{N+1}\)</span>。为了得到 <span class="arithmatex">\(h_N^{(L)}\)</span>，模型需要从第 1 层计算到第 <span class="arithmatex">\(L\)</span> 层。对任意一层 <span class="arithmatex">\(\ell\)</span>，位置 <span class="arithmatex">\(N\)</span> 的计算需要两类信息：</p>
 <ol>
-<li>上层系统仍然负责决定发什么请求</li>
-<li>vLLM 负责请求执行、batching 和内部 runtime 管理</li>
-<li>下层系统仍然决定实际算子效率和硬件利用率</li>
+<li>
+<p><strong>当前 token 在这一层的输入</strong><br />
+   即 <span class="arithmatex">\(h_N^{(\ell-1)}\)</span></p>
+</li>
+<li>
+<p><strong>SWA 窗口内的历史 attention 状态</strong><br />
+   即
+   $$
+   {K_t^{(\ell)}, V_t^{(\ell)}}_{t \in \mathcal{W}_N}
+   $$</p>
+</li>
 </ol>
-<p>这也是为什么只调 engine 参数从来不是全部答案。即使 engine 本身调得很好，如果上层 workload 形状不好，性能依然可能很差；反过来，上层策略再好，如果 runtime 调度或 kernel 效率不足，也仍然会被卡住。</p>
-<h2 id="_5">一次请求是怎样穿过整个栈的</h2>
-<p>一条在线请求通常会大致按下面的顺序流过整个系统：</p>
+<p>长上下文 KV cache 的核心问题可以写得很具体：在预测 <span class="arithmatex">\(token_{N+1}\)</span> 时，系统如何为每一层提供窗口 <span class="arithmatex">\(\mathcal{W}_N\)</span> 内的 attention 状态。不同存储方案的差异主要体现在两点：窗口内状态是否以 full KV 形式长期保留，窗口外状态是否以 checkpoint 或压缩状态作为后续恢复的基础。</p>
+<h2 id="2-swa-full-kv-baseline">2. SWA Full KV Baseline</h2>
+<p>最直接的做法是：对每一层 <span class="arithmatex">\(\ell = 1,\dots,L\)</span>，保存所有可能进入 SWA 窗口的 full K/V。预测 <span class="arithmatex">\(token_{N+1}\)</span> 时的执行路径为：</p>
 <ol>
-<li>应用层或 agent 层决定需要一次模型调用。</li>
-<li>编排层组装 prompt、检索上下文、工具输出和 decoding policy。</li>
-<li>路由层选择具体的模型端点或副本。</li>
-<li>Serving engine 接收请求，并将其送入内部 scheduler。</li>
-<li>Runtime 分配 KV blocks，对 prefill 或 decode 进行 batching，并决定这个请求何时执行。</li>
-<li>模型执行层运行 transformer 计算。</li>
-<li>算子层发起 kernels 和 collectives。</li>
-<li>硬件/runtime 层执行这些 kernels 并搬运数据。</li>
-<li>生成出的 token 再沿着同一条链路向上返回。</li>
+<li>从底向上计算位置 <span class="arithmatex">\(N\)</span> 的表示，得到 <span class="arithmatex">\(h_N^{(0)}, h_N^{(1)}, \dots\)</span></li>
+<li>到达第 <span class="arithmatex">\(\ell\)</span> 层时，用 <span class="arithmatex">\(h_N^{(\ell-1)}\)</span> 生成当前位置的 query</li>
+<li>读取第 <span class="arithmatex">\(\ell\)</span> 层窗口内缓存的 full K/V：
+   $$
+   {K_t^{(\ell)}, V_t^{(\ell)}}_{t \in \mathcal{W}_N}
+   $$</li>
+<li>完成该层 attention 和后续子层，得到 <span class="arithmatex">\(h_N^{(\ell)}\)</span></li>
+<li>重复直到第 <span class="arithmatex">\(L\)</span> 层，得到 <span class="arithmatex">\(h_N^{(L)}\)</span></li>
 </ol>
-<p>按照这个顺序思考问题，调试会容易很多。例如：</p>
+<p>在这个 baseline 中，decode 路径很短。每一层需要的窗口状态已经是可直接消费的 attention 终态，系统不需要在当前 step 恢复历史 K/V。</p>
+<p>若只考虑 SWA 窗口内的 active full KV，每层每个请求的常驻窗口状态规模近似为：</p>
+<div class="arithmatex">\[
+B_{\text{swa}} \approx W \cdot L \cdot 2 \cdot H_{kv} \cdot D \cdot s
+\]</div>
+<p>其中 <span class="arithmatex">\(H_{kv}\)</span> 为每层 KV 头数，<span class="arithmatex">\(D\)</span> 为 head dim，<span class="arithmatex">\(s\)</span> 为每个元素字节数。与完整前缀缓存</p>
+<div class="arithmatex">\[
+B_{\text{full}} \approx N \cdot L \cdot 2 \cdot H_{kv} \cdot D \cdot s
+\]</div>
+<p>相比，SWA 已经把当前 step 直接读取的 full KV 范围限制到 <span class="arithmatex">\(W\)</span>。后续问题集中在窗口滑动之后：离开窗口的历史状态是否完全丢弃，是否压缩保存，或者是否通过 checkpoint 变成未来恢复的锚点。</p>
+<h2 id="3-checkpoint">3. Checkpoint 作为恢复锚点</h2>
+<p>SWA 限制了当前 step 的直接 attention 范围，但长上下文模型仍可能需要为更长历史保留可恢复的信息。checkpoint 的作用是在历史序列上保留一组恢复锚点，使系统在需要重建某段窗口状态时，可以从附近锚点出发。</p>
+<p>假设 <code>block size = 1</code>，系统每隔 <span class="arithmatex">\(M\)</span> 个 token 保留一个 checkpoint。当预测 <span class="arithmatex">\(token_{N+1}\)</span> 时需要恢复窗口 <span class="arithmatex">\(\mathcal{W}_N\)</span> 中某一段状态，系统可以：</p>
+<ol>
+<li>找到覆盖该窗口的最近 checkpoint，记其位置为 <span class="arithmatex">\(c\)</span></li>
+<li>从 checkpoint 对应的状态出发</li>
+<li>重建区间 <span class="arithmatex">\(c+1,\dots,N\)</span> 中落入当前 SWA 窗口的局部状态</li>
+</ol>
+<p>checkpoint 数量约为：</p>
+<div class="arithmatex">\[
+N_{\text{ckpt}} \approx \left\lceil \frac{N}{M} \right\rceil
+\]</div>
+<p>一次恢复的最坏长度由 checkpoint 间距和 SWA 窗口共同决定。间距 <span class="arithmatex">\(M\)</span> 较小，恢复窗口短，长期保存的状态更多；间距 <span class="arithmatex">\(M\)</span> 较大，保存成本下降，单次恢复路径变长。这里的 checkpoint 是推理状态的恢复锚点，和训练里的 activation checkpoint 属于不同问题。</p>
+<h2 id="4">4. 重算对象</h2>
+<p>在 SWA 场景中，重算对象限定为当前 step 需要的窗口状态。对第 <span class="arithmatex">\(\ell\)</span> 层来说，重算发生在以下条件下：</p>
 <ul>
-<li>TTFT 高，可能来自 prompt 组装、排队，或者 prefill 成本</li>
-<li>TPS 低，可能来自路由碎片化、batching 不充分，或者通信开销</li>
-<li>延迟不稳定，可能来自 scheduler 压力、KV 耗尽，或者上层 fan-out 行为</li>
+<li>窗口 <span class="arithmatex">\(\mathcal{W}_N\)</span> 内某些历史位置的 full K/V 没有直接缓存；</li>
+<li>系统保留了覆盖这些位置的 checkpoint 或压缩状态；</li>
+<li>当前 step 需要把这些状态恢复成第 <span class="arithmatex">\(\ell\)</span> 层 attention 可消费的 K/V。</li>
 </ul>
-<h2 id="_6">在本笔记中的阅读路径</h2>
-<p>在这套 notebook 里，AI Infra 各页可以理解为对这条栈中间部分的逐层拆解：</p>
+<p>单层 decode 开销可以写成：</p>
+<div class="arithmatex">\[
+C_{\text{step}}^{(\ell)} =
+C_{\text{load}}^{(\ell)}
++ C_{\text{restore}}^{(\ell)}
++ C_{\text{attn}}^{(\ell)}
++ C_{\text{runtime}}^{(\ell)}
+\]</div>
+<p>其中：</p>
 <ul>
-<li><a href="../metrics/">指标</a>：系统行为如何被测量</li>
-<li><a href="../kv-cache/">KV Cache</a>：长上下文 serving 的核心内存对象</li>
-<li><a href="../serving-runtime/">推理运行时</a>：单个 engine 如何调度和稳定请求</li>
-<li><a href="../parallelism/">并行策略</a>：执行如何分布到多个设备上</li>
-<li><a href="../decoding/">解码与采样</a>：decode 行为如何被塑造</li>
-<li><a href="../training-objective/">训练目标</a>：推理输出背后的概率学基础</li>
+<li><span class="arithmatex">\(C_{\text{load}}^{(\ell)}\)</span> 是读取已保存状态的代价；</li>
+<li><span class="arithmatex">\(C_{\text{restore}}^{(\ell)}\)</span> 是从 checkpoint 或压缩状态恢复窗口 K/V 的代价；</li>
+<li><span class="arithmatex">\(C_{\text{attn}}^{(\ell)}\)</span> 是这一层执行 SWA 的代价；</li>
+<li><span class="arithmatex">\(C_{\text{runtime}}^{(\ell)}\)</span> 包括 metadata、调度、同步和 kernel launch。</li>
 </ul>
+<p>SWA full KV baseline 让 <span class="arithmatex">\(C_{\text{restore}}^{(\ell)} \approx 0\)</span>，代价是窗口内 full KV 必须保持直接可读。checkpoint 路线减少长期常驻状态，把一部分代价转移到 <span class="arithmatex">\(C_{\text{restore}}^{(\ell)}\)</span>。这个转移是否划算，取决于恢复路径是否进入 token-level critical path，以及恢复窗口是否足够短。</p>
+<h2 id="5">5. 层间依赖链</h2>
+<p>为了得到 <span class="arithmatex">\(h_N^{(L)}\)</span>，第 <span class="arithmatex">\(L\)</span> 层需要：</p>
+<ul>
+<li>当前层输入 <span class="arithmatex">\(h_N^{(L-1)}\)</span></li>
+<li>第 <span class="arithmatex">\(L\)</span> 层窗口状态 <span class="arithmatex">\(\{K_t^{(L)}, V_t^{(L)}\}_{t \in \mathcal{W}_N}\)</span></li>
+</ul>
+<p>为了得到 <span class="arithmatex">\(h_N^{(L-1)}\)</span>，第 <span class="arithmatex">\(L-1\)</span> 层需要：</p>
+<ul>
+<li>当前层输入 <span class="arithmatex">\(h_N^{(L-2)}\)</span></li>
+<li>第 <span class="arithmatex">\(L-1\)</span> 层窗口状态 <span class="arithmatex">\(\{K_t^{(L-1)}, V_t^{(L-1)}\}_{t \in \mathcal{W}_N}\)</span></li>
+</ul>
+<p>这个依赖关系一直递推到第 1 层。KV cache 在这里保存的是每一层在 SWA 窗口内后续还要访问的 attention 状态。若某一层没有直接保留窗口内 full KV，系统需要明确恢复来源、恢复范围和恢复时机。</p>
+<h2 id="6-deepseek">6. DeepSeek 路线中的保存对象与恢复对象</h2>
+<p>沿着 SWA 的单步 decode 视角看，DeepSeek 这类方案调整的是长期保存对象与当前步恢复对象之间的边界。full KV baseline 保存每层每个窗口位置的最终 K/V；更压缩的长上下文路线把长期保存对象变成更小的恢复基座，并在当前 step 恢复窗口内局部状态。</p>
+<h3 id="61">6.1 长期保存对象</h3>
+<p>长期保存对象可以包括：</p>
+<ul>
+<li>更紧凑的 latent state</li>
+<li>稀疏 checkpoint</li>
+<li>局部 full KV 加全局压缩状态的混合形式</li>
+</ul>
+<p>这些对象的共同目标是降低常驻 HBM 压力，同时保留恢复 SWA 窗口状态所需的信息。系统长期保存可恢复的历史状态，只让当前窗口内需要参与 attention 的部分恢复为可消费的 K/V。</p>
+<h3 id="62">6.2 当前步恢复对象</h3>
+<p>预测 <span class="arithmatex">\(token_{N+1}\)</span> 时需要恢复的是窗口 <span class="arithmatex">\(\mathcal{W}_N\)</span> 内、当前层 attention 会访问到的状态。关键量包括：</p>
+<ul>
+<li>当前层是否已有窗口内 full K/V；</li>
+<li>最近 checkpoint 到窗口边界的距离；</li>
+<li>从压缩状态恢复 full K/V 的计算和同步代价。</li>
+</ul>
+<p>恢复距离决定重算窗口，也影响 TPOT 和尾延迟。若恢复发生在 decode 前的强同步路径上，单次恢复成本会直接进入 token latency。若恢复能与数据读取或局部预处理重叠，压缩带来的 HBM 收益更容易兑现。</p>
+<h2 id="7">7. 存储与恢复的平衡</h2>
+<p>在 SWA 设定下，prefix hit 长度为 <span class="arithmatex">\(N\)</span>，窗口大小为 <span class="arithmatex">\(W\)</span>，预测 <span class="arithmatex">\(token_{N+1}\)</span> 时要解决的是每层窗口状态的提供方式。几种选择对应不同代价：</p>
+<ul>
+<li>
+<p><strong>保存窗口内 full KV</strong><br />
+  decode 路径短，恢复代价低，窗口状态占用 <span class="arithmatex">\(O(WL)\)</span> 级别 HBM。</p>
+</li>
+<li>
+<p><strong>保存压缩状态并恢复窗口 K/V</strong><br />
+  常驻状态更小，decode step 增加恢复计算和同步。</p>
+</li>
+<li>
+<p><strong>checkpoint 较密</strong><br />
+  恢复路径短，checkpoint 状态占用更高。</p>
+</li>
+<li>
+<p><strong>checkpoint 较疏</strong><br />
+  存储更省，最坏恢复路径更长。</p>
+</li>
+</ul>
+<p>因此，KV cache 存储量和重算的平衡可以写成一个具体问题：为了预测 <span class="arithmatex">\(token_{N+1}\)</span>，每一层窗口内的 attention 状态应长期保存为 full KV，还是通过 checkpoint 与压缩状态在当前 step 恢复。</p>
+<h2 id="8">8. 总结</h2>
+<p>SWA 把预测 <span class="arithmatex">\(token_{N+1}\)</span> 时的直接 attention 范围限制在窗口 <span class="arithmatex">\(\mathcal{W}_N\)</span> 内。DeepSeek 这类 KV 存储方案进一步讨论窗口状态的保存形式：系统可以让窗口内 full K/V 保持直接可读，也可以长期保存更小的恢复基座，并在 decode 时恢复局部状态。checkpoint 间距、窗口大小和恢复路径共同决定这条路线的显存收益与 token latency 代价。</p>
 
 
 
