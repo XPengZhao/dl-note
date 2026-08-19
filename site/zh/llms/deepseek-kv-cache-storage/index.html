@@ -18,7 +18,7 @@
     
     
       
-        <title>DeepSeek KV Cache 存储方案 - DL Notes</title>
+        <title>SWA KV Cache 存储方案 - DL Notes</title>
       
     
     
@@ -64,7 +64,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#deepseek-kv-cache" class="md-skip">
+        <a href="#swa-kv-cache" class="md-skip">
           跳转至
         </a>
       
@@ -100,7 +100,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              DeepSeek KV Cache 存储方案
+              SWA KV Cache 存储方案
             
           </span>
         </div>
@@ -662,6 +662,29 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../glm-5.2-inference-path/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    GLM-5.2 推理路径
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -705,64 +728,56 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#2-swa-full-kv-baseline" class="md-nav__link">
+  <a href="#2-swa-kv-cache-baseline" class="md-nav__link">
     <span class="md-ellipsis">
-      2. SWA Full KV Baseline
+      2. 完全保存 SWA KV Cache Baseline
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#3-checkpoint" class="md-nav__link">
-    <span class="md-ellipsis">
-      3. Checkpoint 作为恢复锚点
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#4" class="md-nav__link">
-    <span class="md-ellipsis">
-      4. 重算对象
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#5" class="md-nav__link">
-    <span class="md-ellipsis">
-      5. 层间依赖链
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#6-deepseek" class="md-nav__link">
-    <span class="md-ellipsis">
-      6. DeepSeek 路线中的保存对象与恢复对象
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="6. DeepSeek 路线中的保存对象与恢复对象">
+    <nav class="md-nav" aria-label="2. 完全保存 SWA KV Cache Baseline">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#61" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      6.1 长期保存对象
+      示例
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#62" class="md-nav__link">
+  <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
-      6.2 当前步恢复对象
+      开销
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="开销">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#dram" class="md-nav__link">
+    <span class="md-ellipsis">
+      DRAM 存储开销
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hbm" class="md-nav__link">
+    <span class="md-ellipsis">
+      HBM 搬运开销
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      计算开销
     </span>
   </a>
   
@@ -772,13 +787,339 @@
     </nav>
   
 </li>
+        
+      </ul>
+    </nav>
+  
+</li>
       
         <li class="md-nav__item">
-  <a href="#7" class="md-nav__link">
+  <a href="#3-baseline" class="md-nav__link">
     <span class="md-ellipsis">
-      7. 存储与恢复的平衡
+      3. 完全重算 Baseline
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="3. 完全重算 Baseline">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      示例
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      开销
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="开销">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#dram_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      DRAM 存储开销
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hbm_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      HBM 搬运开销
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      计算开销
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-kv" class="md-nav__link">
+    <span class="md-ellipsis">
+      4. 保存浅层 KV 的恢复成本
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. 保存浅层 KV 的恢复成本">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      示例
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      开销
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="开销">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#dram_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      DRAM 存储开销
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hbm_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      HBM 搬运开销
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_9" class="md-nav__link">
+    <span class="md-ellipsis">
+      计算开销
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-kv" class="md-nav__link">
+    <span class="md-ellipsis">
+      5. 保存深层 KV 的恢复成本
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. 保存深层 KV 的恢复成本">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_10" class="md-nav__link">
+    <span class="md-ellipsis">
+      示例
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_11" class="md-nav__link">
+    <span class="md-ellipsis">
+      开销
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="开销">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#dram_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      DRAM 存储开销
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hbm_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      HBM 搬运开销
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_12" class="md-nav__link">
+    <span class="md-ellipsis">
+      计算开销
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-kv" class="md-nav__link">
+    <span class="md-ellipsis">
+      6. 间隔层保存 KV 的恢复成本
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6. 间隔层保存 KV 的恢复成本">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_13" class="md-nav__link">
+    <span class="md-ellipsis">
+      示例
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_14" class="md-nav__link">
+    <span class="md-ellipsis">
+      开销
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="开销">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#dram_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      DRAM 存储开销
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hbm_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      HBM 搬运开销
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_15" class="md-nav__link">
+    <span class="md-ellipsis">
+      计算开销
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-token-checkpoint" class="md-nav__link">
+    <span class="md-ellipsis">
+      7. 间隔 Token Checkpoint
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7. 间隔 Token Checkpoint">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_16" class="md-nav__link">
+    <span class="md-ellipsis">
+      示例
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_17" class="md-nav__link">
+    <span class="md-ellipsis">
+      开销
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="开销">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#dram_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      DRAM 存储开销
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hbm_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      HBM 搬运开销
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_18" class="md-nav__link">
+    <span class="md-ellipsis">
+      计算开销
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -807,148 +1148,424 @@
 
 
 
-<h1 id="deepseek-kv-cache">DeepSeek KV Cache 存储方案</h1>
+<h1 id="swa-kv-cache">SWA KV Cache 存储方案</h1>
 <h2 id="1">1. 问题定义</h2>
-<p>设已命中的前缀长度为 <span class="arithmatex">\(N\)</span>，现在模型要根据前缀最后一个位置预测下一个 token，即 <span class="arithmatex">\(token_{N+1}\)</span>。模型共有 <span class="arithmatex">\(L\)</span> 层，并采用 sliding window attention（SWA）。这里约定窗口大小 <span class="arithmatex">\(W\)</span> 包含当前参与计算的位置本身；因此在位置 <span class="arithmatex">\(N\)</span> 计算用于预测 <span class="arithmatex">\(token_{N+1}\)</span> 的表示时，第 <span class="arithmatex">\(\ell\)</span> 层访问的窗口范围为</p>
+<p>设已命中的前缀长度为 <span class="arithmatex">\(N\)</span>，现在模型要根据前缀最后一个位置预测下一个 token，即 <span class="arithmatex">\(\text{token}_{N+1}\)</span>。模型共有 <span class="arithmatex">\(L\)</span> 层，并采用 sliding window attention（SWA）。这里约定窗口大小 <span class="arithmatex">\(W\)</span> 包含当前参与计算的位置本身。因此在位置 <span class="arithmatex">\(N\)</span> 计算用于预测 <span class="arithmatex">\(\text{token}_{N+1}\)</span> 的表示时，第 <span class="arithmatex">\(\ell\)</span> 层访问的窗口范围为</p>
 <div class="arithmatex">\[
 \mathcal{W}_N = \{N-W+1,\dots,N\}
 \]</div>
 <p>若 <span class="arithmatex">\(N &lt; W\)</span>，则窗口退化为 <span class="arithmatex">\(\{1,\dots,N\}\)</span>。记：</p>
 <ul>
-<li>第 <span class="arithmatex">\(\ell\)</span> 层、位置 <span class="arithmatex">\(t\)</span> 的 hidden state 为 <span class="arithmatex">\(h_t^{(\ell)}\)</span></li>
-<li>第 <span class="arithmatex">\(\ell\)</span> 层、位置 <span class="arithmatex">\(t\)</span> 的 key/value 为 <span class="arithmatex">\(K_t^{(\ell)}, V_t^{(\ell)}\)</span></li>
-<li>输入 embedding 记为 <span class="arithmatex">\(h_t^{(0)}\)</span></li>
+<li>第 <span class="arithmatex">\(\ell\)</span> 层、位置 <span class="arithmatex">\(t\)</span> 的输出 hidden state 为 <span class="arithmatex">\(h_t^{(\ell)}\)</span>，其中 <span class="arithmatex">\(h_t^{(0)}\)</span> 表示输入 token embedding</li>
+<li>第 <span class="arithmatex">\(\ell\)</span> 层、位置 <span class="arithmatex">\(t\)</span> 的 key/value 状态记为 <span class="arithmatex">\(KV_t^{(\ell)}\)</span>，其中包含 <span class="arithmatex">\(K_t^{(\ell)}\)</span> 和 <span class="arithmatex">\(V_t^{(\ell)}\)</span></li>
 </ul>
-<p>位置 <span class="arithmatex">\(N\)</span> 的顶层表示为</p>
-<div class="arithmatex">\[
-h_N^{(L)}
-\]</div>
-<p>它经过 LM head 后用于预测 <span class="arithmatex">\(token_{N+1}\)</span>。为了得到 <span class="arithmatex">\(h_N^{(L)}\)</span>，模型需要从第 1 层计算到第 <span class="arithmatex">\(L\)</span> 层。对任意一层 <span class="arithmatex">\(\ell\)</span>，位置 <span class="arithmatex">\(N\)</span> 的计算需要两类信息：</p>
+<p>位置 <span class="arithmatex">\(N\)</span> 的最后一层输出表示为 <span class="arithmatex">\(h_N^{(L)}\)</span>，它经过 LM head 后用于预测 <span class="arithmatex">\(\text{token}_{N+1}\)</span>。为了得到 <span class="arithmatex">\(h_N^{(L)}\)</span>，模型需要从第 1 层计算到第 <span class="arithmatex">\(L\)</span> 层。对任意一层 <span class="arithmatex">\(\ell\)</span>，位置 <span class="arithmatex">\(N\)</span> 的计算需要两类信息：</p>
 <ol>
 <li>
-<p><strong>当前 token 在这一层的输入</strong><br />
-   即 <span class="arithmatex">\(h_N^{(\ell-1)}\)</span></p>
+<p><strong>当前 token 在这一层的输入</strong>，即 <span class="arithmatex">\(h_N^{(\ell-1)}\)</span></p>
 </li>
 <li>
-<p><strong>SWA 窗口内的历史 attention 状态</strong><br />
-   即
-   $$
-   {K_t^{(\ell)}, V_t^{(\ell)}}_{t \in \mathcal{W}_N}
-   $$</p>
+<p><strong>SWA 窗口内的历史 attention 状态</strong>，即 <span class="arithmatex">\((KV_t^{(\ell)})_{t \in \mathcal{W}_N}\)</span></p>
 </li>
 </ol>
-<p>长上下文 KV cache 的核心问题可以写得很具体：在预测 <span class="arithmatex">\(token_{N+1}\)</span> 时，系统如何为每一层提供窗口 <span class="arithmatex">\(\mathcal{W}_N\)</span> 内的 attention 状态。不同存储方案的差异主要体现在两点：窗口内状态是否以 full KV 形式长期保留，窗口外状态是否以 checkpoint 或压缩状态作为后续恢复的基础。</p>
-<h2 id="2-swa-full-kv-baseline">2. SWA Full KV Baseline</h2>
-<p>最直接的做法是：对每一层 <span class="arithmatex">\(\ell = 1,\dots,L\)</span>，保存所有可能进入 SWA 窗口的 full K/V。预测 <span class="arithmatex">\(token_{N+1}\)</span> 时的执行路径为：</p>
+<p>下面将以一个 <span class="arithmatex">\(L=4\)</span>, <span class="arithmatex">\(W=2\)</span> 的例子来说明各个方案的存储与计算。</p>
+<h2 id="2-swa-kv-cache-baseline">2. 完全保存 SWA KV Cache Baseline</h2>
+<p>最直接的做法是：对每一层 <span class="arithmatex">\(\ell = 1,\dots,L\)</span>，保存所有可能进入 SWA 窗口的 full K/V。预测 <span class="arithmatex">\(\text{token}_{N+1}\)</span> 时的执行路径为：</p>
 <ol>
 <li>从底向上计算位置 <span class="arithmatex">\(N\)</span> 的表示，得到 <span class="arithmatex">\(h_N^{(0)}, h_N^{(1)}, \dots\)</span></li>
 <li>到达第 <span class="arithmatex">\(\ell\)</span> 层时，用 <span class="arithmatex">\(h_N^{(\ell-1)}\)</span> 生成当前位置的 query</li>
-<li>读取第 <span class="arithmatex">\(\ell\)</span> 层窗口内缓存的 full K/V：
-   $$
-   {K_t^{(\ell)}, V_t^{(\ell)}}_{t \in \mathcal{W}_N}
-   $$</li>
+<li>读取第 <span class="arithmatex">\(\ell\)</span> 层窗口内缓存的 full K/V：<span class="arithmatex">\((KV_t^{(\ell)})_{t \in \mathcal{W}_N}\)</span></li>
 <li>完成该层 attention 和后续子层，得到 <span class="arithmatex">\(h_N^{(\ell)}\)</span></li>
 <li>重复直到第 <span class="arithmatex">\(L\)</span> 层，得到 <span class="arithmatex">\(h_N^{(L)}\)</span></li>
 </ol>
-<p>在这个 baseline 中，decode 路径很短。每一层需要的窗口状态已经是可直接消费的 attention 终态，系统不需要在当前 step 恢复历史 K/V。</p>
-<p>若只考虑 SWA 窗口内的 active full KV，每层每个请求的常驻窗口状态规模近似为：</p>
+<h3 id="_1">示例</h3>
+<div align="center">
+  <img src="../../assets/images/kv-offloading-swa-full-storage.png" alt="SWA Full KV Baseline" width="300px">
+</div>
+
+<p>图中的例子取 <span class="arithmatex">\(L=4, W=2\)</span>，因此位置 <span class="arithmatex">\(N\)</span> 在每一层只访问窗口 <span class="arithmatex">\(\mathcal{W}_N=\{N-1,N\}\)</span>。绿色块表示已经保存好的 full KV，橙色块表示当前位置 <span class="arithmatex">\(N\)</span> 沿层向上计算得到的 hidden state。虚线框表示当前 decode step 需要计算的，实线框表示已经缓存并可直接读取的。</p>
+<p>以第 4 层为例，<span class="arithmatex">\(h_N^{(4)}\)</span> 的计算读取 <span class="arithmatex">\(KV_{N-1}^{(4)}\)</span> 和 <span class="arithmatex">\(KV_N^{(4)}\)</span>。系统不需要重新计算 <span class="arithmatex">\(h_{N-1}^{(3)}\)</span>，因为位置 <span class="arithmatex">\(N-1\)</span> 在第 4 层需要贡献给 attention 的状态已经保存在 <span class="arithmatex">\(KV_{N-1}^{(4)}\)</span> 中。其它层同理：当前位置的 hidden state 逐层向上计算，窗口内历史 token 的影响通过各层已缓存的 full KV 进入 attention。</p>
+<h3 id="_2">开销</h3>
+<h4 id="dram">DRAM 存储开销</h4>
+<p>若前缀命中长度为 <span class="arithmatex">\(N\)</span>，full KV baseline 需要为命中前缀保存完整 K/V。其状态规模近似为：</p>
 <div class="arithmatex">\[
-B_{\text{swa}} \approx W \cdot L \cdot 2 \cdot H_{kv} \cdot D \cdot s
+B_{\text{full}}(N) \approx N \cdot L \cdot 2 \cdot H_{kv} \cdot D \cdot s
 \]</div>
-<p>其中 <span class="arithmatex">\(H_{kv}\)</span> 为每层 KV 头数，<span class="arithmatex">\(D\)</span> 为 head dim，<span class="arithmatex">\(s\)</span> 为每个元素字节数。与完整前缀缓存</p>
+<p>其中 <span class="arithmatex">\(H_{kv}\)</span> 为每层 KV 头数，<span class="arithmatex">\(D\)</span> 为 head dim，<span class="arithmatex">\(s\)</span> 为每个元素字节数。公式中的系数 <span class="arithmatex">\(2\)</span> 来自 K 和 V 两个张量。</p>
+<h4 id="hbm">HBM 搬运开销</h4>
+<p>SWA 只限制当前 step 的 attention 读取范围；若只看第 <span class="arithmatex">\(N\)</span> 个位置实际参与 attention 的窗口工作集，规模为：</p>
 <div class="arithmatex">\[
-B_{\text{full}} \approx N \cdot L \cdot 2 \cdot H_{kv} \cdot D \cdot s
+B_{\text{swa}}(W) \approx W \cdot L \cdot 2 \cdot H_{kv} \cdot D \cdot s
 \]</div>
-<p>相比，SWA 已经把当前 step 直接读取的 full KV 范围限制到 <span class="arithmatex">\(W\)</span>。后续问题集中在窗口滑动之后：离开窗口的历史状态是否完全丢弃，是否压缩保存，或者是否通过 checkpoint 变成未来恢复的锚点。</p>
-<h2 id="3-checkpoint">3. Checkpoint 作为恢复锚点</h2>
-<p>SWA 限制了当前 step 的直接 attention 范围，但长上下文模型仍可能需要为更长历史保留可恢复的信息。checkpoint 的作用是在历史序列上保留一组恢复锚点，使系统在需要重建某段窗口状态时，可以从附近锚点出发。</p>
-<p>假设 <code>block size = 1</code>，系统每隔 <span class="arithmatex">\(M\)</span> 个 token 保留一个 checkpoint。当预测 <span class="arithmatex">\(token_{N+1}\)</span> 时需要恢复窗口 <span class="arithmatex">\(\mathcal{W}_N\)</span> 中某一段状态，系统可以：</p>
+<p>如果命中后的 full KV 已经在 GPU KV cache 中，当前 step 的主要数据读取就是窗口内的 <span class="arithmatex">\(B_{\text{swa}}(W)\)</span>。</p>
+<h4 id="_3">计算开销</h4>
+<p>窗口内 <span class="arithmatex">\(KV_t^{(\ell)}\)</span> 已经是 attention 可消费的终态，当前 step 不需要恢复历史 KV。因此，full KV baseline 的额外恢复计算可以近似看作 0。</p>
+<p>但 baseline 仍然要完成当前位置 <span class="arithmatex">\(N\)</span> 的正常 decode 计算。按 token-layer 计数，当前位置 hidden state 需要逐层向上计算：</p>
+<div class="arithmatex">\[
+N_{\text{hidden}}^{\text{full}} = L
+\]</div>
+<p>attention 侧，每一层读取窗口内 <span class="arithmatex">\(W\)</span> 个位置的 KV，因此逻辑 attention 访问规模为：</p>
+<div class="arithmatex">\[
+N_{\text{attn-read}}^{\text{full}} \approx L \cdot W
+\]</div>
+<p>以 DeepSeek V4 Pro 的量级估算，若取 <span class="arithmatex">\(L=61,W=128\)</span>，full KV baseline 在一次 decode step 中，当前位置 hidden state 的逐层计算量为：</p>
+<div class="arithmatex">\[
+N_{\text{hidden}}^{\text{full}} = 61
+\]</div>
+<p>attention 侧每层读取窗口内 <span class="arithmatex">\(W\)</span> 个位置的 KV，逻辑 attention 访问规模为：</p>
+<div class="arithmatex">\[
+N_{\text{attn-read}}^{\text{full}} \approx 61 \times 128 = 7808
+\]</div>
+<h2 id="3-baseline">3. 完全重算 Baseline</h2>
+<p>另一个极端方案是只保留前缀内容本身，不为命中前缀长期保存可直接使用的 K/V。prefix hit 表示系统知道这段 token 序列已经出现过；当前 step 需要窗口 <span class="arithmatex">\(\mathcal{W}_N\)</span> 的 K/V 时，系统从 token 和已有边界状态重新生成这些状态。</p>
+<p>预测 <span class="arithmatex">\(\text{token}_{N+1}\)</span> 时，每一层最终仍然只需要窗口内状态：</p>
+<div class="arithmatex">\[
+(KV_t^{(\ell)})_{t \in \mathcal{W}_N}
+\]</div>
+<p>为了得到第 <span class="arithmatex">\(\ell\)</span> 层、窗口内位置 <span class="arithmatex">\(t\)</span> 的 <span class="arithmatex">\(KV_t^{(\ell)}\)</span>，系统需要先得到该位置上一层的 hidden state <span class="arithmatex">\(h_t^{(\ell-1)}\)</span>。而 <span class="arithmatex">\(h_t^{(\ell-1)}\)</span> 又依赖更低层对位置 <span class="arithmatex">\(t\)</span> 的 SWA 窗口计算。完全重算因此会形成一个向低层、向更早 token 扩张的依赖锥。</p>
+<h3 id="_4">示例</h3>
+<div align="center">
+  <img src="../../assets/images/kv-offloading-swa-full-recompute.png" alt="SWA Full KV Baseline" width="300px">
+</div>
+
+<p>仍取 <span class="arithmatex">\(L=4, W=2\)</span>。为了计算 <span class="arithmatex">\(h_N^{(4)}\)</span>，第 4 层需要第 3 层窗口内的 hidden states，即位置 <span class="arithmatex">\(\{N-1,N\}\)</span>。继续向低层展开。这正对应图里的依赖锥：虽然每一层 SWA 只看 2 个位置，但为了从零恢复最高层当前位置的输出，底部输入范围会扩展到 5 个 token。</p>
+<h3 id="_5">开销</h3>
+<h4 id="dram_1">DRAM 存储开销</h4>
+<p>完全重算 baseline 不长期保存可直接读取的 full KV。若只保留原始 token 和最小 metadata，KV 存储可以近似看作 0。这个方案把 DRAM/cache tier 的 KV 存储压力压到最低。</p>
+<h4 id="hbm_1">HBM 搬运开销</h4>
+<p>prefix hit 后不需要搬运 full KV。系统需要把原始 token、必要 metadata 和重算所需的中间结果送入当前计算路径。相比 full KV baseline，它减少了 KV load，但无法避免后续重算产生的 HBM 读写。</p>
+<h4 id="_6">计算开销</h4>
+<p>可以用一个递推集合描述这个依赖锥。令 <span class="arithmatex">\(R_\ell\)</span> 表示重算过程中需要得到第 <span class="arithmatex">\(\ell\)</span> 层 hidden state 的位置集合。为了得到最终输出，最高层只需要当前位置：</p>
+<div class="arithmatex">\[
+R_L = \{N\}
+\]</div>
+<p>若第 <span class="arithmatex">\(\ell\)</span> 层需要计算集合 <span class="arithmatex">\(R_\ell\)</span> 中的位置，那么第 <span class="arithmatex">\(\ell-1\)</span> 层必须提供这些位置各自 SWA 窗口内的 hidden states：</p>
+<div class="arithmatex">\[
+R_{\ell-1} = \bigcup_{t \in R_\ell} \{t-W+1,\dots,t\}
+\]</div>
+<p>当这些集合都是连续区间时，集合长度会逐层向低层扩张。忽略序列起点截断时，有：</p>
+<div class="arithmatex">\[
+|R_\ell| \approx 1 + (L-\ell)(W-1)
+\]</div>
+<p>因此，完全重算需要处理的 token-layer 单元数近似为：</p>
+<div class="arithmatex">\[
+N_{\text{hidden}} \approx \sum_{\ell=1}^{L} |R_\ell| \approx L + \frac{L(L-1)}{2}(W-1)
+\]</div>
+<p>这里统计的是需要重算的 hidden states，不包含输入 token 覆盖范围。若把输入 token 也算进去，覆盖长度近似为：</p>
+<div class="arithmatex">\[
+|R_0| \approx 1 + L(W-1)
+\]</div>
+<p>需要恢复的 KV 由对应位置的 hidden states 派生得到，下面不再单独统计这部分 token-layer 数。</p>
+<p>以 DeepSeek V4 Pro 的量级做一个估算，若取 <span class="arithmatex">\(L=61\)</span>、<span class="arithmatex">\(W=128\)</span>，则输入 token 覆盖范围约为：</p>
+<div class="arithmatex">\[
+1 + L(W-1) = 1 + 61 \times 127 = 7748
+\]</div>
+<p>也就是说，在没有中间 checkpoint 截断依赖的情况下，单次恢复可能向前扩展到约 <span class="arithmatex">\(7.7K\)</span> 个输入 token 的范围。累计 hidden-state 重算量为：</p>
+<div class="arithmatex">\[
+L + \frac{L(L-1)}{2}(W-1) = 61 + \frac{61 \times 60}{2} \times 127 = 232471
+\]</div>
+<h2 id="4-kv">4. 保存浅层 KV 的恢复成本</h2>
+<p>另一种做法是只长期保存浅层 full KV。设保存的层为 <span class="arithmatex">\(1,\dots,m\)</span>，未保存的层为 <span class="arithmatex">\(m+1,\dots,L\)</span>。预测 <span class="arithmatex">\(\text{token}_{N+1}\)</span> 时，浅层 KV 可以直接服务这些层的 SWA attention；高层 KV 缺失，需要在当前 step 从浅层输出继续恢复。</p>
+<p>执行路径可以写成：</p>
 <ol>
-<li>找到覆盖该窗口的最近 checkpoint，记其位置为 <span class="arithmatex">\(c\)</span></li>
-<li>从 checkpoint 对应的状态出发</li>
-<li>重建区间 <span class="arithmatex">\(c+1,\dots,N\)</span> 中落入当前 SWA 窗口的局部状态</li>
+<li>为高层缺失段确定需要恢复的窗口位置集合</li>
+<li>将这些位置从输入侧推到第 <span class="arithmatex">\(m\)</span> 层，得到 <span class="arithmatex">\((h_t^{(m)})_{t\in R_m}\)</span></li>
+<li>用这些第 <span class="arithmatex">\(m\)</span> 层 hidden states 继续恢复第 <span class="arithmatex">\(m+1,\dots,L\)</span> 层的窗口状态</li>
+<li>逐层得到最终的 <span class="arithmatex">\(h_N^{(L)}\)</span>，并预测 <span class="arithmatex">\(\text{token}_{N+1}\)</span></li>
 </ol>
-<p>checkpoint 数量约为：</p>
+<p>这个路径的特点是：浅层 KV 已经保存，但系统仍然要把多个 token 位置推过浅层，给高层窗口状态恢复提供输入。</p>
+<h3 id="_7">示例</h3>
+<div align="center">
+  <img src="../../assets/images/kv-offloading-swa-shallow-kv.png" alt="SWA shallow-layer KV storage" width="300px">
+</div>
+
+<p>图中例子取 <span class="arithmatex">\(L=4, W=2, m=2\)</span>。第 1、2 层的 KV 已经保存，第 3、4 层的 KV 需要恢复。为了得到最终的 <span class="arithmatex">\(h_N^{(4)}\)</span>，第 4 层需要窗口内 <span class="arithmatex">\(KV_{N-1}^{(4)},KV_N^{(4)}\)</span>；这些 KV 又需要第 3 层对应位置的 hidden states。因此第 3 层要恢复位置 <span class="arithmatex">\(\{N-1,N\}\)</span>，第 2 层需要提供位置 <span class="arithmatex">\(\{N-2,N-1,N\}\)</span> 的 hidden states。浅层 KV 虽然已经保存，但系统仍然要把这 3 个位置从输入侧推到第 2 层，形成一个浅层矩形带。</p>
+<p>在 <span class="arithmatex">\(L=4,W=2,m=2\)</span> 的例子里，未保存高层数为 <span class="arithmatex">\(q=L-m=2\)</span>。第 2 层需要提供的位置数为：</p>
+<div class="arithmatex">\[
+|R_2| = 1 + 2 \times 1 = 3
+\]</div>
+<p>浅层矩形带需要计算 <span class="arithmatex">\(2 \times 3=6\)</span> 个 hidden-state 单元；高层依赖锥需要计算 <span class="arithmatex">\(|R_3|+|R_4|=2+1=3\)</span> 个 hidden-state 单元。这与图中的形状一致：第 1、2 层是宽度为 3 的矩形带，第 3、4 层继续向上收缩。</p>
+<h3 id="_8">开销</h3>
+<h4 id="dram_2">DRAM 存储开销</h4>
+<p>保存浅层 <span class="arithmatex">\(1,\dots,m\)</span> 的 full KV 时，前缀长度为 <span class="arithmatex">\(N\)</span> 的常驻状态规模近似为：</p>
+<div class="arithmatex">\[
+B_{\text{shallow}}(N,m) \approx N \cdot m \cdot 2 \cdot H_{kv} \cdot D \cdot s
+\]</div>
+<p>它是 full KV baseline 的 <span class="arithmatex">\(m/L\)</span>。存储量下降来自不保存高层 KV；代价是高层窗口状态要在命中后恢复。</p>
+<h4 id="hbm_2">HBM 搬运开销</h4>
+<p>浅层 KV 已经保存，恢复 <span class="arithmatex">\(R_m\)</span> 中多个位置时，每个浅层 token-layer 单元都要读取对应层的 SWA 窗口 KV。若按逻辑 attention 读取量估算，浅层读取规模近似为：</p>
+<div class="arithmatex">\[
+B_{\text{low-read}} \approx m \cdot |R_m| \cdot W \cdot 2 \cdot H_{kv} \cdot D \cdot s
+\]</div>
+<p>相邻窗口之间存在重叠，实际 kernel 的 HBM 访问会受 layout、cache 命中和 batching 影响。这个式子更适合作为上界口径，表示浅层矩形带会把同一批浅层 KV 反复用于多个位置的恢复计算。</p>
+<h4 id="_9">计算开销</h4>
+<p>保存浅层 KV 的主要计算压力来自两部分：一是浅层矩形带，需要把 <span class="arithmatex">\(|R_m|\)</span> 个位置逐层推到分界层 <span class="arithmatex">\(m\)</span>；二是高层缺失段，需要生成窗口内高层 KV 并继续向上恢复。和保存高层 KV 相比，这条路线没有直接保存当前 step 最靠近输出侧的 attention 状态，因此仍然需要把多个 token 的 hidden states 推过未保存的高层。</p>
+<p>令 <span class="arithmatex">\(R_\ell\)</span> 表示为了恢复最终输出，需要得到第 <span class="arithmatex">\(\ell\)</span> 层 hidden state 的位置集合。高层缺失段的最高层只需要当前位置：</p>
+<div class="arithmatex">\[
+R_L=\{N\}
+\]</div>
+<p>向低层展开时，第 <span class="arithmatex">\(\ell-1\)</span> 层必须提供 <span class="arithmatex">\(R_\ell\)</span> 中各位置 SWA 窗口内的 hidden states：</p>
+<div class="arithmatex">\[
+R_{\ell-1} = \bigcup_{t \in R_\ell} \{t-W+1,\dots,t\}, \quad \ell=m+1,\dots,L
+\]</div>
+<p>忽略序列起点截断时，分界层需要提供的位置数为：</p>
+<div class="arithmatex">\[
+|R_m| \approx 1 + (L-m)(W-1)
+\]</div>
+<p>这就是浅层矩形带的宽度。保存浅层 KV 后，低层不再产生继续向更早 token 扩张的依赖锥；但为了给高层恢复提供输入，系统需要为 <span class="arithmatex">\(R_m\)</span> 中每个位置计算 <span class="arithmatex">\(h_t^{(1)},\dots,h_t^{(m)}\)</span>。因此，浅层 hidden-state 计算量近似为：</p>
+<div class="arithmatex">\[
+N_{\text{low-hidden}} \approx m \cdot |R_m| \approx m \cdot (1 + (L-m)(W-1))
+\]</div>
+<p>高层缺失段继续形成一个依赖锥。令 <span class="arithmatex">\(q=L-m\)</span>，则高层 hidden-state 重算量近似为：</p>
+<div class="arithmatex">\[
+N_{\text{high-hidden}} \approx \sum_{\ell=m+1}^{L} |R_\ell| \approx q + \frac{q(q-1)}{2}(W-1)
+\]</div>
+<p>合起来，保存浅层 KV 时的 hidden-state 计算单元数近似为：</p>
+<div class="arithmatex">\[
+N_{\text{hidden}}^{\text{shallow}} \approx m \cdot (1 + q(W-1)) + q + \frac{q(q-1)}{2}(W-1)
+\]</div>
+<p>其中 <span class="arithmatex">\(q=L-m\)</span>。这个式子对应“浅层矩形带 + 高层依赖锥”：第一项是把多个位置推过已缓存 KV 的浅层，第二项是高层缺失段内部的重算。</p>
+<p>以 DeepSeek V4 Pro 的量级估算，若取 <span class="arithmatex">\(L=61,W=128\)</span>，并保存前 <span class="arithmatex">\(31\)</span> 层浅层 KV，则 <span class="arithmatex">\(m=31,q=30\)</span>。分界层需要提供的位置数为：</p>
+<div class="arithmatex">\[
+|R_m| \approx 1 + 30 \times 127 = 3811
+\]</div>
+<p>浅层矩形带的 hidden-state 计算量为：</p>
+<div class="arithmatex">\[
+31 \times 3811 = 118141
+\]</div>
+<p>高层依赖锥的 hidden-state 计算量为：</p>
+<div class="arithmatex">\[
+30 + \frac{30 \times 29}{2}\times 127 = 55275
+\]</div>
+<p>因此，总 hidden-state 计算量约为：</p>
+<div class="arithmatex">\[
+N_{\text{hidden}}^{\text{shallow}} \approx 118141 + 55275 = 173416
+\]</div>
+<p>这个数说明，保存前 31 层虽然降低了常驻 KV 存储，但高层缺失段会迫使系统把宽度为 <span class="arithmatex">\(3811\)</span> 的位置集合推过浅层，矩形带成为主要计算项。</p>
+<p>这个模型也解释了“保存前一半层”和“保存后一半层”的不对称。保存浅层时，系统省掉的是低层 KV 的长期存储和低层依赖扩张，但当前 step 仍要承担一个宽度为 <span class="arithmatex">\(|R_m|\)</span> 的浅层矩形带，以及高层缺失段的依赖锥。保存高层时，靠近输出侧的窗口 KV 已经存在，恢复路径更容易退化为当前位置的竖线加较低层的局部恢复。</p>
+<h2 id="5-kv">5. 保存深层 KV 的恢复成本</h2>
+<p>保存深层 KV 是另一种连续层 checkpoint。设低层 <span class="arithmatex">\(1,\dots,m\)</span> 不保存 full KV，深层 <span class="arithmatex">\(m+1,\dots,L\)</span> 长期保存 full KV。预测 <span class="arithmatex">\(\text{token}_{N+1}\)</span> 时，高层 attention 需要的窗口 KV 已经存在；系统主要需要恢复当前位置 <span class="arithmatex">\(N\)</span> 在第 <span class="arithmatex">\(m\)</span> 层的 hidden state，然后沿深层一路向上计算当前位置的输出。</p>
+<p>执行路径可以写成：</p>
+<ol>
+<li>从输入侧恢复当前位置 <span class="arithmatex">\(N\)</span> 在第 <span class="arithmatex">\(m\)</span> 层的 hidden state</li>
+<li>对低层缺失段 <span class="arithmatex">\(1,\dots,m\)</span>，按 SWA 依赖向更早 token 展开</li>
+<li>到达第 <span class="arithmatex">\(m\)</span> 层后，进入已经保存 KV 的深层</li>
+<li>在第 <span class="arithmatex">\(m+1,\dots,L\)</span> 层沿当前位置 <span class="arithmatex">\(N\)</span> 向上计算，并读取深层窗口 KV</li>
+</ol>
+<p>这个路径的特点是：恢复扩张集中在低层；到达分界层后，高层窗口 KV 已经可读，后续主要是一条当前位置竖线。</p>
+<h3 id="_10">示例</h3>
+<div align="center">
+  <img src="../../assets/images/kv-offloading-swa-deep-kv.png" alt="SWA deep-layer KV storage" width="300px">
+</div>
+
+<p>图中例子取 <span class="arithmatex">\(L=4,W=2,m=2\)</span>。第 3、4 层的 KV 已经保存，第 1、2 层的 KV 需要恢复。为了得到 <span class="arithmatex">\(h_N^{(4)}\)</span>，第 4 层可以直接读取 <span class="arithmatex">\(KV_{N-1}^{(4)},KV_N^{(4)}\)</span>；第 3 层也可以直接读取 <span class="arithmatex">\(KV_{N-1}^{(3)},KV_N^{(3)}\)</span>。因此，高层只需要沿当前位置 <span class="arithmatex">\(N\)</span> 形成一条竖线：<span class="arithmatex">\(h_N^{(2)} \rightarrow h_N^{(3)} \rightarrow h_N^{(4)}\)</span>。</p>
+<p>剩下的问题是如何得到 <span class="arithmatex">\(h_N^{(2)}\)</span>。由于第 1、2 层 KV 没有保存，低层需要从输入侧恢复一个依赖锥。为了计算 <span class="arithmatex">\(h_N^{(2)}\)</span>，第 2 层需要窗口内 <span class="arithmatex">\(KV_{N-1}^{(2)},KV_N^{(2)}\)</span>；这些 KV 来自第 1 层的 hidden states。继续向下展开，第 1 层需要覆盖 <span class="arithmatex">\(\{N-2,N-1,N\}\)</span> 的输入 token。于是计算形状变成“低层依赖锥 + 高层竖线”。</p>
+<p>在 <span class="arithmatex">\(L=4,W=2,m=2\)</span> 的例子里，低层 hidden-state 计算量为：</p>
+<div class="arithmatex">\[
+2 + \frac{2 \times 1}{2}\times 1 = 3
+\]</div>
+<p>深层竖线还需要 <span class="arithmatex">\(q=2\)</span> 个 hidden-state 单元，因此总 hidden-state 计算量为 <span class="arithmatex">\(5\)</span>。这与图中的形状一致：底部需要覆盖 3 个输入 token，低层形成一个小依赖锥；到达第 2 层后，高层 KV 已经可读，后续只沿当前位置向上计算。</p>
+<h3 id="_11">开销</h3>
+<h4 id="dram_3">DRAM 存储开销</h4>
+<p>保存深层 <span class="arithmatex">\(m+1,\dots,L\)</span> 的 full KV 时，前缀长度为 <span class="arithmatex">\(N\)</span> 的常驻状态规模近似为：</p>
+<div class="arithmatex">\[
+B_{\text{deep}}(N,m) \approx N \cdot (L-m) \cdot 2 \cdot H_{kv} \cdot D \cdot s
+\]</div>
+<p>它是 full KV baseline 的 <span class="arithmatex">\((L-m)/L\)</span>。若和保存浅层方案使用同样的层数，DRAM 存储量相近；差异主要体现在命中后的恢复计算路径。</p>
+<h4 id="hbm_3">HBM 搬运开销</h4>
+<p>深层 KV 已经保存，当前 step 在深层每一层读取窗口内 KV。逻辑读取量近似为：</p>
+<div class="arithmatex">\[
+B_{\text{deep-read}} \approx (L-m) \cdot W \cdot 2 \cdot H_{kv} \cdot D \cdot s
+\]</div>
+<p>低层缺失 KV 在恢复路径中生成和消费。与保存浅层相比，深层保存减少了高层多位置恢复时对 KV 的重复读取；高层只需要服务当前位置 <span class="arithmatex">\(N\)</span> 的竖线计算。</p>
+<h4 id="_12">计算开销</h4>
+<p>保存深层 KV 的恢复计算集中在低层依赖锥。低层缺失段高度为 <span class="arithmatex">\(m\)</span>，因此重算扩张只发生在底部 <span class="arithmatex">\(m\)</span> 层；到达分界层后，深层窗口 KV 已经是可直接消费的 attention 状态。这个结构解释了保存深层 KV 往往比保存浅层 KV 更有利于 decode：同样保存一半层时，保存深层直接保住了靠近输出侧的窗口状态，避免在高层为多个历史位置重新生成 hidden states 和 KV。</p>
+<p>令 <span class="arithmatex">\(R_\ell\)</span> 表示为了得到 <span class="arithmatex">\(h_N^{(m)}\)</span>，需要计算第 <span class="arithmatex">\(\ell\)</span> 层 hidden state 的位置集合。分界层只需要当前位置：</p>
+<div class="arithmatex">\[
+R_m=\{N\}
+\]</div>
+<p>对缺失 KV 的低层，有：</p>
+<div class="arithmatex">\[
+R_{\ell-1} = \bigcup_{t \in R_\ell} \{t-W+1,\dots,t\}, \quad \ell=1,\dots,m
+\]</div>
+<p>忽略序列起点截断时：</p>
+<div class="arithmatex">\[
+|R_\ell| \approx 1 + (m-\ell)(W-1), \quad \ell=1,\dots,m
+\]</div>
+<p>因此，低层依赖锥需要计算的 hidden-state 单元数为：</p>
+<div class="arithmatex">\[
+N_{\text{low-hidden}}^{\text{deep}} \approx \sum_{\ell=1}^{m} |R_\ell| \approx m + \frac{m(m-1)}{2}(W-1)
+\]</div>
+<p>深层 KV 已经保存，但当前位置仍然要逐层向上计算 hidden state。令 <span class="arithmatex">\(q=L-m\)</span>，深层竖线的 hidden-state 单元数为：</p>
+<div class="arithmatex">\[
+N_{\text{high-line}}^{\text{deep}} = q
+\]</div>
+<p>合起来，保存深层 KV 时的 hidden-state 计算单元数近似为：</p>
+<div class="arithmatex">\[
+N_{\text{hidden}}^{\text{deep}} \approx m + \frac{m(m-1)}{2}(W-1) + q = L + \frac{m(m-1)}{2}(W-1)
+\]</div>
+<p>以 DeepSeek V4 Pro 的量级估算，若取 <span class="arithmatex">\(L=61,W=128\)</span>，并保存后 <span class="arithmatex">\(31\)</span> 层深层 KV，则缺失低层数为 <span class="arithmatex">\(m=30\)</span>，深层竖线长度为 <span class="arithmatex">\(q=31\)</span>。低层依赖锥的 hidden-state 计算量为：</p>
+<div class="arithmatex">\[
+30 + \frac{30 \times 29}{2}\times 127 = 55275
+\]</div>
+<p>深层竖线还需要：</p>
+<div class="arithmatex">\[
+q = 31
+\]</div>
+<p>因此，总 hidden-state 计算量约为：</p>
+<div class="arithmatex">\[
+N_{\text{hidden}}^{\text{deep}} \approx 55275 + 31 = 55306
+\]</div>
+<p>在保存层数几乎相同的情况下，保存后 31 层的恢复计算远低于保存前 31 层。差异来自保存位置：深层 KV 已经覆盖了靠近输出侧的窗口状态，当前 step 只需要先恢复低层依赖锥，再沿深层当前位置向上计算。</p>
+<h2 id="6-kv">6. 间隔层保存 KV 的恢复成本</h2>
+<p>另一种层维 checkpoint 是间隔保存 full KV。设层间隔为 <span class="arithmatex">\(S\)</span>，保存层集合为：</p>
+<div class="arithmatex">\[
+\mathcal{C}_{\text{layer}} = \{S,2S,\dots,L\}
+\]</div>
+<p>这里先假设 <span class="arithmatex">\(L\)</span> 可以被 <span class="arithmatex">\(S\)</span> 整除。若最后一段不足 <span class="arithmatex">\(S\)</span> 层，可以按实际段长替换下面公式中的 <span class="arithmatex">\(S\)</span>。这种方案在层深方向上周期性放置恢复边界，并未把某一段连续层全部保留下来。</p>
+<p>执行路径可以写成：</p>
+<ol>
+<li>从顶层当前位置开始，确定当前分段需要的 hidden-state 位置集合</li>
+<li>在两个相邻保存层之间恢复未保存层的局部状态</li>
+<li>到达下一个保存层后，利用该层已保存的窗口 KV 继续向下一个分段传递</li>
+<li>分段重复，直到恢复出最终需要的 <span class="arithmatex">\(h_N^{(L)}\)</span></li>
+</ol>
+<p>这个路径的特点是：完整依赖锥被多个保存层切成若干梯形段。每段都有一个已有宽度的输入集合，同时段内未保存层仍会继续向更早 token 扩张。</p>
+<h3 id="_13">示例</h3>
+<div align="center">
+  <img src="../../assets/images/kv-offloading-swa-interval-layer-kv.png" alt="SWA interval-layer KV checkpoint" width="300px">
+</div>
+
+<p>图中例子取 <span class="arithmatex">\(L=4,W=2,S=2\)</span>，保存的是 Layer2 和 Layer4 的 KV。Layer1 和 Layer3 的 KV 需要在当前 step 恢复。为了得到 <span class="arithmatex">\(h_N^{(4)}\)</span>，Layer4 可以直接读取已保存的 <span class="arithmatex">\(KV_{N-1}^{(4)},KV_N^{(4)}\)</span>，但仍然需要输入 <span class="arithmatex">\(h_N^{(3)}\)</span>。为了得到 <span class="arithmatex">\(h_N^{(3)}\)</span>，Layer3 需要恢复窗口内 <span class="arithmatex">\(KV_{N-1}^{(3)},KV_N^{(3)}\)</span>，因此需要下方 Layer2 提供 <span class="arithmatex">\(h_{N-1}^{(2)},h_N^{(2)}\)</span>。这两个 hidden states 再由 Layer2 借助已保存的 KV 计算出来。</p>
+<p>图中每个保存层提供一个横向边界，阻止依赖锥继续无界向下扩张；但在两个保存层之间，未保存层仍会把所需位置集合向更早 token 扩大。每一段可以看成“已有宽度的矩形带 + 段内小三角”。</p>
+<p>在这个例子里，把保存层按从上到下编号，顶段宽度为：</p>
+<div class="arithmatex">\[
+b_0 = 1
+\]</div>
+<p>经过一个高度为 <span class="arithmatex">\(S=2\)</span> 的分段后，传递到下一个 checkpoint 的宽度变为：</p>
+<div class="arithmatex">\[
+b_1=2
+\]</div>
+<p>顶段需要 Layer4 输出 1 个位置，Layer3 计算 1 个位置；底段需要 Layer2 输出 2 个位置，Layer1 计算 2 个位置。图中底部覆盖到 <span class="arithmatex">\(T_{N-2},T_{N-1},T_N\)</span>，正是因为下方分段需要给上方分段提供宽度为 2 的 Layer2 hidden states。</p>
+<h3 id="_14">开销</h3>
+<h4 id="dram_4">DRAM 存储开销</h4>
+<p>间隔保存 full KV 时，常驻层数为 <span class="arithmatex">\(G=L/S\)</span>。前缀长度为 <span class="arithmatex">\(N\)</span> 时，存储规模近似为：</p>
+<div class="arithmatex">\[
+B_{\text{interval}}(N,S) \approx N \cdot \frac{L}{S} \cdot 2 \cdot H_{kv} \cdot D \cdot s
+\]</div>
+<p>相对于 full KV baseline，它把层维存储比例降到 <span class="arithmatex">\(1/S\)</span>。例如 <span class="arithmatex">\(S=2\)</span> 时，只保存一半层的 KV。</p>
+<h4 id="hbm_4">HBM 搬运开销</h4>
+<p>当前 step 会读取保存层上的窗口 KV。若第 <span class="arithmatex">\(j\)</span> 个保存层需要计算 <span class="arithmatex">\(b_j\)</span> 个位置的 hidden output，则逻辑读取量近似为：</p>
+<div class="arithmatex">\[
+B_{\text{saved-read}} \approx \left(\sum_{j=0}^{G-1} b_j\right) \cdot W \cdot 2 \cdot H_{kv} \cdot D \cdot s
+\]</div>
+<p>未保存层的 K/V 在恢复路径中生成和消费，通常表现为中间结果读写；长期 full KV 的读取只发生在保存层。实际 HBM 压力取决于 kernel 是否能把这些中间状态留在片上，或者是否需要把分段恢复结果写回 HBM 后再被后续层读取。</p>
+<h4 id="_15">计算开销</h4>
+<p>间隔层保存 KV 把完整依赖锥切成多个梯形段。和完全重算相比，最大连续未保存层数从 <span class="arithmatex">\(L\)</span> 变成 <span class="arithmatex">\(S-1\)</span>，单段扩张受到限制。和只保存浅层相比，它不会在高层留下一个连续很长的缺失段，因此更容易控制当前 step 的恢复深度。</p>
+<p>这条路线仍然需要注意一个边界：保存对象是 KV，hidden states 仍需在当前 step 计算。保存层可以直接提供 attention 的历史状态，但它的当前输出 <span class="arithmatex">\(h_t^{(\ell)}\)</span> 仍然要由输入 <span class="arithmatex">\(h_t^{(\ell-1)}\)</span> 计算出来。因此，分段之间传递的对象是若干位置的 hidden states，计算形状自然表现为梯形堆叠。</p>
+<p>用集合建模。把保存层按从上到下编号，令第 <span class="arithmatex">\(j\)</span> 个分段的上端保存层需要输出的位置集合宽度为 <span class="arithmatex">\(b_j\)</span>。最顶层只需要当前位置：</p>
+<div class="arithmatex">\[
+b_0 = 1
+\]</div>
+<p>经过一个高度为 <span class="arithmatex">\(S\)</span> 的分段后，往下一层 checkpoint 传递的位置宽度增加：</p>
+<div class="arithmatex">\[
+b_{j+1} \approx b_j + (S-1)(W-1)
+\]</div>
+<p>因此：</p>
+<div class="arithmatex">\[
+b_j \approx 1 + j(S-1)(W-1)
+\]</div>
+<p>这里的 <span class="arithmatex">\((S-1)(W-1)\)</span> 来自段内未保存的 <span class="arithmatex">\(S-1\)</span> 层。保存层自身的 KV 已经存在，它在计算 hidden output 时读取已保存窗口 KV，不再要求下方 hidden states 覆盖整个 attention 窗口。</p>
+<p>设分段数为：</p>
+<div class="arithmatex">\[
+G = \frac{L}{S}
+\]</div>
+<p>第 <span class="arithmatex">\(j\)</span> 段内部需要计算的 hidden-state 单元数近似为：</p>
+<div class="arithmatex">\[
+C_{\text{seg-hidden}}(b_j) \approx S \cdot b_j + \frac{(S-1)(S-2)}{2}(W-1)
+\]</div>
+<p>其中第一项是宽度为 <span class="arithmatex">\(b_j\)</span> 的矩形带，第二项是段内未保存层继续展开形成的小三角。总 hidden-state 计算量为：</p>
+<div class="arithmatex">\[
+N_{\text{hidden}}^{\text{interval}} \approx \sum_{j=0}^{G-1} \left[ S \cdot b_j + \frac{(S-1)(S-2)}{2}(W-1) \right]
+\]</div>
+<p>代入 <span class="arithmatex">\(b_j\)</span> 后得到：</p>
+<div class="arithmatex">\[
+N_{\text{hidden}}^{\text{interval}} \approx L + \frac{G(S-1)(S-2)}{2}(W-1) + \frac{S(S-1)G(G-1)}{2}(W-1)
+\]</div>
+<h2 id="7-token-checkpoint">7. 间隔 Token Checkpoint</h2>
+<p>若 checkpoint 只保存位置 <span class="arithmatex">\(c\)</span> 的单个 hidden state 或单个 <span class="arithmatex">\(KV_c^{(\ell)}\)</span>，它无法独立恢复后续 token，计算 <span class="arithmatex">\(c+1\)</span> 时仍然需要每一层窗口内的历史 KV。为了让 checkpoint 成为可继续 decode 的边界，这里采用一个 full-state checkpoint 口径：在 checkpoint 位置 <span class="arithmatex">\(c\)</span>，保存每一层窗口末端的 full KV：</p>
+<div class="arithmatex">\[
+\mathcal{B}_c = \{ KV_t^{(\ell)} \mid \ell=1,\dots,L, t \in \{c-W+1,\dots,c\} \}
+\]</div>
+<p>若 <span class="arithmatex">\(c&lt;W\)</span>，窗口左端按序列起点截断。</p>
+<p>假设 <code>block size = 1</code>，系统每隔 <span class="arithmatex">\(M\)</span> 个 token 保存一个边界 checkpoint。预测 <span class="arithmatex">\(\text{token}_{N+1}\)</span> 时的执行路径为：</p>
+<ol>
+<li>选择不超过当前位置 <span class="arithmatex">\(N\)</span> 的最近 checkpoint，记为 <span class="arithmatex">\(c\)</span></li>
+<li>读取 checkpoint 边界状态 <span class="arithmatex">\(\mathcal{B}_c\)</span></li>
+<li>从 <span class="arithmatex">\(c+1\)</span> 顺序重算到 <span class="arithmatex">\(N\)</span>，恢复从 checkpoint 到当前位置之间的局部状态</li>
+<li>使用恢复后的窗口状态完成当前 decode step</li>
+</ol>
+<h3 id="_16">示例</h3>
+<div align="center">
+  <img src="../../assets/images/kv-offloading-swa-token-checkpoint.png" alt="SWA token checkpoint recovery" width="300px">
+</div>
+
+<p>图中的例子取 <span class="arithmatex">\(L=4,W=2\)</span>，最近的 token checkpoint 位于 <span class="arithmatex">\(c=N-2\)</span>。预测 <span class="arithmatex">\(\text{token}_{N+1}\)</span> 时，系统不从更早 token 展开完整依赖锥，而是从 checkpoint 边界状态出发，顺序恢复 <span class="arithmatex">\(N-1\)</span> 和 <span class="arithmatex">\(N\)</span> 两个位置。</p>
+<p>绿色实线块表示 checkpoint 已经提供的边界 KV。对第 1、2、3 层来说，恢复位置 <span class="arithmatex">\(N-1\)</span> 时需要读取对应层的 <span class="arithmatex">\(KV_{N-2}^{(\ell)}\)</span>；恢复出 <span class="arithmatex">\(KV_{N-1}^{(\ell)}\)</span> 后，位置 <span class="arithmatex">\(N\)</span> 又可以继续使用它作为窗口内的历史状态。绿色虚线块表示当前恢复过程中生成的局部 KV，橙色虚线块表示随恢复过程生成的 hidden state。</p>
+<p>这个例子对应恢复长度：</p>
+<div class="arithmatex">\[
+r=N-c=2
+\]</div>
+<p>因此 hidden-state token-layer 计算量约为：</p>
+<div class="arithmatex">\[
+N_{\text{hidden}}^{\text{token-ckpt}} \approx L \cdot r =4\times 2=8
+\]</div>
+<p>图中只画出当前恢复路径实际消费的边界 KV。若按上面的 full-state checkpoint 口径实现，checkpoint 也可以保存顶层的 <span class="arithmatex">\(KV_{N-2}^{(4)}\)</span>；它是安全的边界状态冗余，但在这个具体 decode step 中不会被读取。</p>
+<h3 id="_17">开销</h3>
+<h4 id="dram_5">DRAM 存储开销</h4>
+<p>checkpoint 位置为：</p>
+<div class="arithmatex">\[
+\mathcal{C}=\{M,2M,3M,\dots\}
+\]</div>
+<p>前缀长度为 <span class="arithmatex">\(N\)</span> 时，checkpoint 数量约为：</p>
 <div class="arithmatex">\[
 N_{\text{ckpt}} \approx \left\lceil \frac{N}{M} \right\rceil
 \]</div>
-<p>一次恢复的最坏长度由 checkpoint 间距和 SWA 窗口共同决定。间距 <span class="arithmatex">\(M\)</span> 较小，恢复窗口短，长期保存的状态更多；间距 <span class="arithmatex">\(M\)</span> 较大，保存成本下降，单次恢复路径变长。这里的 checkpoint 是推理状态的恢复锚点，和训练里的 activation checkpoint 属于不同问题。</p>
-<h2 id="4">4. 重算对象</h2>
-<p>在 SWA 场景中，重算对象限定为当前 step 需要的窗口状态。对第 <span class="arithmatex">\(\ell\)</span> 层来说，重算发生在以下条件下：</p>
-<ul>
-<li>窗口 <span class="arithmatex">\(\mathcal{W}_N\)</span> 内某些历史位置的 full K/V 没有直接缓存；</li>
-<li>系统保留了覆盖这些位置的 checkpoint 或压缩状态；</li>
-<li>当前 step 需要把这些状态恢复成第 <span class="arithmatex">\(\ell\)</span> 层 attention 可消费的 K/V。</li>
-</ul>
-<p>单层 decode 开销可以写成：</p>
+<p>若 checkpoint 保存 full SWA 边界状态，常驻存储规模近似为：</p>
 <div class="arithmatex">\[
-C_{\text{step}}^{(\ell)} =
-C_{\text{load}}^{(\ell)}
-+ C_{\text{restore}}^{(\ell)}
-+ C_{\text{attn}}^{(\ell)}
-+ C_{\text{runtime}}^{(\ell)}
+B_{\text{token-ckpt}}(N,M) \approx \left\lceil \frac{N}{M} \right\rceil \cdot W \cdot L \cdot 2 \cdot H_{kv} \cdot D \cdot s
 \]</div>
-<p>其中：</p>
-<ul>
-<li><span class="arithmatex">\(C_{\text{load}}^{(\ell)}\)</span> 是读取已保存状态的代价；</li>
-<li><span class="arithmatex">\(C_{\text{restore}}^{(\ell)}\)</span> 是从 checkpoint 或压缩状态恢复窗口 K/V 的代价；</li>
-<li><span class="arithmatex">\(C_{\text{attn}}^{(\ell)}\)</span> 是这一层执行 SWA 的代价；</li>
-<li><span class="arithmatex">\(C_{\text{runtime}}^{(\ell)}\)</span> 包括 metadata、调度、同步和 kernel launch。</li>
-</ul>
-<p>SWA full KV baseline 让 <span class="arithmatex">\(C_{\text{restore}}^{(\ell)} \approx 0\)</span>，代价是窗口内 full KV 必须保持直接可读。checkpoint 路线减少长期常驻状态，把一部分代价转移到 <span class="arithmatex">\(C_{\text{restore}}^{(\ell)}\)</span>。这个转移是否划算，取决于恢复路径是否进入 token-level critical path，以及恢复窗口是否足够短。</p>
-<h2 id="5">5. 层间依赖链</h2>
-<p>为了得到 <span class="arithmatex">\(h_N^{(L)}\)</span>，第 <span class="arithmatex">\(L\)</span> 层需要：</p>
-<ul>
-<li>当前层输入 <span class="arithmatex">\(h_N^{(L-1)}\)</span></li>
-<li>第 <span class="arithmatex">\(L\)</span> 层窗口状态 <span class="arithmatex">\(\{K_t^{(L)}, V_t^{(L)}\}_{t \in \mathcal{W}_N}\)</span></li>
-</ul>
-<p>为了得到 <span class="arithmatex">\(h_N^{(L-1)}\)</span>，第 <span class="arithmatex">\(L-1\)</span> 层需要：</p>
-<ul>
-<li>当前层输入 <span class="arithmatex">\(h_N^{(L-2)}\)</span></li>
-<li>第 <span class="arithmatex">\(L-1\)</span> 层窗口状态 <span class="arithmatex">\(\{K_t^{(L-1)}, V_t^{(L-1)}\}_{t \in \mathcal{W}_N}\)</span></li>
-</ul>
-<p>这个依赖关系一直递推到第 1 层。KV cache 在这里保存的是每一层在 SWA 窗口内后续还要访问的 attention 状态。若某一层没有直接保留窗口内 full KV，系统需要明确恢复来源、恢复范围和恢复时机。</p>
-<h2 id="6-deepseek">6. DeepSeek 路线中的保存对象与恢复对象</h2>
-<p>沿着 SWA 的单步 decode 视角看，DeepSeek 这类方案调整的是长期保存对象与当前步恢复对象之间的边界。full KV baseline 保存每层每个窗口位置的最终 K/V；更压缩的长上下文路线把长期保存对象变成更小的恢复基座，并在当前 step 恢复窗口内局部状态。</p>
-<h3 id="61">6.1 长期保存对象</h3>
-<p>长期保存对象可以包括：</p>
-<ul>
-<li>更紧凑的 latent state</li>
-<li>稀疏 checkpoint</li>
-<li>局部 full KV 加全局压缩状态的混合形式</li>
-</ul>
-<p>这些对象的共同目标是降低常驻 HBM 压力，同时保留恢复 SWA 窗口状态所需的信息。系统长期保存可恢复的历史状态，只让当前窗口内需要参与 attention 的部分恢复为可消费的 K/V。</p>
-<h3 id="62">6.2 当前步恢复对象</h3>
-<p>预测 <span class="arithmatex">\(token_{N+1}\)</span> 时需要恢复的是窗口 <span class="arithmatex">\(\mathcal{W}_N\)</span> 内、当前层 attention 会访问到的状态。关键量包括：</p>
-<ul>
-<li>当前层是否已有窗口内 full K/V；</li>
-<li>最近 checkpoint 到窗口边界的距离；</li>
-<li>从压缩状态恢复 full K/V 的计算和同步代价。</li>
-</ul>
-<p>恢复距离决定重算窗口，也影响 TPOT 和尾延迟。若恢复发生在 decode 前的强同步路径上，单次恢复成本会直接进入 token latency。若恢复能与数据读取或局部预处理重叠，压缩带来的 HBM 收益更容易兑现。</p>
-<h2 id="7">7. 存储与恢复的平衡</h2>
-<p>在 SWA 设定下，prefix hit 长度为 <span class="arithmatex">\(N\)</span>，窗口大小为 <span class="arithmatex">\(W\)</span>，预测 <span class="arithmatex">\(token_{N+1}\)</span> 时要解决的是每层窗口状态的提供方式。几种选择对应不同代价：</p>
-<ul>
-<li>
-<p><strong>保存窗口内 full KV</strong><br />
-  decode 路径短，恢复代价低，窗口状态占用 <span class="arithmatex">\(O(WL)\)</span> 级别 HBM。</p>
-</li>
-<li>
-<p><strong>保存压缩状态并恢复窗口 K/V</strong><br />
-  常驻状态更小，decode step 增加恢复计算和同步。</p>
-</li>
-<li>
-<p><strong>checkpoint 较密</strong><br />
-  恢复路径短，checkpoint 状态占用更高。</p>
-</li>
-<li>
-<p><strong>checkpoint 较疏</strong><br />
-  存储更省，最坏恢复路径更长。</p>
-</li>
-</ul>
-<p>因此，KV cache 存储量和重算的平衡可以写成一个具体问题：为了预测 <span class="arithmatex">\(token_{N+1}\)</span>，每一层窗口内的 attention 状态应长期保存为 full KV，还是通过 checkpoint 与压缩状态在当前 step 恢复。</p>
+<p>相对于完整历史 full KV 的 <span class="arithmatex">\(B_{\text{full}}(N)\)</span>，这个比例约为 <span class="arithmatex">\(W/M\)</span>。当 <span class="arithmatex">\(M&gt;W\)</span> 时，checkpoint 的常驻 KV 小于完整历史 full KV；当 <span class="arithmatex">\(M\)</span> 接近 <span class="arithmatex">\(W\)</span> 或更小，checkpoint 窗口之间会出现较多重叠，存储优势会下降。实际系统若对重叠窗口做去重，存储口径会低于这个 full-state 上界。</p>
+<h4 id="hbm_5">HBM 搬运开销</h4>
+<p>命中后，系统需要读取最近的边界 checkpoint <span class="arithmatex">\(\mathcal{B}_c\)</span>。因此，单次恢复的 checkpoint 读取量近似为：</p>
+<div class="arithmatex">\[
+B_{\text{token-ckpt-read}} \approx W \cdot L \cdot 2 \cdot H_{kv} \cdot D \cdot s
+\]</div>
+<p>如果 checkpoint 不在 GPU HBM 中，这部分状态还会引入跨层级搬运。恢复区间内生成的中间状态是否写回 HBM，取决于实现是否能把局部 prefill 留在片上或融合到后续计算中。</p>
+<h4 id="_18">计算开销</h4>
+<p>当预测 <span class="arithmatex">\(\text{token}_{N+1}\)</span> 时，系统选择不超过当前位置 <span class="arithmatex">\(N\)</span> 的最近 checkpoint：</p>
+<div class="arithmatex">\[
+c=\max\{x\in\mathcal{C}\mid x\le N\}
+\]</div>
+<p>从 <span class="arithmatex">\(\mathcal{B}_c\)</span> 出发，系统顺序重算 <span class="arithmatex">\(c+1,\dots,N\)</span>。令恢复长度为：</p>
+<div class="arithmatex">\[
+r=N-c
+\]</div>
+<p>由于 checkpoint 间隔为 <span class="arithmatex">\(M\)</span>，有：</p>
+<div class="arithmatex">\[
+0 \le r &lt; M
+\]</div>
+<p>若把恢复过程看作一段局部 prefill，hidden-state token-layer 数近似为：</p>
+<div class="arithmatex">\[
+N_{\text{hidden}}^{\text{token-ckpt}} \approx L \cdot r
+\]</div>
+<p>attention 逻辑读取量还要乘上窗口大小 <span class="arithmatex">\(W\)</span>，近似为 <span class="arithmatex">\(O(LrW)\)</span>。这里的 <span class="arithmatex">\(r\)</span> 由 token checkpoint 间距控制；checkpoint 边界状态已经提供 <span class="arithmatex">\(c\)</span> 之前的 SWA window KV，因此恢复过程不再从当前位置向左展开完整依赖锥。</p>
+<p>这个建模成立的前提是 checkpoint 保存了可继续 SWA 的边界窗口状态。若 checkpoint 只保存单点状态，<span class="arithmatex">\(r=N-c\)</span> 的恢复长度不成立，系统仍需要向 checkpoint 左侧补齐窗口 KV，依赖会继续向更早 token 展开。这里的 checkpoint 是推理状态恢复锚点，和训练里的 activation checkpoint 属于不同问题。</p>
 <h2 id="8">8. 总结</h2>
-<p>SWA 把预测 <span class="arithmatex">\(token_{N+1}\)</span> 时的直接 attention 范围限制在窗口 <span class="arithmatex">\(\mathcal{W}_N\)</span> 内。DeepSeek 这类 KV 存储方案进一步讨论窗口状态的保存形式：系统可以让窗口内 full K/V 保持直接可读，也可以长期保存更小的恢复基座，并在 decode 时恢复局部状态。checkpoint 间距、窗口大小和恢复路径共同决定这条路线的显存收益与 token latency 代价。</p>
+<p>SWA 把预测 <span class="arithmatex">\(\text{token}_{N+1}\)</span> 时的直接 attention 范围限制在窗口 <span class="arithmatex">\(\mathcal{W}_N\)</span> 内，但 KV 存储策略决定了这些窗口状态是直接读取，还是在当前 step 恢复出来。</p>
+<p>full KV baseline 的路径最短，额外恢复计算接近 0，代价是长期保存完整历史 KV。完全重算把 KV 存储压到最低，但层间依赖会形成向低层和更早 token 扩张的依赖锥。层维 checkpoint 介于两者之间：保存浅层 KV 会留下“浅层矩形带 + 高层依赖锥”，保存深层 KV 更接近“低层依赖锥 + 高层竖线”，间隔层保存则把依赖锥切成多个梯形段。</p>
+<p>如果保存层数相同，浅层、深层和间隔层保存的 DRAM 常驻 KV 规模基本相同；差异主要来自恢复路径。深层保存通常更接近 decode 当前 step 直接消费的高层窗口状态，间隔层保存把恢复压力分摊到多个分段，浅层保存则容易在高层恢复中引入更宽的 hidden-state 矩形带。</p>
+<p>token 维 checkpoint 是另一种边界：它需要保存可继续执行 SWA 的窗口状态，而不是单个 token 状态。checkpoint 间距 <span class="arithmatex">\(M\)</span> 控制常驻存储与恢复长度的交换；<span class="arithmatex">\(M\)</span> 越大，长期状态越少，命中后从 checkpoint 到当前窗口的局部恢复越长。</p>
 
 
 

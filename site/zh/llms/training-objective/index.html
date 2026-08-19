@@ -68,7 +68,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#_1" class="md-skip">
+        <a href="#speculative-decoding" class="md-skip">
           跳转至
         </a>
       
@@ -611,6 +611,276 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#1" class="md-nav__link">
+    <span class="md-ellipsis">
+      1. 符号定义
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-serving-objective" class="md-nav__link">
+    <span class="md-ellipsis">
+      2. Serving Objective
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Serving Objective">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#21-target-greedy-draft-greedy" class="md-nav__link">
+    <span class="md-ellipsis">
+      2.1 Target Greedy + Draft Greedy
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#22-target-sampling-draft-greedy" class="md-nav__link">
+    <span class="md-ellipsis">
+      2.2 Target Sampling + Draft Greedy
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#23-target-sampling-draft-sampling-equality" class="md-nav__link">
+    <span class="md-ellipsis">
+      2.3 Target Sampling + Draft Sampling + Equality
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#24-target-sampling-draft-sampling-rejection-sampling" class="md-nav__link">
+    <span class="md-ellipsis">
+      2.4 Target Sampling + Draft Sampling + Rejection Sampling
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#25-serving-objective" class="md-nav__link">
+    <span class="md-ellipsis">
+      2.5 小结：两类 Serving Objective
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2.5 小结：两类 Serving Objective">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-top-1-agreement" class="md-nav__link">
+    <span class="md-ellipsis">
+      1. Top-1 Agreement
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-distribution-matching" class="md-nav__link">
+    <span class="md-ellipsis">
+      2. Distribution Matching
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-training-objectives" class="md-nav__link">
+    <span class="md-ellipsis">
+      3. Training Objectives
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. Training Objectives">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#31-sampled-token-ce-sft" class="md-nav__link">
+    <span class="md-ellipsis">
+      3.1 Sampled-token CE / SFT
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#32-soft-logit-distillation-kl" class="md-nav__link">
+    <span class="md-ellipsis">
+      3.2 Soft-logit Distillation / KL
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#33-target-argmax-cetop-1-oriented-training" class="md-nav__link">
+    <span class="md-ellipsis">
+      3.3 Target Argmax CE：Top-1-oriented Training
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#34-hidden-state-l1-l2-loss" class="md-nav__link">
+    <span class="md-ellipsis">
+      3.4 Hidden-state L1 / L2 Loss
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#35-multi-token-objective" class="md-nav__link">
+    <span class="md-ellipsis">
+      3.5 Multi-token Objective
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-context-distribution-supervision" class="md-nav__link">
+    <span class="md-ellipsis">
+      4. Context Distribution 与 Supervision
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. Context Distribution 与 Supervision">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#41-dataset-teacher-forcing" class="md-nav__link">
+    <span class="md-ellipsis">
+      4.1 Dataset / Teacher Forcing
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#42-target-greedy-rollout" class="md-nav__link">
+    <span class="md-ellipsis">
+      4.2 Target Greedy Rollout
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#43-target-sampling-rollout" class="md-nav__link">
+    <span class="md-ellipsis">
+      4.3 Target Sampling Rollout
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4.3 Target Sampling Rollout">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#sampled-token-supervision" class="md-nav__link">
+    <span class="md-ellipsis">
+      Sampled-token supervision
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#target-argmax-supervision" class="md-nav__link">
+    <span class="md-ellipsis">
+      Target argmax supervision
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#44-draft-on-policy-rollout" class="md-nav__link">
+    <span class="md-ellipsis">
+      4.4 Draft / On-policy Rollout
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-target-temp1-draft-greedy" class="md-nav__link">
+    <span class="md-ellipsis">
+      5. Target Temp=1 + Draft Greedy 下的训练设计
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. Target Temp=1 + Draft Greedy 下的训练设计">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#51-context-distribution" class="md-nav__link">
+    <span class="md-ellipsis">
+      5.1 Context Distribution
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#52-token-level-objective" class="md-nav__link">
+    <span class="md-ellipsis">
+      5.2 Token-level Objective
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#53-auxiliary-objectives" class="md-nav__link">
+    <span class="md-ellipsis">
+      5.3 Auxiliary Objectives
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#llm" class="md-nav__link">
     <span class="md-ellipsis">
       LLM 预训练目标
@@ -719,6 +989,29 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../glm-5.2-inference-path/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    GLM-5.2 推理路径
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -753,6 +1046,276 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#1" class="md-nav__link">
+    <span class="md-ellipsis">
+      1. 符号定义
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-serving-objective" class="md-nav__link">
+    <span class="md-ellipsis">
+      2. Serving Objective
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Serving Objective">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#21-target-greedy-draft-greedy" class="md-nav__link">
+    <span class="md-ellipsis">
+      2.1 Target Greedy + Draft Greedy
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#22-target-sampling-draft-greedy" class="md-nav__link">
+    <span class="md-ellipsis">
+      2.2 Target Sampling + Draft Greedy
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#23-target-sampling-draft-sampling-equality" class="md-nav__link">
+    <span class="md-ellipsis">
+      2.3 Target Sampling + Draft Sampling + Equality
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#24-target-sampling-draft-sampling-rejection-sampling" class="md-nav__link">
+    <span class="md-ellipsis">
+      2.4 Target Sampling + Draft Sampling + Rejection Sampling
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#25-serving-objective" class="md-nav__link">
+    <span class="md-ellipsis">
+      2.5 小结：两类 Serving Objective
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2.5 小结：两类 Serving Objective">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-top-1-agreement" class="md-nav__link">
+    <span class="md-ellipsis">
+      1. Top-1 Agreement
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-distribution-matching" class="md-nav__link">
+    <span class="md-ellipsis">
+      2. Distribution Matching
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-training-objectives" class="md-nav__link">
+    <span class="md-ellipsis">
+      3. Training Objectives
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. Training Objectives">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#31-sampled-token-ce-sft" class="md-nav__link">
+    <span class="md-ellipsis">
+      3.1 Sampled-token CE / SFT
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#32-soft-logit-distillation-kl" class="md-nav__link">
+    <span class="md-ellipsis">
+      3.2 Soft-logit Distillation / KL
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#33-target-argmax-cetop-1-oriented-training" class="md-nav__link">
+    <span class="md-ellipsis">
+      3.3 Target Argmax CE：Top-1-oriented Training
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#34-hidden-state-l1-l2-loss" class="md-nav__link">
+    <span class="md-ellipsis">
+      3.4 Hidden-state L1 / L2 Loss
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#35-multi-token-objective" class="md-nav__link">
+    <span class="md-ellipsis">
+      3.5 Multi-token Objective
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-context-distribution-supervision" class="md-nav__link">
+    <span class="md-ellipsis">
+      4. Context Distribution 与 Supervision
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. Context Distribution 与 Supervision">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#41-dataset-teacher-forcing" class="md-nav__link">
+    <span class="md-ellipsis">
+      4.1 Dataset / Teacher Forcing
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#42-target-greedy-rollout" class="md-nav__link">
+    <span class="md-ellipsis">
+      4.2 Target Greedy Rollout
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#43-target-sampling-rollout" class="md-nav__link">
+    <span class="md-ellipsis">
+      4.3 Target Sampling Rollout
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4.3 Target Sampling Rollout">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#sampled-token-supervision" class="md-nav__link">
+    <span class="md-ellipsis">
+      Sampled-token supervision
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#target-argmax-supervision" class="md-nav__link">
+    <span class="md-ellipsis">
+      Target argmax supervision
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#44-draft-on-policy-rollout" class="md-nav__link">
+    <span class="md-ellipsis">
+      4.4 Draft / On-policy Rollout
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-target-temp1-draft-greedy" class="md-nav__link">
+    <span class="md-ellipsis">
+      5. Target Temp=1 + Draft Greedy 下的训练设计
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. Target Temp=1 + Draft Greedy 下的训练设计">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#51-context-distribution" class="md-nav__link">
+    <span class="md-ellipsis">
+      5.1 Context Distribution
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#52-token-level-objective" class="md-nav__link">
+    <span class="md-ellipsis">
+      5.2 Token-level Objective
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#53-auxiliary-objectives" class="md-nav__link">
+    <span class="md-ellipsis">
+      5.3 Auxiliary Objectives
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#llm" class="md-nav__link">
     <span class="md-ellipsis">
       LLM 预训练目标
@@ -777,9 +1340,619 @@
 
 
 
-<h1 id="_1">训练目标</h1>
-<p>本页记录大语言模型最基础的自回归训练目标。它与 serving 运行时是不同层面的问题，但作为背景知识很有必要，因为许多推理时的量最终都建立在同一套 token 级概率分解之上。</p>
-<p>把这页放在 AI Infra 里，并不是因为做 serving 必须深入研究训练，而是因为推理时很多最基本的对象都继承自预训练目标。logits、token 概率、next-token prediction 和 sampling 的含义，最终都建立在同一套自回归概率分解上。</p>
+<h1 id="speculative-decoding">Speculative Decoding 训练</h1>
+<h2 id="1">1. 符号定义</h2>
+<p>设当前 context 为 <span class="arithmatex">\(x\)</span>，词表为 <span class="arithmatex">\(\mathcal V\)</span>，其中 <span class="arithmatex">\(y\in\mathcal V\)</span> 表示候选下一个 token。</p>
+<ul>
+<li><span class="arithmatex">\(p(\cdot|x)\)</span> 和 <span class="arithmatex">\(q(\cdot|x)\)</span>：Target 和 Draft 的完整下一个 token 分布。</li>
+<li><span class="arithmatex">\(p(y|x)\)</span> 和 <span class="arithmatex">\(q(y|x)\)</span>：对于具体 token <span class="arithmatex">\(y\)</span>，Target 和 Draft 为其分配的概率。</li>
+</ul>
+<p>Draft 常见两种采样方式：</p>
+<ul>
+<li>
+<p><strong>Greedy Draft</strong>：选择 Draft 分布中概率最高的 token 作为 proposal，即</p>
+<div class="arithmatex">\[d=\arg\max_{y\in\mathcal V}q(y|x)\]</div>
+</li>
+<li>
+<p><strong>Probabilistic Draft</strong>：proposal token 按照 Draft 分布采样，即 <span class="arithmatex">\(d\sim q(\cdot|x)\)</span>。</p>
+</li>
+</ul>
+<p>Draft model 的训练目标取决于 Serving 时的采样和验证方式。不同机制对应的最优训练目标也不同，下面分别讨论。</p>
+<hr />
+<h2 id="2-serving-objective">2. Serving Objective</h2>
+<h3 id="21-target-greedy-draft-greedy">2.1 Target Greedy + Draft Greedy</h3>
+<p>Target 使用 greedy decoding：</p>
+<div class="arithmatex">\[
+y_p=\arg\max_y p(y|x)
+\]</div>
+<p>Draft 也使用 greedy decoding：</p>
+<div class="arithmatex">\[
+y_q=\arg\max_y q(y|x)
+\]</div>
+<p>如果 validation 直接判断两个 token 是否相同，则 acceptance 为：</p>
+<div class="arithmatex">\[
+A(x)
+=
+\mathbf{1}
+\left[
+\arg\max_y q(y|x)
+=
+\arg\max_y p(y|x)
+\right]
+\]</div>
+<p>因此，该 validation 机制只关心 Draft 和 Target 的 <strong>Top-1 是否一致</strong>。也就是说，达到最优 acceptance 只需要：</p>
+<div class="arithmatex">\[
+\arg\max q=\arg\max p
+\]</div>
+<p>并不要求完整分布满足<span class="arithmatex">\(q=p\)</span>。</p>
+<p>例如：</p>
+<div class="arithmatex">\[
+p=(0.5,0.3,0.2)
+\]</div>
+<p>两个 Draft 分布分别为：</p>
+<div class="arithmatex">\[
+q_1=(0.49,0.31,0.20)
+\]</div>
+<div class="arithmatex">\[
+q_2=(0.99,0.005,0.005)
+\]</div>
+<p>虽然 <span class="arithmatex">\(q_1\)</span> 和 <span class="arithmatex">\(q_2\)</span> 与 Target 分布 <span class="arithmatex">\(p\)</span> 的距离差别很大，但二者都有：</p>
+<div class="arithmatex">\[
+\arg\max q_1
+=
+\arg\max q_2
+=
+\arg\max p
+\]</div>
+<p>因此在 greedy equality validation 下，两者的单步 acceptance 都是 1。 在 Target greedy + Draft greedy + equality validation 下，distribution matching 是达到最优 acceptance 的充分条件，但不是必要条件。真正的最优条件是 Draft 与 Target 的 Top-1 一致。</p>
+<h3 id="22-target-sampling-draft-greedy">2.2 Target Sampling + Draft Greedy</h3>
+<p>Draft 使用 greedy decoding：</p>
+<div class="arithmatex">\[
+d=\arg\max_y q(y|x)
+\]</div>
+<p>Target 按其分布采样：</p>
+<div class="arithmatex">\[
+Y\sim p(\cdot|x)
+\]</div>
+<p>如果 validation 要求：</p>
+<div class="arithmatex">\[
+Y=d
+\]</div>
+<p>则给定 context <span class="arithmatex">\(x\)</span> 时的期望 acceptance probability 为：</p>
+<div class="arithmatex">\[
+A(x)
+=
+P(Y=d|x)
+=
+p(d|x)
+\]</div>
+<p>代入 Draft proposal：</p>
+<div class="arithmatex">\[
+A(x)
+=
+p\left(
+\arg\max_y q(y|x)
+\mid x
+\right)
+\]</div>
+<p>因此，该 validation 机制下的最优 Draft proposal 满足：</p>
+<div class="arithmatex">\[
+\arg\max q
+=
+\arg\max p
+\]</div>
+<p>此时，给定 context <span class="arithmatex">\(x\)</span> 的最大期望 acceptance 为：</p>
+<div class="arithmatex">\[
+A^*(x)
+=
+\max_y p(y|x)
+\]</div>
+<p>因此，即使 Draft 完全预测正确 Target 的 Top-1 token，由于 Target 本身采用 sampling，acceptance 也不一定为 1。在 Target sampling + Draft greedy + equality validation 下，distribution matching 是 acceptance-optimal 的充分条件，但不是必要条件。真正的最优条件是 Top-1 agreement。</p>
+<h3 id="23-target-sampling-draft-sampling-equality">2.3 Target Sampling + Draft Sampling + Equality</h3>
+<p>Target 按其分布采样：</p>
+<div class="arithmatex">\[
+Y_p\sim p(\cdot|x)
+\]</div>
+<p>Draft 也按其分布采样：</p>
+<div class="arithmatex">\[
+Y_q\sim q(\cdot|x)
+\]</div>
+<p>如果两次采样相互独立，并且 validation 直接判断：</p>
+<div class="arithmatex">\[
+Y_p=Y_q
+\]</div>
+<p>则单步 acceptance probability 为：</p>
+<div class="arithmatex">\[
+A(x)
+=
+P(Y_p=Y_q|x)
+\]</div>
+<p>展开得到：</p>
+<div class="arithmatex">\[
+A(x)
+=
+\sum_y p(y|x)q(y|x)
+\]</div>
+<p>即：</p>
+<div class="arithmatex">\[
+A(x)=p^\top q
+\]</div>
+<p>如果直接以 acceptance 为目标，对 Draft 分布 <span class="arithmatex">\(q\)</span> 进行优化：</p>
+<div class="arithmatex">\[
+\max_q p^\top q
+\]</div>
+<p>由于该目标关于 <span class="arithmatex">\(q\)</span> 是线性的，最优策略是把全部概率放在 Target 概率最大的 token 上：</p>
+<div class="arithmatex">\[
+q(y|x)
+=
+\delta_{y^*}(y),
+\qquad
+y^*=\arg\max_y p(y|x)
+\]</div>
+<p>此时最大 acceptance 为：</p>
+<div class="arithmatex">\[
+A^*(x)
+=
+\max_y p(y|x)
+\]</div>
+<p>因此，在 independent sampling + equality validation 下，真正的最优 Draft distribution 是把全部概率放在 Target top-1 token 上，Distribution matching 通常不是 acceptance-optimal 的充分条件。</p>
+<h3 id="24-target-sampling-draft-sampling-rejection-sampling">2.4 Target Sampling + Draft Sampling + Rejection Sampling</h3>
+<p>标准 speculative decoding 使用 rejection sampling，而不是直接进行 token equality checking。</p>
+<p>Draft 按其分布采样一个 proposal token：</p>
+<div class="arithmatex">\[
+Y\sim q(\cdot|x)
+\]</div>
+<p>假设本次采样得到的具体 token 为 <span class="arithmatex">\(y\)</span>，则该 token 的接受概率为：</p>
+<div class="arithmatex">\[
+\alpha(y)
+=
+\min\left(
+1,
+\frac{p(y|x)}{q(y|x)}
+\right)
+\]</div>
+<p>因此，给定 context <span class="arithmatex">\(x\)</span> 的平均 acceptance probability 为：</p>
+<div class="arithmatex">\[
+A(x)
+=
+\sum_y
+q(y|x)
+\min\left(
+1,
+\frac{p(y|x)}{q(y|x)}
+\right)
+\]</div>
+<p>化简得到：</p>
+<div class="arithmatex">\[
+A(x)
+=
+\sum_y
+\min\left(
+p(y|x),
+q(y|x)
+\right)
+\]</div>
+<p>当：</p>
+<div class="arithmatex">\[
+q(\cdot|x)=p(\cdot|x)
+\]</div>
+<p>时：</p>
+<div class="arithmatex">\[
+A(x)=1
+\]</div>
+<p>因此，在 rejection sampling validation 下，Distribution matching 与最优 acceptance 是直接对齐的；当且仅当 <span class="arithmatex">\(q(\cdot|x)=p(\cdot|x)\)</span> 时，可以达到 <span class="arithmatex">\(A(x)=1\)</span>。</p>
+<h3 id="25-serving-objective">2.5 小结：两类 Serving Objective</h3>
+<p>前面的 validation 机制可以粗略归纳为两类。</p>
+<h4 id="1-top-1-agreement">1. Top-1 Agreement</h4>
+<p>适用于：</p>
+<ul>
+<li>Target greedy + Draft greedy</li>
+<li>Target sampling + Draft greedy + equality validation</li>
+</ul>
+<p>这类机制下，达到最优 acceptance 的条件是：</p>
+<div class="arithmatex">\[
+\arg\max_y q(y|x)
+=
+\arg\max_y p(y|x)
+\]</div>
+<p>因此，validation 主要关心 Draft 和 Target 的 <strong>Top-1 是否一致</strong>，并不要求完整 distribution 一致。</p>
+<h4 id="2-distribution-matching">2. Distribution Matching</h4>
+<p>适用于：</p>
+<ul>
+<li>Standard speculative decoding with rejection sampling</li>
+</ul>
+<p>此时 acceptance 取决于 Target 和 Draft distribution 的整体重叠程度，最优条件为：</p>
+<div class="arithmatex">\[
+q(\cdot|x)=p(\cdot|x)
+\]</div>
+<p>因此，这类机制更直接要求 <strong>distribution matching</strong>。</p>
+<h2 id="3-training-objectives">3. Training Objectives</h2>
+<h3 id="31-sampled-token-ce-sft">3.1 Sampled-token CE / SFT</h3>
+<p>给定 context <span class="arithmatex">\(x\)</span>，Target 按其分布采样一个 token：</p>
+<div class="arithmatex">\[
+Y\sim p(\cdot|x)
+\]</div>
+<p>将采样得到的 token <span class="arithmatex">\(Y\)</span> 作为监督信号，训练 Draft：</p>
+<div class="arithmatex">\[
+L_{\mathrm{CE}}
+=
+-\log q(Y|x)
+\]</div>
+<p>对 Target sampling 取期望：</p>
+<div class="arithmatex">\[
+\mathbb{E}_{Y\sim p(\cdot|x)}
+[L_{\mathrm{CE}}]
+=
+-\sum_y p(y|x)\log q(y|x)
+\]</div>
+<p>这就是 Target 分布 <span class="arithmatex">\(p\)</span> 与 Draft 分布 <span class="arithmatex">\(q\)</span> 的 cross entropy：</p>
+<div class="arithmatex">\[
+H(p,q)
+=
+H(p)
++
+D_{\mathrm{KL}}(p\Vert q)
+\]</div>
+<p>由于 <span class="arithmatex">\(H(p)\)</span> 与 Draft 参数无关，因此最小化期望 CE 等价于最小化：</p>
+<div class="arithmatex">\[
+D_{\mathrm{KL}}(p\Vert q)
+\]</div>
+<p>理论最优解为：</p>
+<div class="arithmatex">\[
+q(\cdot|x)=p(\cdot|x)
+\]</div>
+<p>因此，sampled-token CE 的训练目标是完整的 <strong>distribution matching</strong>。</p>
+<p>从这个角度看，单个 sampled-token CE：</p>
+<div class="arithmatex">\[
+-\log q(Y|x)
+\]</div>
+<p>可以看作完整 cross-entropy objective 的 Monte Carlo estimator。</p>
+<h3 id="32-soft-logit-distillation-kl">3.2 Soft-logit Distillation / KL</h3>
+<p>如果训练时能够获得 Target 的完整 token distribution：</p>
+<div class="arithmatex">\[
+p(\cdot|x)
+\]</div>
+<p>则可以直接让 Draft distribution：</p>
+<div class="arithmatex">\[
+q(\cdot|x)
+\]</div>
+<p>拟合 Target distribution。</p>
+<p>常见目标为：</p>
+<div class="arithmatex">\[
+L_{\mathrm{KD}}
+=
+D_{\mathrm{KL}}(p\Vert q)
+\]</div>
+<p>即：</p>
+<div class="arithmatex">\[
+L_{\mathrm{KD}}
+=
+\sum_y
+p(y|x)
+\log
+\frac{p(y|x)}{q(y|x)}
+\]</div>
+<p>由于 Target distribution <span class="arithmatex">\(p\)</span> 在训练 Draft 时是固定的，因此该目标同样等价于最小化：</p>
+<div class="arithmatex">\[
+-\sum_y p(y|x)\log q(y|x)
+\]</div>
+<p>理论最优解为：</p>
+<div class="arithmatex">\[
+q(\cdot|x)=p(\cdot|x)
+\]</div>
+<p>因此，Soft-logit KD 和 sampled-token CE 的理论最优目标相同，都是 <strong>distribution matching</strong>。</p>
+<p>区别在于：</p>
+<ul>
+<li>Sampled-token CE 每个 context 只使用一个 Target sampled token。</li>
+<li>Soft-logit KD 直接利用 Target 的完整 probability distribution。</li>
+</ul>
+<p>因此，Soft-logit KD 提供的监督信号更完整，也避免了 sampled-token supervision 带来的采样噪声。</p>
+<h3 id="33-target-argmax-cetop-1-oriented-training">3.3 Target Argmax CE：Top-1-oriented Training</h3>
+<p>如果 serving 时 Draft 使用 greedy decoding，并且 validation 主要关心 Top-1 agreement，可以考虑使用 Target 的 top-1 token 作为监督信号：</p>
+<div class="arithmatex">\[
+y^*
+=
+\arg\max_y p(y|x)
+\]</div>
+<p>训练 Draft：</p>
+<div class="arithmatex">\[
+L_{\mathrm{top1}}
+=
+-\log q(y^*|x)
+\]</div>
+<p>该 loss 会提高 Draft 对 Target top-1 token 的概率，因此更直接地推动：</p>
+<div class="arithmatex">\[
+\arg\max q
+=
+\arg\max p
+\]</div>
+<p>这与 Target sampling + Draft greedy + equality validation 下的最优 serving 条件更加直接对齐。</p>
+<p>需要注意，Target-argmax CE 并不是 speculative training 中最常见的标准目标。主流方法通常采用 sampled-token CE 或基于完整 Target distribution 的 distillation。这里将其作为一种 <strong>Top-1-oriented surrogate objective</strong>。</p>
+<p>例如，假设 Target distribution 为：</p>
+<div class="arithmatex">\[
+p=(0.40,0.35,0.25)
+\]</div>
+<p>使用 sampled-token CE 时，理论上会推动：</p>
+<div class="arithmatex">\[
+q\rightarrow p
+\]</div>
+<p>而使用 Target argmax CE 时，监督 token 始终为 token 1，会推动：</p>
+<div class="arithmatex">\[
+q_1\rightarrow1
+\]</div>
+<p>例如：</p>
+<div class="arithmatex">\[
+q=(0.9,0.05,0.05)
+\]</div>
+<p>虽然该分布与 <span class="arithmatex">\(p\)</span> 并不接近，但 Draft greedy token 仍然是 token 1，因此在 Target sampling + Draft greedy + equality validation 下已经达到最大单步 acceptance：</p>
+<div class="arithmatex">\[
+A^*(x)=p_1=0.4
+\]</div>
+<p>这说明 distribution matching quality 与 greedy acceptance 并不完全等价。</p>
+<h3 id="34-hidden-state-l1-l2-loss">3.4 Hidden-state L1 / L2 Loss</h3>
+<p>部分 speculative training 方法还会加入 hidden-state matching loss，使 Draft 的中间表示接近 Target。</p>
+<p>例如：</p>
+<div class="arithmatex">\[
+L_h
+=
+\left\|
+h_t^{\mathrm{draft}}
+-
+h_t^{\mathrm{target}}
+\right\|_1
+\]</div>
+<p>或：</p>
+<div class="arithmatex">\[
+L_h
+=
+\left\|
+h_t^{\mathrm{draft}}
+-
+h_t^{\mathrm{target}}
+\right\|_2^2
+\]</div>
+<p>其中：</p>
+<ul>
+<li><span class="arithmatex">\(h_t^{\mathrm{draft}}\)</span>：Draft 在位置 <span class="arithmatex">\(t\)</span> 预测得到的 hidden representation。</li>
+<li><span class="arithmatex">\(h_t^{\mathrm{target}}\)</span>：Target 对应位置的 hidden representation。</li>
+</ul>
+<p>这类 loss 的目标是 <strong>representation matching</strong>，并不直接优化 token acceptance。</p>
+<p>它通常作为 auxiliary loss，与 token-level CE / KD 一起使用，例如：</p>
+<div class="arithmatex">\[
+L
+=
+L_{\mathrm{token}}
++
+\lambda L_h
+\]</div>
+<p>其作用是让 Draft 的内部表示更接近 Target，从而改善后续 token prediction，尤其是在多层或多步 speculative prediction 中减少 hidden-state drift。</p>
+<p>因此，Hidden-state L1 / L2 属于辅助训练目标：</p>
+<div class="arithmatex">\[
+h^{\mathrm{draft}}\approx h^{\mathrm{target}}
+\quad\Rightarrow\quad
+\text{更好的 token prediction}
+\quad\Rightarrow\quad
+\text{potentially higher acceptance}
+\]</div>
+<p>需要注意，它与 acceptance 的关系是间接的，最终仍需要结合 token-level objective 进行训练。</p>
+<h3 id="35-multi-token-objective">3.5 Multi-token Objective</h3>
+<p>假设 Draft 一次预测 <span class="arithmatex">\(K\)</span> 个 speculative tokens：</p>
+<div class="arithmatex">\[
+d_1,d_2,\ldots,d_K
+\]</div>
+<p>定义 <span class="arithmatex">\(a_k\)</span> 为：在前 <span class="arithmatex">\(k-1\)</span> 个 speculative token 已经被接受的条件下，第 <span class="arithmatex">\(k\)</span> 个 token 的 acceptance probability。</p>
+<p>那么至少连续接受 <span class="arithmatex">\(k\)</span> 个 token 的概率为：</p>
+<div class="arithmatex">\[
+P(L\ge k)
+=
+\prod_{j=1}^{k} a_j
+\]</div>
+<p>其中 <span class="arithmatex">\(L\)</span> 表示最终连续接受的 speculative token 数量。</p>
+<p>因此 expected accepted length 为：</p>
+<div class="arithmatex">\[
+\mathbb{E}[L]
+=
+\sum_{k=1}^{K}
+P(L\ge k)
+=
+\sum_{k=1}^{K}
+\prod_{j=1}^{k} a_j
+\]</div>
+<p>这比简单平均各位置的 acceptance：</p>
+<div class="arithmatex">\[
+\frac{1}{K}\sum_{k=1}^{K} a_k
+\]</div>
+<p>更接近真实 serving objective，因为后续 speculative token 只有在前面 token 都被接受后才有机会被使用。</p>
+<p>因此，early speculative positions 的 acceptance 对最终 accepted length 影响更大。</p>
+<p>实际训练通常采用 multi-position token loss：</p>
+<div class="arithmatex">\[
+L_{\mathrm{MTP}}
+=
+\sum_{k=1}^{K} w_k L_k
+\]</div>
+<p>其中：</p>
+<div class="arithmatex">\[
+L_k
+=
+-\log q_k(y_{t+k}|x_t)
+\]</div>
+<p>最简单的设置是：</p>
+<div class="arithmatex">\[
+w_k=1
+\]</div>
+<p>如果希望训练目标更贴近 expected accepted length，也可以考虑：</p>
+<div class="arithmatex">\[
+w_1&gt;w_2&gt;\cdots&gt;w_K
+\]</div>
+<p>即给予前面的 speculative positions 更高权重。</p>
+<h2 id="4-context-distribution-supervision">4. Context Distribution 与 Supervision</h2>
+<p>Speculative training 需要区分两个独立的设计维度：</p>
+<ul>
+<li><strong>Context distribution</strong>：Draft 在哪些 prefix / state 上训练。</li>
+<li><strong>Supervision</strong>：给定 context 后，Target 提供什么训练信号。</li>
+</ul>
+<p>常见 supervision 包括：</p>
+<ul>
+<li>Target sampled token</li>
+<li>Target argmax token</li>
+<li>Target full distribution / logits</li>
+<li>Target hidden state</li>
+</ul>
+<p>这两个维度可以独立组合。例如，可以使用 Target sampling rollout 产生 context，同时使用 Target argmax token 作为训练 label。</p>
+<h3 id="41-dataset-teacher-forcing">4.1 Dataset / Teacher Forcing</h3>
+<p>训练 context 来自 ground-truth sequence：</p>
+<div class="arithmatex">\[
+x_t=(y_1^{GT},\ldots,y_{t-1}^{GT})
+\]</div>
+<p>这种方式简单、稳定、成本低，但 serving 时的 context 来自模型生成 trajectory，因此可能存在 train-serving distribution shift。</p>
+<h3 id="42-target-greedy-rollout">4.2 Target Greedy Rollout</h3>
+<p>Target 使用 greedy decoding 产生 trajectory：</p>
+<div class="arithmatex">\[
+y_t=\arg\max_y p(y|x_t)
+\]</div>
+<p>得到的 context 更接近 Target 自身生成过程，但 trajectory 相对集中。</p>
+<p>如果实际 serving 使用 sampling，例如 <span class="arithmatex">\(T=1\)</span>，则 greedy rollout 无法覆盖大量 sampling trajectory 中可能出现的 context。</p>
+<h3 id="43-target-sampling-rollout">4.3 Target Sampling Rollout</h3>
+<p>Target 按其分布采样：</p>
+<div class="arithmatex">\[
+y_t\sim p(\cdot|x_t)
+\]</div>
+<p>由此产生 sampling trajectory 和对应的训练 context。</p>
+<p>如果实际 serving 的 Target 也使用 sampling，例如 <span class="arithmatex">\(T=1\)</span>，这种方式能够更好地覆盖 serving 时可能出现的 context。</p>
+<p>需要注意：</p>
+<blockquote>
+<p>使用 Target sampling rollout 产生 context，并不意味着 supervision 也必须使用 sampled token。</p>
+</blockquote>
+<p>在同一个 sampled context <span class="arithmatex">\(x_t\)</span> 上，可以采用不同的 supervision。</p>
+<h4 id="sampled-token-supervision">Sampled-token supervision</h4>
+<p>直接使用 rollout 中采样得到的 token <span class="arithmatex">\(y_t\)</span>：</p>
+<div class="arithmatex">\[
+L
+=
+-\log q(y_t|x_t)
+\]</div>
+<p>其期望目标是：</p>
+<div class="arithmatex">\[
+q(\cdot|x_t)\rightarrow p(\cdot|x_t)
+\]</div>
+<p>因此更偏向 distribution matching。</p>
+<h4 id="target-argmax-supervision">Target argmax supervision</h4>
+<p>在同一个 context <span class="arithmatex">\(x_t\)</span> 上取 Target top-1 token：</p>
+<div class="arithmatex">\[
+y_t^*
+=
+\arg\max_y p(y|x_t)
+\]</div>
+<p>然后训练：</p>
+<div class="arithmatex">\[
+L
+=
+-\log q(y_t^*|x_t)
+\]</div>
+<p>这种方式保留了 sampling rollout 带来的 context diversity，同时将 supervision 更直接地对齐到 Target Top-1。</p>
+<p>因此可以将两种设计理解为：</p>
+<ul>
+<li><strong>Sampling context + sampled-token label</strong>：偏向 distribution matching。</li>
+<li><strong>Sampling context + argmax label</strong>：偏向 Top-1 agreement。</li>
+</ul>
+<h3 id="44-draft-on-policy-rollout">4.4 Draft / On-policy Rollout</h3>
+<p>也可以让 Draft 自己产生 training trajectory：</p>
+<div class="arithmatex">\[
+d_t
+=
+\arg\max_y q(y|x_t)
+\]</div>
+<p>然后在 Draft 实际访问到的 context <span class="arithmatex">\(x_t\)</span> 上查询 Target，并构造相应的 token-level 或 representation-level supervision。</p>
+<p>这种方式能够让训练 context 更接近 Draft 在 serving 时真正访问的 states，从而缓解 rollout distribution shift。</p>
+<p>代价是训练过程更加复杂，因为随着 Draft 参数更新，其访问到的 context distribution 也会不断变化。</p>
+<h2 id="5-target-temp1-draft-greedy">5. Target Temp=1 + Draft Greedy 下的训练设计</h2>
+<p>考虑实际 serving 配置：</p>
+<ul>
+<li>Target 使用 temperature=1 sampling</li>
+<li>Draft 使用 greedy decoding</li>
+<li>Validation 使用 token equality</li>
+<li>不使用 rejection sampling</li>
+</ul>
+<p>前面已经得到，该 validation 下的最优条件是：</p>
+<div class="arithmatex">\[
+\arg\max_y q(y|x)
+=
+\arg\max_y p(y|x)
+\]</div>
+<p>因此，可以分别考虑 context distribution 和 training objective。</p>
+<h3 id="51-context-distribution">5.1 Context Distribution</h3>
+<p>为了匹配 Target temperature=1 serving 时可能访问的 states，可以使用 Target sampling rollout：</p>
+<div class="arithmatex">\[
+y_t\sim p(\cdot|x_t)
+\]</div>
+<p>得到相应的 training contexts：</p>
+<div class="arithmatex">\[
+x_t
+\]</div>
+<p>这里 temperature=1 主要决定 <strong>context 如何产生</strong>，并不要求 sampled token 必须同时作为训练 label。</p>
+<h3 id="52-token-level-objective">5.2 Token-level Objective</h3>
+<p>一种标准做法是直接使用 rollout 中 sampled token 进行 CE 训练：</p>
+<div class="arithmatex">\[
+L_{\mathrm{CE}}
+=
+-\log q(y_t|x_t)
+\]</div>
+<p>其期望目标是：</p>
+<div class="arithmatex">\[
+q(\cdot|x_t)
+\rightarrow
+p(\cdot|x_t)
+\]</div>
+<p>因此属于 distribution matching。</p>
+<p>如果更希望训练目标直接对齐 greedy Draft 的 Top-1 acceptance，也可以在相同 context 上取 Target top-1：</p>
+<div class="arithmatex">\[
+y_t^*
+=
+\arg\max_y p(y|x_t)
+\]</div>
+<p>并训练：</p>
+<div class="arithmatex">\[
+L_{\mathrm{top1}}
+=
+-\log q(y_t^*|x_t)
+\]</div>
+<p>该目标更直接推动：</p>
+<div class="arithmatex">\[
+\arg\max q
+=
+\arg\max p
+\]</div>
+<p>但 Target argmax CE 并不是当前 speculative training 中最常见的标准训练方式，更适合作为一种 serving-aligned alternative。</p>
+<h3 id="53-auxiliary-objectives">5.3 Auxiliary Objectives</h3>
+<p>如果能够获得 Target 的完整 distribution，可以加入 KD：</p>
+<div class="arithmatex">\[
+L_{\mathrm{KD}}
+=
+D_{\mathrm{KL}}(p\Vert q)
+\]</div>
+<p>用于保留 Target distribution 中的概率和 uncertainty 信息。</p>
+<p>如果 speculative architecture 需要预测或传递 hidden representation，还可以加入：</p>
+<div class="arithmatex">\[
+L_h
+=
+\left\|
+h^{\mathrm{draft}}
+-
+h^{\mathrm{target}}
+\right\|
+\]</div>
+<p>作为 representation matching 的 auxiliary loss。</p>
+<p>因此，一个可能的组合为：</p>
+<div class="arithmatex">\[
+L
+=
+L_{\mathrm{top1}}
++
+\beta L_{\mathrm{KD}}
++
+\gamma L_h
+\]</div>
+<p>其中 Top-1 CE 对齐 greedy acceptance，KD 和 hidden-state loss 提供额外的 distribution / representation supervision。</p>
 <h2 id="llm">LLM 预训练目标</h2>
 <p>从零训练的大语言模型，通常是在大规模文本语料上用最大似然估计（MLE）进行优化。</p>
 <p>其核心问题是：如何训练一个模型，使其对真实文本延续赋予更高概率。标准的自回归目标通过把语言建模转化为大规模语料上的 repeated next-token prediction 来解决这个问题。</p>

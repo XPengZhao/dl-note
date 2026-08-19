@@ -1,0 +1,1385 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://XPengZhao.github.io/dl-note/llms/glm-5.2-inference-path/">
+      
+      
+        <link rel="prev" href="../models/">
+      
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.21">
+    
+    
+      
+        <title>GLM-5.2 Inference Path - DL Notes</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.2a3383ac.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../stylesheets/bootstrap.min.css">
+    
+      <link rel="stylesheet" href="../../stylesheets/basic.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#vllm-inference-path-glm-52-as-an-example" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="DL Notes" class="md-header__button md-logo" aria-label="DL Notes" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            DL Notes
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              GLM-5.2 Inference Path
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+      <div class="md-header__option">
+  <div class="md-select">
+    
+    <button class="md-header__button md-icon" aria-label="Select language">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12.87 15.07-2.54-2.51.03-.03A17.5 17.5 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2zm-2.62 7 1.62-4.33L19.12 17z"/></svg>
+    </button>
+    <div class="md-select__inner">
+      <ul class="md-select__list">
+        
+          <li class="md-select__item">
+            <a href="./" hreflang="en" class="md-select__link">
+              English
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="../../zh/llms/glm-5.2-inference-path/" hreflang="zh" class="md-select__link">
+              简体中文
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="DL Notes" class="md-nav__button md-logo" aria-label="DL Notes" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    DL Notes
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Home
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hardware/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Hardware
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tensor/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Tensor Operation
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../neural-graphics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Neural Graphics
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    AI Infra
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            AI Infra
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Overview
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../request-lifecycle/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Request Lifecycle
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../metrics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Metrics
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../roofline/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Roofline Model
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../data-movement/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Data Movement and Communication
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../kv-cache/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    KV Cache
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../serving-runtime/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Serving Runtime
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../parallelism/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Parallelism
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../decoding/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Decoding
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../training-objective/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Training Objective
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Models
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            Models
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../position-encoding/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Position Encoding
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Model Notes
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    GLM-5.2 Inference Path
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    GLM-5.2 Inference Path
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#model-shape" class="md-nav__link">
+    <span class="md-ellipsis">
+      Model Shape
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#before-model-execution" class="md-nav__link">
+    <span class="md-ellipsis">
+      Before Model Execution
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Before Model Execution">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#chat-template-and-tokenization" class="md-nav__link">
+    <span class="md-ellipsis">
+      Chat Template and Tokenization
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#scheduling-and-prefix-cache" class="md-nav__link">
+    <span class="md-ellipsis">
+      Scheduling and Prefix Cache
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#from-token-ids-to-hidden-states" class="md-nav__link">
+    <span class="md-ellipsis">
+      From Token IDs to Hidden States
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#one-transformer-layer" class="md-nav__link">
+    <span class="md-ellipsis">
+      One Transformer Layer
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="One Transformer Layer">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#rmsnorm-and-the-residual-path" class="md-nav__link">
+    <span class="md-ellipsis">
+      RMSNorm and the Residual Path
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mla-projections-and-kv-state" class="md-nav__link">
+    <span class="md-ellipsis">
+      MLA Projections and KV State
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dsa-indexer" class="md-nav__link">
+    <span class="md-ellipsis">
+      DSA Indexer
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sparse-mla-attention" class="md-nav__link">
+    <span class="md-ellipsis">
+      Sparse MLA Attention
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dense-mlp" class="md-nav__link">
+    <span class="md-ellipsis">
+      Dense MLP
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mixture-of-experts" class="md-nav__link">
+    <span class="md-ellipsis">
+      Mixture of Experts
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#from-the-last-layer-to-an-output-token" class="md-nav__link">
+    <span class="md-ellipsis">
+      From the Last Layer to an Output Token
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#prefill-and-decode" class="md-nav__link">
+    <span class="md-ellipsis">
+      Prefill and Decode
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#execution-path" class="md-nav__link">
+    <span class="md-ellipsis">
+      Execution Path
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#precision-and-storage-boundaries" class="md-nav__link">
+    <span class="md-ellipsis">
+      Precision and Storage Boundaries
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#implementation-references" class="md-nav__link">
+    <span class="md-ellipsis">
+      Implementation References
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#model-shape" class="md-nav__link">
+    <span class="md-ellipsis">
+      Model Shape
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#before-model-execution" class="md-nav__link">
+    <span class="md-ellipsis">
+      Before Model Execution
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Before Model Execution">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#chat-template-and-tokenization" class="md-nav__link">
+    <span class="md-ellipsis">
+      Chat Template and Tokenization
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#scheduling-and-prefix-cache" class="md-nav__link">
+    <span class="md-ellipsis">
+      Scheduling and Prefix Cache
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#from-token-ids-to-hidden-states" class="md-nav__link">
+    <span class="md-ellipsis">
+      From Token IDs to Hidden States
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#one-transformer-layer" class="md-nav__link">
+    <span class="md-ellipsis">
+      One Transformer Layer
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="One Transformer Layer">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#rmsnorm-and-the-residual-path" class="md-nav__link">
+    <span class="md-ellipsis">
+      RMSNorm and the Residual Path
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mla-projections-and-kv-state" class="md-nav__link">
+    <span class="md-ellipsis">
+      MLA Projections and KV State
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dsa-indexer" class="md-nav__link">
+    <span class="md-ellipsis">
+      DSA Indexer
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sparse-mla-attention" class="md-nav__link">
+    <span class="md-ellipsis">
+      Sparse MLA Attention
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dense-mlp" class="md-nav__link">
+    <span class="md-ellipsis">
+      Dense MLP
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mixture-of-experts" class="md-nav__link">
+    <span class="md-ellipsis">
+      Mixture of Experts
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#from-the-last-layer-to-an-output-token" class="md-nav__link">
+    <span class="md-ellipsis">
+      From the Last Layer to an Output Token
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#prefill-and-decode" class="md-nav__link">
+    <span class="md-ellipsis">
+      Prefill and Decode
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#execution-path" class="md-nav__link">
+    <span class="md-ellipsis">
+      Execution Path
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#precision-and-storage-boundaries" class="md-nav__link">
+    <span class="md-ellipsis">
+      Precision and Storage Boundaries
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#implementation-references" class="md-nav__link">
+    <span class="md-ellipsis">
+      Implementation References
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="vllm-inference-path-glm-52-as-an-example">vLLM Inference Path: GLM-5.2 as an Example</h1>
+<p>When a conversation request reaches vLLM, the server first arranges the system prompt, message history, tool definitions, and current question into one text sequence, which the tokenizer converts into token IDs. The model then performs prefill to produce the first output token. Each subsequent token is produced by a new decode step. This page assumes a TP8 and EP8 deployment without MTP.</p>
+<h2 id="model-shape">Model Shape</h2>
+<p>The parameters that directly determine the forward path are:</p>
+<div style="text-align: center; overflow-x: auto;">
+<table style="display: inline-block; text-align: left;">
+  <thead>
+    <tr>
+      <th style="text-align: left;">Item</th>
+      <th style="text-align: left;">Configuration</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td style="text-align: left;">Transformer layers</td><td style="text-align: left;">78</td></tr>
+    <tr><td style="text-align: left;">Hidden size</td><td style="text-align: left;">6,144</td></tr>
+    <tr><td style="text-align: left;">Attention heads</td><td style="text-align: left;">64</td></tr>
+    <tr><td style="text-align: left;">Query latent rank</td><td style="text-align: left;">2,048</td></tr>
+    <tr><td style="text-align: left;">KV latent rank</td><td style="text-align: left;">512</td></tr>
+    <tr><td style="text-align: left;">Q/K dimension per head</td><td style="text-align: left;">256: 192 content + 64 RoPE</td></tr>
+    <tr><td style="text-align: left;">V dimension per head</td><td style="text-align: left;">256</td></tr>
+    <tr><td style="text-align: left;">Dense layers</td><td style="text-align: left;">First 3 layers</td></tr>
+    <tr><td style="text-align: left;">MoE layers</td><td style="text-align: left;">Remaining 75 layers</td></tr>
+    <tr><td style="text-align: left;">Routed experts</td><td style="text-align: left;">256; 8 selected per token</td></tr>
+    <tr><td style="text-align: left;">Shared experts</td><td style="text-align: left;">1</td></tr>
+    <tr><td style="text-align: left;">DSA indexer</td><td style="text-align: left;">32 heads, head dimension 128, Top-2048</td></tr>
+    <tr><td style="text-align: left;">Maximum position configuration</td><td style="text-align: left;">1,048,576 tokens</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="before-model-execution">Before Model Execution</h2>
+<h3 id="chat-template-and-tokenization">Chat Template and Tokenization</h3>
+<p>The user begins with natural-language text, such as "Explain KV cache." A Transformer does not process strings directly; it receives a sequence of token IDs. Before model execution begins, the server must first turn the user's input into a prompt in the format expected by the model.</p>
+<p>The conversation usually also contains a system prompt and earlier messages. An OpenAI-compatible API represents this content in the <code>messages</code> field and includes a <code>tools</code> field when the model may call tools. GLM's chat template joins these inputs in the format used during training and inserts markers for roles, thinking, and tool definitions.</p>
+<p>The tokenizer then converts the complete prompt into <code>(t_0, t_1, ..., t_{L-1})</code>. This sequence of token IDs is the Transformer's actual input.</p>
+<h3 id="scheduling-and-prefix-cache">Scheduling and Prefix Cache</h3>
+<p>vLLM schedules tokens according to the current batch, free KV blocks, and <code>max_num_batched_tokens</code>. Complete prompt blocks found in the prefix cache do not run through prefill again; their per-layer KV state is reused. Only the uncached suffix traverses all 78 layers.</p>
+<p>Prefix caching reduces repeated prefill work. It does not alter the model architecture or increase the amount of active KV state that fits in HBM.</p>
+<h2 id="from-token-ids-to-hidden-states">From Token IDs to Hidden States</h2>
+<p>The embedding table maps every token ID to a 6,144-dimensional vector:</p>
+<div class="arithmatex">\[
+h_i^{(0)}=E[t_i].
+\]</div>
+<p>Under TP8, <code>VocabParallelEmbedding</code> shards the vocabulary rows. Each rank produces a contribution for tokens within its local range, and the TP group combines the result. The first Transformer layer receives one hidden state per token.</p>
+<h2 id="one-transformer-layer">One Transformer Layer</h2>
+<p>All 78 layers follow the same residual backbone:</p>
+<div class="arithmatex">\[
+u^{(\ell)} = h^{(\ell)} +
+\operatorname{Attn}\!\left(\operatorname{RMSNorm}(h^{(\ell)})\right),
+\]</div>
+<div class="arithmatex">\[
+h^{(\ell+1)} = u^{(\ell)} +
+\operatorname{FFN}\!\left(\operatorname{RMSNorm}(u^{(\ell)})\right).
+\]</div>
+<p>Attention uses DSA to select historical positions and MLA to compute attention over them. The FFN is a dense MLP in the first three layers and an MoE block in the remaining 75.</p>
+<h3 id="rmsnorm-and-the-residual-path">RMSNorm and the Residual Path</h3>
+<p>RMSNorm normalizes along the hidden dimension and applies a learned scale:</p>
+<div class="arithmatex">\[
+\operatorname{RMSNorm}(h)=
+\frac{h}{\sqrt{\operatorname{mean}(h^2)+\epsilon}}\odot\gamma.
+\]</div>
+<p>vLLM can fuse residual addition with RMSNorm to reduce HBM traffic. In ordinary TP8 execution, the residual and normalized hidden state remain complete on each TP rank; they are not split with the attention heads.</p>
+<h3 id="mla-projections-and-kv-state">MLA Projections and KV State</h3>
+<p>GLM-5.2 does not store 64 expanded K/V pairs for every historical token. It first projects Query and KV into low-rank spaces.</p>
+<p>The Query path is:</p>
+<div class="arithmatex">\[
+c_i^Q=W^{Q_A}h_i,
+\qquad
+q_i=W^{Q_B}\operatorname{RMSNorm}(c_i^Q).
+\]</div>
+<p>The KV path is:</p>
+<div class="arithmatex">\[
+[c_i^{KV},k_i^R]=W^{KV_A}h_i.
+\]</div>
+<p><span class="arithmatex">\(c_i^{KV}\)</span> is a 512-dimensional KV latent and <span class="arithmatex">\(k_i^R\)</span> is a 64-dimensional RoPE key. The main KV cache therefore stores about 576 elements per token per layer instead of materializing K and V for every head. The logical content Key and Value are:</p>
+<div class="arithmatex">\[
+[k_i^C,v_i]=W^{KV_B}\operatorname{RMSNorm}(c_i^{KV}).
+\]</div>
+<p>An optimized MLA kernel can absorb <span class="arithmatex">\(W^{KV_B}\)</span> into attention, avoiding repeated expansion of full K/V for historical tokens.</p>
+<p>The 256-dimensional Query contains a 192-dimensional content component and a 64-dimensional positional component:</p>
+<div class="arithmatex">\[
+q_i=[q_i^C,q_i^R].
+\]</div>
+<p>RoPE is applied only to <span class="arithmatex">\(q_i^R\)</span> and <span class="arithmatex">\(k_i^R\)</span>. The content components remain unchanged.</p>
+<p>Under TP8, the A projections and the 512+64 latent path are replicated. <code>q_b_proj</code> and <code>kv_b_proj</code> are column-sharded by attention head, leaving eight heads on each GPU. This layout keeps the attention computation local while retaining a compressed KV state accessible to every rank.</p>
+<h3 id="dsa-indexer">DSA Indexer</h3>
+<p>MLA reduces the bytes stored for each historical token, but reading every historical position remains expensive at long context lengths. DSA runs a smaller retrieval computation before the full attention operation.</p>
+<p>The indexer derives 32 retrieval queries from the query latent and produces a shared key plus per-head aggregation weights from the hidden state:</p>
+<div class="arithmatex">\[
+q_i^I=W_q^I c_i^Q,
+\qquad
+[k_i^I,w_i]=W_{kw}^I h_i.
+\]</div>
+<p>It scans the historical indexer cache with these lower-dimensional queries, combines the scores across heads, and keeps the highest-scoring 2,048 positions:</p>
+<div class="arithmatex">\[
+\mathcal I_i=\operatorname{TopK}_{j,\,2048}
+\left(
+\sum_m w_{i,m}\operatorname{ReLU}
+\left(\langle q_{i,m}^I,k_j^I\rangle\right)
+\right).
+\]</div>
+<p>The indexer still scans the sequence, but with a smaller representation than the 64-head MLA operation. Contexts shorter than 2,048 tokens receive little sparsity benefit because nearly every available historical position is selected.</p>
+<p>This checkpoint places full indexers at layers 0, 1, 2, 6, 10, 14, and then every fourth layer through layer 74. All other layers reuse the Top-K buffer from the nearest preceding full layer. DSA selection is therefore not recomputed in full at every layer.</p>
+<p>The current vLLM implementation marks <code>wq_b</code> and the fused <code>wk_weights_proj</code> as replicated or <code>disable_tp=True</code>. TP8 repeats the indexer projections and historical scan on every rank. It shards attention heads, not a 160K sequence into eight independent 20K segments.</p>
+<p>The indexer cache and main MLA KV cache are separate objects. On the A100 path, indexer keys are stored in FP8 with separate scales. With <code>--kv-cache-dtype auto</code>, the main MLA KV cache normally follows the BF16 model dtype.</p>
+<h3 id="sparse-mla-attention">Sparse MLA Attention</h3>
+<p>After the indexer produces <span class="arithmatex">\(\mathcal I_i\)</span>, full attention reads MLA KV state only at those positions:</p>
+<div class="arithmatex">\[
+\alpha_{i,j}=
+\operatorname{softmax}_{j\in\mathcal I_i}
+\left(
+\frac{q_i k_j^\mathsf T}{\sqrt{256}}
+\right),
+\]</div>
+<div class="arithmatex">\[
+o_i=\sum_{j\in\mathcal I_i}\alpha_{i,j}v_j.
+\]</div>
+<p>The causal mask still applies: a token cannot read future positions. Each TP rank computes eight local heads. <code>o_proj</code> is row-sharded over its input dimension, and a TP all-reduce sums the partial outputs into a 6,144-dimensional attention result.</p>
+<h3 id="dense-mlp">Dense MLP</h3>
+<p>Layers 0 through 2 use a SwiGLU MLP:</p>
+<div class="arithmatex">\[
+z=\operatorname{SiLU}(W_g u)\odot W_u u,
+\qquad
+y=W_d z.
+\]</div>
+<p>vLLM packs <span class="arithmatex">\(W_g\)</span> and <span class="arithmatex">\(W_u\)</span> into <code>gate_up_proj</code>. TP8 column-shards the intermediate dimension; <code>down_proj</code> is row-sharded and ends with an all-reduce.</p>
+<h3 id="mixture-of-experts">Mixture of Experts</h3>
+<p>Layers 3 through 77 replace the dense MLP with MoE. The router scores 256 experts and selects eight for each token:</p>
+<div class="arithmatex">\[
+s_i=\operatorname{sigmoid}(W_r u_i),
+\qquad
+\mathcal E_i=\operatorname{TopK}_{e,\,8}(s_i+b).
+\]</div>
+<p><span class="arithmatex">\(b\)</span> is the correction bias used only for expert selection. Routing weights for the selected experts come from the unbiased sigmoid scores. This checkpoint normalizes the eight selected scores and then applies a routed scaling factor of 2.5. The GLM path in vLLM uses FP32 router logits. Each routed expert is a SwiGLU MLP with intermediate size 2,048. The eight expert outputs are combined using their routing weights, together with the output of one shared expert.</p>
+<p>EP8 distributes the 256 routed experts across eight GPUs. Tokens are dispatched to ranks that own the selected experts, processed by local expert GEMMs, and returned to their original order. The exact collective depends on the MoE backend; its semantics are dispatch and combine. The shared expert is not placed like a routed expert and normally follows the dense/TP path.</p>
+<p>In a single-node <code>TP8+EP8</code> deployment, the same eight processes serve both roles. Attention and dense projections use TP sharding, while routed experts use EP placement. <code>TP7_EP7</code> describes one process whose rank is seven in both groups; it does not imply 64 processes.</p>
+<h2 id="from-the-last-layer-to-an-output-token">From the Last Layer to an Output Token</h2>
+<p>After all 78 Transformer layers have run, the model applies final RMSNorm to the residual result. The LM head projects the 6,144-dimensional hidden state to 154,880 vocabulary logits:</p>
+<div class="arithmatex">\[
+z=W_{\text{vocab}}h^{\text{final}}.
+\]</div>
+<p><code>ParallelLMHead</code> shards the vocabulary. Each TP rank computes its local range before the logits processor performs the required combination and post-processing. Temperature, top-p, top-k, repetition penalties, and grammar masks are applied here, resulting in one token ID.</p>
+<p>The token is appended to the sequence. Unless EOS, a stop sequence, or <code>max_tokens</code> is reached, it passes through embedding and all 78 layers again. Without MTP, every generated token requires one complete target-model decode step.</p>
+<p>The detokenizer converts token IDs back into text. Reasoning and tool-call parsers then recognize <code>&lt;think&gt;</code> sections, tool names, and arguments. If a tool is executed, its observation enters the chat template of the next model request.</p>
+<h2 id="prefill-and-decode">Prefill and Decode</h2>
+<p>Prefill and decode run the same model layers with different batch shapes.</p>
+<table>
+<thead>
+<tr>
+<th>Phase</th>
+<th>Input in one step</th>
+<th>Main work</th>
+<th>State produced</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Prefill</td>
+<td>Multiple uncached prompt tokens</td>
+<td>Batched projections, DSA/MLA, and MoE</td>
+<td>Per-layer MLA KV and indexer cache</td>
+</tr>
+<tr>
+<td>Decode</td>
+<td>One new token per active sequence</td>
+<td>Read historical cache and run one full forward pass</td>
+<td>KV and indexer entry for the new token</td>
+</tr>
+</tbody>
+</table>
+<p>Long-prompt prefill forms large GEMMs and can reach high GPU utilization. Decode uses narrower matrices while reading historical cache and paying TP collectives and EP routing costs. It is therefore more sensitive to memory bandwidth and communication latency. Continuous batching groups decode tokens from multiple sequences so that these narrow operations form a larger GPU workload.</p>
+<h2 id="execution-path">Execution Path</h2>
+<div class="mermaid">flowchart TD
+    A["Messages + tools"] --&gt; B["Chat template / tokenizer"]
+    B --&gt; C["Scheduler + prefix-cache lookup"]
+    C --&gt; D["Vocab-parallel embedding"]
+    D --&gt; E["RMSNorm"]
+    E --&gt; F["MLA latent projections"]
+    F --&gt; G["DSA indexer: historical Top-2048"]
+    F --&gt; H["RoPE + local TP heads"]
+    G --&gt; I["Sparse MLA"]
+    H --&gt; I
+    I --&gt; J["Row-parallel output + all-reduce"]
+    J --&gt; K["Residual + RMSNorm"]
+    K --&gt; L{"Layer 0-2?"}
+    L --&gt;|Yes| M["TP SwiGLU MLP"]
+    L --&gt;|No| N["FP32 router"]
+    N --&gt; O["EP dispatch to 8 of 256 experts"]
+    O --&gt; P["Expert compute + combine"]
+    M --&gt; Q["Residual"]
+    P --&gt; Q
+    Q --&gt; R{"More layers?"}
+    R --&gt;|Yes| E
+    R --&gt;|No| S["Final RMSNorm + LM head"]
+    S --&gt; T["Sampling"]
+    T --&gt; U["One token"]
+    U --&gt; V{"Stop?"}
+    V --&gt;|No| D
+    V --&gt;|Yes| W["Detokenize + output parser"]</div>
+<h2 id="precision-and-storage-boundaries">Precision and Storage Boundaries</h2>
+<p><code>AWQ-INT4</code> describes weight storage and GEMM kernels; it does not make the entire forward path INT4. This checkpoint primarily quantizes later attention projections and routed-expert linear layers. Its configuration excludes the first three layers, MLA A projections, indexer, shared experts, and LM head. Hidden states, residuals, and normalization remain primarily BF16.</p>
+<p>The main MLA KV-cache dtype is controlled by the vLLM KV configuration. With <code>auto</code>, it normally remains BF16; an explicit FP8 KV setting is required to reduce it further. The FP8 DSA indexer cache is a separate storage path and does not imply that the main KV cache is FP8.</p>
+<h2 id="implementation-references">Implementation References</h2>
+<ul>
+<li><a href="https://huggingface.co/cyankiwi/GLM-5.2-AWQ-INT4/blob/main/config.json">GLM-5.2 AWQ-INT4 config</a></li>
+<li><a href="https://arxiv.org/abs/2603.12201">IndexCache: Accelerating Sparse Attention via Cross-Layer Index Reuse</a></li>
+<li><a href="https://github.com/vllm-project/vllm/blob/main/vllm/model_executor/models/deepseek_v2.py">vLLM <code>GlmMoeDsaForCausalLM</code> implementation</a></li>
+<li><a href="https://github.com/vllm-project/vllm/blob/main/vllm/model_executor/layers/mla.py">vLLM MLA wrapper</a></li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      <script id="__config" type="application/json">{"base": "../..", "features": [], "search": "../../assets/javascripts/workers/search.973d3a69.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.f55a23d4.min.js"></script>
+      
+        <script src="../../javascripts/mathjax.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+      
+        <script src="../../javascripts/mermaid.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>

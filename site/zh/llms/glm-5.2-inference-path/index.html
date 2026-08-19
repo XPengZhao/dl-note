@@ -1,0 +1,1511 @@
+
+<!doctype html>
+<html lang="zh" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://XPengZhao.github.io/dl-note/zh/llms/glm-5.2-inference-path/">
+      
+      
+        <link rel="prev" href="../models/">
+      
+      
+      
+      <link rel="icon" href="../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.21">
+    
+    
+      
+        <title>GLM-5.2 推理路径 - DL Notes</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.2a3383ac.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../stylesheets/bootstrap.min.css">
+    
+      <link rel="stylesheet" href="../../../stylesheets/basic.css">
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#vllm-glm-52" class="md-skip">
+          跳转至
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="页眉">
+    <a href="../../" title="DL Notes" class="md-header__button md-logo" aria-label="DL Notes" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            DL Notes
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              GLM-5.2 推理路径
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+      <div class="md-header__option">
+  <div class="md-select">
+    
+    <button class="md-header__button md-icon" aria-label="选择当前语言">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12.87 15.07-2.54-2.51.03-.03A17.5 17.5 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2zm-2.62 7 1.62-4.33L19.12 17z"/></svg>
+    </button>
+    <div class="md-select__inner">
+      <ul class="md-select__list">
+        
+          <li class="md-select__item">
+            <a href="../../../llms/glm-5.2-inference-path/" hreflang="en" class="md-select__link">
+              English
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="./" hreflang="zh" class="md-select__link">
+              简体中文
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="搜索" placeholder="搜索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="查找">
+        
+        <button type="reset" class="md-search__icon md-icon" title="清空当前内容" aria-label="清空当前内容" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            正在初始化搜索引擎
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="导航栏" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../" title="DL Notes" class="md-nav__button md-logo" aria-label="DL Notes" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    DL Notes
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    首页
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hardware/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    硬件
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tensor/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    张量操作
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../neural-graphics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    神经图形
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    AI Infra
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            AI Infra
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    总览
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../request-lifecycle/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    请求生命周期
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../metrics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    指标
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../roofline/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Roofline 模型
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../data-movement/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    数据搬运与通信
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../kv-cache/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    KV Cache
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../serving-runtime/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    推理运行时
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../parallelism/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    并行策略
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../decoding/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    解码与采样
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../training-objective/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    训练目标
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    模型
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            模型
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../position-encoding/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    位置编码
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    模型笔记
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    GLM-5.2 推理路径
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    GLM-5.2 推理路径
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      请求进入模型之前
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="请求进入模型之前">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      对话模板与分词
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#prefix-cache" class="md-nav__link">
+    <span class="md-ellipsis">
+      调度与 prefix cache
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#token-id-hidden-state" class="md-nav__link">
+    <span class="md-ellipsis">
+      从 token ID 到 hidden state
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#transformer" class="md-nav__link">
+    <span class="md-ellipsis">
+      Transformer 层结构
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Transformer 层结构">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#rmsnorm" class="md-nav__link">
+    <span class="md-ellipsis">
+      RMSNorm 与残差路径
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mla-kv" class="md-nav__link">
+    <span class="md-ellipsis">
+      MLA 投影与 KV 状态
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="MLA 投影与 KV 状态">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#query" class="md-nav__link">
+    <span class="md-ellipsis">
+      Query 低秩投影
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#kv" class="md-nav__link">
+    <span class="md-ellipsis">
+      KV 低秩投影与缓存
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dsa-indexer" class="md-nav__link">
+    <span class="md-ellipsis">
+      DSA Indexer
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sparse-mla-attention" class="md-nav__link">
+    <span class="md-ellipsis">
+      Sparse MLA Attention
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dense-mlp" class="md-nav__link">
+    <span class="md-ellipsis">
+      Dense MLP
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#moe" class="md-nav__link">
+    <span class="md-ellipsis">
+      MoE
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#token" class="md-nav__link">
+    <span class="md-ellipsis">
+      从最后一层到输出 token
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#prefill-decode" class="md-nav__link">
+    <span class="md-ellipsis">
+      Prefill 与 Decode
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      执行路径
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      精度与存储边界
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      实现依据
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      请求进入模型之前
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="请求进入模型之前">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      对话模板与分词
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#prefix-cache" class="md-nav__link">
+    <span class="md-ellipsis">
+      调度与 prefix cache
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#token-id-hidden-state" class="md-nav__link">
+    <span class="md-ellipsis">
+      从 token ID 到 hidden state
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#transformer" class="md-nav__link">
+    <span class="md-ellipsis">
+      Transformer 层结构
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Transformer 层结构">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#rmsnorm" class="md-nav__link">
+    <span class="md-ellipsis">
+      RMSNorm 与残差路径
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mla-kv" class="md-nav__link">
+    <span class="md-ellipsis">
+      MLA 投影与 KV 状态
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="MLA 投影与 KV 状态">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#query" class="md-nav__link">
+    <span class="md-ellipsis">
+      Query 低秩投影
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#kv" class="md-nav__link">
+    <span class="md-ellipsis">
+      KV 低秩投影与缓存
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dsa-indexer" class="md-nav__link">
+    <span class="md-ellipsis">
+      DSA Indexer
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sparse-mla-attention" class="md-nav__link">
+    <span class="md-ellipsis">
+      Sparse MLA Attention
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dense-mlp" class="md-nav__link">
+    <span class="md-ellipsis">
+      Dense MLP
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#moe" class="md-nav__link">
+    <span class="md-ellipsis">
+      MoE
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#token" class="md-nav__link">
+    <span class="md-ellipsis">
+      从最后一层到输出 token
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#prefill-decode" class="md-nav__link">
+    <span class="md-ellipsis">
+      Prefill 与 Decode
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      执行路径
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      精度与存储边界
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      实现依据
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="vllm-glm-52">vLLM 推理链路概览：以 GLM-5.2 为例</h1>
+<p>一条对话请求到达 vLLM 时，服务端先把 system prompt、历史消息、工具定义和当前问题排成一段文本，再由 tokenizer 转成 token ID。模型随后完成一次 prefill，生成第一个输出 token。此后的每个 token 都通过一次新的 decode step 产生。本文假定部署使用 TP8、EP8，不启用 MTP。</p>
+<p>与后续计算路径直接相关的配置如下：</p>
+<div style="text-align: center; overflow-x: auto;">
+<table style="display: inline-block; text-align: left;">
+  <thead>
+    <tr>
+      <th style="text-align: left;">项目</th>
+      <th style="text-align: left;">配置</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td style="text-align: left;">Transformer 层数</td><td style="text-align: left;">78</td></tr>
+    <tr><td style="text-align: left;">hidden size</td><td style="text-align: left;">6,144</td></tr>
+    <tr><td style="text-align: left;">attention heads</td><td style="text-align: left;">64</td></tr>
+    <tr><td style="text-align: left;">query latent rank</td><td style="text-align: left;">2,048</td></tr>
+    <tr><td style="text-align: left;">KV latent rank</td><td style="text-align: left;">512</td></tr>
+    <tr><td style="text-align: left;">每个 head 的 Q/K 维度</td><td style="text-align: left;">256（192 维内容 + 64 维 RoPE）</td></tr>
+    <tr><td style="text-align: left;">每个 head 的 V 维度</td><td style="text-align: left;">256</td></tr>
+    <tr><td style="text-align: left;">Dense 层</td><td style="text-align: left;">前 3 层</td></tr>
+    <tr><td style="text-align: left;">MoE 层</td><td style="text-align: left;">后 75 层</td></tr>
+    <tr><td style="text-align: left;">routed experts</td><td style="text-align: left;">256，每个 token 选择 8 个</td></tr>
+    <tr><td style="text-align: left;">shared experts</td><td style="text-align: left;">1</td></tr>
+    <tr><td style="text-align: left;">DSA indexer</td><td style="text-align: left;">32 heads，head dim 128，Top-2048</td></tr>
+    <tr><td style="text-align: left;">max model lengths</td><td style="text-align: left;">1,048,576 tokens</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="_1">请求进入模型之前</h2>
+<h3 id="_2">对话模板与分词</h3>
+<p>用户输入的是一段自然语言，例如“介绍一下 KV cache”。Transformer 不直接处理字符串，它接收的是一串 token ID。因此，在模型开始计算前，服务端要先把用户输入整理成模型能够识别的 prompt。</p>
+<p>一次对话通常还包含 system prompt 和历史消息。OpenAI-compatible API 将这些内容组织在 <code>messages</code> 字段中。例如，一轮最简单的对话可以写成：</p>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="p">{</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span><span class="nt">&quot;messages&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">    </span><span class="p">{</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">      </span><span class="nt">&quot;role&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;system&quot;</span><span class="p">,</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">      </span><span class="nt">&quot;content&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;你是一个技术助手。&quot;</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">    </span><span class="p">},</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">    </span><span class="p">{</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="w">      </span><span class="nt">&quot;role&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;user&quot;</span><span class="p">,</span>
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="w">      </span><span class="nt">&quot;content&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;介绍一下 KV cache。&quot;</span>
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="w">  </span><span class="p">]</span>
+</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="p">}</span>
+</span></code></pre></div>
+<p><code>role</code> 表示这段内容来自 system、user 还是 assistant，<code>content</code> 保存具体文本。对这组 <code>messages</code> 调用 checkpoint 自带的 chat template，并设置 <code>add_generation_prompt=True</code>，默认会得到：</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>[gMASK]&lt;sop&gt;&lt;|system|&gt;Reasoning Effort: Max&lt;|system|&gt;你是一个技术助手。&lt;|user|&gt;介绍一下 KV cache。&lt;|assistant|&gt;&lt;think&gt;
+</span></code></pre></div>
+<p><code>&lt;|system|&gt;</code>、<code>&lt;|user|&gt;</code> 和 <code>&lt;|assistant|&gt;</code> 标出不同角色的边界，末尾的 <code>&lt;think&gt;</code> 表示模型从这里开始生成 reasoning。如果请求中还包含 <code>tools</code> 字段，chat template 也会把工具定义和调用格式写入 prompt。</p>
+<p>最后，tokenizer 将完整 prompt 转换为 <code>(t_0, t_1, ..., t_{L-1})</code>。这串 token ID 才是 Transformer 的实际输入。</p>
+<h3 id="prefix-cache">调度与 prefix cache</h3>
+<p>prompt 转换为 token ID 后，并不一定一次全部进入模型。vLLM 的调度器会从运行中和等待中的请求里选择本轮需要计算的 token，同时受 token budget 和可用 KV blocks 限制。<code>max_num_batched_tokens</code> 给出了单次调度迭代的 token 数上限，当 prompt 很长时，prefill 可以被拆成多个 chunk。</p>
+<p>分配新的 KV blocks 前，vLLM 会检查 prompt 开头是否已经存在于 prefix cache。命中的完整 blocks 可以直接复用，其中保存了各层 attention 所需的 KV 状态。未命中的后缀仍需经过全部 78 层并写入新的 KV blocks。即使整个 prompt 都命中，最后一个 token 通常仍需重新计算，以产生后续采样所需的 logits。</p>
+<p>Prefix caching 不增加 KV cache 的物理容量。它允许多个请求共享相同前缀的 KV blocks，从而减少重复 prefill 和重复存储。各请求独有的后缀仍会继续消耗 KV 空间。</p>
+<h2 id="token-id-hidden-state">从 token ID 到 hidden state</h2>
+<p>token ID 是 token 在词表中的整数编号。GLM-5.2 的 embedding 矩阵 <span class="arithmatex">\(E\)</span> 包含 154,880 行，每一行都是一个 6,144 维向量。对于序列中的第 <span class="arithmatex">\(i\)</span> 个 token，其 ID 记为 <span class="arithmatex">\(t_i\)</span>。Embedding lookup 取出矩阵的第 <span class="arithmatex">\(t_i\)</span> 行：</p>
+<div class="arithmatex">\[
+h_i^{(0)} = E[t_i].
+\]</div>
+<p><span class="arithmatex">\(h_i^{(0)}\)</span> 是该 token 进入第一层 Transformer 前的初始 hidden state。</p>
+<p>TP8 部署不会让每张 GPU 都保存完整的 embedding 矩阵。<code>VocabParallelEmbedding</code> 将矩阵按词表行切成 8 份，每个 TP rank 只保存其中一段。对于一个 token ID，只有包含对应词表行的 rank 能查到它的 embedding，其他 rank 的局部结果为零。随后，8 个 rank 通过一次 all-reduce 得到完整结果。进入第一层 Transformer 时，每个 rank 都持有相同的 6,144 维 hidden state。</p>
+<h2 id="transformer">Transformer 层结构</h2>
+<p>78 层 Transformer 虽然使用不同的 FFN 结构，但都遵循相同的 Pre-Norm 残差框架。RMSNorm 位于 Attention 和 FFN 之前，每个子层的输出随后加回残差路径。设 <span class="arithmatex">\(h^{(\ell)}\)</span> 为第 <span class="arithmatex">\(\ell\)</span> 层的输入。Attention 子层首先执行以下计算：</p>
+<div class="arithmatex">\[
+u^{(\ell)} = h^{(\ell)} +
+\operatorname{Attn}\!\left(
+\operatorname{RMSNorm}(h^{(\ell)})
+\right).
+\]</div>
+<p><span class="arithmatex">\(u^{(\ell)}\)</span> 是 Attention 之后的中间状态。模型随后执行第二次 RMSNorm 和 FFN，并再次通过残差连接得到下一层的输入：</p>
+<div class="arithmatex">\[
+h^{(\ell+1)} = u^{(\ell)} +
+\operatorname{FFN}\!\left(
+\operatorname{RMSNorm}(u^{(\ell)})
+\right).
+\]</div>
+<p>Attention 负责从当前 token 可见的上下文中读取信息。GLM-5.2 先通过 DSA 选择参与计算的位置，再由 MLA 计算Attention。FFN 负责进一步变换当前 token 的表示。前三层使用 Dense MLP，后 75 层使用 MoE。</p>
+<h3 id="rmsnorm">RMSNorm 与残差路径</h3>
+<p>RMSNorm 分别归一化每个 token 的 6,144 维 hidden state。设其中一个 token 的 hidden state 为 <span class="arithmatex">\(h\)</span>。RMSNorm 先计算所有 hidden dimensions 的均方根，再用它缩放 <span class="arithmatex">\(h\)</span>：</p>
+<div class="arithmatex">\[
+\operatorname{RMSNorm}(h)=
+\frac{h}{\sqrt{\operatorname{mean}(h^2)+\epsilon}}
+\odot\gamma.
+\]</div>
+<p>其中，<span class="arithmatex">\(\operatorname{mean}(h^2)\)</span> 表示对 <span class="arithmatex">\(h\)</span> 的 6,144 个分量取平方后求平均，<span class="arithmatex">\(\epsilon\)</span> 用于避免除零，<span class="arithmatex">\(\gamma\)</span> 是逐维学习的缩放参数，<span class="arithmatex">\(\odot\)</span> 表示逐元素乘法。</p>
+<p>在 vLLM 中，残差相加和紧随其后的 RMSNorm 可以由同一个 kernel 完成。这样无需先将相加后的中间结果写回 HBM，再由 RMSNorm 重新读取（详见<a href="../operator-fusion/">算子融合</a>）。</p>
+<p>本文假定的普通 TP8 部署不会把这里的 6,144 维 hidden state 切成 8 份。每个 TP rank 都持有相同的完整向量，并独立执行 RMSNorm。TP 切分发生在随后进入 Attention 或 FFN 的线性投影中。</p>
+<h3 id="mla-kv">MLA 投影与 KV 状态</h3>
+<p>普通多头注意力会为每个历史 token 保存 64 组 Key 和 Value。GLM-5.2 中每个 head 的 Key 和 Value 都是 256 维，因此每个 token、每层需要保存的逻辑 K/V 一共有：</p>
+<div class="arithmatex">\[
+64\times(256+256)=32{,}768
+\]</div>
+<p>个元素。MLA 不直接缓存这些展开后的 K/V，而是让 Query 和 KV 分别经过低秩投影。只有 KV 的压缩状态会写入 KV cache。</p>
+<h4 id="query">Query 低秩投影</h4>
+<p>设第 <span class="arithmatex">\(i\)</span> 个 token 进入 Attention 的 hidden state 为 <span class="arithmatex">\(h_i\in\mathbb{R}^{6144}\)</span>。Query 先被压缩为 2,048 维 latent，再展开为 64 个 256 维 heads：</p>
+<div class="arithmatex">\[
+c_i^Q=W^{Q_A}h_i,
+\qquad
+q_i=\operatorname{reshape}\!\left(
+W^{Q_B}\operatorname{RMSNorm}(c_i^Q)
+\right),
+\]</div>
+<p>完成这两步变换的A和B投影矩阵分别为：</p>
+<div class="arithmatex">\[
+W^{Q_A}\in\mathbb{R}^{2048\times6144},
+\qquad
+W^{Q_B}\in\mathbb{R}^{16384\times2048}.
+\]</div>
+<p><span class="arithmatex">\(W^{Q_A}\)</span> 将 6,144 维 hidden state 压缩为 <span class="arithmatex">\(c_i^Q\in\mathbb{R}^{2048}\)</span>。RMSNorm 不改变 latent 维度。<span class="arithmatex">\(W^{Q_B}\)</span> 再将其投影为 16,384 维向量，随后 reshape 为 <span class="arithmatex">\(q_i\in\mathbb{R}^{64\times256}\)</span>。</p>
+<p>对于任意第 <span class="arithmatex">\(j\)</span> 个 head，256 维 Query 又分为 192 维内容部分和 64 维位置部分：</p>
+<div class="arithmatex">\[
+q_{i,j}=[q_{i,j}^C,q_{i,j}^R],
+\qquad
+q_{i,j}^C\in\mathbb{R}^{192},
+\quad
+q_{i,j}^R\in\mathbb{R}^{64}.
+\]</div>
+<h4 id="kv">KV 低秩投影与缓存</h4>
+<p>KV 路径通过一次 A 投影同时生成 512 维 KV latent 和 64 维 RoPE key：</p>
+<div class="arithmatex">\[
+[c_i^{KV},k_i^R]=W^{KV_A}h_i,
+\qquad
+c_i^{KV}\in\mathbb{R}^{512},
+\quad
+k_i^R\in\mathbb{R}^{64}.
+\]</div>
+<p>A 投影矩阵的形状为：</p>
+<div class="arithmatex">\[
+W^{KV_A}\in\mathbb{R}^{576\times6144}.
+\]</div>
+<p><span class="arithmatex">\(W^{KV_A}\)</span> 的前 512 个输出分量构成 <span class="arithmatex">\(c_i^{KV}\)</span>，后 64 个输出分量构成 <span class="arithmatex">\(k_i^R\)</span>。</p>
+<p>vLLM 对 <span class="arithmatex">\(c_i^{KV}\)</span> 执行 RMSNorm，并对 Query 和 Key 的位置部分应用 RoPE：</p>
+<div class="arithmatex">\[
+\hat c_i^{KV}=\operatorname{RMSNorm}(c_i^{KV}),
+\]</div>
+<div class="arithmatex">\[
+\tilde q_{i,j}^R=\operatorname{RoPE}_i(q_{i,j}^R),
+\qquad
+\tilde k_i^R=\operatorname{RoPE}_i(k_i^R).
+\]</div>
+<p>主 KV cache 实际保存的是 <span class="arithmatex">\(\hat c_i^{KV}\)</span> 和 <span class="arithmatex">\(\tilde k_i^R\)</span>，合计 <span class="arithmatex">\(512+64=576\)</span> 个元素。普通多头注意力需要保存 64 个 heads 的完整 Key 和 Value，共 <span class="arithmatex">\(64\times(256+256)=32{,}768\)</span> 个元素，因此 MLA 的缓存元素数量减少到大约 <span class="arithmatex">\(1/57\)</span>。Query 只服务于当前计算，不会写入 KV cache。</p>
+<p>归一化后的 512 维 KV latent 先经过 B 投影：</p>
+<div class="arithmatex">\[
+z_i^{KV}=W^{KV_B}\hat c_i^{KV},
+\qquad
+W^{KV_B}\in\mathbb{R}^{28672\times512}.
+\]</div>
+<p>输出 <span class="arithmatex">\(z_i^{KV}\)</span> 一共有 28,672 个分量，正好对应 64 个 heads 各自所需的 192 维内容 Key 和 256 维 Value：</p>
+<div class="arithmatex">\[
+28{,}672=64\times(192+256).
+\]</div>
+<p>按 head reshape 并拆分后：</p>
+<div class="arithmatex">\[
+[k_i^C,v_i]=\operatorname{reshape}\!\left(z_i^{KV}\right),
+\qquad
+k_i^C\in\mathbb{R}^{64\times192},
+\quad
+v_i\in\mathbb{R}^{64\times256}.
+\]</div>
+<p>因此，每个 head 得到 192 维的内容 Key 和 256 维的 Value。第 <span class="arithmatex">\(j\)</span> 个 head 的内容 Key 再与共享的 64 维 RoPE key 拼接，形成完整的 256 维 Key：</p>
+<div class="arithmatex">\[
+k_{i,j}=[k_{i,j}^C,\tilde k_i^R]\in\mathbb{R}^{256}.
+\]</div>
+<p>这些 K/V 是数学上的计算结果。decode 时可以通过<a href="../mla-matrix-absorption/">矩阵吸收</a>改变乘法顺序，让历史 token 的压缩 latent 直接参与 attention，无需先展开为 64 组完整 K/V。</p>
+<p>在 TP8 中，A 投影在各 rank 上复制，因此每个 rank 都会得到相同的 Query latent 和压缩 KV 状态。<code>q_b_proj</code> 和 <code>kv_b_proj</code> 按 heads 切分，每个 rank 持有 8 个 heads 对应的 B 投影参数，并使用压缩 KV cache 计算这 8 个 heads 的 attention 输出。</p>
+<p>由于 512 维 KV latent 和 64 维 RoPE key 在所有 attention heads 之间共享，按 heads 进行 TP 切分不会切分主 KV cache。对于长度为 <span class="arithmatex">\(T\)</span> 的序列，每个 TP rank、每层仍需保存 <span class="arithmatex">\(T\times576\)</span> 个 KV 元素。</p>
+<h3 id="dsa-indexer">DSA Indexer</h3>
+<p>MLA 降低了每个历史 token 的缓存体积，但在超长上下文中读取全部历史位置仍然昂贵。DSA 先用一个较小的 Indexer 为历史位置打分，再将得分最高的 2,048 个位置交给正式 attention。</p>
+<p>对于当前 token <span class="arithmatex">\(i\)</span>，Indexer 从 query latent 生成 32 个 128 维的检索 Query：</p>
+<div class="arithmatex">\[
+q_i^I=\operatorname{reshape}\!\left(W_q^I c_i^Q\right)
+\in\mathbb{R}^{32\times128}.
+\]</div>
+<p>它还从每个 token 的 hidden state 生成一个 128 维 Key 和 32 个聚合权重：</p>
+<div class="arithmatex">\[
+[k_i^I,w_i]=W_{kw}^I h_i,
+\qquad
+k_i^I\in\mathbb{R}^{128},
+\quad
+w_i\in\mathbb{R}^{32}.
+\]</div>
+<p>设 <span class="arithmatex">\(j\)</span> 表示一个历史位置，<span class="arithmatex">\(m\)</span> 表示一个 Indexer head。32 个 heads 分别计算当前 token 与位置 <span class="arithmatex">\(j\)</span> 的相关性，再通过 <span class="arithmatex">\(w_{i,m}\)</span> 合并为该位置的分数：</p>
+<div class="arithmatex">\[
+s_{i,j}=
+\sum_{m=1}^{32}
+w_{i,m}\operatorname{ReLU}
+\left(\left\langle q_{i,m}^I,k_j^I\right\rangle\right).
+\]</div>
+<p>Indexer 按分数选出最高的 2,048 个历史位置：</p>
+<div class="arithmatex">\[
+\mathcal I_i=\operatorname{TopK}_{j,\,2048}\left(s_{i,j}\right).
+\]</div>
+<p>位置集合 <span class="arithmatex">\(\mathcal I_i\)</span> 随后交给正式 attention。64 个 MLA heads 都只在这组历史位置上计算。在一次 Indexer 扫描中，每个历史位置只需读取一份由 32 个 Indexer heads 共享的 128 维 Key，再与当前 token 的 32 个检索 Query 计算相关性。其代价低于让 64 个 MLA heads 读取全部历史位置的 MLA KV。历史长度不足 2,048 时，<span class="arithmatex">\(\mathcal I_i\)</span> 会包含所有可用位置，DSA 此时无法减少正式 attention 需要访问的位置数量。</p>
+<p>按从 0 开始的层编号，该 checkpoint 在第 0、1、2、6、10、14……74 层重新运行 Indexer，并将选出的位置写入 Top-K buffer。其余层直接读取 buffer 中最近一次生成的位置集合。</p>
+<p>vLLM 将两组 Indexer 投影（<code>wq_b</code> 和融合后的 <code>wk_weights_proj</code>）复制到每个 TP rank。TP8 下，每个 rank 都独立扫描完整的历史序列，并得到相同的 Top-K 位置集合。随后，64 个 MLA heads 被分到 8 个 rank，每个 rank 负责其中 8 个 heads 的正式 attention 计算。</p>
+<h3 id="sparse-mla-attention">Sparse MLA Attention</h3>
+<p>Indexer 选出位置集合 <span class="arithmatex">\(\mathcal I_i\)</span> 后，64 个 MLA heads 分别在这些位置上计算 attention。设 <span class="arithmatex">\(m\)</span> 表示 attention head，<span class="arithmatex">\(j\)</span> 表示历史位置。第 <span class="arithmatex">\(m\)</span> 个 head 的 attention 权重为：</p>
+<div class="arithmatex">\[
+\alpha_{i,m,j}=
+\operatorname{softmax}_{j\in\mathcal I_i,\,j\le i}
+\left(
+\frac{q_{i,m}k_{j,m}^{\mathsf T}}{\sqrt{256}}
+\right).
+\]</div>
+<p>它对所选位置的 Value 进行加权求和：</p>
+<div class="arithmatex">\[
+o_{i,m}=
+\sum_{\substack{j\in\mathcal I_i\\j\le i}}
+\alpha_{i,m,j}v_{j,m}.
+\]</div>
+<p>条件 <span class="arithmatex">\(j\le i\)</span> 表示 causal mask。当前位置只能读取自己以及之前的 token，不能读取后续位置。</p>
+<p>TP8 下，每个 rank 计算其中 8 个 heads，并将这 8 个 heads 的输出送入本地的 <code>o_proj</code>。<code>o_proj</code> 按输入维度切分，因此每个 rank 都得到一份 6,144 维的部分结果。TP all-reduce 将 8 份部分结果相加，得到完整的 attention 输出。</p>
+<h3 id="dense-mlp">Dense MLP</h3>
+<p>第 0 到第 2 层使用 SwiGLU MLP：</p>
+<div class="arithmatex">\[
+z=\operatorname{SiLU}(W_g u)\odot W_u u,
+\qquad
+y=W_d z.
+\]</div>
+<p>vLLM 把 <span class="arithmatex">\(W_g\)</span> 和 <span class="arithmatex">\(W_u\)</span> 融合为 <code>gate_up_proj</code>。TP8 对 intermediate dimension 做列切分；<code>down_proj</code> 使用行切分，末尾通过 all-reduce 汇总。</p>
+<h3 id="moe">MoE</h3>
+<p>第 3 到第 77 层用 MoE 取代 Dense MLP。Router 为每个 token 计算 256 个专家分数，并选择其中 8 个：</p>
+<div class="arithmatex">\[
+s_i=\operatorname{sigmoid}(W_r u_i),
+\qquad
+\mathcal E_i=\operatorname{TopK}_{e,\,8}(s_i+b).
+\]</div>
+<p>其中 <span class="arithmatex">\(b\)</span> 是仅用于专家选择的 correction bias。选中专家的 routing weight 取自未加 bias 的 sigmoid 分数；该 checkpoint 会将 8 个分数归一化，再乘以 2.5 的 routed scaling factor。GLM 的 vLLM 路径使用 FP32 router logits。每个 routed expert 都是 intermediate size 为 2,048 的 SwiGLU MLP。8 个专家输出按 routing weight 合并，同时加入一个 shared expert 的输出。</p>
+<p>EP8 把 256 个 routed experts 分布到 8 张 GPU 上。token 根据路由结果发送到持有目标专家的 rank，完成本地 expert GEMM 后再回到原 token 顺序。具体 collective 由 MoE backend 决定，通信语义都是 dispatch 与 combine。shared expert 不按 routed expert 的放置方式分散，通常走 Dense/TP 路径。</p>
+<p>在单机 <code>TP8+EP8</code> 中，同一组 8 个进程同时承担两种角色：Attention 与 Dense 投影按 TP 切分，routed experts 按 EP 放置。<code>TP7_EP7</code> 表示一个进程在两个组中的 rank 都是 7，并不意味着系统启动了 64 个 rank。</p>
+<h2 id="token">从最后一层到输出 token</h2>
+<p>78 层 Transformer 计算结束后，模型对 residual 合并结果执行 final RMSNorm。LM head 将 6,144 维 hidden state 投影到 154,880 维词表 logits：</p>
+<div class="arithmatex">\[
+z=W_{\text{vocab}}h^{\text{final}}.
+\]</div>
+<p><code>ParallelLMHead</code> 按词表切分。各 TP rank 计算自己的词表区间，logits processor 再完成必要的合并与后处理。temperature、top-p、top-k、repetition penalty 和 grammar mask 都发生在这一阶段，最终得到一个 token ID。</p>
+<p>token ID 随即被追加到序列。若未遇到 EOS、stop sequence 或 <code>max_tokens</code>，它会重新经过 embedding 和全部 78 层。没有 MTP 时，每产生一个输出 token 都需要一次完整的 target-model decode step。</p>
+<p>Detokenizer 将 token ID 流还原为文本；reasoning parser 和 tool-call parser 在这里识别 <code>&lt;think&gt;</code>、工具名及参数。工具调用若被执行，其 observation 会在下一轮重新进入 chat template，形成新的模型请求。</p>
+<h2 id="prefill-decode">Prefill 与 Decode</h2>
+<p>Prefill 和 Decode 执行同一组模型层，batch 形状不同。</p>
+<table>
+<thead>
+<tr>
+<th>阶段</th>
+<th>本轮输入</th>
+<th>主要工作</th>
+<th>生成的状态</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Prefill</td>
+<td>prompt 中尚未缓存的多个 token</td>
+<td>大批量投影、DSA/MLA、MoE</td>
+<td>每层 MLA KV 与 indexer cache</td>
+</tr>
+<tr>
+<td>Decode</td>
+<td>每条 active sequence 的一个新 token</td>
+<td>读取历史 cache，完成一次全层前向</td>
+<td>新 token 的 KV 与 indexer entry</td>
+</tr>
+</tbody>
+</table>
+<p>长 prompt 的 prefill GEMM 较大，通常能提供较高 GPU 利用率。Decode 的单步矩阵较窄，还要读取历史 cache、执行 TP collective 和 EP 路由，所以更容易受显存带宽与通信延迟限制。Continuous batching 把多条 sequence 的 decode token 合并，目的是把这些窄计算重新组成可利用 GPU 的 batch。</p>
+<h2 id="_3">执行路径</h2>
+<div class="mermaid">flowchart TD
+    A["Messages + tools"] --&gt; B["Chat template / tokenizer"]
+    B --&gt; C["Scheduler + prefix-cache lookup"]
+    C --&gt; D["Vocab-parallel embedding"]
+    D --&gt; E["RMSNorm"]
+    E --&gt; F["MLA latent projections"]
+    F --&gt; G["DSA indexer: historical Top-2048"]
+    F --&gt; H["RoPE + local TP heads"]
+    G --&gt; I["Sparse MLA"]
+    H --&gt; I
+    I --&gt; J["Row-parallel output + all-reduce"]
+    J --&gt; K["Residual + RMSNorm"]
+    K --&gt; L{"Layer 0-2?"}
+    L --&gt;|Yes| M["TP SwiGLU MLP"]
+    L --&gt;|No| N["FP32 router"]
+    N --&gt; O["EP dispatch to 8 of 256 experts"]
+    O --&gt; P["Expert compute + combine"]
+    M --&gt; Q["Residual"]
+    P --&gt; Q
+    Q --&gt; R{"More layers?"}
+    R --&gt;|Yes| E
+    R --&gt;|No| S["Final RMSNorm + LM head"]
+    S --&gt; T["Sampling"]
+    T --&gt; U["One token"]
+    U --&gt; V{"Stop?"}
+    V --&gt;|No| D
+    V --&gt;|Yes| W["Detokenize + output parser"]</div>
+<h2 id="_4">精度与存储边界</h2>
+<p><code>AWQ-INT4</code> 描述的是权重存储与 GEMM kernel，不代表整条推理路径都使用 INT4。这个 checkpoint 主要量化后部 attention 投影和 routed-expert 线性层；前三层、MLA A 投影、indexer、shared experts 和 LM head 等模块在配置中被排除。hidden states、residual 和 normalization 仍以 BF16 为主。</p>
+<p>主 MLA KV cache 的 dtype 由 vLLM 的 KV 配置决定。使用 <code>auto</code> 时通常为 BF16；显式设置 FP8 KV 才会进一步降低其字节数。DSA indexer cache 的 FP8 存储是另一条独立路径，不能据此推断主 KV 也是 FP8。</p>
+<h2 id="_5">实现依据</h2>
+<ul>
+<li><a href="https://huggingface.co/cyankiwi/GLM-5.2-AWQ-INT4/blob/main/config.json">GLM-5.2 AWQ-INT4 config</a></li>
+<li><a href="https://huggingface.co/cyankiwi/GLM-5.2-AWQ-INT4/blob/main/chat_template.jinja">GLM-5.2 chat template</a></li>
+<li><a href="https://arxiv.org/abs/2603.12201">IndexCache: Accelerating Sparse Attention via Cross-Layer Index Reuse</a></li>
+<li><a href="https://github.com/vllm-project/vllm/blob/main/vllm/model_executor/models/deepseek_v2.py">vLLM <code>GlmMoeDsaForCausalLM</code> implementation</a></li>
+<li><a href="https://github.com/vllm-project/vllm/blob/main/vllm/model_executor/layers/mla.py">vLLM MLA wrapper</a></li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      <script id="__config" type="application/json">{"base": "../../..", "features": [], "search": "../../../assets/javascripts/workers/search.973d3a69.min.js", "tags": null, "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}, "version": null}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.f55a23d4.min.js"></script>
+      
+        <script src="../../../javascripts/mathjax.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+      
+        <script src="../../../javascripts/mermaid.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>

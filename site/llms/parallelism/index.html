@@ -622,6 +622,66 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#case-study-glm-52-with-tp8-and-ep8" class="md-nav__link">
+    <span class="md-ellipsis">
+      Case Study: GLM-5.2 with TP8 and EP8
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Case Study: GLM-5.2 with TP8 and EP8">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#mla-attention" class="md-nav__link">
+    <span class="md-ellipsis">
+      MLA Attention
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dense-mlp-layers" class="md-nav__link">
+    <span class="md-ellipsis">
+      Dense MLP Layers
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dsa-indexer-and-kv-state" class="md-nav__link">
+    <span class="md-ellipsis">
+      DSA Indexer and KV State
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#moe-layers-with-expert-parallelism" class="md-nav__link">
+    <span class="md-ellipsis">
+      MoE Layers with Expert Parallelism
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#serving-implications" class="md-nav__link">
+    <span class="md-ellipsis">
+      Serving Implications
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#8-gpu-inference-example" class="md-nav__link">
     <span class="md-ellipsis">
       8-GPU Inference Example
@@ -818,6 +878,29 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../glm-5.2-inference-path/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    GLM-5.2 Inference Path
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -898,6 +981,66 @@
   <a href="#inference-interpretation" class="md-nav__link">
     <span class="md-ellipsis">
       Inference Interpretation
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#case-study-glm-52-with-tp8-and-ep8" class="md-nav__link">
+    <span class="md-ellipsis">
+      Case Study: GLM-5.2 with TP8 and EP8
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Case Study: GLM-5.2 with TP8 and EP8">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#mla-attention" class="md-nav__link">
+    <span class="md-ellipsis">
+      MLA Attention
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dense-mlp-layers" class="md-nav__link">
+    <span class="md-ellipsis">
+      Dense MLP Layers
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dsa-indexer-and-kv-state" class="md-nav__link">
+    <span class="md-ellipsis">
+      DSA Indexer and KV State
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#moe-layers-with-expert-parallelism" class="md-nav__link">
+    <span class="md-ellipsis">
+      MoE Layers with Expert Parallelism
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#serving-implications" class="md-nav__link">
+    <span class="md-ellipsis">
+      Serving Implications
     </span>
   </a>
   
@@ -1039,6 +1182,105 @@ Y = \sum_{i=0}^{p-1} Y_i.
 <li>Increasing TP reduces per-device weight memory and can enlarge the effective KV budget of one replica, but too much TP may turn communication into the bottleneck.</li>
 </ul>
 <p>This is why inference deployment decisions are often phrased as a trade-off between replica-level concurrency and per-replica memory headroom.</p>
+<h2 id="case-study-glm-52-with-tp8-and-ep8">Case Study: GLM-5.2 with TP8 and EP8</h2>
+<p>The generic description of TP becomes more concrete in a sparse MoE model such as GLM-5.2. The mapping below reflects the current vLLM implementation of <code>GlmMoeDsaForCausalLM</code>, which reuses the DeepSeek-V2/V3-style MLA and sparse-attention execution path. It describes a single replica configured with <code>TP8</code> and with expert parallelism enabled across the same eight ranks.</p>
+<p>All eight TP ranks process the same request and the same token batch. TP therefore differs from request-level parallelism: it partitions selected model tensors and operators inside one forward pass, while every request still occupies the entire TP group.</p>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Placement under TP8</th>
+<th>Main communication</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Query heads and MLA B projections</td>
+<td>Split across eight ranks</td>
+<td>Local attention followed by output reduction</td>
+</tr>
+<tr>
+<td>Attention output projection</td>
+<td>Row-sharded</td>
+<td>TP all-reduce</td>
+</tr>
+<tr>
+<td>Dense MLP gate/up projection</td>
+<td>Column-sharded</td>
+<td>Usually none at the expansion boundary</td>
+</tr>
+<tr>
+<td>Dense MLP down projection</td>
+<td>Row-sharded</td>
+<td>TP all-reduce</td>
+</tr>
+<tr>
+<td>Token embedding and LM head</td>
+<td>Vocabulary-sharded</td>
+<td>Gather/reduction around logits as required</td>
+</tr>
+<tr>
+<td>RMSNorm, RoPE, and residual operations</td>
+<td>Replicated</td>
+<td>None or fused with neighboring operations</td>
+</tr>
+<tr>
+<td>MLA A projections</td>
+<td>Replicated</td>
+<td>None</td>
+</tr>
+<tr>
+<td>DSA indexer</td>
+<td>Largely replicated</td>
+<td>Index-selection-specific synchronization</td>
+</tr>
+<tr>
+<td>Routed MoE experts with EP enabled</td>
+<td>Experts partitioned across EP ranks</td>
+<td>Token all-to-all and result exchange</td>
+</tr>
+<tr>
+<td>MLA and indexer KV state</td>
+<td>Full token range retained per TP rank</td>
+<td>Not sequence-sharded by TP</td>
+</tr>
+</tbody>
+</table>
+<h3 id="mla-attention">MLA Attention</h3>
+<p>Let the model have <span class="arithmatex">\(H\)</span> query heads and let the TP degree be <span class="arithmatex">\(p=8\)</span>. Each rank computes</p>
+<div class="arithmatex">\[
+H_{\mathrm{local}} = \frac{H}{8}
+\]</div>
+<p>query heads. In vLLM, <code>q_b_proj</code> and <code>kv_b_proj</code> are column-parallel projections: their output dimensions are partitioned so that each rank produces the Q/K/V features for its local heads. The attention kernel then operates on those local heads. The output projection is row-parallel, and its partial contributions are summed across the TP group with an all-reduce before the hidden state proceeds to the next block.</p>
+<p>MLA also contains low-rank A projections before the head-wise B projections. The current implementation represents <code>q_a_proj</code> and <code>kv_a_proj_with_mqa</code> as replicated linear layers. Every rank therefore stores the same A-projection weights and repeats this part of the computation. TP8 reduces the head-wise B projections and the local attention work, but it does not divide every attention operation by eight.</p>
+<h3 id="dense-mlp-layers">Dense MLP Layers</h3>
+<p>Dense MLP layers use the usual paired TP layout. The gate and up projections are fused into a column-parallel linear layer, which partitions the intermediate dimension across ranks. The down projection is row-parallel and combines the local partial outputs with a TP reduction. The intermediate activation can remain sharded between the two projections, avoiding an unnecessary all-gather at the expansion boundary.</p>
+<p>This layout reduces the per-rank MLP parameter footprint and GEMM size. Its scaling efficiency falls as TP grows because each local GEMM becomes narrower while the down-projection reduction remains on the critical path.</p>
+<h3 id="dsa-indexer-and-kv-state">DSA Indexer and KV State</h3>
+<p>The sparse-attention indexer is an important exception to the head-wise TP pattern. In the current implementation, its query projection is replicated and the fused key/weight projection explicitly disables TP. Each rank therefore performs largely the same indexer projection and top-<span class="arithmatex">\(k\)</span> selection work.</p>
+<p>The same distinction applies to KV memory. MLA stores a compressed latent vector for every cached token. Local query heads on every TP rank need access to the complete historical token range, so each rank keeps the compressed MLA state for that range. The indexer cache is similarly maintained over the full sequence. TP8 does not turn one 160k-token KV history into eight independent 20k-token shards.</p>
+<p>Consequently, TP and context parallelism solve different problems. TP partitions heads and projection matrices, while DCP/CP partitions the sequence or KV dimension. A TP8 deployment can leave more HBM for KV cache by reducing the per-rank weight footprint, but the eight GPUs do not pool their KV capacity into an eight-times-longer context merely because TP is enabled.</p>
+<h3 id="moe-layers-with-expert-parallelism">MoE Layers with Expert Parallelism</h3>
+<p>When expert parallelism is enabled, routed experts follow a different placement rule from attention and dense MLP layers. The router is replicated so that ranks make consistent routing decisions, while the physical routed experts are distributed across the EP group. Tokens are sent to the ranks that own their selected experts, processed by local expert GEMMs, and returned to their original execution ranks.</p>
+<p>For <code>TP8 + EP8</code>, the resulting execution structure is therefore:</p>
+<ul>
+<li>attention projections and heads use TP8;</li>
+<li>dense MLP layers use TP8;</li>
+<li>routed experts are partitioned with EP8;</li>
+<li>the router, MLA A projections, and most indexer work are replicated;</li>
+<li>shared experts normally retain a tensor-parallel path unless a backend fuses them into the MoE implementation.</li>
+</ul>
+<p>This hybrid structure introduces two communication patterns inside the same transformer layer. Attention and dense projections invoke TP collectives, whereas routed MoE computation invokes token all-to-all exchange. Increasing TP or EP changes only the portions assigned to that parallel dimension; replicated operators and communication boundaries remain and prevent single-request latency from scaling linearly with the number of GPUs.</p>
+<h3 id="serving-implications">Serving Implications</h3>
+<p>The placement above leads to several operational consequences:</p>
+<ul>
+<li>One request consumes all eight GPUs; TP8 does not provide eight independent request slots.</li>
+<li>Attention-head and large projection work becomes smaller per rank, but replicated MLA and indexer work limits compute scaling.</li>
+<li>TP collectives are paid at fine granularity during every decode step, so low-concurrency decode often scales less efficiently than prefill.</li>
+<li>EP reduces routed-expert parameter replication, but token routing adds all-to-all traffic and may suffer from expert-load imbalance.</li>
+<li>MLA KV capacity remains a per-rank constraint. Higher active-context capacity requires more free HBM per rank, a lower-precision KV representation, sequence/context parallelism, or an offloading design that supports active KV state.</li>
+</ul>
+<p>AWQ or other weight quantization changes the storage and kernel used for the sharded matrices, but it does not fundamentally change this parallel placement.</p>
 <h2 id="8-gpu-inference-example">8-GPU Inference Example</h2>
 <p>The clearest way to compare DP and TP is to hold the hardware fixed and change only how the eight GPUs are grouped into replicas. Consider one 8-GPU server with fast intra-node interconnect. The common options are:</p>
 <ul>
