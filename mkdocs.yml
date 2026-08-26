@@ -36,6 +36,7 @@ plugins:
             Position Encoding: 位置编码
             Model Notes: 模型笔记
             GLM-5.2 Inference Path: GLM-5.2 推理路径
+            GLM-5.2 DSpark Design: GLM-5.2 DSpark 训练设计
 nav:
   - Home: index.md
   - Hardware: hardware.md
@@ -56,6 +57,7 @@ nav:
       - Position Encoding: llms/position-encoding.md
       - Model Notes: llms/models.md
       - GLM-5.2 Inference Path: llms/glm-5.2-inference-path.md
+      - GLM-5.2 DSpark Design: llms/glm-5.2-dspark-design.md
 markdown_extensions:
   - pymdownx.highlight:
       anchor_linenums: true
@@ -75,6 +77,7 @@ extra_css:
   - stylesheets/basic.css
 extra_javascript:
   - javascripts/mathjax.js
+  - javascripts/cjk-spacing.js
   - https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js
   - javascripts/mermaid.js
   - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js

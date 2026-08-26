@@ -1,12 +1,71 @@
-.md-typeset p {
-    /* Mixed Chinese-English technical prose looks better without forced justification. */
-    text-align: start;
-    text-justify: auto;
-  }
+.md-header {
+  background-color: rgba(43, 57, 79, 0.95);
+}
+
+.md-typeset {
+  text-autospace: ideograph-alpha ideograph-numeric;
+}
+
+.md-typeset .cjk-latin-space {
+  padding-inline-end: 0.25em;
+}
+
+.md-typeset tr > .cjk-latin-space {
+  display: none;
+}
+
+.md-typeset p,
+.md-typeset li {
+  text-align: justify;
+  text-justify: inter-ideograph;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+  hyphenate-limit-chars: 6 3 3;
+  overflow-wrap: break-word;
+  word-break: normal;
+}
+
+html[lang="en"] .md-typeset p,
+html[lang="en"] .md-typeset li {
+  text-justify: inter-word;
+}
+
+.md-typeset pre,
+.md-typeset .arithmatex {
+  -webkit-hyphens: none;
+  hyphens: none;
+  text-align: start;
+  text-autospace: no-autospace;
+}
+
+.md-typeset code {
+  -webkit-hyphens: none;
+  hyphens: none;
+  text-autospace: no-autospace;
+}
 
 p:has(+ .arithmatex) {
     margin-bottom: 0px; /* Adjust as needed */
   }
+
+.md-typeset :is(p, h1, h2, h3, h4, h5, h6):has(+ div:has(> img)),
+.md-typeset :is(p, h1, h2, h3, h4, h5, h6):has(+ .mermaid-figure) {
+  margin-bottom: 0;
+}
+
+.md-typeset div:has(> img) {
+  margin-block: 1.25em;
+}
+
+.md-typeset div:has(> img) > img {
+  display: block;
+  margin-inline: auto;
+}
+
+.md-typeset div:has(> img) + :is(p, ol, ul, blockquote, h1, h2, h3, h4, h5, h6),
+.md-typeset .mermaid-figure + :is(p, ol, ul, blockquote, h1, h2, h3, h4, h5, h6) {
+  margin-top: 0;
+}
 
   .md-content h1 {
     color: #7C1823; /* Tomato color for h1 */
@@ -56,7 +115,7 @@ p:has(+ .arithmatex) {
   border: 1px solid rgba(19, 49, 103, 0.14);
   border-radius: 0.5rem;
   padding: 0.75rem;
-  margin: 1rem 0 1.25rem;
+  margin: 1.25em 0;
   background: #fff;
   overflow: auto;
 }
