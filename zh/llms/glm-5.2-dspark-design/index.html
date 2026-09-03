@@ -1,0 +1,1627 @@
+
+<!doctype html>
+<html lang="zh" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://XPengZhao.github.io/dl-note/zh/llms/glm-5.2-dspark-design/">
+      
+      
+        <link rel="prev" href="../glm-5.2-inference-path/">
+      
+      
+      
+        
+          <link rel="alternate" href="/dl-note/" hreflang="en">
+        
+          <link rel="alternate" href="./" hreflang="zh">
+        
+      
+      
+      <link rel="icon" href="../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>GLM-5.2 DSpark 训练设计 - DL Notes</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../stylesheets/bootstrap.min.css">
+    
+      <link rel="stylesheet" href="../../../stylesheets/basic.css">
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#glm-52-dspark" class="md-skip">
+          跳转至
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="页眉">
+    <a href="../../" title="DL Notes" class="md-header__button md-logo" aria-label="DL Notes" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            DL Notes
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              GLM-5.2 DSpark 训练设计
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+      <div class="md-header__option">
+  <div class="md-select">
+    
+    <button class="md-header__button md-icon" aria-label="选择当前语言">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12.87 15.07-2.54-2.51.03-.03A17.5 17.5 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2zm-2.62 7 1.62-4.33L19.12 17z"/></svg>
+    </button>
+    <div class="md-select__inner">
+      <ul class="md-select__list">
+        
+          <li class="md-select__item">
+            <a href="/dl-note/" hreflang="en" class="md-select__link">
+              English
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="./" hreflang="zh" class="md-select__link">
+              简体中文
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="搜索" placeholder="搜索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="查找">
+        
+        <button type="reset" class="md-search__icon md-icon" title="清空当前内容" aria-label="清空当前内容" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            正在初始化搜索引擎
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="导航栏" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../" title="DL Notes" class="md-nav__button md-logo" aria-label="DL Notes" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    DL Notes
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    首页
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hardware/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    硬件
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tensor/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    张量操作
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../neural-graphics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    神经图形
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AI Infra
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    AI Infra
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    总览
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../request-lifecycle/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    请求生命周期
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../metrics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    指标
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../roofline/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Roofline 模型
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../data-movement/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    数据搬运与通信
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../kv-cache/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    KV Cache
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../serving-runtime/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    推理运行时
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../parallelism/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    并行策略
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../decoding/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    解码与采样
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../training-objective/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    训练目标
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    模型
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    模型
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../position-encoding/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    位置编码
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    模型笔记
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../glm-5.2-inference-path/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GLM-5.2 推理路径
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GLM-5.2 DSpark 训练设计
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GLM-5.2 DSpark 训练设计
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        参数摘要
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        模型前向设计
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="模型前向设计">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. 训练样本
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. 模型输入
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. 模型输入">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#anchor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Anchor 采样
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#draft" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Draft 输入
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qkv" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        QKV 构造
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. 注意力掩码
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-mla" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. MLA
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. 输出头
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. 训练目标
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        附录
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="附录">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#a" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A.训练数据准备
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="A.训练数据准备">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#option-1-megatron" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Option 1: Megatron 方式
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#option-2-response" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Option 2: 存Response部分
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#attention" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Attention 实现
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        参数摘要
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        模型前向设计
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="模型前向设计">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. 训练样本
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. 模型输入
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. 模型输入">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#anchor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Anchor 采样
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#draft" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Draft 输入
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qkv" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        QKV 构造
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. 注意力掩码
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-mla" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. MLA
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. 输出头
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. 训练目标
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        附录
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="附录">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#a" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A.训练数据准备
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="A.训练数据准备">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#option-1-megatron" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Option 1: Megatron 方式
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#option-2-response" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Option 2: 存Response部分
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#attention" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Attention 实现
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="glm-52-dspark">GLM 5.2 DSpark 投机训练设计</h1>
+<h2 id="_1">参数摘要</h2>
+<p>Draft 为 <span class="arithmatex">\(L=3\)</span> 层 GLM MLA，隐藏维与 Target 相同。数字取自 <code>configs/glm-5.2-dspark.json</code>。</p>
+<p><strong>Width.</strong> <span class="arithmatex">\(d=6144\)</span>，<span class="arithmatex">\(n_h=64\)</span>。Query 低秩 <span class="arithmatex">\(2048\)</span>，KV 低秩 <span class="arithmatex">\(512\)</span>；头维 <span class="arithmatex">\(d_c=192\)</span>，<span class="arithmatex">\(d_r=64\)</span>，<span class="arithmatex">\(d_v=256\)</span>。FFN 中间维 <span class="arithmatex">\(12288\)</span>。词表 <span class="arithmatex">\(V=154880\)</span>，Markov 秩 <span class="arithmatex">\(256\)</span>。block 长 <span class="arithmatex">\(5\)</span>。Draft 用 SWA，窗口 <span class="arithmatex">\(W=128\)</span>，看得见的 context 至多 <span class="arithmatex">\(W-1\)</span> 个位置。</p>
+<p><strong>Parameters.</strong> 可训练参数约 <span class="arithmatex">\(1.37\mathrm{B}\)</span>。冻结的 Target <code>embed_tokens</code> 与 <code>lm_head</code> 不计入。</p>
+<table>
+<thead>
+<tr>
+<th>块</th>
+<th>参数量</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>投影（<code>mtp.0.main_proj</code>）与 RMSNorm（<code>main_norm</code>）</td>
+<td><span class="arithmatex">\(113\mathrm{M}\)</span></td>
+</tr>
+<tr>
+<td>每层 MLA</td>
+<td><span class="arithmatex">\(165\mathrm{M}\times 3=495\mathrm{M}\)</span></td>
+</tr>
+<tr>
+<td>每层 dense SwiGLU</td>
+<td><span class="arithmatex">\(226\mathrm{M}\times 3=679\mathrm{M}\)</span></td>
+</tr>
+<tr>
+<td>Markov（<code>markov_w1</code>，<code>markov_w2</code>）</td>
+<td><span class="arithmatex">\(79\mathrm{M}\)</span></td>
+</tr>
+<tr>
+<td>Confidence 与末层 RMSNorm</td>
+<td><span class="arithmatex">\(&lt;0.1\mathrm{M}\)</span></td>
+</tr>
+</tbody>
+</table>
+<p><strong>KV cache.</strong> MLA 每层每个被缓存 token 存 <span class="arithmatex">\(\mathbf{c}^{KV}\)</span> 的 <span class="arithmatex">\(512\)</span> 维与 <span class="arithmatex">\(k^{R}\)</span> 的 <span class="arithmatex">\(64\)</span> 维，共 <span class="arithmatex">\(576\)</span> 个数；Query 与展开后的 <span class="arithmatex">\(K,V\)</span> 不进 cache。Draft <span class="arithmatex">\(L=3\)</span> 为 <span class="arithmatex">\(1728\)</span> 个数，bf16 合 <span class="arithmatex">\(3.4\,\mathrm{KiB}/\mathrm{token}\)</span>。Target <span class="arithmatex">\(78\)</span> 层为 <span class="arithmatex">\(44928\)</span> 个数，bf16 合 <span class="arithmatex">\(87.8\,\mathrm{KiB}/\mathrm{token}\)</span>。Draft 推理时每层驻留窗口内约 <span class="arithmatex">\(W\)</span> 个 token；<span class="arithmatex">\(3.4\,\mathrm{KiB}\)</span> 与 <span class="arithmatex">\(87.8\,\mathrm{KiB}\)</span> 是每个被缓存 token 的占用。</p>
+<h2 id="_2">模型前向设计</h2>
+<h3 id="1">1. 训练样本</h3>
+<p>如上述训练数据准备中的步骤，用数据集序列做 Target 模型一次 prefill，保存三个逐位对齐的张量供训练。</p>
+<div align="center">
+  <img src="../../../assets/images/glm-dspark/input-data.svg" alt="Target 一次 prefill：input_ids、hidden_states、target_last_hidden_states 与 lm_head 下一 token" style="width:70%;height:auto">
+</div>
+
+<ol>
+<li>
+<p><code>input_ids</code>：<span class="arithmatex">\([x_0, x_1, \ldots, x_{S-1}]\)</span>。数据集窗口，原样作为 Target prefill 的输入。Draft 的输入从该序列中采样 anchor tokens，见 <a href="#anchor-sampling">Anchor 采样</a>。</p>
+</li>
+<li>
+<p><code>hidden_states</code>：<span class="arithmatex">\([h_0, h_1, \ldots, h_{S-1}]\)</span>。<span class="arithmatex">\(h_i\)</span> 由 <span class="arithmatex">\(x_i\)</span> 输入 Target 得到，因果上看见 <span class="arithmatex">\(x_0,\ldots,x_i\)</span>。三路是 layer 75、76、77 做完后、下一层 <code>input_layernorm</code> 之前的 hidden state。层号从 0 计，共 78 层。拼成 <span class="arithmatex">\(\mathbb{R}^{S\times 18432}\)</span>。</p>
+</li>
+<li>
+<p><code>target_last_hidden_states</code>：<span class="arithmatex">\([z_0, z_1, \ldots, z_{S-1}]\)</span>。<span class="arithmatex">\(z_i\)</span> 由 <span class="arithmatex">\(x_i\)</span> 输入 Target 得到，因果上看见 <span class="arithmatex">\(x_0,\ldots,x_i\)</span>。走完 78 层再经 final RMSNorm，是 <code>lm_head</code> 的输入。形状 <span class="arithmatex">\(\mathbb{R}^{S\times 6144}\)</span>。相对 <span class="arithmatex">\(h_i\)</span> 的最后一路（layer 77 输出），<span class="arithmatex">\(z_i\)</span> 只多这一步 RMSNorm。</p>
+</li>
+</ol>
+<h3 id="2">2. 模型输入</h3>
+<p><a id="anchor-sampling"></a></p>
+<h4 id="anchor">Anchor 采样</h4>
+<p>从 <code>input_ids</code> 的下标里选 anchor。记下标为 <span class="arithmatex">\(A\)</span>。候选须同时满足 <span class="arithmatex">\(A \in [0, S-2]\)</span>、<code>loss_mask[A] = 1</code>、<code>loss_mask[A+1] = 1</code>。训练时从这些合法位置中随机取 <span class="arithmatex">\(N\)</span> 个，<span class="arithmatex">\(N \le\)</span> <code>num_anchors</code>。</p>
+<h4 id="draft">Draft 输入</h4>
+<p>按上面抽到的 <span class="arithmatex">\(N\)</span> 个 <span class="arithmatex">\(A\)</span>，Draft 前向构造两路。</p>
+<p><strong>Draft block.</strong> 每个 <span class="arithmatex">\(A\)</span> 对应长度 <code>block_size = 5</code>：第 0 位是 <span class="arithmatex">\(x_A =\)</span> <code>input_ids[A]</code>，后四位填 <code>MASK</code>（token id <span class="arithmatex">\(154821\)</span>）：<code>[x_A, MASK, MASK, MASK, MASK]</code></p>
+<div align="center">
+  <img src="../../../assets/images/glm-dspark/draft-block.svg" alt="从 input_ids 的 anchor A 构造 draft block：第 0 位 x_A，后四位 MASK" style="width:60%;height:auto">
+</div>
+
+<p><span class="arithmatex">\(N\)</span> 个 block 在序列维拼成 <span class="arithmatex">\(\mathbb{R}^{B \times 5N}\)</span> 的 id，经 Target 冻结的 <code>embed_tokens</code> 得到 <code>noise_embedding</code> <span class="arithmatex">\(\in \mathbb{R}^{B \times 5N \times 6144}\)</span>。</p>
+<p><strong>Context.</strong> 第二路是训练样本里那份长度为 <span class="arithmatex">\(S\)</span> 的 <code>hidden_states</code>。此处先不按照 sliding window 裁切，后续通过<a href="#attention-mask">注意力掩码</a>来约束 draft block 内每个位置实际能看见 context 的哪一段。记 <span class="arithmatex">\(\mathbf{H}^{\mathrm{aux}} \in \mathbb{R}^{B \times S \times 18432}\)</span>。<code>mtp.0.main_proj</code> 将其投到 <span class="arithmatex">\(\mathbb{R}^{B \times S \times 6144}\)</span>，再经 <code>main_norm</code>。该路不经过 embedding。两路如何拼成 Q/K/V，见 <a href="#kv-construction">KV 构造</a>。</p>
+<p><a id="kv-construction"></a></p>
+<h4 id="qkv">QKV 构造</h4>
+<p>进入 MLA 时，K/V 把两路拼在同一条序列轴上：context 在前、<span class="arithmatex">\(N\)</span> 个 draft block 在后，长度 <span class="arithmatex">\(S+5N\)</span>。Q 只含后面那 <span class="arithmatex">\(5N\)</span> 个 draft 位置，和 KV 右半列对齐。</p>
+<div align="center">
+  <img src="../../../assets/images/glm-dspark/qkv.svg" alt="KV 轴 context 在前、N 个 draft block 在后；Q 只含 draft block，与 KV 右半列对齐" style="width:80%;height:auto">
+</div>
+
+<p>前 <span class="arithmatex">\(S\)</span> 个 KV 来自投影后的 <span class="arithmatex">\(\mathbf{H}^{\mathrm{aux}}\)</span>；后 <span class="arithmatex">\(5N\)</span> 个与 Q 同源，都是 <code>noise_embedding</code>。RoPE 跟 KV 轴同序：context 为 <span class="arithmatex">\(0,\ldots,S-1\)</span>；第 <span class="arithmatex">\(n\)</span> 个 block 为 <span class="arithmatex">\(A_n,\ldots,A_n+4\)</span>。Q 用后半段位置，K 用整段。</p>
+<p><a id="attention-mask"></a></p>
+<h3 id="3">3. 注意力掩码</h3>
+<p>记注意力掩码为 <span class="arithmatex">\(M\)</span>（<code>attention_mask</code>）。<span class="arithmatex">\(M\)</span> 决定每个 Q 可以看到哪些 KV。<code>sliding_window</code> <span class="arithmatex">\(= W = 128\)</span> 时，窗口为 <span class="arithmatex">\(A-W+1 \le kv &lt; A\)</span>，即 <span class="arithmatex">\([A-127, A)\)</span>，看得见的 context 位置有 <span class="arithmatex">\(W-1\)</span> 个。<span class="arithmatex">\(N\)</span> 个 <span class="arithmatex">\(A\)</span> 的窗口不同，所以上一节的 context 必须整段保留。下图为两个 block，各用自己的 <span class="arithmatex">\(A\)</span> 算窗口。</p>
+<div align="center">
+  <img src="../../../assets/images/glm-dspark/attention-mask.svg" alt="两个 draft block 的注意力掩码：灰为相对 A 的 context 窗口，蓝为块内双向，空为关掉" style="width:100%;height:auto">
+</div>
+
+<p><strong>Causal attention.</strong> KV 下标 <span class="arithmatex">\(&lt; S\)</span> 时，块内 5 个 Q 共用窗口 <span class="arithmatex">\([A-127, A)\)</span>，不随块内偏移右移。该窗口不含 context 位置 <span class="arithmatex">\(A\)</span>。</p>
+<p><strong>Bidirectional attention.</strong> KV 下标 <span class="arithmatex">\(\ge S\)</span> 时，只看见本 block 的 5 个位置。块内双向，块间不可见。</p>
+<p><strong>Padding block.</strong> <code>block_keep_mask=0</code> 的 block 用来在合法 anchor 少于 <code>num_anchors</code> 时凑齐 batch。其 5 个 Q 对所有 KV 关掉：不看 context，也不看任何 draft block。</p>
+<p><span class="arithmatex">\(M\)</span> 在调用 Draft 之前生成，作为 <code>attention_mask</code> 传入各层 MLA。之后按 <code>training.attention_backend</code> 走不同的 attention 实现，见附录 <a href="#appendix-attention-backend">Attention 实现</a>。</p>
+<p><a id="mla"></a></p>
+<h3 id="4-mla">4. MLA</h3>
+<p>Draft 为 <span class="arithmatex">\(L=3\)</span> 层 Transformer 结构。<span class="arithmatex">\(\mathbf{H}^{\mathrm{aux}}\)</span> 经投影（<code>mtp.0.main_proj</code>）与 RMSNorm（<code>main_norm</code>）得到 <span class="arithmatex">\(\mathbf{H}^{\mathrm{ctx}}\in\mathbb{R}^{B\times S\times 6144}\)</span>，三层共用，不随层更新。第 <span class="arithmatex">\(\ell\)</span> 层的输入是 draft hidden <span class="arithmatex">\(\mathbf{H}^{(\ell)}\in\mathbb{R}^{B\times 5N\times 6144}\)</span>，<span class="arithmatex">\(\mathbf{H}^{(0)}\)</span> 为第2节 draft block 的 embedding（<code>noise_embedding</code>）：第0位 <span class="arithmatex">\(x_A\)</span>，后四位 MASK。三层 MLA 使用同一份第 3 节的注意力掩码与同一份 <code>position_ids</code>。下图框外为一次投影，框内为一层。</p>
+<div align="center">
+  <img src="../../../assets/images/glm-dspark/attention.svg" alt="框外 H^aux 经 main_proj 与 RMSNorm 得到 H^ctx；框内一层 RMSNorm-MLA-FFN 残差，H^ctx 从右侧进 MLA 作 K/V" style="width:60%;height:auto">
+</div>
+
+<p><strong>MLA Projection.</strong> 每层先对 <span class="arithmatex">\(\mathbf{H}^{(\ell)}\)</span> 做 RMSNorm（<code>input_layernorm</code>），记 <span class="arithmatex">\(\mathbf{h}\in\mathbb{R}^{B\times 5N\times 6144}\)</span>。下图左为 Key/Value，右为 Query；虚线把同一份 <span class="arithmatex">\(\mathbf{h}\)</span> 接到 KV 的拼接。</p>
+<div align="center">
+  <img src="../../../assets/images/glm-dspark/mla.svg" alt="MLA 投影：右为 Query，从 h 经低秩得到 q^C 与 q^R；左为 KV，拼接 H^ctx 与 h 后得到 k^C、k^R 与 v" style="width:100%;height:auto">
+</div>
+
+<p>Query 只从 <span class="arithmatex">\(\mathbf{h}\)</span> 做低秩投影（<code>q_a_proj</code>，<span class="arithmatex">\(6144\to 2048\)</span>）得到 <span class="arithmatex">\(\mathbf{c}^{Q}\in\mathbb{R}^{B\times 5N\times 2048}\)</span>，经 RMSNorm（<code>q_a_layernorm</code>）再展开（<code>q_b_proj</code>）为 <span class="arithmatex">\(n_h\)</span> 组 <span class="arithmatex">\((d_c,d_r)\)</span>，即 <span class="arithmatex">\(\{q^{C}\}\)</span> 与 <span class="arithmatex">\(\{q^{R}\}\)</span>，其中 <span class="arithmatex">\(n_h=64\)</span>，<span class="arithmatex">\(d_c=192\)</span>，<span class="arithmatex">\(d_r=64\)</span>。<span class="arithmatex">\(q^{R}\)</span> 先做 RoPE，再与 <span class="arithmatex">\(q^{C}\)</span> 拼成 <span class="arithmatex">\(\{[q^{C};q^{R}]\}\in\mathbb{R}^{B\times n_h\times 5N\times(d_c+d_r)}\)</span>。</p>
+<p>Key/Value 的输入为拼接 <span class="arithmatex">\([\mathbf{H}^{\mathrm{ctx}};\mathbf{h}]\in\mathbb{R}^{B\times(S+5N)\times 6144}\)</span>；每一层对该拼接重新投影。低秩投影（<code>kv_a_proj_with_mqa</code>）得到 <span class="arithmatex">\(\mathbf{c}^{KV}\in\mathbb{R}^{B\times(S+5N)\times 512}\)</span> 与 <span class="arithmatex">\(k^{R}\in\mathbb{R}^{B\times(S+5N)\times 64}\)</span>。</p>
+<p><span class="arithmatex">\(\mathbf{c}^{KV}\)</span> 经 RMSNorm（<code>kv_a_layernorm</code>）再展开（<code>kv_b_proj</code>）为 <span class="arithmatex">\(n_h\)</span> 组 <span class="arithmatex">\((d_c,d_v)\)</span>，即 <span class="arithmatex">\(\{k^{C}\}\)</span> 与 <span class="arithmatex">\(\{v\}\)</span>，<span class="arithmatex">\(d_v=256\)</span>。<span class="arithmatex">\(k^{R}\)</span> 不经该展开，先做 RoPE，再复制到 <span class="arithmatex">\(n_h\)</span>，与 <span class="arithmatex">\(\{k^{C}\}\)</span> 拼成 <span class="arithmatex">\(\{[k^{C};k^{R}]\}\in\mathbb{R}^{B\times n_h\times(S+5N)\times(d_c+d_r)}\)</span>。</p>
+<p>缩放系数为 <span class="arithmatex">\((d_c+d_r)^{-1/2}\)</span>。注意力按第 3 节的掩码 <span class="arithmatex">\(M\)</span> 计算，经投影（<code>o_proj</code>，<span class="arithmatex">\(n_h d_v\to 6144\)</span>）加回残差。</p>
+<p><strong>RoPE.</strong> 只旋转 <span class="arithmatex">\(d_r=64\)</span> 的 rope 切片，nope 切片不旋转。旋转为 GLM-5.2 的 interleaved 相邻对（<code>rope_interleave=true</code>）。角度由第 2 节已构造的 <code>position_ids</code> 查询：Query 用后 <span class="arithmatex">\(5N\)</span> 个位置 <span class="arithmatex">\(A,\ldots,A+4\)</span>；Key 用整段，context 为 <span class="arithmatex">\(0,\ldots,S-1\)</span>，draft 与 Query 同号。</p>
+<p><strong>FFN.</strong> 更新后的 draft hidden 再经 RMSNorm（<code>post_attention_layernorm</code>）与 dense SwiGLU（<code>intermediate_size=12288</code>，激活 <code>silu</code>），残差相加。最后一层额外 RMSNorm，得到 <span class="arithmatex">\(\mathbf{H}^{(L)}\in\mathbb{R}^{B\times 5N\times 6144}\)</span>。</p>
+<h3 id="5">5. 输出头</h3>
+<p>第 4 节得到 <span class="arithmatex">\(\mathbf{H}^{(L)}\in\mathbb{R}^{B\times 5N\times 6144}\)</span>。词表 logits 先过冻结的 Target <code>lm_head</code>，再加上最后一层（<code>mtp.2</code>）的 Markov 偏置。Confidence 是并行的标量头。</p>
+<p><strong>LM head.</strong> 冻结的 Target <code>lm_head</code>（<span class="arithmatex">\(6144\to V\)</span>，<span class="arithmatex">\(V=154880\)</span>）作用在 <span class="arithmatex">\(\mathbf{H}^{(L)}\)</span> 上，得到 <span class="arithmatex">\(\mathbf{L}^{\mathrm{base}}\)</span>。该矩阵从 Target checkpoint 载入，训练中不更新；teacher 用同一份矩阵作用在 <span class="arithmatex">\(z_{A+k}\)</span> 上，见第 6 节。</p>
+<p><strong>Markov head.</strong> 前驱 <span class="arithmatex">\(\mathrm{prev}=(x_A,x_{A+1},x_{A+2},x_{A+3},x_{A+4})\)</span>：第 0 位是 anchor，第 1–4 位是 gold token（teacher forcing）。Vanilla Markov（<code>markov_rank=256</code>）先把 prev 嵌入到 <span class="arithmatex">\(r=256\)</span>（<code>markov_w1</code>），再线性映回词表（<code>markov_w2</code>，无偏置），得到 <span class="arithmatex">\(\mathbf{B}(\mathrm{prev})\)</span>。Draft logits 为</p>
+<div class="arithmatex">\[
+\mathbf{L}=\mathbf{L}^{\mathrm{base}}+\mathbf{B}(\mathrm{prev}).
+\]</div>
+<p><span class="arithmatex">\(\mathbf{B}\)</span> 只由 prev 决定，不读 <span class="arithmatex">\(\mathbf{H}^{(L)}\)</span>。</p>
+<p><strong>Confidence head.</strong> 将 <span class="arithmatex">\(\mathbf{H}^{(L)}\)</span> 与 prev 的 Markov 嵌入在最后一维拼接（宽度 <span class="arithmatex">\(6144+256\)</span>），经无偏置线性层（<code>AcceptRatePredictor</code>）得到每个 draft 位置一个标量。监督见第 6 节。</p>
+<h3 id="6">6. 训练目标</h3>
+<p><strong>Label.</strong> 每个 anchor <span class="arithmatex">\(A\)</span> 对应长度为 <code>block_size=5</code> 的监督，与第 2 节 draft block 错开一位：</p>
+<div class="arithmatex">\[
+y_k = x_{A+k+1},\qquad k=0,1,2,3,4
+\]</div>
+<p>即 <span class="arithmatex">\(\mathbf{y}=(x_{A+1},\ldots,x_{A+5})\)</span>。第 <span class="arithmatex">\(k\)</span> 步要预测的是 <span class="arithmatex">\(y_k\)</span>。</p>
+<p><strong>Alignment.</strong> 第 <span class="arithmatex">\(k\)</span> 步 Draft 用第 5 节 <span class="arithmatex">\(\mathbf{L}\)</span> 的第 <span class="arithmatex">\(k\)</span> 个切片，记 <span class="arithmatex">\(\mathbf{L}_k\)</span>。Teacher 用同一份冻结 <code>lm_head</code> 作用在 <span class="arithmatex">\(z_{A+k}\)</span> 上，记 <span class="arithmatex">\(\mathbf{T}_k=\mathrm{lm\_head}(z_{A+k})\)</span>：Target 在看见 <span class="arithmatex">\(x_{A+k}\)</span> 之后预测下一个 token。</p>
+<p><strong>eval_mask.</strong> <span class="arithmatex">\(A\)</span> 的入选只要求 <code>loss_mask[A]</code> 与 <code>loss_mask[A+1]</code> 为 1，且 <span class="arithmatex">\(A\le S-2\)</span>。读入时将 <code>loss_mask[S-1]</code> 置 0，因此 <span class="arithmatex">\(x_{S-1}\)</span> 既不能当 anchor，也不能当 <span class="arithmatex">\(y_0\)</span>。第 <span class="arithmatex">\(k\)</span> 步计入损失须同时满足 <span class="arithmatex">\(A+k+1&lt;S\)</span>、<code>loss_mask[A+k+1]=1</code>、该 block 的 <code>block_keep_mask=1</code>。沿 block 做前缀 <code>cumprod</code>：某步一旦关掉，其后各步也关掉。</p>
+<p><strong>CE.</strong> <span class="arithmatex">\(\mathbf{L}_k\)</span> 对 <span class="arithmatex">\(y_k\)</span> 做交叉熵。系数 <code>dspark_ce_loss_alpha=1</code>。</p>
+<p><strong>L1.</strong> <span class="arithmatex">\(\mathrm{L1}_k=\lVert\mathrm{softmax}(\mathbf{L}_k)-\mathrm{softmax}(\mathbf{T}_k)\rVert_1\)</span>。系数 <code>dspark_l1_loss_alpha=0.9</code>。</p>
+<p><strong>Confidence.</strong> 目标由该 L1 停梯度得到：</p>
+<div class="arithmatex">\[
+a_k=\mathrm{clip}\!\left(1-\tfrac12\,\mathrm{L1}_k,\,0,1\right).
+\]</div>
+<p>第 5 节的标量对 <span class="arithmatex">\(a_k\)</span> 做 BCE-with-logits。系数 <code>dspark_confidence_head_alpha=1</code>。</p>
+<p>三项均按 <code>eval_mask</code> 逐步求和再平均，加权和为总损失。Recipe 为 <code>dspark_loss_mode=original</code>。</p>
+<h2 id="_3">附录</h2>
+<h3 id="a">A.训练数据准备</h3>
+<h4 id="option-1-megatron">Option 1: Megatron 方式</h4>
+<p>每条 <code>(role, content)</code> conversation 经 chat template tokenize 后视为一条 sequence。将打乱后的 sequence 展成一维 token 流，按固定长度 <span class="arithmatex">\(L\)</span>（如 4096）切 sample：从当前 sequence 偏移处取 token，剩余长度不足时继续取后续 sequence，直到凑满 <span class="arithmatex">\(L+1\)</span>。多取 1 个 token，使输入与 label 错位同长为 <span class="arithmatex">\(L\)</span>（<span class="arithmatex">\(\mathrm{tokens}=x_{0:L}\)</span>，<span class="arithmatex">\(\mathrm{labels}=x_{1:L+1}\)</span>）。超长 sequence 按切点拆到多个 sample。epoch 末不足一个完整 sample 的尾段丢弃。</p>
+<p>sequence 边界在预处理写入：每条 sequence 末尾追加 tokenizer EOS。拼装后形如：</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>[seq A][EOS][seq B][EOS][seq C ...]
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a> |------- sample i (4096+1) -------|---- sample i+1 ----
+</span></code></pre></div>
+<p>拼 4k 时按 token id 直接相接。EOS 已写在每条 sequence 末尾，训练时当作普通 token：该位置要被预测，随后 token 的 position 接着编号（整条 sample 为 <span class="arithmatex">\(0,\ldots,L-1\)</span>），也可以 attend 到 EOS 之前的 sequence。</p>
+<pre hidden>
+#### Megatron 代码证据
+
+跨 sequence 补齐到 $L+1$，尾段按整除丢弃（源码标识符为 `document_*`）：
+
+<div class="language-cpp highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1">// megatron/core/datasets/helpers.cpp :: build_sample_idx</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="n">num_samples</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">num_epochs</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">tokens_per_epoch</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">add_extra_token_to_sequence</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">seq_length</span><span class="p">;</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="n">remaining_seq_length</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">seq_length</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">add_extra_token_to_sequence</span><span class="p">;</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="c1">// remaining &gt; 0：++document_idx_index, doc_offset = 0  → 下一条 sequence</span>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="c1">// remaining &lt;= 0：在当前 sequence 内推进 doc_offset，结束本 sample</span>
+</span></code></pre></div>
+
+读样本时按 `sample_index` 跨 sequence 拼接，仅在仍不足 $L+1$ 时 pad：
+
+<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># megatron/core/datasets/gpt_dataset.py :: _query_document_sample_shuffle_indices</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">doc_index_beg</span><span class="p">,</span> <span class="n">doc_index_end</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>    <span class="n">sample_parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">document_index</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">offset</span><span class="o">=...</span><span class="p">,</span> <span class="n">length</span><span class="o">=...</span><span class="p">))</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="c1"># length &lt; sequence_length + add_extra_token_to_sequence 时补 pad</span>
+</span></code></pre></div>
+
+多取 1 token，切成同长的 `tokens` / `labels`：
+
+<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># megatron/core/datasets/gpt_dataset.py</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="c1"># GPTDatasetConfig.add_extra_token_to_sequence = True</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="n">tokens</span> <span class="o">=</span> <span class="n">text</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="n">labels</span> <span class="o">=</span> <span class="n">text</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+</span></code></pre></div>
+
+预处理写入 EOS。Megatron API 将该 id 命名为 `eod`，与 `eos_id` 同值：
+
+<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># tools/preprocess_data.py  --append-eod</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="n">doc_ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Encoder</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">eod</span><span class="p">)</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="c1"># megatron/core/tokenizers/text/libraries/huggingface_tokenizer.py</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="k">def</span><span class="w"> </span><span class="nf">eod</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokens_to_ids</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">eos_token</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+</span></code></pre></div>
+
+上述默认对应 pretrain recipe 三个 `False`。任一改为 `True` 时：`reset_position_ids` 使 EOS 后 position 从 0 重计，`reset_attention_mask` 使 EOS 后看不见前一条 sequence，`eod_mask_loss` 使 EOS 不进 loss。
+
+<div class="language-python highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1"># src/megatron/bridge/recipes/utils/dataset_utils.py</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="n">GPTDatasetConfig</span><span class="p">(</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>    <span class="n">reset_attention_mask</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>    <span class="n">reset_position_ids</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>    <span class="n">eod_mask_loss</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="p">)</span>
+</span></code></pre></div>
+</pre>
+
+<h4 id="option-2-response">Option 2: 存Response部分</h4>
+<p>对完整序列做一次 target 前向，再按 <code>loss_mask</code> 上的监督段裁出保存窗口。令 <code>response_start</code> 为 mask 中 1 的最小下标，<code>response_end</code> 为最大下标加一；保存区间为 <code>[save_start, response_end)</code>，长度 <code>S = response_end - save_start</code>，其中 <code>save_start = max(response_start - C, 0)</code>，<code>C = 128</code> 为 <code>response_context_tokens</code>。监督段从 <code>&lt;|assistant|&gt;</code> 之后开始，包含 <code>&lt;think&gt;</code>。下图以 <code>C = 128</code>、监督段长度 512 示意：</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>save_start                          response_start              response_end
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>     |-------- C tokens -----------||---------- 512 tokens ----------|
+</span></code></pre></div>
+<p>ckpt 中四路序列长度均为 <span class="arithmatex">\(S\)</span>，下标 <span class="arithmatex">\(0,\ldots,S-1\)</span> 与该窗口逐位对齐。窗口内监督段从下标 <code>response_start - save_start</code> 开始（上图为 <code>C</code>）。</p>
+<table>
+<thead>
+<tr>
+<th>张量</th>
+<th>形状</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>input_ids</code></td>
+<td><span class="arithmatex">\([S]\)</span></td>
+<td>窗口内 token id</td>
+</tr>
+<tr>
+<td><code>loss_mask</code></td>
+<td><span class="arithmatex">\([S]\)</span></td>
+<td>从窗口内监督段起点到末尾为 1，左侧 context 为 0</td>
+</tr>
+<tr>
+<td><code>aux_hidden_state</code></td>
+<td><span class="arithmatex">\([S, 18432]\)</span></td>
+<td>layer 75、76、77 做完后、下一层 <code>input_layernorm</code> 之前的 hidden state，沿特征维拼接</td>
+</tr>
+<tr>
+<td><code>hidden_state</code></td>
+<td><span class="arithmatex">\([S, 6144]\)</span></td>
+<td>全部 78 层之后、final RMSNorm 的输出（<code>lm_head</code> 的输入）。aux 最后一路是 layer 77 输出、尚未 RMSNorm</td>
+</tr>
+</tbody>
+</table>
+<p>读入时额外把 <code>loss_mask</code> 的最后一个位置写成 0：DSpark 的 label 是 <code>input_ids[A+1]</code>，窗口末 token 不再作为预测目标，也不能再当 anchor。进入训练 batch 后，<code>aux_hidden_state</code> 改名为 <code>hidden_states</code>（draft context），<code>hidden_state</code> 改名为 <code>target_last_hidden_states</code>（teacher logits）。</p>
+<p><a id="appendix-attention-backend"></a></p>
+<h3 id="attention">Attention 实现</h3>
+<p>第 3 节给出布尔掩码 <span class="arithmatex">\(M\in\{0,1\}^{5N\times(S+5N)}\)</span>。<span class="arithmatex">\(Q\)</span> 仅含 <span class="arithmatex">\(5N\)</span> 个 draft 位置，<span class="arithmatex">\(K,V\)</span> 对应长度为 <span class="arithmatex">\(S+5N\)</span> 的拼接序列。对合法 block 中每个 query，<span class="arithmatex">\(M\)</span> 在 context 段的非零至多 <span class="arithmatex">\(W-1\)</span> 个（列下标落在 <span class="arithmatex">\([A-W+1,A)\)</span>），在 draft 段的非零仅位于本 block 的 <code>block_size</code> 列；padding block 对应行全为 0。<code>training.attention_backend</code> 不改变 <span class="arithmatex">\(M\)</span>，只选择其表示以及缩放点积注意力的实现。注意力为</p>
+<div class="arithmatex">\[
+\mathrm{softmax}\!\left(\frac{QK^\top}{\sqrt{d}}+\Lambda(M)\right)V,
+\]</div>
+<p>其中 <span class="arithmatex">\(\Lambda(M)\)</span> 在 <span class="arithmatex">\(M=1\)</span> 处为 0，在 <span class="arithmatex">\(M=0\)</span> 处为 <span class="arithmatex">\(-\infty\)</span>。</p>
+<p><code>flex_attention</code> 为 GPU 默认。<code>create_dflash_block_mask</code> 将第 3 节的判定写成 FlexAttention 谓词 <span class="arithmatex">\(m(b,h,q,kv)\in\{0,1\}\)</span>，再编译为 <code>BlockMask</code>：按块记录非零结构，全零块不参与 <span class="arithmatex">\(QK^\top\)</span>。</p>
+<p><code>eager</code> 与 <code>sdpa</code> 由 <code>create_dflash_sdpa_mask</code> 将 <span class="arithmatex">\(M\)</span> 物化为稠密布尔张量，形状 <span class="arithmatex">\([B,1,5N,S+5N]\)</span>。随后 <code>Glm52DSparkAttention._dense_attention</code> 以显式矩阵乘与 softmax 计算上式。在 GLM-5.2 DSpark 中，这两个配置名均进入该实现。Ascend NPU 未提供 FlexAttention，训练配置取 <code>eager</code>。</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": [], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}, "version": null}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+        <script src="../../../javascripts/mathjax.js"></script>
+      
+        <script src="../../../javascripts/cjk-spacing.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+      
+        <script src="../../../javascripts/mermaid.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>

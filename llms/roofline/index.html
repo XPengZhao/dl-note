@@ -1,0 +1,1537 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://XPengZhao.github.io/dl-note/llms/roofline/">
+      
+      
+        <link rel="prev" href="../metrics/">
+      
+      
+        <link rel="next" href="../data-movement/">
+      
+      
+        
+          <link rel="alternate" href="./" hreflang="en">
+        
+          <link rel="alternate" href="../../zh/llms/roofline/" hreflang="zh">
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Roofline Model - DL Notes</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../stylesheets/bootstrap.min.css">
+    
+      <link rel="stylesheet" href="../../stylesheets/basic.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#roofline-model-for-inference" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="DL Notes" class="md-header__button md-logo" aria-label="DL Notes" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            DL Notes
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Roofline Model
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+      <div class="md-header__option">
+  <div class="md-select">
+    
+    <button class="md-header__button md-icon" aria-label="Select language">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12.87 15.07-2.54-2.51.03-.03A17.5 17.5 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2zm-2.62 7 1.62-4.33L19.12 17z"/></svg>
+    </button>
+    <div class="md-select__inner">
+      <ul class="md-select__list">
+        
+          <li class="md-select__item">
+            <a href="./" hreflang="en" class="md-select__link">
+              English
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="../../zh/llms/roofline/" hreflang="zh" class="md-select__link">
+              简体中文
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="DL Notes" class="md-nav__button md-logo" aria-label="DL Notes" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    DL Notes
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hardware/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hardware
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tensor/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tensor Operation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../neural-graphics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Neural Graphics
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AI Infra
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    AI Infra
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../request-lifecycle/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Request Lifecycle
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../metrics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Metrics
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Roofline Model
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Roofline Model
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#why-roofline-matters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why Roofline Matters
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-basic-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The Basic Model
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="The Basic Model">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#memory-bound-regime" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Memory-Bound Regime
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#compute-bound-regime" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Compute-Bound Regime
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#arithmetic-intensity" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Arithmetic Intensity
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#mapping-roofline-to-inference" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Mapping Roofline to Inference
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Mapping Roofline to Inference">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#prefill" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prefill
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#decode" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Decode
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-roofline-explains-and-what-it-does-not" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What Roofline Explains and What It Does Not
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#reading-common-inference-optimizations-through-roofline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reading Common Inference Optimizations Through Roofline
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Reading Common Inference Optimizations Through Roofline">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#kv-cache-and-memory-traffic" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        KV Cache and Memory Traffic
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#batching-and-wider-execution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Batching and Wider Execution
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#quantization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quantization
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#speculative-decoding" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Speculative Decoding
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#beyond-single-device-roofline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Beyond Single-Device Roofline
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#practical-questions-to-ask" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Practical Questions to Ask
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#related" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Related
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../data-movement/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Data Movement and Communication
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../kv-cache/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    KV Cache
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../serving-runtime/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Serving Runtime
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../parallelism/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Parallelism
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../decoding/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Decoding
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../training-objective/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Training Objective
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Models
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Models
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../position-encoding/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Position Encoding
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Model Notes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../glm-5.2-inference-path/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GLM-5.2 Inference Path
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../glm-5.2-dspark-design.md" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GLM-5.2 DSpark Design
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#why-roofline-matters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why Roofline Matters
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-basic-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The Basic Model
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="The Basic Model">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#memory-bound-regime" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Memory-Bound Regime
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#compute-bound-regime" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Compute-Bound Regime
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#arithmetic-intensity" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Arithmetic Intensity
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#mapping-roofline-to-inference" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Mapping Roofline to Inference
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Mapping Roofline to Inference">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#prefill" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prefill
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#decode" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Decode
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-roofline-explains-and-what-it-does-not" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What Roofline Explains and What It Does Not
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#reading-common-inference-optimizations-through-roofline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reading Common Inference Optimizations Through Roofline
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Reading Common Inference Optimizations Through Roofline">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#kv-cache-and-memory-traffic" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        KV Cache and Memory Traffic
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#batching-and-wider-execution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Batching and Wider Execution
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#quantization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quantization
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#speculative-decoding" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Speculative Decoding
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#beyond-single-device-roofline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Beyond Single-Device Roofline
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#practical-questions-to-ask" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Practical Questions to Ask
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#related" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Related
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="roofline-model-for-inference">Roofline Model for Inference</h1>
+<p>Latency and throughput metrics tell us what users observe, but they do not by themselves explain why a serving configuration stops improving. A system may show high TPOT, low TPS, or weak scaling under larger batch sizes, yet those symptoms still leave one core question unresolved: is the workload limited mainly by compute or by data movement? The roofline model is a compact way to answer that question.</p>
+<p>For inference, this matters because not all stages stress hardware in the same way. Prefill and decode can run on the same model and the same GPU while sitting in very different performance regimes. Many practical optimizations, including batching, KV compression, quantization, and speculative decoding, are best understood as attempts to move the workload away from one limiting roof and toward a higher one.</p>
+<h2 id="why-roofline-matters">Why Roofline Matters</h2>
+<p>When people say an inference optimization "improves utilization," the statement is often incomplete. Utilization can improve for different reasons:</p>
+<ul>
+<li>the workload performs more math per byte moved</li>
+<li>the workload moves fewer bytes for the same mathematical result</li>
+<li>fixed runtime overhead is amortized over a wider step</li>
+<li>the original bottleneck is removed and a different one becomes dominant</li>
+</ul>
+<p>The roofline model gives a common language for separating these cases. It does not replace request-level analysis, scheduler analysis, or communication analysis. It provides a first-principles upper-bound view of device-side performance.</p>
+<h2 id="the-basic-model">The Basic Model</h2>
+<p>The classical roofline model relates achieved performance to two hardware limits:</p>
+<ul>
+<li>peak compute throughput</li>
+<li>peak memory bandwidth</li>
+</ul>
+<p>Let:</p>
+<ul>
+<li><span class="arithmatex">\(P\)</span> be achieved performance in FLOPs/s</li>
+<li><span class="arithmatex">\(P_{\max}\)</span> be peak compute throughput</li>
+<li><span class="arithmatex">\(B_{\max}\)</span> be peak memory bandwidth in bytes/s</li>
+<li><span class="arithmatex">\(I\)</span> be arithmetic intensity in FLOPs per byte moved</li>
+</ul>
+<p>Then the attainable performance is bounded by:</p>
+<div class="arithmatex">\[
+P \le \min \left(P_{\max},\; I \cdot B_{\max}\right)
+\]</div>
+<p>This expression separates two regimes.</p>
+<h3 id="memory-bound-regime">Memory-Bound Regime</h3>
+<p>When arithmetic intensity <span class="arithmatex">\(I\)</span> is small, the product <span class="arithmatex">\(I \cdot B_{\max}\)</span> stays below peak compute. In this region, performance is limited mainly by how fast data can be moved:</p>
+<div class="arithmatex">\[
+P \approx I \cdot B_{\max}
+\]</div>
+<p>Increasing raw compute capability alone does not help much here unless bandwidth or arithmetic intensity also improves.</p>
+<h3 id="compute-bound-regime">Compute-Bound Regime</h3>
+<p>When arithmetic intensity is high enough, the bandwidth-derived ceiling rises above peak compute:</p>
+<div class="arithmatex">\[
+I \cdot B_{\max} \ge P_{\max}
+\]</div>
+<p>The workload then approaches the compute roof:</p>
+<div class="arithmatex">\[
+P \approx P_{\max}
+\]</div>
+<p>In this region, performance gains come mainly from improving kernel efficiency, tensor-core utilization, or parallel execution quality rather than from reducing memory traffic alone.</p>
+<h2 id="arithmetic-intensity">Arithmetic Intensity</h2>
+<p>Arithmetic intensity is the bridge between workload structure and hardware limits:</p>
+<div class="arithmatex">\[
+I = \frac{\text{FLOPs}}{\text{Bytes moved}}
+\]</div>
+<p>The point is not to compute this value with perfect precision for every kernel. The point is to reason about whether a workload performs a large amount of math relative to the memory it must read and write.</p>
+<p>A workload with low arithmetic intensity tends to:</p>
+<ul>
+<li>spend much of its time waiting on memory traffic</li>
+<li>show limited gains from higher peak FLOPs alone</li>
+<li>benefit from techniques that reduce bytes moved or improve reuse</li>
+</ul>
+<p>A workload with high arithmetic intensity tends to:</p>
+<ul>
+<li>make better use of tensor cores or SIMD units</li>
+<li>benefit more directly from better kernels and more available compute</li>
+<li>flatten less quickly when the batch or step width increases</li>
+</ul>
+<h2 id="mapping-roofline-to-inference">Mapping Roofline to Inference</h2>
+<p>The main value of roofline in AI Infra is not the abstract diagram. The main value is that it explains why different inference stages behave differently.</p>
+<h3 id="prefill">Prefill</h3>
+<p>Prefill processes the prompt in bulk. Sequence length is large, matrix shapes are wider, and the hardware usually has more parallel work available in one pass. As a result, prefill is often closer to the compute-bound side than decode, especially when prompt length or batch size is substantial.</p>
+<p>This does not mean prefill is always compute-bound. Under small batches, multimodal preprocessing overhead, or distributed communication pressure, other ceilings can dominate. The safer statement is that prefill is usually more compute-favorable than decode.</p>
+<h3 id="decode">Decode</h3>
+<p>Decode runs one autoregressive step at a time. Each step is narrow, latency-sensitive, and repeatedly touches KV state accumulated from all previous tokens. In practical serving, decode is therefore much more likely to fall into a memory-bound or overhead-dominated regime.</p>
+<p>This is why online serving often feels counterintuitive: the mathematically smaller phase can become the operational bottleneck. Decode may perform less total work per step than prefill, yet achieve worse hardware efficiency because the work is too narrow and too sequential to fully utilize the device.</p>
+<h2 id="what-roofline-explains-and-what-it-does-not">What Roofline Explains and What It Does Not</h2>
+<p>Roofline is useful, but it is not the whole serving story.</p>
+<p>It explains well:</p>
+<ul>
+<li>whether a device-side workload is primarily constrained by compute or by memory traffic</li>
+<li>why wider batch shapes often improve performance</li>
+<li>why some optimizations help more in decode than in prefill</li>
+<li>why reducing bytes moved can matter as much as reducing FLOPs</li>
+</ul>
+<p>It does not fully explain:</p>
+<ul>
+<li>request queueing and scheduler delay</li>
+<li>prefix-routing fragmentation across replicas</li>
+<li>host-device synchronization overhead outside the kernel view</li>
+<li>inter-GPU communication ceilings in distributed execution</li>
+<li>application-layer fan-out and orchestration overhead</li>
+</ul>
+<p>So the right way to use roofline is as a local performance model within a larger request lifecycle, not as a substitute for the lifecycle itself.</p>
+<h2 id="reading-common-inference-optimizations-through-roofline">Reading Common Inference Optimizations Through Roofline</h2>
+<p>Once the roofline view is in place, many optimizations become easier to classify.</p>
+<h3 id="kv-cache-and-memory-traffic">KV Cache and Memory Traffic</h3>
+<p>Decode often reads large amounts of cached attention state relative to the amount of new computation introduced by one token step. That pushes arithmetic intensity downward. Techniques such as KV quantization, better cache layout, or more efficient block reuse matter because they reduce memory pressure or improve effective reuse in a regime that is already close to a bandwidth ceiling.</p>
+<h3 id="batching-and-wider-execution">Batching and Wider Execution</h3>
+<p>Larger effective batches usually improve utilization because they make kernels wider and amortize fixed overhead. In roofline terms, batching can move a workload toward a more compute-favorable regime by improving reuse and making the achieved performance point climb closer to the upper envelope.</p>
+<p>The same logic also explains why batching eventually shows diminishing returns. Once the workload is already near the relevant roof, further widening helps less.</p>
+<h3 id="quantization">Quantization</h3>
+<p>Quantization is sometimes described as a compute optimization and sometimes as a memory optimization. In inference, it is often both, but the dominant benefit depends on the original bottleneck. If the workload is memory-bound, smaller activations, weights, or KV tensors can reduce bandwidth pressure and capacity pressure. If the workload is already close to the compute roof, the realized gain may be much smaller unless the lower-precision kernels also increase achieved compute throughput.</p>
+<h3 id="speculative-decoding">Speculative Decoding</h3>
+<p>Speculative decoding is best understood as a change in target-model work granularity. In ordinary autoregressive decode, the target model performs many narrow sequential steps. In speculative decoding, the target model verifies multiple proposed tokens in a wider step.</p>
+<p>This can help for two related reasons:</p>
+<ul>
+<li>fixed overhead is amortized over more useful work</li>
+<li>the wider verification step often uses the hardware more efficiently than many isolated narrow steps</li>
+</ul>
+<p>That does not mean speculative decoding should be reduced to a single phrase such as "it increases arithmetic intensity." A more accurate statement is that it reduces the number of expensive target-side sequential steps and may improve target-side utilization if the baseline decode path is underfilled. The gain shrinks when the baseline serving batch is already large and the target path is already close to its effective roof.</p>
+<h2 id="beyond-single-device-roofline">Beyond Single-Device Roofline</h2>
+<p>The classical roofline model is most natural for one device or one kernel family. Real inference systems often hit additional ceilings above that level.</p>
+<p>In distributed or MoE serving, achieved throughput may be bounded not only by HBM bandwidth and on-device compute, but also by:</p>
+<ul>
+<li>all-reduce or all-to-all bandwidth</li>
+<li>collective start-up latency</li>
+<li>pipeline bubbles</li>
+<li>scheduler-level admission and preemption behavior</li>
+</ul>
+<p>For that reason, roofline should be introduced as the first useful ceiling model, not the final one. It tells us whether the local computation is bandwidth-limited or compute-limited. Then the broader system analysis asks whether communication, runtime policy, or workload shaping imposes an even lower ceiling.</p>
+<h2 id="practical-questions-to-ask">Practical Questions to Ask</h2>
+<p>When an inference optimization claims to improve performance, a roofline-oriented reading starts with four questions:</p>
+<ol>
+<li>Does it reduce FLOPs, reduce bytes moved, or mainly amortize fixed overhead?</li>
+<li>Does it help prefill, decode, or both?</li>
+<li>Is the baseline workload memory-bound, compute-bound, or dominated by a higher-level system ceiling?</li>
+<li>Does the optimization remove the current bottleneck, or merely shift the bottleneck elsewhere?</li>
+</ol>
+<p>Those questions are often more useful than asking whether a technique is "good" in the abstract. A serving optimization is valuable only if it lifts the active ceiling for the workload that actually matters.</p>
+<h2 id="related">Related</h2>
+<ul>
+<li><a href="../metrics/">Metrics</a> defines TTFT, TPOT, and TPS, which describe the user-visible symptoms.</li>
+<li><a href="../kv-cache/">KV Cache</a> explains why decode often experiences strong memory pressure.</li>
+<li><a href="../serving-runtime/">Serving Runtime</a> explains scheduler and admission effects that roofline alone does not capture.</li>
+<li><a href="../decoding/">Decoding and Sampling</a> discusses speculative decoding as one concrete example of changing decode-side work shape.</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": [], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+        <script src="../../javascripts/mathjax.js"></script>
+      
+        <script src="../../javascripts/cjk-spacing.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+      
+        <script src="../../javascripts/mermaid.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>

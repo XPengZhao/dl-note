@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xl="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="-32 -14 633 136.50427" width="633" height="136.50427">
+  <defs/>
+  <g id="Canvas_4" stroke="none" stroke-opacity="1" stroke-dasharray="none" fill="none" fill-opacity="1">
+    <title>Canvas 4</title>
+    <rect fill="white" x="-32" y="-14" width="633" height="136.50427"/>
+    <g id="Canvas_4_Layer_1">
+      <title>Layer 1</title>
+      <g id="Group_67">
+        <g id="Group_71">
+          <g id="Graphic_72"/>
+        </g>
+        <g id="Group_68">
+          <g id="Group_69">
+            <g id="Graphic_70">
+              <title>Text</title>
+              <text transform="translate(.65625 .6796875)" fill="#333">
+                <tspan font-family="Helvetica" font-size="16" fill="#333" x="0" y="15" xml:space="preserve">KV</tspan>
+              </text>
+            </g>
+          </g>
+        </g>
+      </g>
+      <g id="Group_61">
+        <g id="Group_65">
+          <g id="Graphic_66">
+            <path d="M 48 -13.5 L 273 -13.5 C 277.14214 -13.5 280.5 -10.142136 280.5 -6 L 280.5 29 C 280.5 33.142136 277.14214 36.5 273 36.5 L 48 36.5 C 43.857864 36.5 40.5 33.142136 40.5 29 L 40.5 -6 C 40.5 -10.142136 43.857864 -13.5 48 -13.5 Z" fill="white"/>
+            <path d="M 48 -13.5 L 273 -13.5 C 277.14214 -13.5 280.5 -10.142136 280.5 -6 L 280.5 29 C 280.5 33.142136 277.14214 36.5 273 36.5 L 48 36.5 C 43.857864 36.5 40.5 33.142136 40.5 29 L 40.5 -6 C 40.5 -10.142136 43.857864 -13.5 48 -13.5 Z" stroke="#bdbdbd" stroke-linecap="butt" stroke-linejoin="round" stroke-width="1"/>
+          </g>
+        </g>
+        <g id="Group_62">
+          <g id="Group_63">
+            <g id="Graphic_64">
+              <title>Text</title>
+              <text transform="translate(114.12549 1.989746)" fill="#333">
+                <tspan font-family="Helvetica" font-weight="bold" font-size="13" fill="#333" x="0" y="13" xml:space="preserve">context 0 .. S-1</tspan>
+              </text>
+            </g>
+          </g>
+        </g>
+      </g>
+      <g id="Group_55">
+        <g id="Group_59">
+          <g id="Graphic_60">
+            <rect x="292.5" y="-13.5" width="120" height="50" fill="#90caf9"/>
+            <rect x="292.5" y="-13.5" width="120" height="50" stroke="#64b5f6" stroke-linecap="butt" stroke-linejoin="round" stroke-width="1"/>
+          </g>
+        </g>
+        <g id="Group_56">
+          <g id="Group_57">
+            <g id="Graphic_58">
+              <title>Text</title>
+              <text transform="translate(332.5205 .4897461)" fill="#1a1a1a">
+                <tspan font-family="Helvetica" font-weight="bold" font-size="13" fill="#1a1a1a" x="0" y="13" xml:space="preserve">block</tspan>
+                <tspan font-family="Helvetica" font-weight="bold" font-size="9" fill="#1a1a1a" y="17" xml:space="preserve">0</tspan>
+              </text>
+            </g>
+          </g>
+        </g>
+      </g>
+      <g id="Group_49">
+        <g id="Group_53">
+          <g id="Graphic_54"/>
+        </g>
+        <g id="Group_50">
+          <g id="Group_51">
+            <g id="Graphic_52">
+              <title>Text</title>
+              <text transform="translate(427 -1.8603516)" fill="#333">
+                <tspan font-family="Helvetica" font-size="18" fill="#333" x="0" y="18" xml:space="preserve">…</tspan>
+              </text>
+            </g>
+          </g>
+        </g>
+      </g>
+      <g id="Group_43">
+        <g id="Group_47">
+          <g id="Graphic_48">
+            <rect x="460.5" y="-13.5" width="140" height="50" fill="#90caf9"/>
+            <rect x="460.5" y="-13.5" width="140" height="50" stroke="#64b5f6" stroke-linecap="butt" stroke-linejoin="round" stroke-width="1"/>
+          </g>
+        </g>
+        <g id="Group_44">
+          <g id="Group_45">
+            <g id="Graphic_46">
+              <title>Text</title>
+              <text transform="translate(505.7722 .4897461)" fill="#1a1a1a">
+                <tspan font-family="Helvetica" font-weight="bold" font-size="13" fill="#1a1a1a" x="0" y="13" xml:space="preserve">block</tspan>
+                <tspan font-family="Helvetica" font-weight="bold" font-size="9" fill="#1a1a1a" y="17" xml:space="preserve">N-1</tspan>
+              </text>
+            </g>
+          </g>
+        </g>
+      </g>
+      <g id="Group_37">
+        <g id="Group_41">
+          <g id="Graphic_42"/>
+        </g>
+        <g id="Group_38">
+          <g id="Group_39">
+            <g id="Graphic_40">
+              <title>Text</title>
+              <text transform="translate(149.99707 45.529785)" fill="#9e9e9e">
+                <tspan font-family="Helvetica" font-weight="bold" font-size="11" fill="#9e9e9e" x="0" y="10" xml:space="preserve">H</tspan>
+                <tspan font-family="Helvetica" font-weight="bold" font-size="7" fill="#9e9e9e" y="6" xml:space="preserve">aux</tspan>
+              </text>
+            </g>
+          </g>
+        </g>
+      </g>
+      <g id="Group_31">
+        <g id="Group_35">
+          <g id="Graphic_36"/>
+        </g>
+        <g id="Group_32">
+          <g id="Group_33">
+            <g id="Graphic_34">
+              <title>Text</title>
+              <text transform="translate(399.24194 45.529785)" fill="#64b5f6">
+                <tspan font-family="Helvetica" font-weight="bold" font-size="11" fill="#64b5f6" x="0" y="10" xml:space="preserve">noise_embedding</tspan>
+              </text>
+            </g>
+          </g>
+        </g>
+      </g>
+      <g id="Group_25">
+        <g id="Group_29">
+          <g id="Graphic_30"/>
+        </g>
+        <g id="Group_26">
+          <g id="Group_27">
+            <g id="Graphic_28">
+              <title>Text</title>
+              <text transform="translate(9.554688 86.18396)" fill="#333">
+                <tspan font-family="Helvetica" font-size="16" fill="#333" x="0" y="15" xml:space="preserve">Q</tspan>
+              </text>
+            </g>
+          </g>
+        </g>
+      </g>
+      <g id="Group_19">
+        <g id="Group_23">
+          <g id="Graphic_24">
+            <rect x="292.5" y="72.00427" width="120" height="50" fill="#90caf9"/>
+            <rect x="292.5" y="72.00427" width="120" height="50" stroke="#64b5f6" stroke-linecap="butt" stroke-linejoin="round" stroke-width="1"/>
+          </g>
+        </g>
+        <g id="Group_20">
+          <g id="Group_21">
+            <g id="Graphic_22">
+              <title>Text</title>
+              <text transform="translate(332.5205 85.99402)" fill="#1a1a1a">
+                <tspan font-family="Helvetica" font-weight="bold" font-size="13" fill="#1a1a1a" x="0" y="13" xml:space="preserve">block</tspan>
+                <tspan font-family="Helvetica" font-weight="bold" font-size="9" fill="#1a1a1a" y="17" xml:space="preserve">0</tspan>
+              </text>
+            </g>
+          </g>
+        </g>
+      </g>
+      <g id="Group_13">
+        <g id="Group_17">
+          <g id="Graphic_18"/>
+        </g>
+        <g id="Group_14">
+          <g id="Group_15">
+            <g id="Graphic_16">
+              <title>Text</title>
+              <text transform="translate(427 83.64392)" fill="#333">
+                <tspan font-family="Helvetica" font-size="18" fill="#333" x="0" y="18" xml:space="preserve">…</tspan>
+              </text>
+            </g>
+          </g>
+        </g>
+      </g>
+      <g id="Group_7">
+        <g id="Group_11">
+          <g id="Graphic_12">
+            <rect x="460.5" y="72.00427" width="140" height="50" fill="#90caf9"/>
+            <rect x="460.5" y="72.00427" width="140" height="50" stroke="#64b5f6" stroke-linecap="butt" stroke-linejoin="round" stroke-width="1"/>
+          </g>
+        </g>
+        <g id="Group_8">
+          <g id="Group_9">
+            <g id="Graphic_10">
+              <title>Text</title>
+              <text transform="translate(505.7722 85.99402)" fill="#1a1a1a">
+                <tspan font-family="Helvetica" font-weight="bold" font-size="13" fill="#1a1a1a" x="0" y="13" xml:space="preserve">block</tspan>
+                <tspan font-family="Helvetica" font-weight="bold" font-size="9" fill="#1a1a1a" y="17" xml:space="preserve">N-1</tspan>
+              </text>
+            </g>
+          </g>
+        </g>
+      </g>
+    </g>
+  </g>
+</svg>
