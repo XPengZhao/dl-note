@@ -265,3 +265,18 @@ ckpt 中四路序列长度均为 $S$，下标 $0,\ldots,S-1$ 与该窗口逐位�
 `eager` 与 `sdpa` 由 `create_dflash_sdpa_mask` 将 \(M\) 物化为稠密布尔张量，形状 \([B,1,5N,S+5N]\)。随后 `Glm52DSparkAttention._dense_attention` 以显式矩阵乘与 softmax 计算上式。在 GLM-5.2 DSpark 中，这两个配置名均进入该实现。Ascend NPU 未提供 FlexAttention，训练配置取 `eager`。
 
 
+
+
+## 后续试验
+
+- Dspark 训练复现
+  - 在 qwen3-4B 复现 Deepseek 论文从头训练效果（数据集/hidden state准备，训练资源估计）
+  - 
+
+- Dspark 结构探索
+    - 分析 n-gram 嵌入dspark训练推理可行性（mask, markov 头嵌入）
+    - 端侧dspark推理方案
+
+- Dspark 数据集rollout和实际推理时采样目标对齐分析
+    - 推理时不同的temperature, 采样与验证策略应该需要什么验证目标
+

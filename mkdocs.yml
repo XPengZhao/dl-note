@@ -37,6 +37,7 @@ plugins:
             Model Notes: 模型笔记
             GLM-5.2 Inference Path: GLM-5.2 推理路径
             GLM-5.2 DSpark Design: GLM-5.2 DSpark 训练设计
+            Qwen3-4B DSpark Ablation: Qwen3-4B DSpark 消融报告
 nav:
   - Home: index.md
   - Hardware: hardware.md
@@ -58,6 +59,7 @@ nav:
       - Model Notes: llms/models.md
       - GLM-5.2 Inference Path: llms/glm-5.2-inference-path.md
       - GLM-5.2 DSpark Design: llms/glm-5.2-dspark-design.md
+      - Qwen3-4B DSpark Ablation: llms/qwen3-4b-dspark-ablation.md
 markdown_extensions:
   - pymdownx.highlight:
       anchor_linenums: true
