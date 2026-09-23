@@ -62,6 +62,12 @@ p:has(+ .arithmatex) {
   margin-block: 1.25em;
 }
 
+.md-typeset p:has(> img),
+.md-typeset div:has(> img) {
+  text-align: center;
+}
+
+.md-typeset p > img,
 .md-typeset div:has(> img) > img {
   display: block;
   margin-inline: auto;
@@ -173,6 +179,21 @@ p:has(+ .arithmatex) {
   border-bottom: none;
   vertical-align: middle;
   text-align: center !important;
+}
+
+.md-typeset .js-sortable-table table:not([class]) td:not(:first-child) {
+  text-align: center !important;
+}
+
+.md-typeset .js-sortable-table table:not([class]) th {
+  cursor: pointer;
+  user-select: none;
+}
+
+.md-typeset .js-sortable-table table:not([class]) th::after {
+  content: none !important;
+  display: none !important;
+  border: 0 !important;
 }
 
 .md-typeset table:not([class]) th a {

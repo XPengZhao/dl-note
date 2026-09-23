@@ -64,11 +64,14 @@ $$
 
 <span class="ablation-sq">\(\blacksquare\)</span>**Full-sequence.** Prompt 与 response 同时作为监督和 anchor 候选。
 
-## 指标总览
+## 结果总览
 
-| **实验** | CE ↓ | 分布 L1 ↓ | Token acc ↑ | τ ↑ | Δτ |
-| --- | ---: | ---: | ---: | ---: | ---: |
+<div class="js-sortable-table" markdown="1">
+
+| **实验** | CE ↓ | L1 ↓ | Acc. ↑ | τ ↑ | Δτ |
+| --- | :---: | :---: | :---: | :---: | :---: |
 | **GQA baseline** | 1.1191 | 0.4550 | 74.35% | 4.9591 | 0.00% |
+| **GQA baseline（2.3 epoch）** | 0.8744 | 0.3721 | — | 5.3611 | +8.11% |
 | **GQA + tau loss** | 1.1260 | 0.4546 | 74.34% | 4.9860 | +0.54% |
 | **MLA** | 1.1402 | 0.4623 | 74.00% | 4.9368 | -0.45% |
 | **MLA + SWA1024** | 1.1571 | 0.4690 | 73.65% | 4.9008 | -1.17% |
@@ -78,141 +81,103 @@ $$
 | **GQA all-mask** | 1.1860 | 0.4780 | 73.51% | 4.8791 | -1.61% |
 | **GQA 三层 aux** | 1.1676 | 0.4735 | 73.36% | 4.8837 | -1.52% |
 
+</div>
+
 
 ## 结果分析
 
 ### Tau loss
 
+添加训练接受长度（\(\tau\)）的目标函数。末段 \(\tau\) 从 4.9591 提高到 4.9860，增加 0.0270，即约 0.54%。与此同时，token accuracy 几乎不变：74.3522% → 74.3407%。CE 也基本不变，而 distribution L1 略有改善。
 
-末段 τ 从 4.9591 提高到 4.9860，增加 0.0270，即约 0.54%。与此同时，token accuracy 几乎不变：74.3522% → 74.3407%。CE 也基本不变，而 distribution L1 略有改善。
+<span class="ablation-sq">\(\blacksquare\)</span>**位置上，收益随 draft depth 增大。** 第 1 个位置接受率约 **+0.045 pp**，第 7 个位置约 **+0.403 pp**。tau loss 几乎不改首 token 的 top-1，主要提高后续位置的接受率。
 
-位置上，收益随 draft depth 增大：
+![末段各位置接受率相对 baseline 的差异](../../assets/images/qwen3-4b-dspark-ablation/tau-loss-position.svg){ width="50%" }
 
-* position 1 overlap：约 **+0.045 pp**
-* position 7 overlap：约 **+0.403 pp**
+<span class="ablation-sq">\(\blacksquare\)</span>**收益也主要出现在训练中后期。** 810–1000 步时，baseline：3.9087，tau loss：3.8614。到 1610–1800 步，baseline：4.7117，tau loss：4.7488。一个可能的原因来自 \(\tau\) 本身的 prefix-product 结构。对较后位置 \(a_i\) 的梯度会乘以前面多个位置的接受率；训练早期各位置预测较弱时，这些乘积较小，因此多步目标对后位置的有效梯度也较弱。随着基础 CE/L1 训练提高前缀接受率，tau objective 才逐渐产生更明显的作用。
 
-这说明 tau loss 的主要作用并非改善首 token top-1 prediction，而是提高后续位置的 distribution alignment。对于 speculative decoding，这一区别很重要：token accuracy 很难反映多个连续 draft token 的联合接受行为，而 τ 会显式累积前缀接受概率。
+![训练过程中 τ 相对 baseline 的差异](../../assets/images/qwen3-4b-dspark-ablation/tau-loss-steps.svg){ width="50%" }
 
-收益也主要出现在训练中后期。810–1000 步时：
+### MLA
 
-* baseline：3.9087
-* tau loss：3.8614
+Attention 换为 MLA 后，末段 \(\tau\) 从 4.9591 降到 4.9368，约 0.45%。token accuracy 从 74.35% 降到 74.00%。CE 1.1191 → 1.1402，L1 0.4550 → 0.4623。可训练参数 \(612.1\mathrm{M}\) vs \(615.2\mathrm{M}\)（\(-0.51\%\)）。
 
-到 1610–1800 步：
+<span class="ablation-sq">\(\blacksquare\)</span>**位置上，损失不随 draft depth 扩大。** 第 1 个位置接受率约 **-0.26 pp**，第 7 个位置约 **-0.15 pp**。后续位置没有额外放大。
 
-* baseline：4.7117
-* tau loss：4.7488
+![末段各位置接受率相对 baseline 的差异](../../assets/images/qwen3-4b-dspark-ablation/mla-position.svg){ width="50%" }
 
-一个可能的原因来自 τ 本身的 prefix-product 结构。对较后位置 \(a_i\) 的梯度会乘以前面多个位置的 overlap；训练早期各位置预测较弱时，这些乘积较小，因此多步目标对后位置的有效梯度也较弱。随着基础 CE/L1 训练提高前缀 overlap，tau objective 才逐渐产生更明显的作用。
+<span class="ablation-sq">\(\blacksquare\)</span>**训练全程与 GQA 接近。** 810–1000 步时，baseline：3.9087，MLA：3.9128。到 1610–1800 步，baseline：4.7117，MLA：4.7038。末段才到 -0.45%。
 
-因此，当前结果更像是 **tau loss 在基础 draft 已经较强后进一步优化 multi-token alignment**，而不是替代原始 token-level objective。
+![训练过程中 τ 相对 baseline 的差异](../../assets/images/qwen3-4b-dspark-ablation/mla-steps.svg){ width="50%" }
 
-## Anchor information and block communication affect different positions
+<span class="ablation-sq">\(\blacksquare\)</span>**KV cache收益。** 每层每 token 从 2048 压到 576，约 \(3.6\times\)。训练 \(\tau\) 只差 0.45%。
 
-![位置 overlap 相对 baseline 的差异](../../assets/images/qwen3-4b-dspark-ablation/position-deltas.png)
+### MLA + SWA
 
-两个 ablation 对 block 内信息采用了不同的删除方式。
+SWA 叠在 MLA 上，history 限制为至多 \(W-1\) 个 token。\(W=1024,512,128\) 相对最大长度 4096 约为 \(1/4\)、\(1/8\)、\(1/32\)。末段 \(\tau\) 相对 MLA：4.9008（−0.73%）、4.8523（−1.71%）、4.6668（−5.47%）。
+
+<span class="ablation-sq">\(\blacksquare\)</span>**窗口越小，各位置接受率下降越大。** SWA128 第 1 个位置约 **-1.49 pp**，第 4–5 个约 **-3.28 pp**，第 7 个约 **-2.94 pp**。块内双向 attention 不能补偿被限制的 target history。
+
+![末段各位置接受率相对 MLA 的差异](../../assets/images/qwen3-4b-dspark-ablation/swa-position.svg){ width="50%" }
+
+<span class="ablation-sq">\(\blacksquare\)</span>**SWA128 相对 MLA 的 \(\tau\) 差在 810–1000 步已接近末段。** 该窗口内 MLA：3.9128，SWA128：3.7498（−4.17%）。SWA1024 同期为 3.9153，末段 −0.73%。
+
+![训练过程中 τ 相对 MLA 的差异](../../assets/images/qwen3-4b-dspark-ablation/swa-steps.svg){ width="50%" }
+
+<span class="ablation-sq">\(\blacksquare\)</span>**缩短 history 对 \(\tau\) 的影响大于 GQA 换 MLA。** GQA → MLA：−0.45%；MLA → SWA128：−5.47%。若限制 history KV，这一组中 SWA1024 的 \(\tau\) 下降最小。
 
 ### Context-only
 
-Context-only 移除当前 draft block 的 K/V，只允许模型读取严格早于 anchor 的 target context。首位置仍保留 anchor embedding residual，Markov head 也仍能看到训练序列中的前驱 token。
+去掉当前 draft block 的双向 K/V，只保留严格早于 anchor 的 target context。第 1 个位置仍保留 anchor embedding residual，Markov head 仍接收前驱 token。末段 \(\tau\) 从 4.9591 降到 4.8718，约 1.76%。token accuracy 74.35% → 73.30%。CE 1.1191 → 1.1795，L1 0.4550 → 0.4767。
 
-末段 τ 下降 **1.76%**。
+<span class="ablation-sq">\(\blacksquare\)</span>**第 1 个位置接受率几乎不变，下降出现在后续位置。** 第 1 个位置约 **−0.12 pp**，第 2 个约 **−1.56 pp**，第 7 个约 **−0.79 pp**。CE：第 1 个 0.6036 → 0.6090，第 2 个 0.8965 → 0.9910。当前 block 的双向 K/V 主要用于第 2 个及之后位置。
 
-位置上：
+![末段各位置接受率相对 baseline 的差异](../../assets/images/qwen3-4b-dspark-ablation/context-only-position.svg){ width="50%" }
 
-* position 1：−0.12 pp
-* position 2：−1.56 pp
-* position 7：−0.79 pp
+<span class="ablation-sq">\(\blacksquare\)</span>**相对 baseline 的 \(\tau\) 差在 810–1000 步已接近末段。** 该窗口内 baseline：3.9087，context-only：3.8379（−1.81%）。1610–1800 步：4.7117 vs 4.6435（−1.45%）。末段 −1.76%。
 
-首位置几乎不受影响，而后续位置明显下降，说明 **block 内通信主要服务于多步 draft prediction**。
+![训练过程中 τ 相对 baseline 的差异](../../assets/images/qwen3-4b-dspark-ablation/context-only-steps.svg){ width="50%" }
+
+<span class="ablation-sq">\(\blacksquare\)</span>**第 1 个位置几乎不依赖当前 block 的 K/V。** 此处第 1 个位置接受率 −0.12 pp；SWA128 在同一位置为 −1.49 pp。该消融去掉的是 block 内双向 K/V，target history 仍完整。
 
 ### All-mask
 
-All-mask 将 backbone 输入从 `[anchor, MASK×6]` 改为 `[MASK×7]`，但仍保留 block 内双向 attention；Markov head 仍接收 anchor 或训练时前驱 token。
+Backbone 输入从 `[anchor, MASK×6]` 改为 `[MASK×7]`，保留块内双向 attention。Markov head 仍接收前驱 token。末段 \(\tau\) 从 4.9591 降到 4.8791，约 1.61%。token accuracy 74.35% → 73.51%。CE 1.1191 → 1.1860，L1 0.4550 → 0.4780。
 
-末段 τ 下降 **1.61%**。
+<span class="ablation-sq">\(\blacksquare\)</span>**下降集中在第 1 个位置，随后逐位置减小。** 第 1 个位置接受率约 **−1.65 pp**，第 2 个约 **−1.19 pp**，第 7 个约 **−0.04 pp**。CE：第 1 个 0.6036 → 0.6978，第 7 个 1.9763 → 1.9983。
 
-位置上：
+![末段各位置接受率相对 baseline 的差异](../../assets/images/qwen3-4b-dspark-ablation/all-mask-position.svg){ width="50%" }
 
-* position 1：−1.65 pp
-* position 7：−0.04 pp
+<span class="ablation-sq">\(\blacksquare\)</span>**相对 baseline 的 \(\tau\) 差在 810–1000 步大于末段。** 该窗口内 baseline：3.9087，all-mask：3.7809（−3.27%）。1610–1800 步：4.7117 vs 4.6327（−1.68%）。末段 −1.61%。
 
-对应 CE 的变化也高度集中在首位置：
+![训练过程中 τ 相对 baseline 的差异](../../assets/images/qwen3-4b-dspark-ablation/all-mask-steps.svg){ width="50%" }
 
-* position 1：0.6036 → 0.6978
-* position 7：1.9763 → 1.9983
+<span class="ablation-sq">\(\blacksquare\)</span>**第 1 个位置依赖 backbone 读到 anchor token。** 此处第 1 个位置 −1.65 pp、第 7 个 −0.04 pp；context-only 为 −0.12 pp 与 −0.79 pp。该消融去掉的是 backbone 的 anchor 输入，块内双向 K/V 仍保留。
 
-因此 anchor information 与 block communication 呈现出明显不同的作用位置：
+### 三层 aux
 
-* **anchor embedding 主要帮助 block 的第一个预测；**
-* **block 内信息交换主要帮助后续 draft positions。**
+Auxiliary layers 从 `[1, 9, 17, 25, 33]` 改为 `[1, 17, 33]`。输入投影参数 32.77M → 19.66M，可训练参数减少 13.11M，约 2.13%。末段 \(\tau\) 从 4.9591 降到 4.8837，约 1.52%。token accuracy 74.35% → 73.36%。CE 1.1191 → 1.1676，L1 0.4550 → 0.4735。
 
-all-mask 在后续位置基本恢复，也说明这些位置可以从历史 target context、block 内其他 hidden states 以及 Markov predecessor 中重新获得部分信息。
+<span class="ablation-sq">\(\blacksquare\)</span>**接受率下降随位置加深。** 第 1 个位置约 **−0.42 pp**，第 4 个约 **−0.96 pp**，第 7 个约 **−1.15 pp**。CE：第 1 个 0.6036 → 0.6267，第 7 个 1.9763 → 2.0540。
 
-目前还无法区分后续位置的收益究竟来自一般的 bidirectional block interaction，还是主要来自第一个位置对 anchor 信息的广播。一个直接的对照是只允许所有 query 读取当前 block 的第一个 K/V，同时保持历史 context 完全一致。
+![末段各位置接受率相对 baseline 的差异](../../assets/images/qwen3-4b-dspark-ablation/aux-3layers-position.svg){ width="50%" }
 
-## Context length matters more than GQA vs. MLA
+<span class="ablation-sq">\(\blacksquare\)</span>**相对 baseline 的 \(\tau\) 差在 810–1000 步大于末段。** 该窗口内 baseline：3.9087，三层 aux：3.7945（−2.92%）。1610–1800 步：4.7117 vs 4.6211（−1.92%）。末段 −1.52%。
 
-MLA 的末段 τ 为 4.9368，相比 GQA baseline 仅下降 **0.45%**。考虑到两者参数量只差 0.51%，当前结果表明，将 GQA 替换为这一版 MLA 对 draft quality 的影响较小。
+![训练过程中 τ 相对 baseline 的差异](../../assets/images/qwen3-4b-dspark-ablation/aux-3layers-steps.svg){ width="50%" }
 
-但在 MLA 内缩短 target history 后，性能呈明显单调下降：
+### 2.3 epoch
 
-| **Context window** | τ | 相对 MLA |
-| --- | ---: | ---: |
-| **Unlimited** | 4.9368 | — |
-| **1024** | 4.9008 | −0.73% |
-| **512** | 4.8523 | −1.71% |
-| **128** | 4.6668 | −5.47% |
+同一 GQA 配置，末段取 5820–6010 步（约 2.3 epoch）。\(\tau\) 从 4.9591 到 5.3611，约 +8.11%。CE 0.8744，L1 0.3721。
 
-当前 SWA 仅限制 anchor 之前的 target context：
+<span class="ablation-sq">\(\blacksquare\)</span>**接受率提高随位置加深。** 第 1 个位置约 **+2.59 pp**，第 4 个约 **+5.20 pp**，第 7 个约 **+6.42 pp**。
 
-$$
-[\max(0,a-W+1),a),
-$$
+![末段各位置接受率相对 1 epoch 的差异](../../assets/images/qwen3-4b-dspark-ablation/epoch3-position.svg){ width="50%" }
 
-不改变 block 内双向 attention。
 
-这一组结果比 GQA/MLA 差异更明显：**attention parameterization 本身影响较小，而历史 context range 对 draft prediction 十分敏感。**
+<div hidden markdown="1">
 
-尤其是 SWA128，其损失并不局限于第一位置，而会持续到整个 block。也就是说，Markov predecessor 和 block 内 hidden-state communication 无法完全补偿长历史信息。
-
-这表明 DSpark 的 draft prediction 并不是纯局部 continuation。即使 target 已经提供了 anchor 和训练时前驱 token，较远的上下文仍能显著降低预测不确定性。
-
-这一结果也意味着，对 speculative draft 做 context compression 时，**简单截断 sequence history 可能比修改 attention representation 更危险**。如果系统目标是降低 KV cache 或 attention 开销，SWA1024 目前是更合理的起点：相对 MLA 的训练 τ 损失只有 0.73%，远低于 512 和 128。
-
-需要注意的是，当前 MLA 实现仍使用展开后的 K/V attention/cache，并未形成完整的 compressed latent cache 推理路径。因此该实验只说明其训练质量接近 GQA，还不能推出实际的 memory 或 throughput 优势。
-
-## Auxiliary features help later predictions
-
-baseline 使用 target backbone 的五层 auxiliary features：
-
-$$
-[1,9,17,25,33].
-$$
-
-将其减少为：
-
-$$
-[1,17,33]
-$$
-
-后，输入投影参数从 32.77M 降至 19.66M，总 trainable parameters 减少 13.11M，即约 **2.13%**。
-
-代价是：
-
-* τ：−1.52%
-* token accuracy：约 −0.99 pp
-* position 1 overlap：−0.42 pp
-* position 7 overlap：−1.15 pp
-
-损失随位置加深而扩大，说明 intermediate target representations 对较远 draft positions 更有价值。一个合理解释是：后续位置需要从固定 anchor 附近推断更远的未来状态，多层 target features 提供了比单一高层 representation 更丰富的局部和语义信息。
-
-从当前数字看，这一压缩的 trade-off 并不明显有利。总参数只减少约 2%，但 τ 损失达到 1.5%。如果三层 aux 不能显著降低实际 feature bandwidth、projection latency 或 cache footprint，就很难仅从参数量上证明其价值。
-
-另外，当前训练仍复用五层离线缓存并在读取后切片，因此该实验本身并未降低缓存文件大小或原始 I/O。
-
-## Full-sequence changes the training distribution
+### Full-sequence
 
 Full-sequence run 的末段结果为：
 
@@ -230,24 +195,18 @@ Full-sequence 将 prompt 和 response 都加入监督和 anchor 候选，因此�
 
 它是否提高或降低最终 response speculative decoding quality，需要在固定的 response-only validation positions 上重新评估。同时应记录 prompt / response anchor 数量，判断是否存在监督预算被 prompt 稀释的问题。
 
+</div>
 
-## Takeaways
+## 总结
 
-这组消融给出了几个比较明确的信号。
 
-**1. 长历史上下文很重要。**
-GQA → MLA 只损失 0.45% τ，而 MLA → SWA128 损失 5.47%。对当前 DSpark，context range 比 attention parameterization 更敏感。
 
-**2. Anchor 与 block 内通信承担不同功能。**
-移除 anchor 主要损伤第一个预测位置；移除 block K/V 主要损伤后续位置。DSpark 的多步预测同时依赖初始 anchor information 和 block 内的信息传播。
+**缩短 history 对 \(\tau\) 的影响大于 GQA 换 MLA。** GQA → MLA：−0.45%；MLA → SWA128：−5.47%；MLA → SWA1024：−0.73%。MLA 每层每 token KV 从 2048 压到 576，约 \(3.6\times\)。
 
-**3. Token accuracy 不足以描述 speculative draft quality。**
-Tau loss 几乎没有改变 top-1 accuracy，却主要改善了后续位置 overlap。直接优化 multi-token objective 可能捕获 CE / token accuracy 看不到的收益。
+**Backbone 的 anchor 输入与块内双向 K/V 作用在不同位置。** All-mask 第 1 个位置 −1.65 pp、第 7 个 −0.04 pp。Context-only 第 1 个 −0.12 pp、第 2 个 −1.56 pp。
 
-**4. Tau loss 有正向信号，但收益仍小。**
-当前末段 τ 提升约 0.54%，且主要在训练后期出现。最重要的下一步是同实现 baseline + 实际 MAL，而不是继续比较 training loss。
+**4. Tau loss 提高后续位置接受率，几乎不改 token accuracy。** 末段 \(\tau\) +0.54%。第 1 个位置 +0.045 pp，第 7 个 +0.403 pp。acc 74.35% → 74.34%。该 \(\tau\) 是训练接受长度，不是推理 MAL。
 
-**5. Auxiliary feature compression 目前缺少足够的系统收益。**
-三层 aux 仅减少 2.13% 总参数，却损失约 1.52% τ。只有在实际 feature bandwidth 或 latency 明显下降时，这一取舍才可能成立。
+**5. 三层 aux 减少 2.13% 可训练参数，\(\tau\) 下降 1.52%。** 第 1 个位置 −0.42 pp，第 7 个 −1.15 pp。该结果来自无 MTP 的 Qwen3-4B，对于有MTP的模型可能不一样。
 
-从下一轮实验优先级看，最值得补的是：**SpecForge baseline vs. tau-loss 的同实现 MAL 对比、block-first-only attention、以及 MLA+SWA1024 的实际 KV/cache 与 decode latency。**
+
