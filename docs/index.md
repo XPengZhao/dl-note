@@ -26,12 +26,12 @@ A focused knowledge base for modern deep learning systems, from hardware fundame
 
 ### Systems and Infrastructure
 
-- [Hardware](hardware.md)
 - [Tensor Operations](tensor.md)
 
 ### AI Infra
 
 - [Overview](llms/overview.md)
+- [Hardware](hardware.md)
 - [Request Lifecycle](llms/request-lifecycle.md)
 - [Metrics](llms/metrics.md)
 - [Roofline Model for Inference](llms/roofline.md)

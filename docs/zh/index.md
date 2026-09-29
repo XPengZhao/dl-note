@@ -5,7 +5,7 @@
 
 1. [硬件](hardware.md) - GPU/NPU 基础、显存类型与 GPU 配置
 2. [张量操作](tensor.md) - 常见张量维度操作、激活函数与 CUDA Graph
-3. [AI Infra 总览](llms/overview.md) - 端到端推理系统的分层结构
+3. [AI Infra Overview](llms/overview.md) - 端到端推理系统的分层结构
 4. [推理请求生命周期](llms/request-lifecycle.md) - 一条请求如何穿过整个在线系统
 5. [AI Infra 指标](llms/metrics.md) - TTFT、TPOT 与 TPS
 6. [KV Cache](llms/kv-cache.md) - KV 内存语义、paged blocks 与 prefix 复用
@@ -22,12 +22,12 @@
 
 ### 系统与基础设施
 
-- [硬件](hardware.md)
 - [张量操作](tensor.md)
 
 ### AI Infra
 
-- [总览](llms/overview.md)
+- [Overview](llms/overview.md)
+- [硬件](hardware.md)
 - [请求生命周期](llms/request-lifecycle.md)
 - [指标](llms/metrics.md)
 - [KV Cache](llms/kv-cache.md)

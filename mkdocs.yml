@@ -22,7 +22,7 @@ plugins:
             Tensor Operation: 张量操作
             Neural Graphics: 神经图形
             AI Infra: AI Infra
-            Overview: 总览
+            Overview: Overview
             Request Lifecycle: 请求生命周期
             Metrics: 指标
             Roofline Model: Roofline 模型
@@ -31,6 +31,7 @@ plugins:
             Serving Runtime: 推理运行时
             Parallelism: 并行策略
             Decoding: 解码与采样
+            Speculative Decoding: Speculative Decoding
             Training Objective: 训练目标
             Models: 模型
             Position Encoding: 位置编码
@@ -40,11 +41,11 @@ plugins:
             Qwen3-4B DSpark Ablation: Qwen3-4B DSpark 消融报告
 nav:
   - Home: index.md
-  - Hardware: hardware.md
   - Tensor Operation: tensor.md
   - Neural Graphics: neural-graphics.md
   - AI Infra:
       - Overview: llms/overview.md
+      - Hardware: hardware.md
       - Request Lifecycle: llms/request-lifecycle.md
       - Metrics: llms/metrics.md
       - Roofline Model: llms/roofline.md
@@ -53,6 +54,7 @@ nav:
       - Serving Runtime: llms/serving-runtime.md
       - Parallelism: llms/parallelism.md
       - Decoding: llms/decoding.md
+      - Speculative Decoding: llms/speculative-decoding.md
       - Training Objective: llms/training-objective.md
   - Models:
       - Position Encoding: llms/position-encoding.md

@@ -100,6 +100,10 @@ p:has(+ .arithmatex) {
     margin: 1.5em 0 .8em;
     color: #133167;
   }
+
+.md-typeset h5 {
+  text-transform: none;
+}
 /* Use hollow circles for nested unordered lists. */
 .md-typeset ul ul,
 .md-typeset ul ul ul {
