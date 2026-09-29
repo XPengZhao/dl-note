@@ -114,6 +114,8 @@ $$
 
 所以，无论一个 token 是由 draft 提出后被接受，还是在 rejection 后通过 residual sampling 得到，最终分布都严格等于 target distribution。这个结论在每一个 decoding position 上都成立，因此 speculative decoding 在加速生成的同时，仍然保持与原始 target autoregressive sampling 完全相同的输出分布。
 
+## 4. Where Does the Speedup Come From?
+
 ### 4.1 Acceptance Length
 
 Speculative decoding 的加速首先取决于：一次 target verification 能让生成序列向前推进多少个 token。假设 draft length 为 \(K\)，并且前 \(m\) 个 draft token 被连续接受，那么这一轮至少可以确认这 \(m\) 个 token；在标准 speculative decoding 中，target 还会在 verification 的末尾额外产生一个 token，因此这一轮通常能够推进
@@ -180,60 +182,254 @@ $$
 因此，评价一个 speculative decoding 方法时，只看 acceptance rate 并不够。真正需要关心的是：**每次 target verification 最终推进了多少 token，以及为了得到这些 token 额外付出了多少 drafting 和 verification 成本。** 后面的各种 speculative decoding 方法，本质上都在优化这个 trade-off。
 
 
-## 加速比
+## 5. A Systems View of Speculative Decoding
+### 5.1 What Changes in a Speculative Step?
 
-Target 自回归 decode 时，每个请求每步只多一个 token。同时解码的请求数是 batch $B$，这一步的延迟写成 $L_{\mathrm{target}}(B)$。该请求已有的 KV cache 仍要读进来，kernel 也要启动并同步。$B$ 小的时候矩阵乘法很窄，这些开销在这一次 forward 里占得更多。
+前面的 speedup model 把 speculative decoding 简化成 draft cost、verification cost 和 acceptance length。要进一步分析 batch size、通信、MoE 和 KV cache，需要先把一次 speculative step 中发生的工作分开记账。设当前 batch size 为 \(B\)，draft 一次提出 \(K\) 个 candidate，一轮结束后每个请求平均向前推进 \(A\) 个 token。Target verification 实际处理的 query token 数记为 \(q\)；它通常与 \(K\) 同阶，但具体是 \(K\) 还是 \(K+1\) 取决于实现，因此这里不预先固定。
 
-一个周期的时间为 draft 的 $T_{\mathrm{draft}}$ 加上 target 验证的 $T_{\mathrm{target}}$。每个写出 token 分到
+在暂时忽略 draft 与 target 重叠执行的情况下，一轮 speculative decoding 的时间可以写成
 
-$$
-L=\frac{T_{\mathrm{draft}}+T_{\mathrm{target}}}{\tau}.
-$$
+\[
+C_{\mathrm{spec}}
+=
+T_{\mathrm{draft}}
++
+T_{\mathrm{verify}}(B,q)
++
+T_{\mathrm{control}},
+\]
 
-与基线一步相比，加速比为
+其中 \(T_{\mathrm{control}}\) 包括 acceptance、sampling、状态更新等没有包含在模型 forward 中的开销。由于这一轮平均产生 \(A\) 个最终输出 token，每个输出 token 分摊到的时间为
 
-$$
-\eta=\frac{L_{\mathrm{target}}(B)}{L}.
-$$
+\[
+L_{\mathrm{spec}}
+=
+\frac{C_{\mathrm{spec}}}{A}.
+\]
 
-$\eta>1$ 等价于
+作为对照，普通 autoregressive decoding 在相同 batch 下，每次 target forward 只推进一个 token，其延迟记为 \(L_{\mathrm{AR}}(B)\)。因此，用 baseline 生成同样 \(A\) 个 token，大约需要
 
-$$
-T_{\mathrm{draft}}+T_{\mathrm{target}}<\tau\,L_{\mathrm{target}}(B).
-$$
+\[
+A\,L_{\mathrm{AR}}(B),
+\]
 
-## 验证步的时间
+于是 speculative decoding 的加速条件可以直接写成
 
-该 forward 的 token 宽度为 $n=B(\gamma+1)$。写成
+\[
+T_{\mathrm{draft}}
++
+T_{\mathrm{verify}}(B,q)
++
+T_{\mathrm{control}}
+<
+A\,L_{\mathrm{AR}}(B).
+\]
 
-$$
-T_{\mathrm{target}}(n)\approx\alpha_t(n)+n\cdot\bar\beta_t(n).
-$$
+这个式子给出了后面系统分析最重要的观察：speculative decoding 并没有消除计算，而是把原来的 \(A\) 次窄 target decode，替换成一次更宽的 verification，同时增加 drafting 和控制开销。把 target 一侧节省出来的时间写成
 
-$\alpha_t(n)$ 是随 $n$ 变化较慢的一次调用开销：kernel 启动与同步、attention metadata、paged KV 索引、collective 启动。$n\bar\beta_t(n)$ 是 QKV、MLP、attention 和 KV 读写。$n$ 较小时 $\bar\beta_t(n)$ 随宽度下降。接近设备算力或带宽上限后不再明显下降，$T_{\mathrm{target}}(n)$ 更接近对 $n$ 线性。
+\[
+H
+=
+A\,L_{\mathrm{AR}}(B)
+-
+T_{\mathrm{verify}}(B,q),
+\]
 
-每个写出 token 分到的 target 时间为
+那么真正能够用于支付额外开销的预算只有 \(H\)。Speculative decoding 能否加速，本质上取决于
 
-$$
-\frac{T_{\mathrm{target}}(n)}{\tau}
-\approx\frac{\alpha_t(n)}{\tau}+\frac{n}{\tau}\bar\beta_t(n).
-$$
+\[
+T_{\mathrm{draft}}+T_{\mathrm{control}}<H.
+\]
 
-令 $p=\tau/(\gamma+1)$，则 $n/\tau=B/p$。基线写成 $L_{\mathrm{target}}(B)\approx\alpha_t(B)+B\bar\beta_t(B)$。只比较随 token 数增长的一项，target 侧变小的条件是
+接下来的问题因此变得很具体：增大 \(q\) 后，target verification 为什么可能比 \(A\) 次单-token decode 更便宜？这种收益来自更好的计算利用率、权重复用、KV 访问还是更少的通信同步？与此同时，额外的 candidate 又会给通信、MoE routing 和 KV 管理带来多少成本？后面的各节都会围绕这份时间预算展开。
 
-$$
-\frac{B}{p}\bar\beta_t(n)<B\bar\beta_t(B),
-$$
+### 5.2 Batch Size, Compute, and Memory Traffic
 
-即
+普通 autoregressive decoding 中，一个 batch 为 \(B\) 的 decode step 只处理 \(B\) 个新 token；而 speculative verification 会同时处理每个请求的多个 candidate。设每个请求送入 target 的 query 数为 \(q\)，那么这一轮共有 \(Bq\) 个 query token。乍看之下，这似乎只是把 batch 从 \(B\) 扩大到了 \(Bq\)，但两者并不完全等价。对于 linear、MLP 等 dense layer，主要看到的是更宽的 token dimension；而对 attention 来说，\(Bq\) 个 query 实际上只属于 \(B\) 条序列，并共享各自已经存在的历史 KV cache。因此，verification 的成本不能只写成 \(Bq\) 的函数，更合适的分解是
 
-$$
-\frac{\bar\beta_t(n)}{p}<\bar\beta_t(B).
-$$
+\[
+T_{\mathrm{verify}}(B,q,\ell)
+\approx
+T_{\mathrm{dense}}(Bq)
++
+T_{\mathrm{attn}}(B,q,\ell)
++
+T_{\mathrm{misc}}(B,q),
+\]
 
-$p<1$ 使左端放大 $1/p$。宽度从 $B$ 增到 $n$，只有 $\bar\beta_t(n)$ 的下降超过这个因子，这一项才变小。$B$ 大到 $\bar\beta_t(B)$ 接近平台时，$\bar\beta_t(n)/\bar\beta_t(B)$ 接近 1，只要 $p<1$ 该不等式就不成立。$a_i$ 小则 $\tau$ 接近 1，$T_{\mathrm{draft}}/\tau$ 与 $\alpha_t(n)/\tau$ 变大。拒绝记账、KV 回滚和采样若进入 $\alpha_t(n)$，$\alpha_t(n)/\tau$ 可以大于模型 forward 本身。
+其中 \(\ell\) 表示历史 context length。对应的 baseline target decode 为
 
-## 实现
+\[
+L_{\mathrm{AR}}(B,\ell)
+\approx
+T_{\mathrm{dense}}(B)
++
+T_{\mathrm{attn}}(B,1,\ell)
++
+T_{\mathrm{misc}}(B,1).
+\]
+
+对 dense layer 来说，speculation 的机会来自把多次很窄的 GEMM 合并成一次更宽的 GEMM。Batch 较小时，一次 decode 中只有 \(B\) 个 token 参与计算，模型权重读取、kernel launch 以及较低的矩阵利用率都会占据较大比例；将宽度扩展到 \(Bq\) 后，这些成本可以被更多 token 分摊。因此，在尚未充分利用 GPU 的区间中，通常可能出现
+
+\[
+T_{\mathrm{dense}}(Bq)
+<
+q\,T_{\mathrm{dense}}(B).
+\]
+
+但这种收益不会无限持续。随着 \(B\) 增大，GEMM 逐渐接近设备的计算或带宽利用上限，继续增加 \(q\) 后，dense 部分的延迟会越来越接近随 token 数线性增长。真正决定 speculation 是否划算的也不是上式中的 \(q\)，而是最终推进的 token 数 \(A\)：dense 部分只有满足
+
+\[
+T_{\mathrm{dense}}(Bq)
+<
+A\,T_{\mathrm{dense}}(B)
+\]
+
+时，才比生成同样 \(A\) 个 token 的 autoregressive decode 更便宜。
+
+Attention 的情况不同。增加 \(q\) 会增加 query 相关的计算，但这些 query 属于同一条请求，因此都需要访问相同的历史 KV cache。可以把历史 KV 的实际读取放大倍数记为 \(r_{\mathrm{KV}}(B,q,\ell)\)：如果每个 query 都重新从 HBM 读取一遍历史 KV，那么 \(r_{\mathrm{KV}}\) 接近 \(q\)；如果 attention kernel 能够在多个 query 之间有效复用历史 KV，则这个值可以明显更小。只看历史 KV 访问这一部分，speculation 能降低每个输出 token 的成本需要满足
+
+\[
+r_{\mathrm{KV}}(B,q,\ell)<A.
+\]
+
+这也说明为什么 batch size 本身不足以判断 speculative decoding 的收益。小 batch 时，收益可能主要来自更宽的 dense computation；context 较长时，即使 baseline batch 已经很大，历史 KV 的读取与复用仍然可能成为新的收益来源。相反，如果 dense layer 已经充分饱和，而 attention kernel 又无法在多个 candidate 之间有效复用 KV，那么 verification 增加的大量计算最终只换回少量 accepted token，加速空间就会迅速缩小。因此后面的实验需要同时扫描 \(B\)、\(q\) 和 \(\ell\)，并分别观察 dense computation 与 attention/KV traffic 的变化，而不能仅用一个总 token 数 \(Bq\) 来解释 verification latency。
+
+### 5.3 Communication: Fewer Synchronizations, More Bytes
+
+在 tensor parallel 等分布式推理中，一次 target forward 往往伴随着多次 collective communication。普通 autoregressive decoding 每生成一个 token 都要重新执行这些通信，而 speculative decoding 可以用一次 verification 推进平均 \(A\) 个 token。因此，speculation 首先节省的是 **collective 的重复启动和同步次数**。但与此同时，verification 一次处理 \(q\) 个 query token，通信张量也通常随之变大，因此单次 collective 的数据量会高于普通 decode。
+
+可以先用一个简化模型描述这种 trade-off。设一次普通 target decode 的某条通信路径耗时为
+
+\[
+T_{\mathrm{comm}}^{\mathrm{AR}}
+=
+c_0+\frac{V}{W},
+\]
+
+其中 \(c_0\) 表示 collective launch、同步以及固定协议开销，\(V\) 是通信数据量，\(W\) 是有效通信带宽。若 verification 的通信量近似随 query 数 \(q\) 成比例增长，则一次 verification 的通信时间约为
+
+\[
+T_{\mathrm{comm}}^{\mathrm{verify}}
+=
+c_0+\frac{qV}{W}.
+\]
+
+为了生成同样平均 \(A\) 个 token，baseline 需要执行 \(A\) 次这样的通信，而 speculative decoding 只在一次 target verification 中执行。因此，仅比较 target 侧这部分通信，speculation 获得收益需要满足
+
+\[
+c_0+\frac{qV}{W}
+<
+A\left(c_0+\frac{V}{W}\right),
+\]
+
+整理得到
+
+\[
+(A-1)c_0
+>
+(q-A)\frac{V}{W}.
+\]
+
+这个式子很好地刻画了通信侧的收益来源。左边是少执行 \(A-1\) 轮 target communication 所节省的固定启动与同步成本；右边则来自 verification 中那些最终没有转化为输出 token 的额外 candidate。若 \(A\) 接近 \(q\)，大部分 candidate 都被接受，额外 payload 很少浪费，此时 speculation 很容易摊薄 collective latency；如果 rejection 很早，使得 \(A\ll q\)，verification 已经通信过的数据却无法成为有效输出，通信效率就会下降。
+
+实际系统中，\(V/W\) 也不一定与消息大小严格线性。小消息往往更受 latency 和 synchronization 限制，而消息变大后才逐渐进入 bandwidth-bound 区间；collective algorithm、GPU 拓扑和并行方式也可能随消息大小改变。因此，speculative decoding 对通信的影响不能简单总结成“通信次数更少”或“通信量更多”。更准确的说法是：**它把多次小规模 collective 合并成更少的、更宽的 collective，而收益取决于减少的同步成本能否覆盖额外 candidate 带来的通信流量。**
+
+这一点在不同并行方式下还会表现得不同。Tensor parallel 中，verification 通常扩大每次 all-reduce、reduce-scatter 或 all-gather 所处理的 activation；而在 MoE 中，candidate token 还会进一步影响 expert dispatch 和 combine 的流量及负载分布。因此，不能只统计总 communication time，而应该同时观察 collective 次数、message size、有效 bandwidth，以及真正暴露在 critical path 上的同步时间。
+
+### 5.4 MoE: Expert Utilization and Load Imbalance
+
+对于 MoE 模型，speculative verification 的影响比 dense model 更复杂。设一次 verification 中 expert \(e\) 接收到 \(n_e\) 个 token，那么整个 MoE layer 的执行时间不仅取决于总 token 数 \(Bq\)，还取决于这些 token 如何分布到不同 experts 和不同 devices。一个简化的执行时间可以写成
+
+\[
+T_{\mathrm{MoE}}
+\approx
+T_{\mathrm{dispatch}}
++
+\max_g T_{\mathrm{expert},g}
++
+T_{\mathrm{combine}},
+\]
+
+其中 \(g\) 表示一个 expert-parallel rank。这里出现的是 \(\max_g\)，因为下一层通常需要等待最慢的 rank 完成，因此平均每个 expert 收到多少 token 并不能完整描述实际 latency。
+
+Speculation 可能改善 expert computation。普通 decode 中每轮只有 \(B\) 个新 token，经过 routing 后，单个 expert 实际拿到的 micro-batch 可能很小；verification 将 token 数扩大到 \(Bq\) 后，一些 expert 的 GEMM 会变宽，权重读取能够被更多 token 分摊，GPU utilization 也可能提高。对于 expert \(e\)，真正值得比较的不是
+
+\[
+T_e(qn_e) \quad \text{和} \quad qT_e(n_e),
+\]
+
+而是生成相同 \(A\) 个最终 token 时的成本：只有 verification 后的 expert computation 小于 \(A\) 次普通 decode 的累计成本，这部分才真正贡献 speedup。
+
+但更多 candidate 并不保证 MoE 更高效。不同 candidate 可能被路由到更多 experts，使一次 verification 触达更大的 expert 集合，增加权重访问和 dispatch/combine traffic；也可能集中到少数 experts，使这些 experts 或所在 rank 成为 straggler。尤其需要注意，verification 会先执行整段 candidate 的 routing 和 expert computation，然后才知道哪里发生 rejection。因此，如果第一个或第二个 candidate 就被拒绝，后面的 token 虽然不会成为最终输出，它们已经消耗的 MoE computation 和 communication 并不会被追回。
+
+因此，MoE 场景下 acceptance length \(A\) 仍然不够解释性能，还需要观察 routing pattern。比较 speculative decoding 和普通 decode 时，至少应该同时记录每个 expert 的 token count \(n_e\)、每个 rank 的总 routed tokens、active expert 数量以及最慢 rank 的执行时间。**Speculation 真正有利的情况，是更宽的 verification 能提高 expert 的有效计算效率，同时没有引入足以抵消这一收益的 routing imbalance 和额外 expert-parallel traffic。** 这也是为什么同样的 \(B\)、\(q\) 和 \(A\)，在 dense model 和 MoE model 上可能表现出完全不同的 speedup。
+
+### 5.5 KV Cache: Reuse, Rollback, and Capacity
+
+Speculative verification 一次处理同一请求的多个 query token，而这些 query 共享相同的历史 KV cache。与普通 decode 相比，这给 attention 提供了更强的 KV reuse 机会：如果每个 query 都独立从 HBM 读取一遍历史 KV，那么 verification 的历史读取量会接近普通 decode 的 \(q\) 倍；如果 attention kernel 能在多个 query 之间有效复用已经加载的 K/V，这个放大倍数就会明显降低。设 verification 相对一次普通 decode 的历史 KV 读取放大倍数为 \(r_{\mathrm{KV}}\)，那么生成同样平均 \(A\) 个输出 token 时，仅从历史 KV traffic 来看，speculation 获得收益需要满足
+
+\[
+r_{\mathrm{KV}} < A.
+\]
+
+Verification 同时也会为整段 candidate 计算并写入新的 KV。问题在于，这些 candidate 是否最终保留，要到 verification 结束后才能确定。假设前 \(m\) 个 draft token 被接受，而第 \(m+1\) 个发生 rejection，那么更靠后的 candidate KV 即使已经完成计算和写入，也不会成为最终序列的一部分。这部分工作可以看作 speculative decoding 的另一种“wasted work”：acceptance 越短，相对于最终输出产生的无效 KV computation 和 memory traffic 就越多。
+
+这里需要区分 **rollback 的逻辑成本** 和 **已经发生的计算成本**。发生 rejection 后，系统通常只需要把有效序列长度恢复到正确的位置，并让后续分配覆盖或重新使用失效的 KV 空间，并不意味着把整个历史 KV cache 重新复制一遍。因此，rollback 本身可以很便宜；真正无法追回的是那些已经为被丢弃 candidate 执行过的 attention、KV projection 和 KV write。
+
+KV cache 还会通过显存容量间接影响系统性能。Speculative decoding 需要为 verification 中尚未确认的 candidate 预留 KV 空间，独立 drafter 还可能维护自己的 KV cache，再加上额外 workspace，这些都会减少同一 GPU 上能够同时驻留的请求数量。因此，即使固定 batch 下 speculative decoding 的单步 latency 更低，也可能出现
+
+\[
+B_{\mathrm{SD}} < B_{\mathrm{AR}},
+\]
+
+使部分 latency 收益被较低的并发能力抵消。评价 KV cache 对 speculative decoding 的影响时，因此需要同时看三件事：**历史 KV 是否被更有效地复用、被拒 candidate 产生了多少无效 KV 工作，以及额外缓存最终是否压缩了可服务的 batch size。**
+
+### 5.6 From Step Latency to Serving Throughput
+
+前面的分析都以一次 speculative step 为单位，但 serving system 最终关心的是在相同 GPU 资源下能够持续输出多少 token。设 speculative decoding 的一个周期耗时为 \(C_{\mathrm{spec}}\)，每个请求平均推进 \(A\) 个 token，可维持的 batch size 为 \(B_{\mathrm{SD}}\)，那么其输出吞吐可以近似写成
+
+\[
+\Theta_{\mathrm{SD}}
+=
+\frac{B_{\mathrm{SD}}A}{C_{\mathrm{spec}}}.
+\]
+
+普通 autoregressive decoding 每一步为每个请求生成一个 token，若其可维持 batch 为 \(B_{\mathrm{AR}}\)，单步延迟为 \(L_{\mathrm{AR}}\)，则
+
+\[
+\Theta_{\mathrm{AR}}
+=
+\frac{B_{\mathrm{AR}}}{L_{\mathrm{AR}}}.
+\]
+
+因此，真正的 system-level speedup 应比较
+
+\[
+\frac{\Theta_{\mathrm{SD}}}{\Theta_{\mathrm{AR}}}
+=
+\frac{B_{\mathrm{SD}}}{B_{\mathrm{AR}}}
+\cdot
+\frac{A\,L_{\mathrm{AR}}}{C_{\mathrm{spec}}}.
+\]
+
+第二项正是前面一直分析的 step-level gain，而第一项则描述 speculation 对系统并发能力的影响。这一区分很重要：即使固定 batch 下 \(A\,L_{\mathrm{AR}}/C_{\mathrm{spec}}>1\)，额外的 draft weights、draft KV、candidate KV 和 workspace 仍可能降低 \(B_{\mathrm{SD}}\)，从而抵消一部分甚至全部局部加速。反过来，如果 speculation 显著缩短了 target 的 critical path，同时没有明显压缩可驻留请求数，那么 step-level gain 才更容易转化成实际吞吐提升。
+
+真实 serving 还比固定 batch 模型更复杂。Continuous batching 下，不同请求具有不同 context length、不同 acceptance length，并且会不断进入和离开 batch，因此 \(B\)、\(A\) 和 \(C_{\mathrm{spec}}\) 都随时间变化。这时最可靠的评价方式不是对每轮的 speedup 简单取平均，而是直接测量一段完整 workload 中的
+
+\[
+\text{Throughput}
+=
+\frac{\text{total output tokens}}
+{\text{wall-clock time}}.
+\]
+
+同时还需要分别观察 TTFT、TPOT 和 tail latency，因为 speculative decoding 会改变 token 输出的时间结构：一次 verification 可能批量确认多个 token，但也引入 drafting 和 verification 的周期性等待。因此，最终评价 speculative decoding 不能停留在 acceptance rate 或单步 latency，而应该回答一个更完整的问题：**在给定硬件、并发负载和延迟约束下，它是否真的让系统以更低的成本持续输出更多 token。**
+
+
+## Appendix
+
+### Implementation Details
 
 接受与重采样的实现来自 [vLLM](https://github.com/vllm-project/vllm/blob/main/vllm/v1/sample/rejection_sampler.py)。接受条件是 $p(x)/q(x)\ge u$，$u$ 为均匀随机数。`NO_DRAFT_PROBS` 将该 token 的 draft 概率取为 1，条件变成 $p(x)\ge u$。`is_greedy` 的请求在入口返回。重采样核在 $\max(p-q,0)$ 上做 Gumbel-max。代码里的 `q` 是这组随机数，不是提议分布 $q_i$。
 
