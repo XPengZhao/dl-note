@@ -15,11 +15,12 @@ A focused knowledge base for modern deep learning systems, from hardware fundame
 8. [KV Cache](llms/kv-cache.md) - KV memory semantics, paged blocks, and prefix reuse
 9. [Serving Runtime](llms/serving-runtime.md) - chunked prefill, admission control, and runtime-side stability
 10. [Parallelism](llms/parallelism.md) - DP and TP from the perspective of memory, throughput, and communication
-11. [Decoding and Sampling](llms/decoding.md) - sampling policies and speculative decoding
-12. [Training Objective](llms/training-objective.md) - autoregressive pre-training objective
-13. [Position Encoding](llms/position-encoding.md) - RoPE, M-RoPE, and TM-RoPE from sequence to multimodal space-time
-14. [Models](llms/models.md) - model-specific notes (Qwen3-Omni, DFlash) and practical serving commands
-15. [Neural Graphics](neural-graphics.md) - NeRF and Flow Matching foundations
+11. [Decoding and Sampling](llms/decoding.md) - temperature, top-k, top-p, and min-p
+12. [Speculative Decoding](llms/speculative-decoding.md) - verification, accepted length, and per-token latency
+13. [Training Objective](llms/training-objective.md) - autoregressive pre-training objective
+14. [Position Encoding](llms/position-encoding.md) - RoPE, M-RoPE, and TM-RoPE from sequence to multimodal space-time
+15. [Models](llms/models.md) - model-specific notes (Qwen3-Omni, DFlash) and practical serving commands
+16. [Neural Graphics](neural-graphics.md) - NeRF and Flow Matching foundations
 
 ## Documentation Map
 
@@ -39,6 +40,7 @@ A focused knowledge base for modern deep learning systems, from hardware fundame
 - [Serving Runtime](llms/serving-runtime.md)
 - [Parallelism](llms/parallelism.md)
 - [Decoding and Sampling](llms/decoding.md)
+- [Speculative Decoding](llms/speculative-decoding.md)
 - [Training Objective](llms/training-objective.md)
 
 ### Models

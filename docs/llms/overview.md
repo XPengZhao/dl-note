@@ -122,5 +122,6 @@ Within this notebook, the AI Infra pages can be read as a top-down decomposition
 - [KV Cache](kv-cache.md): the central memory object of long-context serving
 - [Serving Runtime](serving-runtime.md): how one engine schedules and stabilizes requests
 - [Parallelism](parallelism.md): how execution is distributed across devices
-- [Decoding and Sampling](decoding.md): how decode-time behavior is shaped
+- [Decoding and Sampling](decoding.md): how logits become tokens
+- [Speculative Decoding](speculative-decoding.md): verification width, accepted length, and per-token latency
 - [Training Objective](training-objective.md): the probabilistic base underlying inference-time outputs

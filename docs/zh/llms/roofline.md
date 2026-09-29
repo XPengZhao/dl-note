@@ -180,4 +180,5 @@ Decode 往往需要读取大量缓存下来的 attention 状态，而单步新�
 - [指标](metrics.md) 定义 TTFT、TPOT 和 TPS，它们描述的是用户可见现象。
 - [KV Cache](kv-cache.md) 解释为什么 decode 往往伴随明显的内存压力。
 - [推理运行时](serving-runtime.md) 讨论 roofline 本身无法捕获的调度与准入效应。
-- [解码与采样](decoding.md) 将 speculative decoding 作为改变 decode 工作形状的一个具体例子展开。
+- [解码与采样](decoding.md) 讨论 temperature、top-k、top-p 与 min-p。
+- [Speculative Decoding](speculative-decoding.md) 写出验证宽度、接受长度和每 token 延迟。

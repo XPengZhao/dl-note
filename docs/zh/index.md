@@ -11,11 +11,12 @@
 6. [KV Cache](llms/kv-cache.md) - KV 内存语义、paged blocks 与 prefix 复用
 7. [推理运行时](llms/serving-runtime.md) - chunked prefill、准入控制与运行时稳定性
 8. [并行策略](llms/parallelism.md) - 从显存、吞吐与通信理解 DP/TP
-9. [解码与采样](llms/decoding.md) - 采样策略与 speculative decoding
-10. [训练目标](llms/training-objective.md) - 自回归预训练目标
-11. [位置编码](llms/position-encoding.md) - 从 RoPE、M-RoPE 到 TM-RoPE 的建模演进
-12. [模型笔记](llms/models.md) - Qwen3-Omni 与 DFlash 的结构和实践命令
-13. [神经图形](neural-graphics.md) - NeRF 与 Flow Matching 基础
+9. [解码与采样](llms/decoding.md) - temperature、top-k、top-p 与 min-p
+10. [Speculative Decoding](llms/speculative-decoding.md) - 验证、接受长度与每 token 延迟
+11. [训练目标](llms/training-objective.md) - 自回归预训练目标
+12. [位置编码](llms/position-encoding.md) - 从 RoPE、M-RoPE 到 TM-RoPE 的建模演进
+13. [模型笔记](llms/models.md) - Qwen3-Omni 与 DFlash 的结构和实践命令
+14. [神经图形](neural-graphics.md) - NeRF 与 Flow Matching 基础
 
 ## 文档目录
 
@@ -33,6 +34,7 @@
 - [推理运行时](llms/serving-runtime.md)
 - [并行策略](llms/parallelism.md)
 - [解码与采样](llms/decoding.md)
+- [Speculative Decoding](llms/speculative-decoding.md)
 - [训练目标](llms/training-objective.md)
 
 ### 模型

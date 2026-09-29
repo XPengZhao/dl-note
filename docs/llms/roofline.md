@@ -180,4 +180,5 @@ Those questions are often more useful than asking whether a technique is "good" 
 - [Metrics](metrics.md) defines TTFT, TPOT, and TPS, which describe the user-visible symptoms.
 - [KV Cache](kv-cache.md) explains why decode often experiences strong memory pressure.
 - [Serving Runtime](serving-runtime.md) explains scheduler and admission effects that roofline alone does not capture.
-- [Decoding and Sampling](decoding.md) discusses speculative decoding as one concrete example of changing decode-side work shape.
+- [Decoding and Sampling](decoding.md) covers temperature, top-k, top-p, and min-p.
+- [Speculative Decoding](speculative-decoding.md) writes down verification width, accepted length, and per-token latency.
