@@ -1,0 +1,1644 @@
+
+<!doctype html>
+<html lang="zh" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://XPengZhao.github.io/dl-note/zh/llms/qwen3-4b-dspark-ablation/">
+      
+      
+        <link rel="prev" href="../glm-5.2-dspark-design/">
+      
+      
+      
+        
+          <link rel="alternate" href="/dl-note/" hreflang="en">
+        
+          <link rel="alternate" href="./" hreflang="zh">
+        
+      
+      
+      <link rel="icon" href="../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Qwen3-4B DSpark 消融报告 - DL Notes</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../stylesheets/bootstrap.min.css">
+    
+      <link rel="stylesheet" href="../../../stylesheets/basic.css">
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#qwen3-4b-dspark" class="md-skip">
+          跳转至
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="页眉">
+    <a href="../../" title="DL Notes" class="md-header__button md-logo" aria-label="DL Notes" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            DL Notes
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Qwen3-4B DSpark 消融报告
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+      <div class="md-header__option">
+  <div class="md-select">
+    
+    <button class="md-header__button md-icon" aria-label="选择当前语言">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12.87 15.07-2.54-2.51.03-.03A17.5 17.5 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2zm-2.62 7 1.62-4.33L19.12 17z"/></svg>
+    </button>
+    <div class="md-select__inner">
+      <ul class="md-select__list">
+        
+          <li class="md-select__item">
+            <a href="/dl-note/" hreflang="en" class="md-select__link">
+              English
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="./" hreflang="zh" class="md-select__link">
+              简体中文
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="搜索" placeholder="搜索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="查找">
+        
+        <button type="reset" class="md-search__icon md-icon" title="清空当前内容" aria-label="清空当前内容" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            正在初始化搜索引擎
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="导航栏" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../" title="DL Notes" class="md-nav__button md-logo" aria-label="DL Notes" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    DL Notes
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    首页
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tensor/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    张量操作
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../neural-graphics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    神经图形
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AI Infra
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    AI Infra
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hardware/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    硬件
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../request-lifecycle/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    请求生命周期
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../metrics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    指标
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../roofline/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Roofline 模型
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../data-movement/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    数据搬运与通信
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../kv-cache/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    KV Cache
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../serving-runtime/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    推理运行时
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../parallelism/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    并行策略
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../decoding/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    解码与采样
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../speculative-decoding/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Speculative Decoding
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../training-objective/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    训练目标
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    模型
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    模型
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../position-encoding/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    位置编码
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    模型笔记
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../glm-5.2-inference-path/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GLM-5.2 推理路径
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../glm-5.2-dspark-design/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GLM-5.2 DSpark 训练设计
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Qwen3-4B DSpark 消融报告
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Qwen3-4B DSpark 消融报告
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        实验设置
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="实验设置">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        指标
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        消融条件
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        结果总览
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        结果分析
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="结果分析">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tau-loss" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tau loss
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mla" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MLA
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mla-swa" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MLA + SWA
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#context-only" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Context-only
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#all-mask" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        All-mask
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#aux" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        三层 aux
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#23-epoch" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.3 epoch
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#full-sequence" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Full-sequence
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        总结
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        实验设置
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="实验设置">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        指标
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        消融条件
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        结果总览
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        结果分析
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="结果分析">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tau-loss" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tau loss
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mla" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MLA
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mla-swa" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MLA + SWA
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#context-only" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Context-only
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#all-mask" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        All-mask
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#aux" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        三层 aux
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#23-epoch" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.3 epoch
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#full-sequence" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Full-sequence
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        总结
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="qwen3-4b-dspark">Qwen3-4B DSpark 训练消融</h1>
+<h2 id="_1">实验设置</h2>
+<p>以 Qwen3-4B 为冻结的Target模型，训练五层 DSpark draft。目标模型的 token embedding 与 LM head 保持冻结。各实验训练 2,616 个optimizer steps，约一个 epoch，占完整scheduler的 10%。具体设置如下。</p>
+<table>
+<thead>
+<tr>
+<th><strong>项目</strong></th>
+<th>设置</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>训练数据</strong></td>
+<td>Open PerfectBlend；经目标模型重新生成回复并缓存特征，共 1,339,875 个样本</td>
+</tr>
+<tr>
+<td><strong>Regen 采样</strong></td>
+<td>Non-thinking；temperature 0.7，top-p 0.8，top-k 20，min-p 0；每次回复最多生成 4096 tokens（不含 prompt）</td>
+</tr>
+<tr>
+<td><strong>最大序列长度</strong></td>
+<td>4096 tokens（完整对话，含 prompt与response）。</td>
+</tr>
+<tr>
+<td><strong>Draft 架构</strong></td>
+<td>5 层；隐藏维度 2560；FFN 中间维度 9728；GQA：32 个 Q heads、8 个 KV heads，head dim 128</td>
+</tr>
+<tr>
+<td><strong>Aux 层</strong></td>
+<td><code>[1, 9, 17, 25, 33]</code></td>
+</tr>
+<tr>
+<td><strong>Block size</strong></td>
+<td>7；Backbone 输入为 <code>[anchor, MASK × 6]</code></td>
+</tr>
+<tr>
+<td><strong>Anchor 采样</strong></td>
+<td>每个样本最多 512 个</td>
+</tr>
+<tr>
+<td><strong>监督</strong></td>
+<td>仅监督 response</td>
+</tr>
+<tr>
+<td><strong>Markov head</strong></td>
+<td>Vanilla，rank 256</td>
+</tr>
+<tr>
+<td><strong>Batch size</strong></td>
+<td>4 GPUs × micro-batch 1 × 梯度累积 128；global batch 512</td>
+</tr>
+<tr>
+<td><strong>学习率</strong></td>
+<td>峰值 <span class="arithmatex">\(6\times10^{-4}\)</span>；warmup 比例 0.04；完整计划为 26,160 步</td>
+</tr>
+<tr>
+<td><strong>Loss</strong></td>
+<td><span class="arithmatex">\(0.1L_{\mathrm{CE}}+0.9L_{\mathrm{L1}}+L_{\mathrm{conf}}\)</span>；位置权重为 <span class="arithmatex">\(\exp(-i/4)\)</span>，<span class="arithmatex">\(i=0,\ldots,6\)</span></td>
+</tr>
+<tr>
+<td><strong>训练步数</strong></td>
+<td>2,616 optimizer step，约一个 epoch</td>
+</tr>
+<tr>
+<td><strong>总参数量</strong></td>
+<td>GQA baseline：1,393,133,569（约 1.393B；含冻结的 embedding 与 LM head，不含 target backbone）</td>
+</tr>
+<tr>
+<td><strong>可训练参数量</strong></td>
+<td>GQA baseline：615,221,249（约 615.2M）</td>
+</tr>
+</tbody>
+</table>
+<h3 id="_2">指标</h3>
+<p>第 <span class="arithmatex">\(i\)</span> 个 draft 位置上，从 <span class="arithmatex">\(q_i\)</span> 采样、按 <span class="arithmatex">\(p_i\)</span> 做拒绝采样的接受率为</p>
+<div class="arithmatex">\[
+a_i
+=\sum_v\min\bigl(p_i(v),q_i(v)\bigr)
+=1-\tfrac12\lVert p_i-q_i\rVert_1.
+\]</div>
+<p>训练接受长度</p>
+<div class="arithmatex">\[
+\tau
+=1+\sum_{i=0}^{6}\prod_{j=0}^{i}a_j.
+\]</div>
+<h3 id="_3">消融条件</h3>
+<p>各消融相对上表默认配置只改一项。</p>
+<p><span class="ablation-sq"><span class="arithmatex">\(\blacksquare\)</span></span><strong>Tau loss.</strong> 附加</p>
+<div class="arithmatex">\[
+L_{\tau}=\frac{8-\tau}{7},
+\]</div>
+<p>系数 0.1。CE 与 L1 仍按位置衰减，该项不衰减。</p>
+<p><span class="ablation-sq"><span class="arithmatex">\(\blacksquare\)</span></span><strong>MLA.</strong> Attention 换为 MLA：32 个 query heads，每头 QK 为 64 content + 64 RoPE，V 为 128，KV latent 512。相对 GQA（32Q / 8KV，head dim 128），可训练参数 <span class="arithmatex">\(612.1\mathrm{M}\)</span> vs <span class="arithmatex">\(615.2\mathrm{M}\)</span>（<span class="arithmatex">\(-0.51\%\)</span>）。压缩 KV 每层每 token 为 <span class="arithmatex">\(512+64=576\)</span> 个数，GQA 为 <span class="arithmatex">\(8\times128\times2=2048\)</span>，约 <span class="arithmatex">\(3.6\times\)</span>。</p>
+<p><span class="ablation-sq"><span class="arithmatex">\(\blacksquare\)</span></span><strong>SWA.</strong> 叠在 MLA 上。History 相对 anchor 截成 <span class="arithmatex">\([\max(0,a-W+1),a)\)</span>，至多 <span class="arithmatex">\(W-1\)</span> 个 token，不随块内 query 滑动；块内 7位仍双向可见。<span class="arithmatex">\(W\in\{1024,512,128\}\)</span>，相对最大长度 4096，history KV 约为 <span class="arithmatex">\(1/4\)</span>、<span class="arithmatex">\(1/8\)</span>、<span class="arithmatex">\(1/32\)</span>。</p>
+<p><span class="ablation-sq"><span class="arithmatex">\(\blacksquare\)</span></span><strong>Context-only.</strong> 去掉当前 draft block 的 bi-directional K/V，只保留严格早于 anchor 的 target context。</p>
+<p><span class="ablation-sq"><span class="arithmatex">\(\blacksquare\)</span></span><strong>All-mask.</strong> Backbone 输入改为七个 MASK，保留 block 内双向 attention。Markov head 第一个生成draft仍接收 anchor token logits bias。</p>
+<p><span class="ablation-sq"><span class="arithmatex">\(\blacksquare\)</span></span><strong>三层 aux.</strong> Auxiliary layers 改为 <span class="arithmatex">\([1,17,33]\)</span>。</p>
+<p><span class="ablation-sq"><span class="arithmatex">\(\blacksquare\)</span></span><strong>Full-sequence.</strong> Prompt 与 response 同时作为监督和 anchor 候选。</p>
+<h2 id="_4">结果总览</h2>
+<div class="js-sortable-table">
+<table>
+<thead>
+<tr>
+<th><strong>实验</strong></th>
+<th style="text-align: center;">CE ↓</th>
+<th style="text-align: center;">L1 ↓</th>
+<th style="text-align: center;">Acc. ↑</th>
+<th style="text-align: center;">τ ↑</th>
+<th style="text-align: center;">Δτ</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>GQA baseline</strong></td>
+<td style="text-align: center;">1.1191</td>
+<td style="text-align: center;">0.4550</td>
+<td style="text-align: center;">74.35%</td>
+<td style="text-align: center;">4.9591</td>
+<td style="text-align: center;">0.00%</td>
+</tr>
+<tr>
+<td><strong>GQA baseline（2.3 epoch）</strong></td>
+<td style="text-align: center;">0.8744</td>
+<td style="text-align: center;">0.3721</td>
+<td style="text-align: center;">—</td>
+<td style="text-align: center;">5.3611</td>
+<td style="text-align: center;">+8.11%</td>
+</tr>
+<tr>
+<td><strong>GQA + tau loss</strong></td>
+<td style="text-align: center;">1.1260</td>
+<td style="text-align: center;">0.4546</td>
+<td style="text-align: center;">74.34%</td>
+<td style="text-align: center;">4.9860</td>
+<td style="text-align: center;">+0.54%</td>
+</tr>
+<tr>
+<td><strong>MLA</strong></td>
+<td style="text-align: center;">1.1402</td>
+<td style="text-align: center;">0.4623</td>
+<td style="text-align: center;">74.00%</td>
+<td style="text-align: center;">4.9368</td>
+<td style="text-align: center;">-0.45%</td>
+</tr>
+<tr>
+<td><strong>MLA + SWA1024</strong></td>
+<td style="text-align: center;">1.1571</td>
+<td style="text-align: center;">0.4690</td>
+<td style="text-align: center;">73.65%</td>
+<td style="text-align: center;">4.9008</td>
+<td style="text-align: center;">-1.17%</td>
+</tr>
+<tr>
+<td><strong>MLA + SWA512</strong></td>
+<td style="text-align: center;">1.1853</td>
+<td style="text-align: center;">0.4787</td>
+<td style="text-align: center;">73.16%</td>
+<td style="text-align: center;">4.8523</td>
+<td style="text-align: center;">-2.15%</td>
+</tr>
+<tr>
+<td><strong>MLA + SWA128</strong></td>
+<td style="text-align: center;">1.2830</td>
+<td style="text-align: center;">0.5140</td>
+<td style="text-align: center;">71.35%</td>
+<td style="text-align: center;">4.6668</td>
+<td style="text-align: center;">-5.89%</td>
+</tr>
+<tr>
+<td><strong>GQA context-only</strong></td>
+<td style="text-align: center;">1.1795</td>
+<td style="text-align: center;">0.4767</td>
+<td style="text-align: center;">73.30%</td>
+<td style="text-align: center;">4.8718</td>
+<td style="text-align: center;">-1.76%</td>
+</tr>
+<tr>
+<td><strong>GQA all-mask</strong></td>
+<td style="text-align: center;">1.1860</td>
+<td style="text-align: center;">0.4780</td>
+<td style="text-align: center;">73.51%</td>
+<td style="text-align: center;">4.8791</td>
+<td style="text-align: center;">-1.61%</td>
+</tr>
+<tr>
+<td><strong>GQA 三层 aux</strong></td>
+<td style="text-align: center;">1.1676</td>
+<td style="text-align: center;">0.4735</td>
+<td style="text-align: center;">73.36%</td>
+<td style="text-align: center;">4.8837</td>
+<td style="text-align: center;">-1.52%</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h2 id="_5">结果分析</h2>
+<h3 id="tau-loss">Tau loss</h3>
+<p>添加训练接受长度（<span class="arithmatex">\(\tau\)</span>）的目标函数。末段 <span class="arithmatex">\(\tau\)</span> 从 4.9591 提高到 4.9860，增加 0.0270，即约 0.54%。与此同时，token accuracy 几乎不变：74.3522% → 74.3407%。CE 也基本不变，而 distribution L1 略有改善。</p>
+<p><span class="ablation-sq"><span class="arithmatex">\(\blacksquare\)</span></span><strong>位置上，收益随 draft depth 增大。</strong> 第 1 个位置接受率约 <strong>+0.045 pp</strong>，第 7 个位置约 <strong>+0.403 pp</strong>。tau loss 几乎不改首 token 的 top-1，主要提高后续位置的接受率。</p>
+<p><img alt="末段各位置接受率相对 baseline 的差异" src="../../../assets/images/qwen3-4b-dspark-ablation/tau-loss-position.svg" width="50%" /></p>
+<p><span class="ablation-sq"><span class="arithmatex">\(\blacksquare\)</span></span><strong>收益也主要出现在训练中后期。</strong> 810–1000 步时，baseline：3.9087，tau loss：3.8614。到 1610–1800 步，baseline：4.7117，tau loss：4.7488。一个可能的原因来自 <span class="arithmatex">\(\tau\)</span> 本身的 prefix-product 结构。对较后位置 <span class="arithmatex">\(a_i\)</span> 的梯度会乘以前面多个位置的接受率；训练早期各位置预测较弱时，这些乘积较小，因此多步目标对后位置的有效梯度也较弱。随着基础 CE/L1 训练提高前缀接受率，tau objective 才逐渐产生更明显的作用。</p>
+<p><img alt="训练过程中 τ 相对 baseline 的差异" src="../../../assets/images/qwen3-4b-dspark-ablation/tau-loss-steps.svg" width="50%" /></p>
+<h3 id="mla">MLA</h3>
+<p>Attention 换为 MLA 后，末段 <span class="arithmatex">\(\tau\)</span> 从 4.9591 降到 4.9368，约 0.45%。token accuracy 从 74.35% 降到 74.00%。CE 1.1191 → 1.1402，L1 0.4550 → 0.4623。可训练参数 <span class="arithmatex">\(612.1\mathrm{M}\)</span> vs <span class="arithmatex">\(615.2\mathrm{M}\)</span>（<span class="arithmatex">\(-0.51\%\)</span>）。</p>
+<p><span class="ablation-sq"><span class="arithmatex">\(\blacksquare\)</span></span><strong>位置上，损失不随 draft depth 扩大。</strong> 第 1 个位置接受率约 <strong>-0.26 pp</strong>，第 7 个位置约 <strong>-0.15 pp</strong>。后续位置没有额外放大。</p>
+<p><img alt="末段各位置接受率相对 baseline 的差异" src="../../../assets/images/qwen3-4b-dspark-ablation/mla-position.svg" width="50%" /></p>
+<p><span class="ablation-sq"><span class="arithmatex">\(\blacksquare\)</span></span><strong>训练全程与 GQA 接近。</strong> 810–1000 步时，baseline：3.9087，MLA：3.9128。到 1610–1800 步，baseline：4.7117，MLA：4.7038。末段才到 -0.45%。</p>
+<p><img alt="训练过程中 τ 相对 baseline 的差异" src="../../../assets/images/qwen3-4b-dspark-ablation/mla-steps.svg" width="50%" /></p>
+<p><span class="ablation-sq"><span class="arithmatex">\(\blacksquare\)</span></span><strong>KV cache收益。</strong> 每层每 token 从 2048 压到 576，约 <span class="arithmatex">\(3.6\times\)</span>。训练 <span class="arithmatex">\(\tau\)</span> 只差 0.45%。</p>
+<h3 id="mla-swa">MLA + SWA</h3>
+<p>SWA 叠在 MLA 上，history 限制为至多 <span class="arithmatex">\(W-1\)</span> 个 token。<span class="arithmatex">\(W=1024,512,128\)</span> 相对最大长度 4096 约为 <span class="arithmatex">\(1/4\)</span>、<span class="arithmatex">\(1/8\)</span>、<span class="arithmatex">\(1/32\)</span>。末段 <span class="arithmatex">\(\tau\)</span> 相对 MLA：4.9008（−0.73%）、4.8523（−1.71%）、4.6668（−5.47%）。</p>
+<p><span class="ablation-sq"><span class="arithmatex">\(\blacksquare\)</span></span><strong>窗口越小，各位置接受率下降越大。</strong> SWA128 第 1 个位置约 <strong>-1.49 pp</strong>，第 4–5 个约 <strong>-3.28 pp</strong>，第 7 个约 <strong>-2.94 pp</strong>。块内双向 attention 不能补偿被限制的 target history。</p>
+<p><img alt="末段各位置接受率相对 MLA 的差异" src="../../../assets/images/qwen3-4b-dspark-ablation/swa-position.svg" width="50%" /></p>
+<p><span class="ablation-sq"><span class="arithmatex">\(\blacksquare\)</span></span><strong>SWA128 相对 MLA 的 <span class="arithmatex">\(\tau\)</span> 差在 810–1000 步已接近末段。</strong> 该窗口内 MLA：3.9128，SWA128：3.7498（−4.17%）。SWA1024 同期为 3.9153，末段 −0.73%。</p>
+<p><img alt="训练过程中 τ 相对 MLA 的差异" src="../../../assets/images/qwen3-4b-dspark-ablation/swa-steps.svg" width="50%" /></p>
+<p><span class="ablation-sq"><span class="arithmatex">\(\blacksquare\)</span></span><strong>缩短 history 对 <span class="arithmatex">\(\tau\)</span> 的影响大于 GQA 换 MLA。</strong> GQA → MLA：−0.45%；MLA → SWA128：−5.47%。若限制 history KV，这一组中 SWA1024 的 <span class="arithmatex">\(\tau\)</span> 下降最小。</p>
+<h3 id="context-only">Context-only</h3>
+<p>去掉当前 draft block 的双向 K/V，只保留严格早于 anchor 的 target context。第 1 个位置仍保留 anchor embedding residual，Markov head 仍接收前驱 token。末段 <span class="arithmatex">\(\tau\)</span> 从 4.9591 降到 4.8718，约 1.76%。token accuracy 74.35% → 73.30%。CE 1.1191 → 1.1795，L1 0.4550 → 0.4767。</p>
+<p><span class="ablation-sq"><span class="arithmatex">\(\blacksquare\)</span></span><strong>第 1 个位置接受率几乎不变，下降出现在后续位置。</strong> 第 1 个位置约 <strong>−0.12 pp</strong>，第 2 个约 <strong>−1.56 pp</strong>，第 7 个约 <strong>−0.79 pp</strong>。CE：第 1 个 0.6036 → 0.6090，第 2 个 0.8965 → 0.9910。当前 block 的双向 K/V 主要用于第 2 个及之后位置。</p>
+<p><img alt="末段各位置接受率相对 baseline 的差异" src="../../../assets/images/qwen3-4b-dspark-ablation/context-only-position.svg" width="50%" /></p>
+<p><span class="ablation-sq"><span class="arithmatex">\(\blacksquare\)</span></span><strong>相对 baseline 的 <span class="arithmatex">\(\tau\)</span> 差在 810–1000 步已接近末段。</strong> 该窗口内 baseline：3.9087，context-only：3.8379（−1.81%）。1610–1800 步：4.7117 vs 4.6435（−1.45%）。末段 −1.76%。</p>
+<p><img alt="训练过程中 τ 相对 baseline 的差异" src="../../../assets/images/qwen3-4b-dspark-ablation/context-only-steps.svg" width="50%" /></p>
+<p><span class="ablation-sq"><span class="arithmatex">\(\blacksquare\)</span></span><strong>第 1 个位置几乎不依赖当前 block 的 K/V。</strong> 此处第 1 个位置接受率 −0.12 pp；SWA128 在同一位置为 −1.49 pp。该消融去掉的是 block 内双向 K/V，target history 仍完整。</p>
+<h3 id="all-mask">All-mask</h3>
+<p>Backbone 输入从 <code>[anchor, MASK×6]</code> 改为 <code>[MASK×7]</code>，保留块内双向 attention。Markov head 仍接收前驱 token。末段 <span class="arithmatex">\(\tau\)</span> 从 4.9591 降到 4.8791，约 1.61%。token accuracy 74.35% → 73.51%。CE 1.1191 → 1.1860，L1 0.4550 → 0.4780。</p>
+<p><span class="ablation-sq"><span class="arithmatex">\(\blacksquare\)</span></span><strong>下降集中在第 1 个位置，随后逐位置减小。</strong> 第 1 个位置接受率约 <strong>−1.65 pp</strong>，第 2 个约 <strong>−1.19 pp</strong>，第 7 个约 <strong>−0.04 pp</strong>。CE：第 1 个 0.6036 → 0.6978，第 7 个 1.9763 → 1.9983。</p>
+<p><img alt="末段各位置接受率相对 baseline 的差异" src="../../../assets/images/qwen3-4b-dspark-ablation/all-mask-position.svg" width="50%" /></p>
+<p><span class="ablation-sq"><span class="arithmatex">\(\blacksquare\)</span></span><strong>相对 baseline 的 <span class="arithmatex">\(\tau\)</span> 差在 810–1000 步大于末段。</strong> 该窗口内 baseline：3.9087，all-mask：3.7809（−3.27%）。1610–1800 步：4.7117 vs 4.6327（−1.68%）。末段 −1.61%。</p>
+<p><img alt="训练过程中 τ 相对 baseline 的差异" src="../../../assets/images/qwen3-4b-dspark-ablation/all-mask-steps.svg" width="50%" /></p>
+<p><span class="ablation-sq"><span class="arithmatex">\(\blacksquare\)</span></span><strong>第 1 个位置依赖 backbone 读到 anchor token。</strong> 此处第 1 个位置 −1.65 pp、第 7 个 −0.04 pp；context-only 为 −0.12 pp 与 −0.79 pp。该消融去掉的是 backbone 的 anchor 输入，块内双向 K/V 仍保留。</p>
+<h3 id="aux">三层 aux</h3>
+<p>Auxiliary layers 从 <code>[1, 9, 17, 25, 33]</code> 改为 <code>[1, 17, 33]</code>。输入投影参数 32.77M → 19.66M，可训练参数减少 13.11M，约 2.13%。末段 <span class="arithmatex">\(\tau\)</span> 从 4.9591 降到 4.8837，约 1.52%。token accuracy 74.35% → 73.36%。CE 1.1191 → 1.1676，L1 0.4550 → 0.4735。</p>
+<p><span class="ablation-sq"><span class="arithmatex">\(\blacksquare\)</span></span><strong>接受率下降随位置加深。</strong> 第 1 个位置约 <strong>−0.42 pp</strong>，第 4 个约 <strong>−0.96 pp</strong>，第 7 个约 <strong>−1.15 pp</strong>。CE：第 1 个 0.6036 → 0.6267，第 7 个 1.9763 → 2.0540。</p>
+<p><img alt="末段各位置接受率相对 baseline 的差异" src="../../../assets/images/qwen3-4b-dspark-ablation/aux-3layers-position.svg" width="50%" /></p>
+<p><span class="ablation-sq"><span class="arithmatex">\(\blacksquare\)</span></span><strong>相对 baseline 的 <span class="arithmatex">\(\tau\)</span> 差在 810–1000 步大于末段。</strong> 该窗口内 baseline：3.9087，三层 aux：3.7945（−2.92%）。1610–1800 步：4.7117 vs 4.6211（−1.92%）。末段 −1.52%。</p>
+<p><img alt="训练过程中 τ 相对 baseline 的差异" src="../../../assets/images/qwen3-4b-dspark-ablation/aux-3layers-steps.svg" width="50%" /></p>
+<h3 id="23-epoch">2.3 epoch</h3>
+<p>同一 GQA 配置，末段取 5820–6010 步（约 2.3 epoch）。<span class="arithmatex">\(\tau\)</span> 从 4.9591 到 5.3611，约 +8.11%。CE 0.8744，L1 0.3721。</p>
+<p><span class="ablation-sq"><span class="arithmatex">\(\blacksquare\)</span></span><strong>接受率提高随位置加深。</strong> 第 1 个位置约 <strong>+2.59 pp</strong>，第 4 个约 <strong>+5.20 pp</strong>，第 7 个约 <strong>+6.42 pp</strong>。</p>
+<p><img alt="末段各位置接受率相对 1 epoch 的差异" src="../../../assets/images/qwen3-4b-dspark-ablation/epoch3-position.svg" width="50%" /></p>
+<div hidden="hidden">
+<h3 id="full-sequence">Full-sequence</h3>
+<p>Full-sequence run 的末段结果为：</p>
+<ul>
+<li>CE：1.4346</li>
+<li>token accuracy：68.58%</li>
+<li>τ：4.7750</li>
+</ul>
+<p>这些数值明显低于 response-only baseline，但二者并非同分布比较。</p>
+<p>Full-sequence 将 prompt 和 response 都加入监督和 anchor 候选，因此训练指标包含了不同类型的位置。固定每个样本最多 512 个 anchor 后，加入 prompt positions 还会改变 response anchors 获得的监督预算。</p>
+<p>因此，该结果目前能说明的是：</p>
+<p><strong>将训练范围扩展到 full sequence 会显著改变 optimizer 实际看到的位置分布。</strong></p>
+<p>它是否提高或降低最终 response speculative decoding quality，需要在固定的 response-only validation positions 上重新评估。同时应记录 prompt / response anchor 数量，判断是否存在监督预算被 prompt 稀释的问题。</p>
+</div>
+<h2 id="_6">总结</h2>
+<p><strong>缩短 history 对 <span class="arithmatex">\(\tau\)</span> 的影响大于 GQA 换 MLA。</strong> GQA → MLA：−0.45%；MLA → SWA128：−5.47%；MLA → SWA1024：−0.73%。MLA 每层每 token KV 从 2048 压到 576，约 <span class="arithmatex">\(3.6\times\)</span>。</p>
+<p><strong>Backbone 的 anchor 输入与块内双向 K/V 作用在不同位置。</strong> All-mask 第 1 个位置 −1.65 pp、第 7 个 −0.04 pp。Context-only 第 1 个 −0.12 pp、第 2 个 −1.56 pp。</p>
+<p><strong>4. Tau loss 提高后续位置接受率，几乎不改 token accuracy。</strong> 末段 <span class="arithmatex">\(\tau\)</span> +0.54%。第 1 个位置 +0.045 pp，第 7 个 +0.403 pp。acc 74.35% → 74.34%。该 <span class="arithmatex">\(\tau\)</span> 是训练接受长度，不是推理 MAL。</p>
+<p><strong>5. 三层 aux 减少 2.13% 可训练参数，<span class="arithmatex">\(\tau\)</span> 下降 1.52%。</strong> 第 1 个位置 −0.42 pp，第 7 个 −1.15 pp。该结果来自无 MTP 的 Qwen3-4B，对于有MTP的模型可能不一样。</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": [], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}, "version": null}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+        <script src="../../../javascripts/mathjax.js"></script>
+      
+        <script src="../../../javascripts/cjk-spacing.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+      
+        <script src="../../../javascripts/mermaid.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/tablesort@5.3.0/dist/tablesort.min.js"></script>
+      
+        <script src="../../../javascripts/tablesort.js"></script>
+      
+    
+  </body>
+</html>

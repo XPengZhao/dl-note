@@ -1,0 +1,1948 @@
+
+<!doctype html>
+<html lang="zh" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://XPengZhao.github.io/dl-note/zh/llms/speculative-decoding/">
+      
+      
+        <link rel="prev" href="../decoding/">
+      
+      
+        <link rel="next" href="../training-objective/">
+      
+      
+        
+          <link rel="alternate" href="../../../llms/speculative-decoding/" hreflang="en">
+        
+          <link rel="alternate" href="./" hreflang="zh">
+        
+      
+      
+      <link rel="icon" href="../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Speculative Decoding - DL Notes</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../stylesheets/bootstrap.min.css">
+    
+      <link rel="stylesheet" href="../../../stylesheets/basic.css">
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#speculative-decoding" class="md-skip">
+          跳转至
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="页眉">
+    <a href="../../" title="DL Notes" class="md-header__button md-logo" aria-label="DL Notes" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            DL Notes
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Speculative Decoding
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+      <div class="md-header__option">
+  <div class="md-select">
+    
+    <button class="md-header__button md-icon" aria-label="选择当前语言">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12.87 15.07-2.54-2.51.03-.03A17.5 17.5 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2zm-2.62 7 1.62-4.33L19.12 17z"/></svg>
+    </button>
+    <div class="md-select__inner">
+      <ul class="md-select__list">
+        
+          <li class="md-select__item">
+            <a href="../../../llms/speculative-decoding/" hreflang="en" class="md-select__link">
+              English
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="./" hreflang="zh" class="md-select__link">
+              简体中文
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="搜索" placeholder="搜索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="查找">
+        
+        <button type="reset" class="md-search__icon md-icon" title="清空当前内容" aria-label="清空当前内容" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            正在初始化搜索引擎
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="导航栏" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../" title="DL Notes" class="md-nav__button md-logo" aria-label="DL Notes" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    DL Notes
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    首页
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tensor/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    张量操作
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../neural-graphics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    神经图形
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AI Infra
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    AI Infra
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hardware/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    硬件
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../request-lifecycle/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    请求生命周期
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../metrics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    指标
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../roofline/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Roofline 模型
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../data-movement/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    数据搬运与通信
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../kv-cache/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    KV Cache
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../serving-runtime/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    推理运行时
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../parallelism/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    并行策略
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../decoding/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    解码与采样
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Speculative Decoding
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Speculative Decoding
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-motivation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Motivation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-vanilla-speculative-decoding" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Vanilla Speculative Decoding
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Vanilla Speculative Decoding">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#21-draft" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.1 Draft
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#22-verification" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.2 Verification
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#23-rejection-and-resampling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.3 Rejection and Resampling
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-why-is-speculative-decoding-exact" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Why Is Speculative Decoding Exact?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-where-does-the-speedup-come-from" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Where Does the Speedup Come From?
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. Where Does the Speedup Come From?">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#41-acceptance-length" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.1 Acceptance Length
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#42-a-simple-speedup-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.2 A Simple Speedup Model
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#43-what-actually-determines-the-speedup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.3 What Actually Determines the Speedup?
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-a-systems-view-of-speculative-decoding" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. A Systems View of Speculative Decoding
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. A Systems View of Speculative Decoding">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#51-what-changes-in-a-speculative-step" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.1 What Changes in a Speculative Step?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#52-batch-size-compute-and-memory-traffic" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.2 Batch Size, Compute, and Memory Traffic
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#53-communication-fewer-synchronizations-more-bytes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.3 Communication: Fewer Synchronizations, More Bytes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#54-moe-expert-utilization-and-load-imbalance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.4 MoE: Expert Utilization and Load Imbalance
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#55-kv-cache-reuse-rollback-and-capacity" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.5 KV Cache: Reuse, Rollback, and Capacity
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#56-from-step-latency-to-serving-throughput" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.6 From Step Latency to Serving Throughput
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#appendix" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Appendix
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Appendix">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#implementation-details" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Implementation Details
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../training-objective/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    训练目标
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    模型
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    模型
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../position-encoding/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    位置编码
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    模型笔记
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../glm-5.2-inference-path/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GLM-5.2 推理路径
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../glm-5.2-dspark-design/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GLM-5.2 DSpark 训练设计
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../qwen3-4b-dspark-ablation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Qwen3-4B DSpark 消融报告
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-motivation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Motivation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-vanilla-speculative-decoding" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Vanilla Speculative Decoding
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Vanilla Speculative Decoding">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#21-draft" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.1 Draft
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#22-verification" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.2 Verification
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#23-rejection-and-resampling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.3 Rejection and Resampling
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-why-is-speculative-decoding-exact" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Why Is Speculative Decoding Exact?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-where-does-the-speedup-come-from" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Where Does the Speedup Come From?
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. Where Does the Speedup Come From?">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#41-acceptance-length" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.1 Acceptance Length
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#42-a-simple-speedup-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.2 A Simple Speedup Model
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#43-what-actually-determines-the-speedup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.3 What Actually Determines the Speedup?
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-a-systems-view-of-speculative-decoding" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. A Systems View of Speculative Decoding
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. A Systems View of Speculative Decoding">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#51-what-changes-in-a-speculative-step" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.1 What Changes in a Speculative Step?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#52-batch-size-compute-and-memory-traffic" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.2 Batch Size, Compute, and Memory Traffic
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#53-communication-fewer-synchronizations-more-bytes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.3 Communication: Fewer Synchronizations, More Bytes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#54-moe-expert-utilization-and-load-imbalance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.4 MoE: Expert Utilization and Load Imbalance
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#55-kv-cache-reuse-rollback-and-capacity" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.5 KV Cache: Reuse, Rollback, and Capacity
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#56-from-step-latency-to-serving-throughput" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.6 From Step Latency to Serving Throughput
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#appendix" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Appendix
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Appendix">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#implementation-details" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Implementation Details
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="speculative-decoding">Speculative Decoding</h1>
+<h2 id="1-motivation">1. Motivation</h2>
+<p><img alt="Draft 逐个写出 token，target 一次 forward 验证到第一处拒绝" src="../../../assets/images/speculative-decoding/sd-architecture.svg" width="80%" /></p>
+<p>大模型生成文本时，token 是一个接一个产生的。比如模型已经生成到 <strong>once</strong>，接下来要得到 <strong>upon → a → time → there</strong>。由于后一个 token 依赖前一个 token，target model 必须连续执行四次 decode，才能生成这四个 token。问题在于，decode 的每一步其实只生成一个 token。尤其在 batch 较小时，一次 forward 的计算量并不大，但仍然需要读取已有的 KV cache、启动 GPU kernel，并完成同步。因此，生成四个 token 的代价基本就是四次 target forward的时间. Speculative decoding 的想法很直接：既然 target 每次只生成一个 token 很贵，能不能先让一个更小、更快的模型猜几个 token，再让 target 一次检查完？</p>
+<p>图中，draft model 先连续生成 <strong>upon → a → time → there</strong>。随后 target 不再逐个生成这些 token，而是在一次 forward 中同时计算这几个位置的预测结果，并从左到右进行验证。在这个例子里，<strong>upon、a、time</strong> 都被接受，到 <strong>there</strong> 时第一次出现拒绝，因此验证在这里停止。这样，原本需要 target 连续执行四次的工作，被压缩成了一次 target forward，再加上若干次成本更低的 draft forward。这也是 speculative decoding 的核心：<strong>用便宜的 draft 生成候选，再利用 target 对多个候选 token 进行并行验证，以减少昂贵的 target decode 次数。</strong> Draft 猜得越准，一次 target forward 能确认的 token 越多，加速效果也就越明显。</p>
+<h2 id="2-vanilla-speculative-decoding">2. Vanilla Speculative Decoding</h2>
+<h3 id="21-draft">2.1 Draft</h3>
+<p>Speculative decoding 的第一步，是让一个更小的 draft model 先向前生成若干个候选 token。继续使用前面的例子，当前 prefix 以 <strong>once</strong> 结尾。如果 draft length 为 <span class="arithmatex">\(K=4\)</span>，draft 会连续生成<span class="arithmatex">\(\text{upon}\rightarrow\text{a}\rightarrow\text{time}\rightarrow\text{there}.\)</span> 形式化地，令当前 prefix 为 <span class="arithmatex">\(y\)</span>，draft model 的条件分布为 <span class="arithmatex">\(p_d\)</span>。第 <span class="arithmatex">\(i\)</span> 个候选 token 按照</p>
+<div class="arithmatex">\[
+x_i\sim p_d(\cdot\mid y,x_{&lt;i})
+\]</div>
+<p>依次生成，其中 <span class="arithmatex">\(x_{&lt;i}=(x_1,\ldots,x_{i-1})\)</span>。因此，draft 阶段本身仍然是 autoregressive 的：生成 <span class="arithmatex">\(K\)</span> 个候选 token，依然需要 <span class="arithmatex">\(K\)</span> 次 draft forward。 这看起来似乎没有减少 forward 次数，关键在于 draft 通常远小于 target。Speculative decoding 实际上是在用 <span class="arithmatex">\(K\)</span> 次便宜的 draft forward 去换取后面若干次昂贵的 target forward。Draft 生成的 token 也只是候选，真正决定它们能否进入最终输出的仍然是 target。</p>
+<p>因此，一个好的 draft 并不需要完全复现 target，只需要同时做到两件事：<strong>生成得足够快，并且经常猜中 target 接下来会接受的 token。</strong> Draft 太大，候选更准但自身开销更高；draft 太小，虽然便宜，却可能频繁被拒绝。这个 trade-off 会直接决定 speculative decoding 最终能获得多少加速。</p>
+<h3 id="22-verification">2.2 Verification</h3>
+<p>Draft 得到 <span class="arithmatex">\(K\)</span> 个候选 token 后，target 不需要像正常 decoding 那样再逐个生成。因为整段 candidate sequence 已经给定，target 可以把它们一次性送入模型，在一次 forward 中同时得到每个位置的条件分布</p>
+<div class="arithmatex">\[
+p_t(\cdot\mid y),\quad
+p_t(\cdot\mid y,x_1),\quad \ldots,\quad
+p_t(\cdot\mid y,x_{&lt;K}).
+\]</div>
+<p>虽然这些位置在语义上仍然存在先后依赖，但它们的输入 token 已经由 draft 提供，因此 target 可以像 prefill 一样并行计算。回到前面的例子，draft 给出 <strong>upon → a → time → there</strong>，target 只需一次 forward，就能得到这四个位置对应的预测分布。</p>
+<p>接下来从左到右验证候选 token。对于第 <span class="arithmatex">\(i\)</span> 个 draft token <span class="arithmatex">\(x_i\)</span>，其接受概率为</p>
+<div class="arithmatex">\[
+\alpha_i=
+\min\left(
+1,
+\frac{p_t(x_i\mid y,x_{&lt;i})}
+     {p_d(x_i\mid y,x_{&lt;i})}
+\right).
+\]</div>
+<p>如果 <span class="arithmatex">\(x_i\)</span> 被接受，就继续检查下一个；一旦某个位置被拒绝，它右边的候选全部失效，因为这些 token 都是在被拒绝的 token 条件下生成的。于是图中的 <strong>upon、a、time</strong> 可以连续通过，而 <strong>there</strong> 被拒绝，当前 speculative step 也就在这里结束。</p>
+<p>Verification 的收益正来自这里：<strong>target 用一次较宽的 forward，同时检查多个 draft token，再把可以接受的部分一次写入输出。</strong> 如果一次 verification 平均能接受多个 token，就相当于用一次 target forward 替代了多次普通 decode。</p>
+<h3 id="23-rejection-and-resampling">2.3 Rejection and Resampling</h3>
+<p>如果第 <span class="arithmatex">\(i\)</span> 个候选 token <span class="arithmatex">\(x_i\)</span> 被拒绝，那么从 <span class="arithmatex">\(x_{i+1}\)</span> 开始的候选都会被丢弃，因为它们是在 <span class="arithmatex">\(x_i\)</span> 已经出现的条件下生成的。此时需要由 target 在第 <span class="arithmatex">\(i\)</span> 个位置重新生成一个 token，然后结束这一轮 speculative decoding。</p>
+<p>这里不能简单地重新从 <span class="arithmatex">\(p_t\)</span> 采样。原因是：我们已经知道 <span class="arithmatex">\(x_i\)</span> 没有通过前面的 acceptance test，这个 rejection 本身已经改变了当前位置的条件分布。如果忽略这一信息再次直接采样 <span class="arithmatex">\(p_t\)</span>，某些 token 会被重复赋予概率，最终生成分布就不再严格等价于 target model。</p>
+<p>正确的做法是从 target 与 draft 的<strong>剩余概率质量</strong>中采样：</p>
+<div class="arithmatex">\[
+p_{\mathrm{res}}(x)
+=
+\frac{
+\left[p_t(x)-p_d(x)\right]_+
+}{
+\sum_{x'}
+\left[p_t(x')-p_d(x')\right]_+
+},
+\qquad
+[a]_+=\max(a,0).
+\]</div>
+<p>直观来看，draft 已经通过候选过程“用掉”了一部分概率质量；当候选被拒绝时，只需要由 target 补上 draft 没有覆盖到的部分。正是 acceptance rule 和 residual resampling 的配合，使 speculative decoding 虽然先让 draft 猜测多个 token，最终得到的采样分布仍然与直接从 target autoregressive decoding 完全一致。</p>
+<h2 id="3-why-is-speculative-decoding-exact">3. Why Is Speculative Decoding Exact?</h2>
+<p>Speculative decoding 改变了 token 的生成过程，但不会改变最终的采样分布。关键在于：draft 负责提出 candidate，acceptance rule 保留 target 与 draft 重叠的概率质量，而 rejection 后的 residual sampling 再补上 target 剩余的部分。</p>
+<p>先看一个候选 token <span class="arithmatex">\(x\)</span>。Draft 以 <span class="arithmatex">\(p_d(x)\)</span> 的概率提出它，并以</p>
+<div class="arithmatex">\[
+\alpha(x)=
+\min\left(
+1,\frac{p_t(x)}{p_d(x)}
+\right)
+\]</div>
+<p>的概率接受。因此，<span class="arithmatex">\(x\)</span> 通过 draft proposal 并最终被接受的概率为</p>
+<div class="arithmatex">\[
+p_d(x)\alpha(x)
+=
+\min\left(p_d(x),p_t(x)\right).
+\]</div>
+<p>也就是说，acceptance 恰好保留了 <span class="arithmatex">\(p_d\)</span> 和 <span class="arithmatex">\(p_t\)</span> 之间重叠的概率质量。对于 target 比 draft 更偏好的 token，这部分还不够，缺少的概率正是</p>
+<div class="arithmatex">\[
+\left[p_t(x)-p_d(x)\right]_+.
+\]</div>
+<p>当 candidate 被拒绝后，residual distribution 正是按照这部分剩余概率重新采样。因此，对任意 token <span class="arithmatex">\(x\)</span>，最终得到它的总概率为</p>
+<div class="arithmatex">\[
+\min\left(p_d(x),p_t(x)\right)
++
+\left[p_t(x)-p_d(x)\right]_+
+=
+p_t(x).
+\]</div>
+<p>所以，无论一个 token 是由 draft 提出后被接受，还是在 rejection 后通过 residual sampling 得到，最终分布都严格等于 target distribution。这个结论在每一个 decoding position 上都成立，因此 speculative decoding 在加速生成的同时，仍然保持与原始 target autoregressive sampling 完全相同的输出分布。</p>
+<h2 id="4-where-does-the-speedup-come-from">4. Where Does the Speedup Come From?</h2>
+<h3 id="41-acceptance-length">4.1 Acceptance Length</h3>
+<p>Speculative decoding 的加速首先取决于：一次 target verification 能让生成序列向前推进多少个 token。假设 draft length 为 <span class="arithmatex">\(K\)</span>，并且前 <span class="arithmatex">\(m\)</span> 个 draft token 被连续接受，那么这一轮至少可以确认这 <span class="arithmatex">\(m\)</span> 个 token；在标准 speculative decoding 中，target 还会在 verification 的末尾额外产生一个 token，因此这一轮通常能够推进</p>
+<div class="arithmatex">\[
+m+1
+\]</div>
+<p>个 token。我们将一次 speculative step 实际推进的 token 数称为 <strong>acceptance length</strong>，其平均值记为</p>
+<div class="arithmatex">\[
+A=\mathbb{E}[\text{tokens advanced per speculative step}].
+\]</div>
+<p>以 <span class="arithmatex">\(K=4\)</span> 为例，如果 draft 给出 <strong>upon → a → time → there</strong>，其中前三个 token 被接受、第四个被拒绝，那么 target 会在第四个位置重新采样一个 token。这一轮最终向前推进 4 个 token，因此 acceptance length 为 4。相反，如果第一个 draft token 就被拒绝，那么这一轮只能推进 1 个 token，此时 speculative decoding 几乎没有利用到并行 verification 的优势。</p>
+<p>这里需要区分 <strong>acceptance rate</strong> 和 <strong>acceptance length</strong>。Acceptance rate 描述单个 draft token 被接受的比例，而 acceptance length 直接描述一次昂贵的 target verification 能换来多少个输出 token。对于实际推理性能，后者通常更加重要：<strong>一次 verification 推进得越远，需要执行的 target forward 就越少。</strong> 下一节可以据此建立一个简单的 speedup model，分析 acceptance length、draft cost 和 verification cost 如何共同决定最终加速比。</p>
+<h3 id="42-a-simple-speedup-model">4.2 A Simple Speedup Model</h3>
+<p>有了 acceptance length，就可以粗略估算 speculative decoding 为什么会更快。假设普通 autoregressive decoding 的一次 target decode 耗时为 <span class="arithmatex">\(T_{\mathrm{target}}\)</span>。如果生成 <span class="arithmatex">\(A\)</span> 个 token，需要执行 <span class="arithmatex">\(A\)</span> 次 target forward，因此时间约为</p>
+<div class="arithmatex">\[
+T_{\mathrm{AR}}
+=
+A\,T_{\mathrm{target}}.
+\]</div>
+<p>对于 speculative decoding，假设 draft length 为 <span class="arithmatex">\(K\)</span>。一轮 speculative step 需要先执行 <span class="arithmatex">\(K\)</span> 次 draft forward，再执行一次 target verification，因此其耗时可以写成</p>
+<div class="arithmatex">\[
+T_{\mathrm{spec}}
+=
+K T_{\mathrm{draft}}
++
+T_{\mathrm{verify}}(K).
+\]</div>
+<p>如果这一轮平均能够推进 <span class="arithmatex">\(A\)</span> 个 token，那么对应的理想化 speedup 为</p>
+<div class="arithmatex">\[
+S
+=
+\frac{A\,T_{\mathrm{target}}}
+{K T_{\mathrm{draft}}+T_{\mathrm{verify}}(K)}.
+\]</div>
+<p>这个公式也直接说明了 speculative decoding 的三个核心目标：让一次 verification 接受尽可能多的 token，即增大 <span class="arithmatex">\(A\)</span>；让 draft 足够轻量，减小 <span class="arithmatex">\(T_{\mathrm{draft}}\)</span>；同时控制一次多-token verification 的额外开销 <span class="arithmatex">\(T_{\mathrm{verify}}(K)\)</span>。因此，<strong>高 acceptance 并不自动意味着高 speedup</strong>。如果为了提高 acceptance 使用了过大的 draft，或者 verification 本身变得很贵，最终节省下来的 target decode 时间仍然可能抵不过新增的开销。</p>
+<h3 id="43-what-actually-determines-the-speedup">4.3 What Actually Determines the Speedup?</h3>
+<p>从上一节的公式可以看出，speculative decoding 的性能主要由三个因素决定：acceptance length <span class="arithmatex">\(A\)</span>、draft cost <span class="arithmatex">\(T_{\mathrm{draft}}\)</span> 和 verification cost <span class="arithmatex">\(T_{\mathrm{verify}}(K)\)</span>。其中最直接的是 <span class="arithmatex">\(A\)</span>。一次 verification 能接受的 token 越多，就越能摊薄 target forward 的成本；如果 draft 经常在前几个位置就被拒绝，那么即使 verification 能一次处理很多 candidate，大部分计算也没有真正转化成有效输出。</p>
+<p>Draft length <span class="arithmatex">\(K\)</span> 也存在明显的 trade-off。增大 <span class="arithmatex">\(K\)</span> 给了一次 verification 接受更多 token 的机会，但同时需要更多 draft forward，而且越靠后的 candidate 越容易因为前面某个 token 被拒绝而直接作废。因此，<span class="arithmatex">\(K\)</span> 并不是越大越好。类似地，更大的 draft model 往往能提高 acceptance，但自身生成 candidate 的成本也更高。一个好的 drafter 追求的不是单纯更准确，而是以尽可能低的代价获得较长的 acceptance length。</p>
+<p>Verification 本身也不是免费的。Target 虽然只执行一次 forward，但需要同时处理 <span class="arithmatex">\(K\)</span> 个 candidate token，因此</p>
+<div class="arithmatex">\[
+T_{\mathrm{verify}}(K) &gt; T_{\mathrm{target}}
+\]</div>
+<p>通常是正常的。Speculative decoding 能够加速，是因为一次较宽的 verification 仍然可能比连续执行多次单-token decode 更划算。这个优势还会受到 batch size、KV cache 访问和 GPU utilization 的影响：例如 batch 较大时，普通 target decoding 已经能更充分地利用 GPU，speculative decoding 可以获得的额外收益往往会缩小。</p>
+<p>因此，评价一个 speculative decoding 方法时，只看 acceptance rate 并不够。真正需要关心的是：<strong>每次 target verification 最终推进了多少 token，以及为了得到这些 token 额外付出了多少 drafting 和 verification 成本。</strong> 后面的各种 speculative decoding 方法，本质上都在优化这个 trade-off。</p>
+<h2 id="5-a-systems-view-of-speculative-decoding">5. A Systems View of Speculative Decoding</h2>
+<h3 id="51-what-changes-in-a-speculative-step">5.1 What Changes in a Speculative Step?</h3>
+<p>前面的 speedup model 把 speculative decoding 简化成 draft cost、verification cost 和 acceptance length。要进一步分析 batch size、通信、MoE 和 KV cache，需要先把一次 speculative step 中发生的工作分开记账。设当前 batch size 为 <span class="arithmatex">\(B\)</span>，draft 一次提出 <span class="arithmatex">\(K\)</span> 个 candidate，一轮结束后每个请求平均向前推进 <span class="arithmatex">\(A\)</span> 个 token。Target verification 实际处理的 query token 数记为 <span class="arithmatex">\(q\)</span>；它通常与 <span class="arithmatex">\(K\)</span> 同阶，但具体是 <span class="arithmatex">\(K\)</span> 还是 <span class="arithmatex">\(K+1\)</span> 取决于实现，因此这里不预先固定。</p>
+<p>在暂时忽略 draft 与 target 重叠执行的情况下，一轮 speculative decoding 的时间可以写成</p>
+<div class="arithmatex">\[
+C_{\mathrm{spec}}
+=
+T_{\mathrm{draft}}
++
+T_{\mathrm{verify}}(B,q)
++
+T_{\mathrm{control}},
+\]</div>
+<p>其中 <span class="arithmatex">\(T_{\mathrm{control}}\)</span> 包括 acceptance、sampling、状态更新等没有包含在模型 forward 中的开销。由于这一轮平均产生 <span class="arithmatex">\(A\)</span> 个最终输出 token，每个输出 token 分摊到的时间为</p>
+<div class="arithmatex">\[
+L_{\mathrm{spec}}
+=
+\frac{C_{\mathrm{spec}}}{A}.
+\]</div>
+<p>作为对照，普通 autoregressive decoding 在相同 batch 下，每次 target forward 只推进一个 token，其延迟记为 <span class="arithmatex">\(L_{\mathrm{AR}}(B)\)</span>。因此，用 baseline 生成同样 <span class="arithmatex">\(A\)</span> 个 token，大约需要</p>
+<div class="arithmatex">\[
+A\,L_{\mathrm{AR}}(B),
+\]</div>
+<p>于是 speculative decoding 的加速条件可以直接写成</p>
+<div class="arithmatex">\[
+T_{\mathrm{draft}}
++
+T_{\mathrm{verify}}(B,q)
++
+T_{\mathrm{control}}
+&lt;
+A\,L_{\mathrm{AR}}(B).
+\]</div>
+<p>这个式子给出了后面系统分析最重要的观察：speculative decoding 并没有消除计算，而是把原来的 <span class="arithmatex">\(A\)</span> 次窄 target decode，替换成一次更宽的 verification，同时增加 drafting 和控制开销。把 target 一侧节省出来的时间写成</p>
+<div class="arithmatex">\[
+H
+=
+A\,L_{\mathrm{AR}}(B)
+-
+T_{\mathrm{verify}}(B,q),
+\]</div>
+<p>那么真正能够用于支付额外开销的预算只有 <span class="arithmatex">\(H\)</span>。Speculative decoding 能否加速，本质上取决于</p>
+<div class="arithmatex">\[
+T_{\mathrm{draft}}+T_{\mathrm{control}}&lt;H.
+\]</div>
+<p>接下来的问题因此变得很具体：增大 <span class="arithmatex">\(q\)</span> 后，target verification 为什么可能比 <span class="arithmatex">\(A\)</span> 次单-token decode 更便宜？这种收益来自更好的计算利用率、权重复用、KV 访问还是更少的通信同步？与此同时，额外的 candidate 又会给通信、MoE routing 和 KV 管理带来多少成本？后面的各节都会围绕这份时间预算展开。</p>
+<h3 id="52-batch-size-compute-and-memory-traffic">5.2 Batch Size, Compute, and Memory Traffic</h3>
+<p>普通 autoregressive decoding 中，一个 batch 为 <span class="arithmatex">\(B\)</span> 的 decode step 只处理 <span class="arithmatex">\(B\)</span> 个新 token；而 speculative verification 会同时处理每个请求的多个 candidate。设每个请求送入 target 的 query 数为 <span class="arithmatex">\(q\)</span>，那么这一轮共有 <span class="arithmatex">\(Bq\)</span> 个 query token。乍看之下，这似乎只是把 batch 从 <span class="arithmatex">\(B\)</span> 扩大到了 <span class="arithmatex">\(Bq\)</span>，但两者并不完全等价。对于 linear、MLP 等 dense layer，主要看到的是更宽的 token dimension；而对 attention 来说，<span class="arithmatex">\(Bq\)</span> 个 query 实际上只属于 <span class="arithmatex">\(B\)</span> 条序列，并共享各自已经存在的历史 KV cache。因此，verification 的成本不能只写成 <span class="arithmatex">\(Bq\)</span> 的函数，更合适的分解是</p>
+<div class="arithmatex">\[
+T_{\mathrm{verify}}(B,q,\ell)
+\approx
+T_{\mathrm{dense}}(Bq)
++
+T_{\mathrm{attn}}(B,q,\ell)
++
+T_{\mathrm{misc}}(B,q),
+\]</div>
+<p>其中 <span class="arithmatex">\(\ell\)</span> 表示历史 context length。对应的 baseline target decode 为</p>
+<div class="arithmatex">\[
+L_{\mathrm{AR}}(B,\ell)
+\approx
+T_{\mathrm{dense}}(B)
++
+T_{\mathrm{attn}}(B,1,\ell)
++
+T_{\mathrm{misc}}(B,1).
+\]</div>
+<p>对 dense layer 来说，speculation 的机会来自把多次很窄的 GEMM 合并成一次更宽的 GEMM。Batch 较小时，一次 decode 中只有 <span class="arithmatex">\(B\)</span> 个 token 参与计算，模型权重读取、kernel launch 以及较低的矩阵利用率都会占据较大比例；将宽度扩展到 <span class="arithmatex">\(Bq\)</span> 后，这些成本可以被更多 token 分摊。因此，在尚未充分利用 GPU 的区间中，通常可能出现</p>
+<div class="arithmatex">\[
+T_{\mathrm{dense}}(Bq)
+&lt;
+q\,T_{\mathrm{dense}}(B).
+\]</div>
+<p>但这种收益不会无限持续。随着 <span class="arithmatex">\(B\)</span> 增大，GEMM 逐渐接近设备的计算或带宽利用上限，继续增加 <span class="arithmatex">\(q\)</span> 后，dense 部分的延迟会越来越接近随 token 数线性增长。真正决定 speculation 是否划算的也不是上式中的 <span class="arithmatex">\(q\)</span>，而是最终推进的 token 数 <span class="arithmatex">\(A\)</span>：dense 部分只有满足</p>
+<div class="arithmatex">\[
+T_{\mathrm{dense}}(Bq)
+&lt;
+A\,T_{\mathrm{dense}}(B)
+\]</div>
+<p>时，才比生成同样 <span class="arithmatex">\(A\)</span> 个 token 的 autoregressive decode 更便宜。</p>
+<p>Attention 的情况不同。增加 <span class="arithmatex">\(q\)</span> 会增加 query 相关的计算，但这些 query 属于同一条请求，因此都需要访问相同的历史 KV cache。可以把历史 KV 的实际读取放大倍数记为 <span class="arithmatex">\(r_{\mathrm{KV}}(B,q,\ell)\)</span>：如果每个 query 都重新从 HBM 读取一遍历史 KV，那么 <span class="arithmatex">\(r_{\mathrm{KV}}\)</span> 接近 <span class="arithmatex">\(q\)</span>；如果 attention kernel 能够在多个 query 之间有效复用历史 KV，则这个值可以明显更小。只看历史 KV 访问这一部分，speculation 能降低每个输出 token 的成本需要满足</p>
+<div class="arithmatex">\[
+r_{\mathrm{KV}}(B,q,\ell)&lt;A.
+\]</div>
+<p>这也说明为什么 batch size 本身不足以判断 speculative decoding 的收益。小 batch 时，收益可能主要来自更宽的 dense computation；context 较长时，即使 baseline batch 已经很大，历史 KV 的读取与复用仍然可能成为新的收益来源。相反，如果 dense layer 已经充分饱和，而 attention kernel 又无法在多个 candidate 之间有效复用 KV，那么 verification 增加的大量计算最终只换回少量 accepted token，加速空间就会迅速缩小。因此后面的实验需要同时扫描 <span class="arithmatex">\(B\)</span>、<span class="arithmatex">\(q\)</span> 和 <span class="arithmatex">\(\ell\)</span>，并分别观察 dense computation 与 attention/KV traffic 的变化，而不能仅用一个总 token 数 <span class="arithmatex">\(Bq\)</span> 来解释 verification latency。</p>
+<h3 id="53-communication-fewer-synchronizations-more-bytes">5.3 Communication: Fewer Synchronizations, More Bytes</h3>
+<p>在 tensor parallel 等分布式推理中，一次 target forward 往往伴随着多次 collective communication。普通 autoregressive decoding 每生成一个 token 都要重新执行这些通信，而 speculative decoding 可以用一次 verification 推进平均 <span class="arithmatex">\(A\)</span> 个 token。因此，speculation 首先节省的是 <strong>collective 的重复启动和同步次数</strong>。但与此同时，verification 一次处理 <span class="arithmatex">\(q\)</span> 个 query token，通信张量也通常随之变大，因此单次 collective 的数据量会高于普通 decode。</p>
+<p>可以先用一个简化模型描述这种 trade-off。设一次普通 target decode 的某条通信路径耗时为</p>
+<div class="arithmatex">\[
+T_{\mathrm{comm}}^{\mathrm{AR}}
+=
+c_0+\frac{V}{W},
+\]</div>
+<p>其中 <span class="arithmatex">\(c_0\)</span> 表示 collective launch、同步以及固定协议开销，<span class="arithmatex">\(V\)</span> 是通信数据量，<span class="arithmatex">\(W\)</span> 是有效通信带宽。若 verification 的通信量近似随 query 数 <span class="arithmatex">\(q\)</span> 成比例增长，则一次 verification 的通信时间约为</p>
+<div class="arithmatex">\[
+T_{\mathrm{comm}}^{\mathrm{verify}}
+=
+c_0+\frac{qV}{W}.
+\]</div>
+<p>为了生成同样平均 <span class="arithmatex">\(A\)</span> 个 token，baseline 需要执行 <span class="arithmatex">\(A\)</span> 次这样的通信，而 speculative decoding 只在一次 target verification 中执行。因此，仅比较 target 侧这部分通信，speculation 获得收益需要满足</p>
+<div class="arithmatex">\[
+c_0+\frac{qV}{W}
+&lt;
+A\left(c_0+\frac{V}{W}\right),
+\]</div>
+<p>整理得到</p>
+<div class="arithmatex">\[
+(A-1)c_0
+&gt;
+(q-A)\frac{V}{W}.
+\]</div>
+<p>这个式子很好地刻画了通信侧的收益来源。左边是少执行 <span class="arithmatex">\(A-1\)</span> 轮 target communication 所节省的固定启动与同步成本；右边则来自 verification 中那些最终没有转化为输出 token 的额外 candidate。若 <span class="arithmatex">\(A\)</span> 接近 <span class="arithmatex">\(q\)</span>，大部分 candidate 都被接受，额外 payload 很少浪费，此时 speculation 很容易摊薄 collective latency；如果 rejection 很早，使得 <span class="arithmatex">\(A\ll q\)</span>，verification 已经通信过的数据却无法成为有效输出，通信效率就会下降。</p>
+<p>实际系统中，<span class="arithmatex">\(V/W\)</span> 也不一定与消息大小严格线性。小消息往往更受 latency 和 synchronization 限制，而消息变大后才逐渐进入 bandwidth-bound 区间；collective algorithm、GPU 拓扑和并行方式也可能随消息大小改变。因此，speculative decoding 对通信的影响不能简单总结成“通信次数更少”或“通信量更多”。更准确的说法是：<strong>它把多次小规模 collective 合并成更少的、更宽的 collective，而收益取决于减少的同步成本能否覆盖额外 candidate 带来的通信流量。</strong></p>
+<p>这一点在不同并行方式下还会表现得不同。Tensor parallel 中，verification 通常扩大每次 all-reduce、reduce-scatter 或 all-gather 所处理的 activation；而在 MoE 中，candidate token 还会进一步影响 expert dispatch 和 combine 的流量及负载分布。因此，不能只统计总 communication time，而应该同时观察 collective 次数、message size、有效 bandwidth，以及真正暴露在 critical path 上的同步时间。</p>
+<h3 id="54-moe-expert-utilization-and-load-imbalance">5.4 MoE: Expert Utilization and Load Imbalance</h3>
+<p>对于 MoE 模型，speculative verification 的影响比 dense model 更复杂。设一次 verification 中 expert <span class="arithmatex">\(e\)</span> 接收到 <span class="arithmatex">\(n_e\)</span> 个 token，那么整个 MoE layer 的执行时间不仅取决于总 token 数 <span class="arithmatex">\(Bq\)</span>，还取决于这些 token 如何分布到不同 experts 和不同 devices。一个简化的执行时间可以写成</p>
+<div class="arithmatex">\[
+T_{\mathrm{MoE}}
+\approx
+T_{\mathrm{dispatch}}
++
+\max_g T_{\mathrm{expert},g}
++
+T_{\mathrm{combine}},
+\]</div>
+<p>其中 <span class="arithmatex">\(g\)</span> 表示一个 expert-parallel rank。这里出现的是 <span class="arithmatex">\(\max_g\)</span>，因为下一层通常需要等待最慢的 rank 完成，因此平均每个 expert 收到多少 token 并不能完整描述实际 latency。</p>
+<p>Speculation 可能改善 expert computation。普通 decode 中每轮只有 <span class="arithmatex">\(B\)</span> 个新 token，经过 routing 后，单个 expert 实际拿到的 micro-batch 可能很小；verification 将 token 数扩大到 <span class="arithmatex">\(Bq\)</span> 后，一些 expert 的 GEMM 会变宽，权重读取能够被更多 token 分摊，GPU utilization 也可能提高。对于 expert <span class="arithmatex">\(e\)</span>，真正值得比较的不是</p>
+<div class="arithmatex">\[
+T_e(qn_e) \quad \text{和} \quad qT_e(n_e),
+\]</div>
+<p>而是生成相同 <span class="arithmatex">\(A\)</span> 个最终 token 时的成本：只有 verification 后的 expert computation 小于 <span class="arithmatex">\(A\)</span> 次普通 decode 的累计成本，这部分才真正贡献 speedup。</p>
+<p>但更多 candidate 并不保证 MoE 更高效。不同 candidate 可能被路由到更多 experts，使一次 verification 触达更大的 expert 集合，增加权重访问和 dispatch/combine traffic；也可能集中到少数 experts，使这些 experts 或所在 rank 成为 straggler。尤其需要注意，verification 会先执行整段 candidate 的 routing 和 expert computation，然后才知道哪里发生 rejection。因此，如果第一个或第二个 candidate 就被拒绝，后面的 token 虽然不会成为最终输出，它们已经消耗的 MoE computation 和 communication 并不会被追回。</p>
+<p>因此，MoE 场景下 acceptance length <span class="arithmatex">\(A\)</span> 仍然不够解释性能，还需要观察 routing pattern。比较 speculative decoding 和普通 decode 时，至少应该同时记录每个 expert 的 token count <span class="arithmatex">\(n_e\)</span>、每个 rank 的总 routed tokens、active expert 数量以及最慢 rank 的执行时间。<strong>Speculation 真正有利的情况，是更宽的 verification 能提高 expert 的有效计算效率，同时没有引入足以抵消这一收益的 routing imbalance 和额外 expert-parallel traffic。</strong> 这也是为什么同样的 <span class="arithmatex">\(B\)</span>、<span class="arithmatex">\(q\)</span> 和 <span class="arithmatex">\(A\)</span>，在 dense model 和 MoE model 上可能表现出完全不同的 speedup。</p>
+<h3 id="55-kv-cache-reuse-rollback-and-capacity">5.5 KV Cache: Reuse, Rollback, and Capacity</h3>
+<p>Speculative verification 一次处理同一请求的多个 query token，而这些 query 共享相同的历史 KV cache。与普通 decode 相比，这给 attention 提供了更强的 KV reuse 机会：如果每个 query 都独立从 HBM 读取一遍历史 KV，那么 verification 的历史读取量会接近普通 decode 的 <span class="arithmatex">\(q\)</span> 倍；如果 attention kernel 能在多个 query 之间有效复用已经加载的 K/V，这个放大倍数就会明显降低。设 verification 相对一次普通 decode 的历史 KV 读取放大倍数为 <span class="arithmatex">\(r_{\mathrm{KV}}\)</span>，那么生成同样平均 <span class="arithmatex">\(A\)</span> 个输出 token 时，仅从历史 KV traffic 来看，speculation 获得收益需要满足</p>
+<div class="arithmatex">\[
+r_{\mathrm{KV}} &lt; A.
+\]</div>
+<p>Verification 同时也会为整段 candidate 计算并写入新的 KV。问题在于，这些 candidate 是否最终保留，要到 verification 结束后才能确定。假设前 <span class="arithmatex">\(m\)</span> 个 draft token 被接受，而第 <span class="arithmatex">\(m+1\)</span> 个发生 rejection，那么更靠后的 candidate KV 即使已经完成计算和写入，也不会成为最终序列的一部分。这部分工作可以看作 speculative decoding 的另一种“wasted work”：acceptance 越短，相对于最终输出产生的无效 KV computation 和 memory traffic 就越多。</p>
+<p>这里需要区分 <strong>rollback 的逻辑成本</strong> 和 <strong>已经发生的计算成本</strong>。发生 rejection 后，系统通常只需要把有效序列长度恢复到正确的位置，并让后续分配覆盖或重新使用失效的 KV 空间，并不意味着把整个历史 KV cache 重新复制一遍。因此，rollback 本身可以很便宜；真正无法追回的是那些已经为被丢弃 candidate 执行过的 attention、KV projection 和 KV write。</p>
+<p>KV cache 还会通过显存容量间接影响系统性能。Speculative decoding 需要为 verification 中尚未确认的 candidate 预留 KV 空间，独立 drafter 还可能维护自己的 KV cache，再加上额外 workspace，这些都会减少同一 GPU 上能够同时驻留的请求数量。因此，即使固定 batch 下 speculative decoding 的单步 latency 更低，也可能出现</p>
+<div class="arithmatex">\[
+B_{\mathrm{SD}} &lt; B_{\mathrm{AR}},
+\]</div>
+<p>使部分 latency 收益被较低的并发能力抵消。评价 KV cache 对 speculative decoding 的影响时，因此需要同时看三件事：<strong>历史 KV 是否被更有效地复用、被拒 candidate 产生了多少无效 KV 工作，以及额外缓存最终是否压缩了可服务的 batch size。</strong></p>
+<h3 id="56-from-step-latency-to-serving-throughput">5.6 From Step Latency to Serving Throughput</h3>
+<p>前面的分析都以一次 speculative step 为单位，但 serving system 最终关心的是在相同 GPU 资源下能够持续输出多少 token。设 speculative decoding 的一个周期耗时为 <span class="arithmatex">\(C_{\mathrm{spec}}\)</span>，每个请求平均推进 <span class="arithmatex">\(A\)</span> 个 token，可维持的 batch size 为 <span class="arithmatex">\(B_{\mathrm{SD}}\)</span>，那么其输出吞吐可以近似写成</p>
+<div class="arithmatex">\[
+\Theta_{\mathrm{SD}}
+=
+\frac{B_{\mathrm{SD}}A}{C_{\mathrm{spec}}}.
+\]</div>
+<p>普通 autoregressive decoding 每一步为每个请求生成一个 token，若其可维持 batch 为 <span class="arithmatex">\(B_{\mathrm{AR}}\)</span>，单步延迟为 <span class="arithmatex">\(L_{\mathrm{AR}}\)</span>，则</p>
+<div class="arithmatex">\[
+\Theta_{\mathrm{AR}}
+=
+\frac{B_{\mathrm{AR}}}{L_{\mathrm{AR}}}.
+\]</div>
+<p>因此，真正的 system-level speedup 应比较</p>
+<div class="arithmatex">\[
+\frac{\Theta_{\mathrm{SD}}}{\Theta_{\mathrm{AR}}}
+=
+\frac{B_{\mathrm{SD}}}{B_{\mathrm{AR}}}
+\cdot
+\frac{A\,L_{\mathrm{AR}}}{C_{\mathrm{spec}}}.
+\]</div>
+<p>第二项正是前面一直分析的 step-level gain，而第一项则描述 speculation 对系统并发能力的影响。这一区分很重要：即使固定 batch 下 <span class="arithmatex">\(A\,L_{\mathrm{AR}}/C_{\mathrm{spec}}&gt;1\)</span>，额外的 draft weights、draft KV、candidate KV 和 workspace 仍可能降低 <span class="arithmatex">\(B_{\mathrm{SD}}\)</span>，从而抵消一部分甚至全部局部加速。反过来，如果 speculation 显著缩短了 target 的 critical path，同时没有明显压缩可驻留请求数，那么 step-level gain 才更容易转化成实际吞吐提升。</p>
+<p>真实 serving 还比固定 batch 模型更复杂。Continuous batching 下，不同请求具有不同 context length、不同 acceptance length，并且会不断进入和离开 batch，因此 <span class="arithmatex">\(B\)</span>、<span class="arithmatex">\(A\)</span> 和 <span class="arithmatex">\(C_{\mathrm{spec}}\)</span> 都随时间变化。这时最可靠的评价方式不是对每轮的 speedup 简单取平均，而是直接测量一段完整 workload 中的</p>
+<div class="arithmatex">\[
+\text{Throughput}
+=
+\frac{\text{total output tokens}}
+{\text{wall-clock time}}.
+\]</div>
+<p>同时还需要分别观察 TTFT、TPOT 和 tail latency，因为 speculative decoding 会改变 token 输出的时间结构：一次 verification 可能批量确认多个 token，但也引入 drafting 和 verification 的周期性等待。因此，最终评价 speculative decoding 不能停留在 acceptance rate 或单步 latency，而应该回答一个更完整的问题：<strong>在给定硬件、并发负载和延迟约束下，它是否真的让系统以更低的成本持续输出更多 token。</strong></p>
+<h2 id="appendix">Appendix</h2>
+<h3 id="implementation-details">Implementation Details</h3>
+<p>接受与重采样的实现来自 <a href="https://github.com/vllm-project/vllm/blob/main/vllm/v1/sample/rejection_sampler.py">vLLM</a>。接受条件是 <span class="arithmatex">\(p(x)/q(x)\ge u\)</span>，<span class="arithmatex">\(u\)</span> 为均匀随机数。<code>NO_DRAFT_PROBS</code> 将该 token 的 draft 概率取为 1，条件变成 <span class="arithmatex">\(p(x)\ge u\)</span>。<code>is_greedy</code> 的请求在入口返回。重采样核在 <span class="arithmatex">\(\max(p-q,0)\)</span> 上做 Gumbel-max。代码里的 <code>q</code> 是这组随机数，不是提议分布 <span class="arithmatex">\(q_i\)</span>。</p>
+<details>
+<summary>Triton 中的拒绝采样 kernel</summary>
+
+<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># NOTE(woosuk): Avoid specialization to prevent unnecessary recompilation.</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nd">@triton</span><span class="o">.</span><span class="n">jit</span><span class="p">(</span><span class="n">do_not_specialize</span><span class="o">=</span><span class="p">[</span><span class="s2">"max_spec_len"</span><span class="p">])</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="k">def</span><span class="w"> </span><span class="nf">rejection_random_sample_kernel</span><span class="p">(</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">output_token_ids_ptr</span><span class="p">,</span>  <span class="c1"># [batch_size, max_spec_len + 1]</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">cu_num_draft_tokens_ptr</span><span class="p">,</span>  <span class="c1"># [batch_size]</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">draft_token_ids_ptr</span><span class="p">,</span>  <span class="c1"># [num_tokens]</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">draft_probs_ptr</span><span class="p">,</span>  <span class="c1"># [num_tokens, vocab_size] or None</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="n">target_probs_ptr</span><span class="p">,</span>  <span class="c1"># [num_tokens, vocab_size]</span>
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    <span class="n">bonus_token_ids_ptr</span><span class="p">,</span>  <span class="c1"># [batch_size]</span>
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>    <span class="n">recovered_token_ids_ptr</span><span class="p">,</span>  <span class="c1"># [num_tokens]</span>
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>    <span class="n">uniform_probs_ptr</span><span class="p">,</span>  <span class="c1"># [num_tokens]</span>
+</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>    <span class="n">is_greedy_ptr</span><span class="p">,</span>  <span class="c1"># [batch_size]</span>
+</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>    <span class="n">max_spec_len</span><span class="p">,</span>
+</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>    <span class="n">vocab_size</span><span class="p">,</span>
+</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>    <span class="n">NO_DRAFT_PROBS</span><span class="p">:</span> <span class="n">tl</span><span class="o">.</span><span class="n">constexpr</span><span class="p">,</span>
+</span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="p">):</span>
+</span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>    <span class="n">req_idx</span> <span class="o">=</span> <span class="n">tl</span><span class="o">.</span><span class="n">program_id</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+</span><span id="__span-0-18"><a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>    <span class="n">is_greedy</span> <span class="o">=</span> <span class="n">tl</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">is_greedy_ptr</span> <span class="o">+</span> <span class="n">req_idx</span><span class="p">)</span>
+</span><span id="__span-0-19"><a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>    <span class="k">if</span> <span class="n">is_greedy</span><span class="p">:</span>
+</span><span id="__span-0-20"><a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a>        <span class="c1"># Early exit for greedy sampling requests.</span>
+</span><span id="__span-0-21"><a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a>        <span class="k">return</span>
+</span><span id="__span-0-22"><a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a>
+</span><span id="__span-0-23"><a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a>    <span class="n">start_idx</span> <span class="o">=</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">req_idx</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">tl</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">cu_num_draft_tokens_ptr</span> <span class="o">+</span> <span class="n">req_idx</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+</span><span id="__span-0-24"><a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a>    <span class="n">end_idx</span> <span class="o">=</span> <span class="n">tl</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">cu_num_draft_tokens_ptr</span> <span class="o">+</span> <span class="n">req_idx</span><span class="p">)</span>
+</span><span id="__span-0-25"><a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a>    <span class="n">num_draft_tokens</span> <span class="o">=</span> <span class="n">end_idx</span> <span class="o">-</span> <span class="n">start_idx</span>
+</span><span id="__span-0-26"><a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a>
+</span><span id="__span-0-27"><a id="__codelineno-0-27" name="__codelineno-0-27" href="#__codelineno-0-27"></a>    <span class="n">rejected</span> <span class="o">=</span> <span class="kc">False</span>
+</span><span id="__span-0-28"><a id="__codelineno-0-28" name="__codelineno-0-28" href="#__codelineno-0-28"></a>    <span class="k">for</span> <span class="n">pos</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_draft_tokens</span><span class="p">):</span>
+</span><span id="__span-0-29"><a id="__codelineno-0-29" name="__codelineno-0-29" href="#__codelineno-0-29"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">rejected</span><span class="p">:</span>
+</span><span id="__span-0-30"><a id="__codelineno-0-30" name="__codelineno-0-30" href="#__codelineno-0-30"></a>            <span class="n">draft_token_id</span> <span class="o">=</span> <span class="n">tl</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">draft_token_ids_ptr</span> <span class="o">+</span> <span class="n">start_idx</span> <span class="o">+</span> <span class="n">pos</span><span class="p">)</span>
+</span><span id="__span-0-31"><a id="__codelineno-0-31" name="__codelineno-0-31" href="#__codelineno-0-31"></a>            <span class="k">if</span> <span class="n">NO_DRAFT_PROBS</span><span class="p">:</span>
+</span><span id="__span-0-32"><a id="__codelineno-0-32" name="__codelineno-0-32" href="#__codelineno-0-32"></a>                <span class="n">draft_prob</span> <span class="o">=</span> <span class="mi">1</span>
+</span><span id="__span-0-33"><a id="__codelineno-0-33" name="__codelineno-0-33" href="#__codelineno-0-33"></a>            <span class="k">else</span><span class="p">:</span>
+</span><span id="__span-0-34"><a id="__codelineno-0-34" name="__codelineno-0-34" href="#__codelineno-0-34"></a>                <span class="n">draft_prob</span> <span class="o">=</span> <span class="n">tl</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+</span><span id="__span-0-35"><a id="__codelineno-0-35" name="__codelineno-0-35" href="#__codelineno-0-35"></a>                    <span class="n">draft_probs_ptr</span> <span class="o">+</span> <span class="p">(</span><span class="n">start_idx</span> <span class="o">+</span> <span class="n">pos</span><span class="p">)</span> <span class="o">*</span> <span class="n">vocab_size</span> <span class="o">+</span> <span class="n">draft_token_id</span>
+</span><span id="__span-0-36"><a id="__codelineno-0-36" name="__codelineno-0-36" href="#__codelineno-0-36"></a>                <span class="p">)</span>
+</span><span id="__span-0-37"><a id="__codelineno-0-37" name="__codelineno-0-37" href="#__codelineno-0-37"></a>            <span class="n">target_prob</span> <span class="o">=</span> <span class="n">tl</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+</span><span id="__span-0-38"><a id="__codelineno-0-38" name="__codelineno-0-38" href="#__codelineno-0-38"></a>                <span class="n">target_probs_ptr</span> <span class="o">+</span> <span class="p">(</span><span class="n">start_idx</span> <span class="o">+</span> <span class="n">pos</span><span class="p">)</span> <span class="o">*</span> <span class="n">vocab_size</span> <span class="o">+</span> <span class="n">draft_token_id</span>
+</span><span id="__span-0-39"><a id="__codelineno-0-39" name="__codelineno-0-39" href="#__codelineno-0-39"></a>            <span class="p">)</span>
+</span><span id="__span-0-40"><a id="__codelineno-0-40" name="__codelineno-0-40" href="#__codelineno-0-40"></a>            <span class="n">uniform_prob</span> <span class="o">=</span> <span class="n">tl</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">uniform_probs_ptr</span> <span class="o">+</span> <span class="n">start_idx</span> <span class="o">+</span> <span class="n">pos</span><span class="p">)</span>
+</span><span id="__span-0-41"><a id="__codelineno-0-41" name="__codelineno-0-41" href="#__codelineno-0-41"></a>            <span class="c1"># NOTE(woosuk): While the draft probability should never be 0,</span>
+</span><span id="__span-0-42"><a id="__codelineno-0-42" name="__codelineno-0-42" href="#__codelineno-0-42"></a>            <span class="c1"># we check it to avoid NaNs. If it happens to be 0, we reject.</span>
+</span><span id="__span-0-43"><a id="__codelineno-0-43" name="__codelineno-0-43" href="#__codelineno-0-43"></a>            <span class="k">if</span> <span class="n">draft_prob</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">target_prob</span> <span class="o">/</span> <span class="n">draft_prob</span> <span class="o">&gt;=</span> <span class="n">uniform_prob</span><span class="p">:</span>
+</span><span id="__span-0-44"><a id="__codelineno-0-44" name="__codelineno-0-44" href="#__codelineno-0-44"></a>                <span class="c1"># Accept.</span>
+</span><span id="__span-0-45"><a id="__codelineno-0-45" name="__codelineno-0-45" href="#__codelineno-0-45"></a>                <span class="n">token_id</span> <span class="o">=</span> <span class="n">draft_token_id</span>
+</span><span id="__span-0-46"><a id="__codelineno-0-46" name="__codelineno-0-46" href="#__codelineno-0-46"></a>            <span class="k">else</span><span class="p">:</span>
+</span><span id="__span-0-47"><a id="__codelineno-0-47" name="__codelineno-0-47" href="#__codelineno-0-47"></a>                <span class="c1"># Reject. Use recovered token.</span>
+</span><span id="__span-0-48"><a id="__codelineno-0-48" name="__codelineno-0-48" href="#__codelineno-0-48"></a>                <span class="n">rejected</span> <span class="o">=</span> <span class="kc">True</span>
+</span><span id="__span-0-49"><a id="__codelineno-0-49" name="__codelineno-0-49" href="#__codelineno-0-49"></a>                <span class="n">token_id</span> <span class="o">=</span> <span class="n">tl</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">recovered_token_ids_ptr</span> <span class="o">+</span> <span class="n">start_idx</span> <span class="o">+</span> <span class="n">pos</span><span class="p">)</span>
+</span><span id="__span-0-50"><a id="__codelineno-0-50" name="__codelineno-0-50" href="#__codelineno-0-50"></a>            <span class="n">tl</span><span class="o">.</span><span class="n">store</span><span class="p">(</span>
+</span><span id="__span-0-51"><a id="__codelineno-0-51" name="__codelineno-0-51" href="#__codelineno-0-51"></a>                <span class="n">output_token_ids_ptr</span> <span class="o">+</span> <span class="n">req_idx</span> <span class="o">*</span> <span class="p">(</span><span class="n">max_spec_len</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">pos</span><span class="p">,</span> <span class="n">token_id</span>
+</span><span id="__span-0-52"><a id="__codelineno-0-52" name="__codelineno-0-52" href="#__codelineno-0-52"></a>            <span class="p">)</span>
+</span><span id="__span-0-53"><a id="__codelineno-0-53" name="__codelineno-0-53" href="#__codelineno-0-53"></a>
+</span><span id="__span-0-54"><a id="__codelineno-0-54" name="__codelineno-0-54" href="#__codelineno-0-54"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="n">rejected</span><span class="p">:</span>
+</span><span id="__span-0-55"><a id="__codelineno-0-55" name="__codelineno-0-55" href="#__codelineno-0-55"></a>        <span class="c1"># If all tokens are accepted, append the bonus token.</span>
+</span><span id="__span-0-56"><a id="__codelineno-0-56" name="__codelineno-0-56" href="#__codelineno-0-56"></a>        <span class="n">bonus_token_id</span> <span class="o">=</span> <span class="n">tl</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">bonus_token_ids_ptr</span> <span class="o">+</span> <span class="n">req_idx</span><span class="p">)</span>
+</span><span id="__span-0-57"><a id="__codelineno-0-57" name="__codelineno-0-57" href="#__codelineno-0-57"></a>        <span class="n">tl</span><span class="o">.</span><span class="n">store</span><span class="p">(</span>
+</span><span id="__span-0-58"><a id="__codelineno-0-58" name="__codelineno-0-58" href="#__codelineno-0-58"></a>            <span class="n">output_token_ids_ptr</span> <span class="o">+</span> <span class="n">req_idx</span> <span class="o">*</span> <span class="p">(</span><span class="n">max_spec_len</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">num_draft_tokens</span><span class="p">,</span>
+</span><span id="__span-0-59"><a id="__codelineno-0-59" name="__codelineno-0-59" href="#__codelineno-0-59"></a>            <span class="n">bonus_token_id</span><span class="p">,</span>
+</span><span id="__span-0-60"><a id="__codelineno-0-60" name="__codelineno-0-60" href="#__codelineno-0-60"></a>        <span class="p">)</span>
+</span></code></pre></div>
+
+</details>
+
+<details>
+<summary>Triton 中的重采样 kernel</summary>
+
+<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nd">@triton</span><span class="o">.</span><span class="n">jit</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="k">def</span><span class="w"> </span><span class="nf">sample_recovered_tokens_kernel</span><span class="p">(</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>    <span class="n">output_token_ids_ptr</span><span class="p">,</span>  <span class="c1"># [num_tokens]</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>    <span class="n">cu_num_draft_tokens_ptr</span><span class="p">,</span>  <span class="c1"># [batch_size]</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>    <span class="n">draft_token_ids_ptr</span><span class="p">,</span>  <span class="c1"># [num_tokens]</span>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>    <span class="n">draft_probs_ptr</span><span class="p">,</span>  <span class="c1"># [num_tokens, vocab_size] or None</span>
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>    <span class="n">target_probs_ptr</span><span class="p">,</span>  <span class="c1"># [num_tokens, vocab_size]</span>
+</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>    <span class="n">q_ptr</span><span class="p">,</span>  <span class="c1"># [batch_size, vocab_size]</span>
+</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>    <span class="n">vocab_size</span><span class="p">,</span>
+</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>    <span class="n">PADDED_VOCAB_SIZE</span><span class="p">:</span> <span class="n">tl</span><span class="o">.</span><span class="n">constexpr</span><span class="p">,</span>
+</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>    <span class="n">NO_DRAFT_PROBS</span><span class="p">:</span> <span class="n">tl</span><span class="o">.</span><span class="n">constexpr</span><span class="p">,</span>
+</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="p">):</span>
+</span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>    <span class="n">req_idx</span> <span class="o">=</span> <span class="n">tl</span><span class="o">.</span><span class="n">program_id</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+</span><span id="__span-1-14"><a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a>    <span class="n">start_idx</span> <span class="o">=</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">req_idx</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">tl</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">cu_num_draft_tokens_ptr</span> <span class="o">+</span> <span class="n">req_idx</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+</span><span id="__span-1-15"><a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a>    <span class="n">end_idx</span> <span class="o">=</span> <span class="n">tl</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">cu_num_draft_tokens_ptr</span> <span class="o">+</span> <span class="n">req_idx</span><span class="p">)</span>
+</span><span id="__span-1-16"><a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a>    <span class="n">num_draft_tokens</span> <span class="o">=</span> <span class="n">end_idx</span> <span class="o">-</span> <span class="n">start_idx</span>
+</span><span id="__span-1-17"><a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a>
+</span><span id="__span-1-18"><a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a>    <span class="c1"># Early exit for out-of-range positions.</span>
+</span><span id="__span-1-19"><a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a>    <span class="n">pos</span> <span class="o">=</span> <span class="n">tl</span><span class="o">.</span><span class="n">program_id</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</span><span id="__span-1-20"><a id="__codelineno-1-20" name="__codelineno-1-20" href="#__codelineno-1-20"></a>    <span class="k">if</span> <span class="n">pos</span> <span class="o">&gt;=</span> <span class="n">num_draft_tokens</span><span class="p">:</span>
+</span><span id="__span-1-21"><a id="__codelineno-1-21" name="__codelineno-1-21" href="#__codelineno-1-21"></a>        <span class="k">return</span>
+</span><span id="__span-1-22"><a id="__codelineno-1-22" name="__codelineno-1-22" href="#__codelineno-1-22"></a>
+</span><span id="__span-1-23"><a id="__codelineno-1-23" name="__codelineno-1-23" href="#__codelineno-1-23"></a>    <span class="n">vocab_offset</span> <span class="o">=</span> <span class="n">tl</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">PADDED_VOCAB_SIZE</span><span class="p">)</span>
+</span><span id="__span-1-24"><a id="__codelineno-1-24" name="__codelineno-1-24" href="#__codelineno-1-24"></a>    <span class="k">if</span> <span class="n">NO_DRAFT_PROBS</span><span class="p">:</span>
+</span><span id="__span-1-25"><a id="__codelineno-1-25" name="__codelineno-1-25" href="#__codelineno-1-25"></a>        <span class="n">draft_token_id</span> <span class="o">=</span> <span class="n">tl</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">draft_token_ids_ptr</span> <span class="o">+</span> <span class="n">start_idx</span> <span class="o">+</span> <span class="n">pos</span><span class="p">)</span>
+</span><span id="__span-1-26"><a id="__codelineno-1-26" name="__codelineno-1-26" href="#__codelineno-1-26"></a>        <span class="n">prob</span> <span class="o">=</span> <span class="n">tl</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+</span><span id="__span-1-27"><a id="__codelineno-1-27" name="__codelineno-1-27" href="#__codelineno-1-27"></a>            <span class="n">target_probs_ptr</span> <span class="o">+</span> <span class="p">(</span><span class="n">start_idx</span> <span class="o">+</span> <span class="n">pos</span><span class="p">)</span> <span class="o">*</span> <span class="n">vocab_size</span> <span class="o">+</span> <span class="n">vocab_offset</span><span class="p">,</span>
+</span><span id="__span-1-28"><a id="__codelineno-1-28" name="__codelineno-1-28" href="#__codelineno-1-28"></a>            <span class="n">mask</span><span class="o">=</span><span class="p">((</span><span class="n">vocab_offset</span> <span class="o">&lt;</span> <span class="n">vocab_size</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">vocab_offset</span> <span class="o">!=</span> <span class="n">draft_token_id</span><span class="p">)),</span>
+</span><span id="__span-1-29"><a id="__codelineno-1-29" name="__codelineno-1-29" href="#__codelineno-1-29"></a>            <span class="n">other</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+</span><span id="__span-1-30"><a id="__codelineno-1-30" name="__codelineno-1-30" href="#__codelineno-1-30"></a>        <span class="p">)</span>
+</span><span id="__span-1-31"><a id="__codelineno-1-31" name="__codelineno-1-31" href="#__codelineno-1-31"></a>    <span class="k">else</span><span class="p">:</span>
+</span><span id="__span-1-32"><a id="__codelineno-1-32" name="__codelineno-1-32" href="#__codelineno-1-32"></a>        <span class="n">draft_prob</span> <span class="o">=</span> <span class="n">tl</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+</span><span id="__span-1-33"><a id="__codelineno-1-33" name="__codelineno-1-33" href="#__codelineno-1-33"></a>            <span class="n">draft_probs_ptr</span> <span class="o">+</span> <span class="p">(</span><span class="n">start_idx</span> <span class="o">+</span> <span class="n">pos</span><span class="p">)</span> <span class="o">*</span> <span class="n">vocab_size</span> <span class="o">+</span> <span class="n">vocab_offset</span><span class="p">,</span>
+</span><span id="__span-1-34"><a id="__codelineno-1-34" name="__codelineno-1-34" href="#__codelineno-1-34"></a>            <span class="n">mask</span><span class="o">=</span><span class="n">vocab_offset</span> <span class="o">&lt;</span> <span class="n">vocab_size</span><span class="p">,</span>
+</span><span id="__span-1-35"><a id="__codelineno-1-35" name="__codelineno-1-35" href="#__codelineno-1-35"></a>            <span class="n">other</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+</span><span id="__span-1-36"><a id="__codelineno-1-36" name="__codelineno-1-36" href="#__codelineno-1-36"></a>        <span class="p">)</span>
+</span><span id="__span-1-37"><a id="__codelineno-1-37" name="__codelineno-1-37" href="#__codelineno-1-37"></a>        <span class="n">target_prob</span> <span class="o">=</span> <span class="n">tl</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+</span><span id="__span-1-38"><a id="__codelineno-1-38" name="__codelineno-1-38" href="#__codelineno-1-38"></a>            <span class="n">target_probs_ptr</span> <span class="o">+</span> <span class="p">(</span><span class="n">start_idx</span> <span class="o">+</span> <span class="n">pos</span><span class="p">)</span> <span class="o">*</span> <span class="n">vocab_size</span> <span class="o">+</span> <span class="n">vocab_offset</span><span class="p">,</span>
+</span><span id="__span-1-39"><a id="__codelineno-1-39" name="__codelineno-1-39" href="#__codelineno-1-39"></a>            <span class="n">mask</span><span class="o">=</span><span class="n">vocab_offset</span> <span class="o">&lt;</span> <span class="n">vocab_size</span><span class="p">,</span>
+</span><span id="__span-1-40"><a id="__codelineno-1-40" name="__codelineno-1-40" href="#__codelineno-1-40"></a>            <span class="n">other</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+</span><span id="__span-1-41"><a id="__codelineno-1-41" name="__codelineno-1-41" href="#__codelineno-1-41"></a>        <span class="p">)</span>
+</span><span id="__span-1-42"><a id="__codelineno-1-42" name="__codelineno-1-42" href="#__codelineno-1-42"></a>        <span class="n">prob</span> <span class="o">=</span> <span class="n">tl</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">target_prob</span> <span class="o">-</span> <span class="n">draft_prob</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+</span><span id="__span-1-43"><a id="__codelineno-1-43" name="__codelineno-1-43" href="#__codelineno-1-43"></a>        <span class="c1"># NOTE(woosuk): We don't need `prob = prob / tl.sum(prob)` here because</span>
+</span><span id="__span-1-44"><a id="__codelineno-1-44" name="__codelineno-1-44" href="#__codelineno-1-44"></a>        <span class="c1"># `tl.argmax` will select the maximum value.</span>
+</span><span id="__span-1-45"><a id="__codelineno-1-45" name="__codelineno-1-45" href="#__codelineno-1-45"></a>
+</span><span id="__span-1-46"><a id="__codelineno-1-46" name="__codelineno-1-46" href="#__codelineno-1-46"></a>    <span class="n">q</span> <span class="o">=</span> <span class="n">tl</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+</span><span id="__span-1-47"><a id="__codelineno-1-47" name="__codelineno-1-47" href="#__codelineno-1-47"></a>        <span class="n">q_ptr</span> <span class="o">+</span> <span class="n">req_idx</span> <span class="o">*</span> <span class="n">vocab_size</span> <span class="o">+</span> <span class="n">vocab_offset</span><span class="p">,</span>
+</span><span id="__span-1-48"><a id="__codelineno-1-48" name="__codelineno-1-48" href="#__codelineno-1-48"></a>        <span class="n">mask</span><span class="o">=</span><span class="n">vocab_offset</span> <span class="o">&lt;</span> <span class="n">vocab_size</span><span class="p">,</span>
+</span><span id="__span-1-49"><a id="__codelineno-1-49" name="__codelineno-1-49" href="#__codelineno-1-49"></a>        <span class="n">other</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="s2">"-inf"</span><span class="p">),</span>
+</span><span id="__span-1-50"><a id="__codelineno-1-50" name="__codelineno-1-50" href="#__codelineno-1-50"></a>    <span class="p">)</span>
+</span><span id="__span-1-51"><a id="__codelineno-1-51" name="__codelineno-1-51" href="#__codelineno-1-51"></a>    <span class="n">recovered_id</span> <span class="o">=</span> <span class="n">tl</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">prob</span> <span class="o">/</span> <span class="n">q</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+</span><span id="__span-1-52"><a id="__codelineno-1-52" name="__codelineno-1-52" href="#__codelineno-1-52"></a>    <span class="n">tl</span><span class="o">.</span><span class="n">store</span><span class="p">(</span><span class="n">output_token_ids_ptr</span> <span class="o">+</span> <span class="n">start_idx</span> <span class="o">+</span> <span class="n">pos</span><span class="p">,</span> <span class="n">recovered_id</span><span class="p">)</span>
+</span></code></pre></div>
+</details>
+
+<p class="doc-reference-label"><strong>Reference</strong></p>
+
+<p class="doc-reference">[1] Y. Leviathan, M. Kalman, Y. Matias. Fast Inference from Transformers via Speculative Decoding. ICML, 2023. <a href="https://arxiv.org/pdf/2211.17192">arXiv:2211.17192</a>.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": [], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}, "version": null}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+        <script src="../../../javascripts/mathjax.js"></script>
+      
+        <script src="../../../javascripts/cjk-spacing.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+      
+        <script src="../../../javascripts/mermaid.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/tablesort@5.3.0/dist/tablesort.min.js"></script>
+      
+        <script src="../../../javascripts/tablesort.js"></script>
+      
+    
+  </body>
+</html>
