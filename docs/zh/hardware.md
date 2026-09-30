@@ -63,37 +63,151 @@ Wafer-scale integration 的价值来自 **compute、memory 和 communication 被
 
 ### 2.2 Matrix Engines and GEMM
 
-以一个线性层为例，
+#### 2.2.1 Matrix Engines
+
+现代 AI accelerator 通常同时包含 scalar、vector 和 matrix 三类计算单元。Scalar unit 一次处理少量标量操作，适合地址计算、控制流等任务；vector unit 可以对一组数据同时执行相同运算，常用于 activation、normalization 和 element-wise operation。Transformer 中占据大部分计算量的 linear layer 和 MoE expert 则主要由 matrix engine 执行。
+
+Matrix engine 针对的核心操作是矩阵乘加，例如
 
 \[
-Y = XW,
+D = AB + C.
 \]
 
-其中 \(X\in\mathbb{R}^{M\times K}\)，\(W\in\mathbb{R}^{K\times N}\)。对 LLM decode 来说，\(M\) 往往与当前参与计算的 token 数有关；batch 较小时，\(M\) 可能很小，而 \(K\) 和 \(N\) 通常很大。现代 accelerator 会把这样的矩阵拆成大量小 tile，再交给 Tensor Core 或类似的 matrix engine 并行执行。
+矩阵乘法本身可以展开成大量 multiply-accumulate（MAC）。如果完全依靠普通 scalar 或 vector instruction 执行，需要发出大量独立指令并不断读取和写回中间结果。Matrix engine 会把一小块矩阵作为一个整体交给专门的数据通路，在硬件内部同时完成大量 MAC。NVIDIA 的 Tensor Core、TPU 的 MXU 和 Ascend 的 Cube Unit 虽然实现方式不同，都体现了这种设计思路。
 
-这也是为什么 AI 芯片拥有很高的理论 FLOPS，却不意味着任意 GEMM 都能达到这个数字。矩阵太窄时，可以同时执行的工作有限，计算单元可能无法被完全填满；矩阵规模增大后，更多计算可以并行执行，同时同一份权重也能够被更多 token 复用，硬件利用率通常会提高。这也是 batch size 会显著影响 LLM 推理效率的一个重要原因。
+以 Tensor Core 为例，软件通常不会要求它直接计算完整的 \(M\times N\) 矩阵，而是提交较小的 matrix multiply-accumulate operation。大量这样的操作再组合成完整 GEMM。这样做的价值在于，数据进入 matrix engine 后，可以在内部计算路径中连续参与多次乘加，控制和指令开销也能够被大量 MAC 分摊。对于以 GEMM 为主的 neural network workload，这种专用数据通路能够提供远高于普通通用计算单元的矩阵吞吐。
 
-矩阵计算之外，GPU 仍然需要执行 normalization、sampling、element-wise operation、routing 等大量非 GEMM 算子。这些操作可能由普通 CUDA Core、vector unit 或其他执行单元完成。因此，一个模型即使大部分 FLOPs 来自 GEMM，端到端 latency 也不一定完全由 matrix engine 决定。
+因此，现代 AI accelerator 的计算能力可以理解为两部分的配合：**matrix engine 承担大规模、规则的矩阵计算，scalar 和 vector unit 处理剩余的通用算子。** 拥有大量 matrix engine 仍然只提供了计算能力的上限；这些单元能否真正被填满，还取决于 GEMM 的矩阵形状以及任务如何被切分到硬件上，这也是下一节要讨论的问题。
+
+#### 2.2.2 GEMM Shape and Tiling
+
+考虑一个最常见的 linear layer：
+
+\[
+Y=XW,
+\qquad
+X\in\mathbb{R}^{M\times K},
+\quad
+W\in\mathbb{R}^{K\times N}.
+\]
+
+这次 GEMM 需要大约 \(2MNK\) FLOPs，其中 \(K\) 和 \(N\) 通常由模型维度决定，而 \(M\) 往往对应这次 forward 中一起处理的 token 数。对于 LLM prefill，多个 prompt token 可以同时进入 linear layer，因此 \(M\) 通常较大；decode 时每个请求每一步只有一个新 token，\(M\) 基本随 batch size 增长。这也是为什么同一个模型在 prefill 和 decode 阶段，会表现出非常不同的计算效率。
+
+GPU 不会把整个 \(M\times N\) 输出矩阵一次交给一个计算单元，而是将它划分成许多更小的 **tiles**。例如一个 thread block 负责一个 \(M_{\mathrm{tile}}\times N_{\mathrm{tile}}\) 的输出区域，再沿着 \(K\) 维分块读取 \(X\) 和 \(W\)，不断执行 matrix multiply-accumulate。这样，大 GEMM 会产生大量彼此独立的 tiles，可以同时分配到不同的 SM 上执行。矩阵较小时，能够产生的 tiles 也更少，即使每个 Tensor Core 本身很快，整块 GPU 仍然可能没有足够的并行工作可以执行。
+
+Tiling 还会带来两个容易被忽略的量化效应。如果 \(M\) 或 \(N\) 不能被 tile size 整除，边缘 tile 中只有部分位置是真正有效的，但硬件仍需要执行这个 tile，这称为 **tile quantization**。即使 tile 本身都很满，总 tile 数也可能无法刚好填满 GPU：假设一次可以并行执行 \(S\) 个 tiles，而 GEMM 最终产生 \(S+1\) 个，那么最后那个 tile 还需要额外启动一轮计算，其余大部分计算单元却处于空闲状态，这就是 **wave quantization**。因此，GEMM latency 并不一定随着 FLOPs 平滑增长，有时矩阵尺寸只增加一点，就可能因为多出一个 tile 或一个 wave 而出现明显的 latency 跳变。
+
+所以，矩阵“更大”本身并不是重点，关键是它是否产生了足够多、足够规整的计算工作。Prefill 的大 \(M\) 通常能够产生更多 tiles，把更多计算单元同时利用起来；小 batch decode 的 \(M\) 很窄，则更容易受到 tile parallelism 和 wave quantization 的限制。这也解释了 AI Infra 中一个很常见的现象：**增加 batch size 或一次处理更多 token 后，计算量虽然增加了，执行时间却可能增长得远慢于计算量。** 接下来还需要考虑另一个原因——更大的 GEMM 同时能够带来更好的数据复用。
+
+#### 2.2.3 Data Reuse and Arithmetic Intensity
+
+GEMM 的效率还取决于另一件事：**搬进来的数据能够参与多少次计算。** 仍然考虑
+
+\[
+Y=XW,
+\qquad
+X\in\mathbb{R}^{M\times K},
+\quad
+W\in\mathbb{R}^{K\times N}.
+\]
+
+完成这次矩阵乘法需要大约 \(2MNK\) FLOPs，但真正的执行时间还取决于 \(X\)、\(W\) 和中间结果需要在不同 memory level 之间搬动多少数据。通常用 **arithmetic intensity** 描述这种关系：
+
+\[
+I=
+\frac{\text{FLOPs}}
+{\text{Bytes Moved}}.
+\]
+
+\(I\) 越高，说明每搬运一个 byte 的数据能够完成更多计算。
+
+如果暂时只考虑 HBM traffic，并假设 \(X\)、\(W\) 各读取一次、\(Y\) 写回一次，每个元素占 \(s\) bytes，那么一个理想化的 GEMM arithmetic intensity 可以写成
+
+\[
+I
+\approx
+\frac{2MNK}
+{s(MK+KN+MN)}.
+\]
+
+这个式子可以直观看出 \(M\) 为什么重要。Decode 中 \(M\) 很小时，庞大的权重矩阵 \(W\) 被读进来后只服务少量 token，每读取一次权重只能完成有限计算；随着 batch size 或同时处理的 token 数增加，同一份 \(W\) 可以被更多行的 \(X\) 复用，计算量增长得比权重读取量更快，因此 arithmetic intensity 随之提高。
+
+实际 GPU 会进一步通过 tiling 把这种 reuse 留在更靠近计算单元的位置。一个 tile 的 \(X\) 或 \(W\) 被加载到 register、shared memory 或其他片上存储后，可以参与多次 matrix multiply-accumulate，再去处理下一块数据。这里需要区分 **理论上存在的数据复用** 和 **硬件真正实现的数据复用**：矩阵形状、tile size、cache behavior 和 kernel implementation 都会决定有多少数据最终仍然需要从更远的 memory hierarchy 重新读取。
+
+因此，扩大 GEMM 的工作规模通常同时产生两种收益：更多 tiles 提供更高的并行度，而更高的数据复用又提高 arithmetic intensity。当前者不足时，计算单元没有被填满；后者不足时，计算单元可能在等待数据。只有两者都足够高，GEMM 才有机会接近 accelerator 的峰值计算能力。这也自然引出了下一节的问题：**规格表上的 Peak FLOPS，究竟在什么条件下才能真正转化成有效性能？**
 
 ### 2.3 Peak FLOPS vs. Effective Performance
 
-硬件规格表最常出现的指标是 TFLOPS 或 PFLOPS，但这个数字描述的通常是特定数据类型和特定执行条件下的理论峰值。例如，同一颗 accelerator 在 FP32、BF16、FP8 或更低精度下可能具有完全不同的峰值吞吐；如果规格使用了 structured sparsity，数字还可能进一步提高。因此，在比较两颗芯片之前，至少需要确认 **precision、dense/sparse、accumulation type 和统计口径是否一致**。
+#### 2.3.1 Precision and Peak FLOPS
 
-更重要的是，实际性能取决于有多少理论算力真正被 workload 使用。可以简单写成
+硬件规格中的 FLOPS（floating-point operations per second）描述的是单位时间能够完成多少浮点运算。对于矩阵乘法中最常见的 fused multiply-add（FMA），一次乘法和一次加法通常计作两次 floating-point operations。因此，如果一颗 accelerator 每秒能够执行 \(N_{\mathrm{FMA}}\) 次这样的操作，其理论计算吞吐可以写成
 
 \[
-P_{\mathrm{effective}}
+P_{\mathrm{peak}}
 =
-U_{\mathrm{compute}}\cdot P_{\mathrm{peak}},
+2N_{\mathrm{FMA}}.
 \]
 
-其中 \(U_{\mathrm{compute}}\) 表示有效计算利用率。这个量会受到矩阵形状、batch size、kernel implementation、数据类型以及 memory traffic 等因素共同影响。一个理论峰值更高的 accelerator，如果 workload 无法提供足够大的计算规模，或者大部分时间都在等待数据和通信，最终未必更快。
+同一颗 accelerator 往往会给出多组完全不同的 peak throughput，例如 FP32、TF32、BF16、FP16 和 FP8。原因很直接：precision 越低，一个数需要的 bit 越少，同样的芯片面积和数据通路通常能够并行处理更多元素。以 matrix engine 为例，一条面向低精度数据设计的计算路径可以在一个周期内完成更多 multiply-accumulate，因此通常有
 
-因此，看 AI accelerator 时，峰值 FLOPS 只能回答“这颗芯片最多能算多快”。真正需要进一步问的是：**模型能否把这些计算单元填满，数据能否及时送到计算单元，以及计算完成后是否还要等待其他设备。** 后两个问题分别会把我们带到下一章的 memory hierarchy，以及后面的 interconnect 和 networking。
+\[
+P_{\mathrm{FP8}}
+>
+P_{\mathrm{BF16}}
+>
+P_{\mathrm{FP32}}.
+\]
 
+更低的 precision 同时也减少了数据量。相同数量的参数和 activation 使用 BF16 时只需要 FP32 一半的存储空间，FP8 又进一步减半，因此 HBM、cache 和片上数据通路可以在相同时间内搬运更多元素。低精度计算带来的收益于是同时出现在 **compute throughput** 和 **memory traffic** 两侧，这也是现代 AI accelerator 越来越强调 BF16、FP8 甚至更低精度计算的重要原因。
 
+不过，“FP8 compute”并不意味着整条计算链路中的所有数据都以 FP8 完成运算。Matrix multiplication 经常使用较低精度的 input 执行乘法，再使用更高精度保存和累加 partial sum，例如低精度 multiply 配合 FP16 或 FP32 accumulation。这样可以在提高吞吐的同时控制长序列乘加带来的数值误差。因此，阅读一项 peak FLOPS 时，需要同时确认 **input precision、accumulation precision 和实际使用的计算单元**。只有这些口径一致，两颗 accelerator 的峰值算力才具有直接可比性。
 
+#### 2.3.2 Dense, Sparse, and Tensor Core Throughput
 
+即使 precision 相同，一颗 accelerator 的规格表中也可能出现多组完全不同的 peak throughput。以 NVIDIA GPU 为例，普通 FP32 CUDA Core、Tensor Core dense GEMM 和 Tensor Core sparse GEMM 使用的是不同的执行路径，因此对应的峰值算力也不同。Tensor Core 针对规则的 matrix multiply-accumulate 提供更高吞吐，而普通计算单元还需要支持更广泛的 arithmetic 和 control operation。因此，看到一个很高的 TFLOPS 数字时，首先需要确认它描述的是哪条计算路径。
 
+Sparse throughput 又引入了另一层区别。以 NVIDIA Ampere 及后续架构支持的 structured sparsity 为例，对于一些数据类型，硬件可以利用 **2:4 sparsity**：每连续四个 weight 中至少有两个为零，非零值和对应 metadata 被压缩后送入 Sparse Tensor Core。硬件只对保留下来的非零元素执行实际乘加，因此在满足这种结构约束时，同一套 matrix hardware 可以完成大约两倍的等效 dense computation。 这也是为什么规格表中的 sparse Tensor Core throughput 经常明显高于对应的 dense throughput。
 
+这里的关键在于，**sparse FLOPS 描述的是满足特定 sparsity pattern 时的有效计算能力，并不代表任意稀疏模型都能获得同样的加速。** 模型权重首先需要满足硬件支持的结构，例如 2:4 sparsity，kernel 和软件栈也必须真正使用对应的 sparse execution path；普通 unstructured sparsity 并不会自动映射到 Sparse Tensor Core。以 2:4 为例，NVIDIA 的实现通过只保存和计算非零值来减少权重 footprint 和相关 bandwidth，并在支持的 Tensor Core 路径上提高理论吞吐。
 
+因此，比较两颗 accelerator 的“算力”时，至少需要同时对齐 **precision、accumulation precision、dense/sparse 口径，以及实际使用的 compute path**。例如一个 BF16 dense Transformer，应该首先比较 BF16 dense matrix throughput；直接拿另一颗芯片的 FP8 sparse peak 与它相比，得到的数字几乎没有实际意义。规格表给出的始终是某种特定条件下的硬件上限，下一步真正需要回答的是：实际 workload 最终能够利用其中多少。
+
+#### 2.3.3 From Peak FLOPS to Achieved Throughput
+
+Peak FLOPS 给出了 accelerator 在特定 precision 和计算路径下的理论上限，实际 workload 能达到的计算吞吐则可以写成
+
+\[
+P_{\mathrm{achieved}}
+=
+\frac{\text{executed FLOPs}}
+{\text{execution time}},
+\]
+
+进一步定义相对于峰值算力的利用率
+
+\[
+U_{\mathrm{compute}}
+=
+\frac{P_{\mathrm{achieved}}}{P_{\mathrm{peak}}}.
+\]
+
+这个比例通常远小于 1，而且会随着 workload 改变。同一颗 GPU、同一个模型，仅仅改变 batch size、sequence length 或 GEMM shape，就可能得到完全不同的 \(U_{\mathrm{compute}}\)。
+
+前面讨论的几个机制都会影响这个比例。矩阵较窄时，tile 数量不足，matrix engine 无法全部填满；tile 或 wave 没有很好对齐时，一部分计算资源会处于空闲；arithmetic intensity 较低时，计算单元又可能需要等待数据从 memory hierarchy 中搬进来。可以粗略地把实际计算性能理解为同时受到两个上限约束：
+
+\[
+P_{\mathrm{achieved}}
+\lesssim
+\min
+\left(
+P_{\mathrm{peak}},
+\;
+I\cdot BW_{\mathrm{memory}}
+\right),
+\]
+
+其中 \(I\) 是 arithmetic intensity，\(BW_{\mathrm{memory}}\) 是可用 memory bandwidth。前者对应 compute ceiling，后者对应数据供给能够支撑的计算速度。这也是 Roofline Model 最核心的直觉：提高 Peak FLOPS 只有在 workload 能够提供足够高 arithmetic intensity 时，才会真正转化成性能提升。
+
+端到端模型性能还会进一步低于单个 GEMM 所能达到的吞吐。Transformer 中除了 matrix multiplication，还有 normalization、softmax、sampling、routing、memory copy 等操作；多卡运行时还会加入 collective communication 和 synchronization。即使 GEMM 已经接近 Tensor Core 的峰值，其他部分仍然可能处在 critical path 上。因此，分析硬件性能时，需要从单个 kernel 的 achieved throughput 一直看到完整模型的 execution timeline。
+
+这里也要区分不同意义上的 utilization。监控工具显示的“GPU utilization”通常表示一段时间内 GPU 是否有 kernel 在执行，并不能直接说明 Tensor Core 已经达到多少 Peak FLOPS。一块 GPU 可以长期处于 busy 状态，同时只达到很低的理论计算吞吐。真正评价 accelerator 是否被有效使用，需要结合 **achieved FLOPS、matrix shape、memory bandwidth、kernel breakdown 和端到端 latency** 一起看。规格表告诉我们硬件的上限，而 workload 决定了最终能够接近这个上限多少。
