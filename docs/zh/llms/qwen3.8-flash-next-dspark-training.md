@@ -14,6 +14,7 @@
 | **验证集** | GSM8K 256 条问题对应的重新生成回复及 hidden cache |
 | **最大序列长度** | 4096 tokens，包含 prompt 与 response |
 | **Draft 架构** | 3 层；隐藏维度 2560；FFN 中间维度 9728；GQA：24 个 Q heads、2 个 KV heads，head dim 256 |
+| **Attention 设置** | 三层均为 full attention，无滑动窗口；Q/K RMSNorm 与 RoPE，RoPE theta 为 \(10^6\) |
 | **Aux 层** | `[45, 46, 47]`，按配置中的零基层号记录 |
 | **Block size** | 7；Baseline 输入为 `[anchor, MASK × 6]` |
 | **Anchor 采样** | 每个样本最多 512 个 |
@@ -87,13 +88,13 @@ $$
 
 ## Baseline 架构
 
-Baseline 将块内生成分解为并行特征计算与顺序 token 选择。三层 draft backbone 在已知前缀和 anchor 条件下，一次生成各预测位置的隐藏表示，LM head 将其映射为初始 logits。Vanilla Markov head 根据前驱 token 添加低秩词表偏置，confidence head 独立估计对应位置的分布重叠率。
+Baseline 采用标准DSpark结构。三层 draft backbone一次生成各预测位置的hidden states，LM head 将其映射为初始 logits。Markov head 根据前驱 token 添加logits bias，confidence head 独立估计对应位置的分布重叠率。
 
 ![DSpark baseline：左为并行 draft 与顺序选择，右为首个预测位置的 Markov 修正及 confidence 分支](../../assets/images/qwen3.8-flash-next-dspark/dspark-baseline.svg){ width="100%" }
 
-图左以 D 为 anchor，展示 E–I 的生成，虚线表示相邻位置的选择依赖。右图展开预测 E 时的 Markov 修正与 confidence 分支。本文架构图按需省略输入槽，实际 block size 均为 7，包含一个 anchor 槽和六个后续输入槽，具体表示由各变体定义。
+图左以 D 为 anchor，展示E – I的生成，虚线表示相邻位置的选择依赖。右图展开预测E时的 Markov 修正与 confidence 分支。实际训练时 block size 为 7，包含一个 anchor 和六个MASK。
 
-### Target context 与并行预测
+### Dspark Backbone
 
 设 block size 为 \(B\)，token embedding 为 \(E(\cdot)\)。对于前缀 `[... A B C]` 与新 anchor D，draft 输入为
 
@@ -102,9 +103,7 @@ X=[E(D),\underbrace{E(\mathrm{MASK}),\ldots,E(\mathrm{MASK})}_{B-1\text{ 个槽}
 \qquad B=7.
 $$
 
-MASK 槽共享输入 embedding，并使用不同的位置编号。输出采用 next-token 对齐：anchor 槽对应 \(h_1\)，用于预测 E，后续槽依次预测 F–K。
-
-对 anchor 之前的每个位置 \(j\)，拼接 Target 第 45、46、47 层的隐藏状态，经投影与归一化得到 context 特征：
+MASK 槽共享输入 embedding，并使用不同的位置编号。anchor 槽对应 \(h_1\)，用于预测 E，后续槽依次预测 F – K。对 anchor 之前的每个位置 \(j\)，拼接 Target 第 45、46、47 层的隐藏状态，经投影与归一化得到 context 特征：
 
 $$
 c_j=\operatorname{RMSNorm}\!\left(
@@ -116,9 +115,11 @@ $$
 
 \(W_{\mathrm{aux}}\) 是可训练的无偏置投影。图中的 Target context 截止 C，anchor D 仅通过自身 embedding 输入，不提供其对应位置及未来位置的 Target hidden。
 
-每层的 query 来自当前 draft 隐藏状态，K/V 由 context 特征与当前 block 的隐藏状态共同构成，在同一次 attention 中读取。三层共享 \(c_j\)，分别使用自身的 K/V 投影，通过 attention、残差连接和 MLP 更新 draft 状态。最终经 RMSNorm 得到 \(h_1,\ldots,h_B\)，再由冻结的 LM head 并行生成全词表初始 logits \(\ell_1^0,\ldots,\ell_B^0\)。
+三层 backbone 均采用 GQA，每层包含 24 个 query heads 和 2 个 K/V heads，head dimension 为 256，即每 12 个 query heads 共享一组 K/V。三层均配置为 full attention，不启用 SWA。对于一个 anchor block，每个 query 可读取 anchor 之前全部有效的 Target context，以及自身 block 中的所有输入槽。
 
-Block 内采用双向 attention，输入仅包含 anchor 和 MASK。训练可将多个 anchor block 合并到一次前向计算中，各 block 的可见范围限定为自身输入槽及对应 anchor 之前的 Target context。
+每层的 query 来自当前 draft 隐藏状态，context 特征与当前 block 隐藏状态分别经过该层的 K/V 投影，沿序列维拼接后在同一次 attention 中读取。三层共享 \(c_j\)，但各层的 Q/K/V 投影参数独立。Draft 状态通过 attention、残差连接和 MLP 逐层更新，最终经 RMSNorm 得到 \(h_1,\ldots,h_B\)，再由冻结的 LM head 并行生成全词表初始 logits \(\ell_1^0,\ldots,\ell_B^0\)。
+
+
 
 ### Markov 顺序修正
 
@@ -405,7 +406,97 @@ Prefix K/V 在当前 block 内增长，每轮重新清空。新增计算位于�
 
 ## 结果总览
 
-实验结果尚待按统一评估口径汇总。
+已完成 Prefix reranker 与独立 baseline 在 step 7812 的在线 GSM8K 全集评测，并记录 reranker 的 thinking 与 non-thinking 对照。其余结构的在线结果待补。
+
+### Prefix reranker 在线评测
+
+2026 年 10 月 5 日，使用 `qwen38-prefix-reranker-step7812` 在 vLLM 中进行多轮 draft–verify 推理。测试集为 GSM8K test split 全部 1,319 条问题，区别于训练过程中使用的 256 条重新生成回复及 hidden cache 的离线验证集。
+
+| **项目** | 设置 |
+| --- | --- |
+| **Target** | Qwen3.8-Flash-Next |
+| **Draft checkpoint** | `qwen38-prefix-reranker-step7812` |
+| **接口与 prompt** | `/v1/chat/completions`；5-shot 示例与待回答问题拼接为单条 user message |
+| **Thinking 设置** | 对比开启 thinking 与 `enable_thinking=False`；后者与 DeepSpec cache 的 non-thinking 设置一致 |
+| **Target 采样** | Temperature 0 |
+| **Draft 选择** | Greedy；每轮 7 个 proposal；关闭 adaptive verification |
+| **并行与并发** | Target TP 4；服务端 `max_num_seqs=8`；客户端最大并发 256 |
+| **长度限制** | 模型最大上下文 8,192 tokens；每题最多生成 1,024 tokens |
+| **计分** | 使用本地 `gsm8k_eval.py` 的答案提取与计分逻辑 |
+
+评测期间的接受统计由服务端累计计数获得，测试前计数为零。逐位置接受率的分母均为 draft rounds，表示一轮中前 \(i\) 个 proposal 连续被接受的比例，不是前 \(i-1\) 个已接受条件下的条件接受率。
+
+| **指标** | Thinking | Non-thinking |
+| --- | --- | --- |
+| **GSM8K accuracy** | 76.4% | 96.8916%（1,278 / 1,319） |
+| **Invalid rate** | 5.6% | 0% |
+| **Draft rounds** | 131,596 | 38,100 |
+| **Drafted tokens** | 921,172 | 266,700 |
+| **Accepted draft tokens** | 294,863 | 154,796 |
+| **MAL** | 3.2407 | 5.0629 |
+| **Draft token acceptance rate** | 32.01% | 58.04% |
+| **评测总耗时** | 151.655 s | 51.6538 s |
+| **Questions/s** | 8.697 | 25.5354 |
+| **总输出 tokens** | 426,057 | 191,738 |
+| **整体输出吞吐** | 2,809.391 tokens/s | 3,711.9851 tokens/s |
+
+Thinking 的 accuracy 与 invalid rate 保留原始日志的显示精度，未据此反推精确题数。
+
+上述吞吐由总输出 token 数除以评测总耗时计算，包含并发与排队影响，不表示单请求 decode 速度。MAL 沿用 vLLM 的计数口径，包含每轮一个 bonus／纠正 token：
+
+$$
+\mathrm{MAL}=1+\frac{154{,}796}{38{,}100}=5.0629.
+$$
+
+| **Proposal 位置** | Thinking 连续接受计数 | Thinking 接受率 | Non-thinking 连续接受计数 | Non-thinking 接受率 |
+| --- | --- | --- | --- | --- |
+| **1** | 89,759 | 68.21% | 35,616 | 93.48% |
+| **2** | 62,427 | 47.44% | 31,325 | 82.22% |
+| **3** | 46,642 | 35.44% | 26,918 | 70.65% |
+| **4** | 36,031 | 27.38% | 22,033 | 57.83% |
+| **5** | 27,063 | 20.57% | 17,209 | 45.17% |
+| **6** | 19,551 | 14.86% | 12,817 | 33.64% |
+| **7** | 13,390 | 10.18% | 8,878 | 23.30% |
+
+此前开启 thinking 的在线评测中，MAL 为 3.2407，第一位置接受率为 68.21%。改为 non-thinking 后，二者分别提高至 5.0629 与 93.48%。该变化表明 thinking 设置造成的生成分布差异显著影响接受统计。两次评测的生成轨迹不同，这一对比不能替代相同前缀下的端到端数值对齐，也不能用于估计 reranker 相对 baseline 的增量。
+
+Non-thinking 的总输出量也低于 thinking，因此总耗时下降同时包含输出长度与整体输出吞吐的变化，不能全部归因于 MAL 提高。Thinking 的无效回答尚未按生成截断、答案格式或提取失败分类，当前准确率差异仅反映该长度限制与计分协议下的评测结果。
+
+在 temperature 0 下，在线第一位置的接受判据为 draft token 与 Target argmax 一致，与离线 `reranker/target_accuracy@0` 的判据相同。在线生成与离线参考序列的前缀和 anchor 分布仍有差异，两个指标不要求数值相等。
+
+### Non-thinking 下的 baseline 对照
+
+独立 baseline 使用 `qwen38-baseline-lr3e4-step7812`，对应训练 checkpoint `qwen38-flash-next-baseline-lr3e4-step7812`。与 reranker 使用相同的 non-thinking、temperature 0、5-shot、长度限制、TP、并发及 proposal 设置，均在 `dspark-v1.4-prefix-reranker` 推理分支运行。Baseline 按自身配置加载，不启用 reranker，保留 DSpark 的 anchor 对齐与顺序 Markov 修正。
+
+| **指标** | Baseline | Prefix reranker |
+| --- | --- | --- |
+| **GSM8K accuracy** | 97.0% | 96.8916% |
+| **Invalid rate** | 0% | 0% |
+| **Draft rounds** | 38,812 | 38,100 |
+| **Drafted tokens** | 271,684 | 266,700 |
+| **Accepted draft tokens** | 154,726 | 154,796 |
+| **MAL** | 4.9866 | 5.0629 |
+| **Draft token acceptance rate** | 56.95% | 58.04% |
+| **评测总耗时** | 51.224 s | 51.6538 s |
+| **Questions/s** | 25.750 | 25.5354 |
+| **总输出 tokens** | 192,395 | 191,738 |
+| **整体输出吞吐** | 3,755.970 tokens/s | 3,711.9851 tokens/s |
+
+Baseline accuracy 沿用日志中三位小数的显示精度。结果文件为 `/public/workspace/dspark/logs/eval-qwen38-flash-next/qwen38-baseline-lr3e4-step7812.json`。
+
+| **Proposal 位置** | Baseline 连续接受计数 | Baseline 接受率 | Reranker 接受率 | 接受率变化（百分点） |
+| --- | --- | --- | --- | --- |
+| **1** | 36,173 | 93.20% | 93.48% | +0.28 |
+| **2** | 32,162 | 82.87% | 82.22% | −0.65 |
+| **3** | 27,308 | 70.36% | 70.65% | +0.29 |
+| **4** | 22,090 | 56.92% | 57.83% | +0.91 |
+| **5** | 16,909 | 43.57% | 45.17% | +1.60 |
+| **6** | 12,028 | 30.99% | 33.64% | +2.65 |
+| **7** | 8,056 | 20.76% | 23.30% | +2.54 |
+
+在这次全集对照中，reranker 的 MAL 增加约 0.0763，相对提高约 1.53%。第一位置的接受率基本不变，第二位置略降，较大的增量出现在第 5–7 个位置。该结果衡量联合训练方法相对独立 baseline 的整体差异，不等同于同一 checkpoint 内关闭重排得到的模块增量。
+
+两组准确率基本持平。Reranker 的总耗时增加约 0.84%，整体输出吞吐降低约 1.17%，本次评测未观察到端到端推理加速。该幅度较小，单次测量尚不能区分新增串行计算开销与运行波动。当前结果支持小幅接受长度收益，但不足以证明净速度收益。
 
 <!--
 待汇总的结果表与分析提纲，暂不渲染。
