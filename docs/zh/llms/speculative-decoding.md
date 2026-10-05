@@ -4,9 +4,13 @@
 
 ![Draft 逐个写出 token，target 一次 forward 验证到第一处拒绝](../../assets/images/speculative-decoding/sd-architecture.svg){ width="80%" }
 
-大模型生成文本时，token 是一个接一个产生的。比如模型已经生成到 **once**，接下来要得到 **upon → a → time → there**。由于后一个 token 依赖前一个 token，target model 必须连续执行四次 decode，才能生成这四个 token。问题在于，decode 的每一步其实只生成一个 token。尤其在 batch 较小时，一次 forward 的计算量并不大，但仍然需要读取已有的 KV cache、启动 GPU kernel，并完成同步。因此，生成四个 token 的代价基本就是四次 target forward的时间. Speculative decoding 的想法很直接：既然 target 每次只生成一个 token 很贵，能不能先让一个更小、更快的模型猜几个 token，再让 target 一次检查完？
+自回归大模型在生成文本时，decoding 阶段的 token 是逐个产生的。以 “once upon a time there ...” 为例，假设模型已经生成到 **once**，接下来需要生成 **upon → a → time → there**。由于后一个 token 的预测依赖此前已经生成的序列，target model 必须连续执行四次 decode，才能依次得到这四个 token。
 
-图中，draft model 先连续生成 **upon → a → time → there**。随后 target 不再逐个生成这些 token，而是在一次 forward 中同时计算这几个位置的预测结果，并从左到右进行验证。在这个例子里，**upon、a、time** 都被接受，到 **there** 时第一次出现拒绝，因此验证在这里停止。这样，原本需要 target 连续执行四次的工作，被压缩成了一次 target forward，再加上若干次成本更低的 draft forward。这也是 speculative decoding 的核心：**用便宜的 draft 生成候选，再利用 target 对多个候选 token 进行并行验证，以减少昂贵的 target decode 次数。** Draft 猜得越准，一次 target forward 能确认的 token 越多，加速效果也就越明显。
+在每一步 decode 中，模型实际上只生成一个新的 token。尤其当 batch size 较小时，单次 forward 的计算量并不高，但仍然需要读取已有的 KV cache、执行 GPU kernel，并完成必要的同步。因此，生成四个 token 基本对应四次 target forward 的开销。Speculative decoding 的出发点正是在这里。如果可以先由一个**更小、更快**的模型生成若干候选 token，再让 target model 在一次 forward 中完成验证，就有可能显著减少昂贵的 target decode 次数。
+
+如图所示，draft model 首先连续生成 **upon → a → time → there**。随后，target model 不再逐个生成这些 token，而是在一次 forward 中同时计算多个位置的预测结果，并按照自左向右的顺序进行验证。在这个例子中，**upon、a、time** 均被接受，而 **there** 是第一个被拒绝的 token，因此本轮验证在该位置结束。
+
+这样，原本需要多次 target decode 才能确认的多个 token，可以通过一次 target forward 完成验证，只额外引入若干次成本更低的 draft forward。这构成了 speculative decoding 的基本思想。**由低成本的 draft model 提出候选序列，再利用 target model 并行验证多个候选 token，从而减少昂贵的 target decode 次数。** Draft model 与 target model 的预测越一致，一次 target forward 能够接受的 token 越多，speculative decoding 所带来的加速也就越明显。
 
 
 ## 2. Vanilla Speculative Decoding
@@ -563,4 +567,10 @@ def sample_recovered_tokens_kernel(
 <p class="doc-reference-label"><strong>Reference</strong></p>
 
 <p class="doc-reference">[1] Y. Leviathan, M. Kalman, Y. Matias. Fast Inference from Transformers via Speculative Decoding. ICML, 2023. <a href="https://arxiv.org/pdf/2211.17192">arXiv:2211.17192</a>.</p>
+
+### DSpark 训练记录
+
+- [Qwen3-4B DSpark 训练消融](qwen3-4b-dspark-ablation.md)
+- [Qwen3.8-Flash-Next DSpark 训练实验](qwen3.8-flash-next-dspark-training.md)
+- [GLM 5.2 DSpark 投机训练设计](glm-5.2-dspark-design.md)
 

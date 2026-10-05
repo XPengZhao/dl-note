@@ -16,6 +16,32 @@ plugins:
         - locale: zh
           name: 简体中文
           build: true
+          # Keep Chinese-only reports out of the default English navigation.
+          nav:
+            - Home: index.md
+            - Tensor Operation: tensor.md
+            - Neural Graphics: neural-graphics.md
+            - AI Infra:
+                - Overview: llms/overview.md
+                - Hardware: hardware.md
+                - Request Lifecycle: llms/request-lifecycle.md
+                - Metrics: llms/metrics.md
+                - Roofline Model: llms/roofline.md
+                - Data Movement and Communication: llms/data-movement.md
+                - KV Cache: llms/kv-cache.md
+                - Serving Runtime: llms/serving-runtime.md
+                - Parallelism: llms/parallelism.md
+                - Decoding: llms/decoding.md
+                - Speculative Decoding:
+                    - Speculative Decoding: llms/speculative-decoding.md
+                    - GLM-5.2 DSpark Design: llms/glm-5.2-dspark-design.md
+                    - Qwen3-4B DSpark Ablation: llms/qwen3-4b-dspark-ablation.md
+                    - Qwen3.8-Flash-Next DSpark Training: llms/qwen3.8-flash-next-dspark-training.md
+                - Training Objective: llms/training-objective.md
+            - Models:
+                - Position Encoding: llms/position-encoding.md
+                - Model Notes: llms/models.md
+                - GLM-5.2 Inference Path: llms/glm-5.2-inference-path.md
           nav_translations:
             Home: 首页
             Hardware: 硬件
@@ -39,6 +65,7 @@ plugins:
             GLM-5.2 Inference Path: GLM-5.2 推理路径
             GLM-5.2 DSpark Design: GLM-5.2 DSpark 训练设计
             Qwen3-4B DSpark Ablation: Qwen3-4B DSpark 消融报告
+            Qwen3.8-Flash-Next DSpark Training: Qwen3.8-Flash-Next DSpark 训练实验
 nav:
   - Home: index.md
   - Tensor Operation: tensor.md
