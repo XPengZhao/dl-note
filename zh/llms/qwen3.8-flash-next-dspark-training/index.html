@@ -1,0 +1,2771 @@
+
+<!doctype html>
+<html lang="zh" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://XPengZhao.github.io/dl-note/zh/llms/qwen3.8-flash-next-dspark-training/">
+      
+      
+        <link rel="prev" href="../qwen3-4b-dspark-ablation/">
+      
+      
+        <link rel="next" href="../training-objective/">
+      
+      
+        
+          <link rel="alternate" href="/dl-note/" hreflang="en">
+        
+          <link rel="alternate" href="./" hreflang="zh">
+        
+      
+      
+      <link rel="icon" href="../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Qwen3.8-Flash-Next DSpark 训练实验 - DL Notes</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../stylesheets/bootstrap.min.css">
+    
+      <link rel="stylesheet" href="../../../stylesheets/basic.css">
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#qwen38-flash-next-dspark" class="md-skip">
+          跳转至
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="页眉">
+    <a href="../../" title="DL Notes" class="md-header__button md-logo" aria-label="DL Notes" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            DL Notes
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Qwen3.8-Flash-Next DSpark 训练实验
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+      <div class="md-header__option">
+  <div class="md-select">
+    
+    <button class="md-header__button md-icon" aria-label="选择当前语言">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12.87 15.07-2.54-2.51.03-.03A17.5 17.5 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2zm-2.62 7 1.62-4.33L19.12 17z"/></svg>
+    </button>
+    <div class="md-select__inner">
+      <ul class="md-select__list">
+        
+          <li class="md-select__item">
+            <a href="/dl-note/" hreflang="en" class="md-select__link">
+              English
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="./" hreflang="zh" class="md-select__link">
+              简体中文
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="搜索" placeholder="搜索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="查找">
+        
+        <button type="reset" class="md-search__icon md-icon" title="清空当前内容" aria-label="清空当前内容" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            正在初始化搜索引擎
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="导航栏" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../" title="DL Notes" class="md-nav__button md-logo" aria-label="DL Notes" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    DL Notes
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    首页
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tensor/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    张量操作
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../neural-graphics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    神经图形
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AI Infra
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    AI Infra
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hardware/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    硬件
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../request-lifecycle/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    请求生命周期
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../metrics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    指标
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../roofline/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Roofline 模型
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../data-movement/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    数据搬运与通信
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../kv-cache/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    KV Cache
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../serving-runtime/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    推理运行时
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../parallelism/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    并行策略
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../decoding/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    解码与采样
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_11" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_4_11" id="__nav_4_11_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Speculative Decoding
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_11_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4_11">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Speculative Decoding
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../speculative-decoding/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Speculative Decoding
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../glm-5.2-dspark-design/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GLM-5.2 DSpark 训练设计
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../qwen3-4b-dspark-ablation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Qwen3-4B DSpark 消融报告
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Qwen3.8-Flash-Next DSpark 训练实验
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Qwen3.8-Flash-Next DSpark 训练实验
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#baseline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Baseline 架构
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Baseline 架构">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#dspark" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DSpark 主干网络
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#markov" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Markov 顺序修正
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#confidence-head" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Confidence head 与训练目标
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#engram-markov-head" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Engram 增强 Markov head
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Engram 增强 Markov head">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        门控与特征注入
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        训练与推理
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#engram-mask" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Engram 增强 MASK 输入
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Engram 增强 MASK 输入">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        门控残差
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        直接替换
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        训练与推理
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#draft-memory" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Draft Memory
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Draft Memory">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        两阶段训练
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#memory" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Memory 筛选与读取
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        训练与推理
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#prefix-reranker" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prefix reranker
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Prefix reranker">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        候选与前缀表示
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_9" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        残差打分
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_10" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        重排评估
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_11" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        训练目标与更新范围
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_12" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        推理开销
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#evaluation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Evaluation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Evaluation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1experimental-setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.Experimental Setup
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1.Experimental Setup">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#dataset" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dataset
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#evaluation-metrics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Evaluation Metrics
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_13" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        实验分组
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="实验分组">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#evaluation-results" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Evaluation Results
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Evaluation Results">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-acceptance-rate-vs-sampling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Acceptance rate vs. Sampling
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_14" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        整体结果
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-acceptance-rate-vs-epochs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Acceptance rate vs. Epochs
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#prefix-reranker_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prefix reranker 的效果
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#thinking" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Thinking 的影响
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#math-500" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MATH-500
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_15" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        附录
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="附录">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_16" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        学习率与训练稳定性
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../training-objective/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    训练目标
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    模型
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    模型
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../position-encoding/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    位置编码
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    模型笔记
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../glm-5.2-inference-path/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GLM-5.2 推理路径
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#baseline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Baseline 架构
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Baseline 架构">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#dspark" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DSpark 主干网络
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#markov" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Markov 顺序修正
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#confidence-head" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Confidence head 与训练目标
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#engram-markov-head" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Engram 增强 Markov head
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Engram 增强 Markov head">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        门控与特征注入
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        训练与推理
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#engram-mask" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Engram 增强 MASK 输入
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Engram 增强 MASK 输入">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        门控残差
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        直接替换
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        训练与推理
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#draft-memory" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Draft Memory
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Draft Memory">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        两阶段训练
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#memory" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Memory 筛选与读取
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        训练与推理
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#prefix-reranker" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prefix reranker
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Prefix reranker">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        候选与前缀表示
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_9" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        残差打分
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_10" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        重排评估
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_11" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        训练目标与更新范围
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_12" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        推理开销
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#evaluation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Evaluation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Evaluation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1experimental-setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.Experimental Setup
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1.Experimental Setup">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#dataset" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dataset
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#evaluation-metrics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Evaluation Metrics
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_13" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        实验分组
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="实验分组">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#evaluation-results" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Evaluation Results
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Evaluation Results">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-acceptance-rate-vs-sampling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Acceptance rate vs. Sampling
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_14" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        整体结果
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-acceptance-rate-vs-epochs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Acceptance rate vs. Epochs
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#prefix-reranker_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prefix reranker 的效果
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#thinking" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Thinking 的影响
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#math-500" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MATH-500
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_15" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        附录
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="附录">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_16" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        学习率与训练稳定性
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="qwen38-flash-next-dspark">Qwen3.8-Flash-Next DSpark 架构探索</h1>
+<p>以 Qwen3.8-Flash-Next 为目标模型（Target），冻结其参数，训练三层 DSpark 草稿模型（draft）。各实验使用相同的数据和隐藏状态缓存，比较不同结构的收敛情况、候选选择和接受长度。</p>
+<h2 id="baseline">Baseline 架构</h2>
+<p>Baseline 采用标准 DSpark 结构。三层 draft 主干网络一次生成各预测位置的隐藏状态，LM head 将其映射为初始 logits。Markov head 根据前驱 token 添加偏置，confidence head 预测对应位置的分布重叠率。</p>
+<p><img alt="DSpark baseline：左为并行 draft 与顺序选择，右为首个预测位置的 Markov 修正及 confidence 分支" src="../../../assets/images/qwen3.8-flash-next-dspark/dspark-baseline.svg" width="100%" /></p>
+<p>图示以 D 为 anchor；实际 block size 为 7，预测 E–K。</p>
+<h3 id="dspark">DSpark 主干网络</h3>
+<p>设 block size 为 <span class="arithmatex">\(B\)</span>，token embedding 为 <span class="arithmatex">\(E(\cdot)\)</span>。对于前缀 <code>[... A B C]</code> 与新 anchor D，draft 输入为</p>
+<div class="arithmatex">\[
+X=[E(D),\underbrace{E(\mathrm{MASK}),\ldots,E(\mathrm{MASK})}_{B-1\text{ 个槽}}],
+\qquad B=7.
+\]</div>
+<p>MASK 槽共享输入 embedding，并使用不同的位置编号。anchor 槽对应 <span class="arithmatex">\(h_1\)</span>，用于预测 E，后续槽依次预测 F – K。对 anchor 之前的每个位置 <span class="arithmatex">\(j\)</span>，拼接 Target 第 45、46、47 层的隐藏状态，经投影与归一化得到上下文特征：</p>
+<div class="arithmatex">\[
+c_j=\operatorname{RMSNorm}\!\left(
+W_{\mathrm{aux}}[H_j^{45};H_j^{46};H_j^{47}]
+\right),
+\qquad
+W_{\mathrm{aux}}:\mathbb R^{7680}\rightarrow\mathbb R^{2560}.
+\]</div>
+<p><span class="arithmatex">\(W_{\mathrm{aux}}\)</span> 为可训练的无偏置投影。每个 query 可读取 anchor 之前的有效 Target 上下文及自身 block 的全部输入槽；anchor 本身通过 token embedding 输入。</p>
+<p>每层的 query 来自当前 draft 隐藏状态，上下文特征与当前 block 隐藏状态分别经过该层的 K/V 投影，沿序列维拼接后在同一次 attention 中读取。三层共享 <span class="arithmatex">\(c_j\)</span>，但各层的 Q/K/V 投影参数独立。Draft 状态通过 attention、残差连接和 MLP 逐层更新，最终经 RMSNorm 得到 <span class="arithmatex">\(h_1,\ldots,h_B\)</span>，再由冻结的 LM head 并行生成全词表初始 logits <span class="arithmatex">\(\ell_1^0,\ldots,\ell_B^0\)</span>。</p>
+<h3 id="markov">Markov 顺序修正</h3>
+<p>令 <span class="arithmatex">\(t_0=D\)</span>，<span class="arithmatex">\(t_i\)</span> 为第 <span class="arithmatex">\(i\)</span> 个生成位置的 token。Markov head 将前驱 token 映射为低秩表示 <span class="arithmatex">\(m_i\)</span>，再投影为词表偏置 <span class="arithmatex">\(b_i\)</span>：</p>
+<div class="arithmatex">\[
+\begin{aligned}
+m_i&amp;=W_1[t_{i-1}]\in\mathbb R^{256},\\
+b_i&amp;=W_2m_i,\\
+\ell_i&amp;=\ell_i^0+b_i,\qquad
+q_i=\operatorname{softmax}(\ell_i).
+\end{aligned}
+\]</div>
+<p><span class="arithmatex">\(W_1\)</span> 与 <span class="arithmatex">\(W_2\)</span> 均参与训练。前驱 token 提供偏置，上下文信息由 <span class="arithmatex">\(\ell_i^0\)</span> 提供；greedy 选择 <span class="arithmatex">\(\hat t_i=\arg\max_v\ell_i(v)\)</span>。</p>
+<p>训练使用参考前驱 token，所有位置的 Markov 修正可并行计算。推理使用实际选出的前驱 token，依次查表、修正 logits 并选择下一个 token。主干网络的隐藏状态在整轮内保持不变。</p>
+<h3 id="confidence-head">Confidence head 与训练目标</h3>
+<p>Confidence 分支读取 draft 隐藏状态 <span class="arithmatex">\(h_i\)</span> 与词表投影之前的 Markov 表示 <span class="arithmatex">\(m_i\)</span>，通过线性层与 sigmoid 得到预测值：</p>
+<div class="arithmatex">\[
+s_i=w_c^\top[h_i;m_i]+b_c,
+\qquad
+\hat a_i=\sigma(s_i).
+\]</div>
+<p>输入维度为 2816，监督目标为 teacher 与修正后 draft 分布的重叠率 <span class="arithmatex">\(a_i\)</span>。标签停止梯度，以二元交叉熵训练 confidence head；token 仍由 logits 选择。</p>
+<p>基础损失中，CE 监督记录的下一个 token，L1 拟合 teacher 全词表分布，confidence loss 拟合分布重叠率。三项损失均在有效 response 位置按实验设置中的衰减权重求平均。</p>
+<h2 id="engram-markov-head">Engram 增强 Markov head</h2>
+<p>Engram-Markov 在前驱 token 的低秩表示中加入 n-gram 特征，由当前 draft 隐藏状态控制其权重。主干网络与 MASK 输入保持不变。</p>
+<p><img alt="Engram 增强 Markov head：左为整块生成，右为以 D 为 anchor 预测 E 的第一步" src="../../../assets/images/qwen3.8-flash-next-dspark/engram-markov.svg" width="100%" /></p>
+<h3 id="_1">门控与特征注入</h3>
+<p><span class="arithmatex">\(e_{i-1}\in\mathbb R^{2560}\)</span> 为截至前驱 token <span class="arithmatex">\(t_{i-1}\)</span> 的 n-gram 查表特征。</p>
+<p>Draft 隐藏状态提供 query，Engram 特征提供 key 和 value。记 <span class="arithmatex">\(N\)</span> 为无可训练 affine 参数的 RMSNorm，Markov rank 为 <span class="arithmatex">\(r=256\)</span>，则</p>
+<div class="arithmatex">\[
+\begin{aligned}
+\bar e_{i-1}&amp;=N(e_{i-1}),\\
+\mathbf q_i&amp;=N\!\left(W_QN(h_i)\right),\\
+\mathbf k_i&amp;=N(W_K\bar e_{i-1}),\qquad
+\mathbf v_i=W_V\bar e_{i-1},\\
+s_i&amp;=\frac{\mathbf q_i^\top\mathbf k_i}{\sqrt r},\\
+g_i&amp;=\sigma\!\left(\operatorname{sign}(s_i)
+\sqrt{\max(|s_i|,10^{-6})}\right).
+\end{aligned}
+\]</div>
+<p>各位置独立计算门值，增强后的 Markov 表示与 logits 为</p>
+<div class="arithmatex">\[
+m_i=W_1[t_{i-1}]+g_i\mathbf v_i,
+\qquad
+\ell_i=\ell_i^0+W_2m_i.
+\]</div>
+<p>Confidence head 同样读取增强后的 <span class="arithmatex">\(m_i\)</span>。</p>
+<p>三个无偏置投影均为 <span class="arithmatex">\(2560\rightarrow256\)</span>，新增 1.97M 参数。<span class="arithmatex">\(W_V\)</span> 零初始化，初始 Engram 残差为零。</p>
+<h3 id="_2">训练与推理</h3>
+<p>训练读取参考前驱位置的 Engram 缓存，并行计算各位置的门控与修正；推理随实际生成前缀逐 token 查表。Engram 表另占存储空间，查表和特征传输增加推理耗时。</p>
+<h2 id="engram-mask">Engram 增强 MASK 输入</h2>
+<p>两种方案均读取 anchor 前一个位置的 Engram 特征，投影后填入六个 MASK 槽，anchor 保留 token embedding，后续使用 vanilla Markov head。设 anchor 位置为 <span class="arithmatex">\(a\)</span>，共享特征为</p>
+<div class="arithmatex">\[
+z_a=\operatorname{RMSNorm}(Pe_{a-1}),
+\qquad P\in\mathbb R^{2560\times2560}.
+\]</div>
+<p><span class="arithmatex">\(P\)</span> 为随机初始化的无偏置投影，RMSNorm 无可训练仿射参数。六个槽共享 <span class="arithmatex">\(z_a\)</span>，保留各自的位置编号、RoPE 和块内双向 attention。</p>
+<h3 id="_3">门控残差</h3>
+<p><img alt="Engram 门控增强 MASK：共享特征经逐槽 tanh 门缩放后，与 MASK embedding 相加" src="../../../assets/images/qwen3.8-flash-next-dspark/engram-gate-mask.svg" width="100%" /></p>
+<div class="arithmatex">\[
+u_{a,0}=E(x_a),
+\qquad
+u_{a,j}=E(\mathrm{MASK})+\tanh(\theta_j)z_a,
+\quad j=1,\ldots,6.
+\]</div>
+<p>每槽一个可训练标量 <span class="arithmatex">\(\theta_j\)</span>，由所有样本共享，零初始化后输入与 baseline 相同。门值离开零后，投影 <span class="arithmatex">\(P\)</span> 开始获得任务梯度。新增参数为 <span class="arithmatex">\(2560^2+6=6{,}553{,}606\)</span>。</p>
+<h3 id="_4">直接替换</h3>
+<p><img alt="Engram 替换 MASK：共享特征经投影和归一化后填充 draft 输入槽" src="../../../assets/images/qwen3.8-flash-next-dspark/engram-fix-mask.svg" width="100%" /></p>
+<div class="arithmatex">\[
+X_a=[E(x_a),\underbrace{z_a,\ldots,z_a}_{6\text{ 个槽}}].
+\]</div>
+<p>省去标量门，从训练开始替换 MASK embedding。新增参数仅为 <span class="arithmatex">\(P\)</span>，共 <span class="arithmatex">\(2560^2=6{,}553{,}600\)</span>。</p>
+<h3 id="_5">训练与推理</h3>
+<p>训练按 anchor 读取 <span class="arithmatex">\(a-1\)</span> 位置的缓存，缺少有效前驱或 block 无效时特征置零，新增参数由基础损失优化。推理每轮查表并投影一次，特征整轮保持不变；查表可在新 anchor 产生前进行，尝试与 Target 计算并行。</p>
+<h2 id="draft-memory">Draft Memory</h2>
+<p>Draft Memory 保留上一轮 draft 对后续位置的隐藏表示，供下一轮预测使用。训练分两次执行同一个 draft 模型，复用已有 Target 隐藏状态缓存。</p>
+<p><img alt="DSpark Draft Memory：第一遍筛选后缀 hidden，第二遍在各层 attention 中读取 memory" src="../../../assets/images/qwen3.8-flash-next-dspark/draft-memory.svg" width="100%" /></p>
+<h3 id="_6">两阶段训练</h3>
+<p>第一阶段不输入 memory，也不保留梯度，计算 draft 最终 RMSNorm 后的隐藏表示。LM head 与 Markov head 使用参考前驱 token 选择分数最高的 token，再找到预测与记录序列首次不匹配的位置。首次不匹配之前的前驱与 greedy 生成一致，因此可以用这次并行计算确定新的 anchor。</p>
+<p>图中前两个预测匹配、第三个不匹配时，以参考 token F 为新 anchor，上下文扩展至 E。移除 <span class="arithmatex">\(h_1,h_2,h_3\)</span>，保留后缀 <span class="arithmatex">\(h_4,h_5\)</span>；这些状态来自原 block 前向，选出错误 token 后不重新计算。</p>
+<p>第二阶段输入新 anchor、对应的 Target 上下文和保留的 memory，使用参考前驱 token 计算基础训练损失。梯度由这一阶段回传，更新共享 draft 和 memory 适配器。</p>
+<h3 id="memory">Memory 筛选与读取</h3>
+<p>令旧 anchor 的绝对位置为 <span class="arithmatex">\(a\)</span>，block size 为 <span class="arithmatex">\(B\)</span>，第 <span class="arithmatex">\(i\)</span> 个输出 hidden 为 <span class="arithmatex">\(h_i^{\mathrm{old}}\)</span>，其中 <span class="arithmatex">\(i=1,\ldots,B\)</span>。该 hidden 的旧 query 位置为 <span class="arithmatex">\(a+i-1\)</span>，预测的 token 位置为 <span class="arithmatex">\(a+i\)</span>。若连续匹配了 <span class="arithmatex">\(m&lt;B\)</span> 个 token，则</p>
+<div class="arithmatex">\[
+a'=a+m+1,\qquad
+\mathcal I=\{m+2,\ldots,B\}.
+\]</div>
+<p>新 anchor 为 <span class="arithmatex">\(a'\)</span>。后缀索引集合 <span class="arithmatex">\(\mathcal I\)</span> 中的隐藏表示经共享的无偏置线性投影和带可训练尺度参数的 RMSNorm 转换为 memory：</p>
+<div class="arithmatex">\[
+M_i=\operatorname{RMSNorm}_{\gamma}
+\left(P\,\operatorname{stopgrad}(h_i^{\mathrm{old}})\right),
+\qquad i\in\mathcal I.
+\]</div>
+<p><span class="arithmatex">\(P\in\mathbb R^{2560\times2560}\)</span> 随机初始化，<span class="arithmatex">\(\gamma\)</span> 为可训练归一化尺度；共新增 6,556,160 个参数，由第二阶段损失优化。</p>
+<p>Memory 的 RoPE 位置采用预测位置 <span class="arithmatex">\(a+i\)</span>，即旧 query 位置编号加一。因此，首条保留状态对齐新 anchor 后的第一个预测位置 <span class="arithmatex">\(a'+1\)</span>。图中 <span class="arithmatex">\(h_4,h_5\)</span> 分别对齐 G、H。</p>
+<p>Adapter 计算一次，得到的同一组 <span class="arithmatex">\(M\)</span> 供三层 draft 使用。每层的 query 来自当前 draft 隐藏状态。将正确上下文、memory 和当前 draft 隐藏状态拼接，再通过该层原有的投影得到 K/V。省略归一化与 RoPE 后，可写为</p>
+<div class="arithmatex">\[
+\operatorname{Attn}_{\ell}
+\left(
+Q_{\ell}(X_{\ell}),
+K_{\ell}([H_{\mathrm{ctx}};M;X_{\ell}]),
+V_{\ell}([H_{\mathrm{ctx}};M;X_{\ell}])
+\right).
+\]</div>
+<p>其中 <span class="arithmatex">\(H_{\mathrm{ctx}}\)</span> 为投影后的正确前缀特征，<span class="arithmatex">\(X_\ell\)</span> 为当前层的 draft 隐藏状态。</p>
+<p>若整块全部匹配，则转移至记录序列的 bonus 位置，memory 为空。缺少后续监督或跨越回答边界的样本跳过。其余样本保留全部有效后缀。</p>
+<h3 id="_7">训练与推理</h3>
+<p>每步训练增加一次无梯度 draft 前向、后缀筛选、memory 投影与 K/V 计算。</p>
+<p>在线推理为每个请求保存上一轮 draft 的最终隐藏表示。Target 验证后，移除已接受位置和首次拒绝位置的状态，将剩余后缀按预测位置用于下一轮。各层通过自身投影生成 memory K/V。</p>
+<p>训练用参考序列确定拒绝位置，memory 来自未输入 memory 的第一阶段。在线推理由 Target 验证确定拒绝位置，并连续复用上一轮的隐藏状态，因此可能累积更早轮次的 memory 信息。</p>
+<h2 id="prefix-reranker">Prefix reranker</h2>
+<p>Prefix reranker 用块内因果 Transformer 编码 anchor 与已选 token，结合当前 draft 隐藏状态，对 Markov top-16 候选进行残差打分，使候选选择利用整个块内前缀。</p>
+<p><img alt="DSpark prefix reranker：左为整块生成，右为第三个位置的候选重排" src="../../../assets/images/qwen3.8-flash-next-dspark/prefix-reranker.svg" width="100%" /></p>
+<h3 id="_8">候选与前缀表示</h3>
+<p>沿用 baseline 记号，训练使用参考 token，推理使用当前轮已选 token。</p>
+<p>复用 Markov head 的两张秩为 256 的 token 表 <span class="arithmatex">\(E_{\mathrm{in}}\)</span> 与 <span class="arithmatex">\(E_{\mathrm{out}}\)</span>，得到原 DSpark 分数</p>
+<div class="arithmatex">\[
+\ell_i(v)=\ell_i^0(v)+E_{\mathrm{in}}(t_{i-1})^\top E_{\mathrm{out}}(v),
+\qquad
+C_i=\operatorname{Top16}(\ell_i).
+\]</div>
+<p>候选集合由 Markov 修正后的分数确定。因此，teacher argmax 的候选覆盖率构成重排选择准确率的上界。</p>
+<p>Prefix Transformer 的输入为 <span class="arithmatex">\([t_0,\ldots,t_{i-1}]\)</span>。各 token 经共享的 <span class="arithmatex">\(E_{\mathrm{in}}\)</span> 查表、线性投影并加上可学习的块内位置 embedding。一个 pre-norm 因果 Transformer 层生成前缀表示 <span class="arithmatex">\(r_i\)</span>。其宽度为 256，包含 4 个 attention heads，FFN 为 <span class="arithmatex">\(256\rightarrow1024\rightarrow256\)</span>，使用 SiLU，输出经过 LayerNorm。</p>
+<p>前缀编码范围限于当前 block，历史上下文由 <span class="arithmatex">\(h_i\)</span> 提供。</p>
+<h3 id="_9">残差打分</h3>
+<p>将 <span class="arithmatex">\(h_i\)</span> 投影到 256 维，与 <span class="arithmatex">\(r_i\)</span> 拼接，再经过 MLP 和输出投影形成查询向量 <span class="arithmatex">\(u_i\)</span>。候选 token 则从共享的 <span class="arithmatex">\(E_{\mathrm{out}}\)</span> 查表并投影为 <span class="arithmatex">\(k_v\)</span>：</p>
+<div class="arithmatex">\[
+\begin{aligned}
+u_i&amp;=W_o\,\operatorname{SiLU}\!\left(W_q[W_hh_i;r_i]+\beta_q\right),\\
+k_v&amp;=W_cE_{\mathrm{out}}(v),\\
+\Delta_i(v)&amp;=\frac{u_i^\top k_v}{\sqrt{256}},\\
+s_i(v)&amp;=\ell_i(v)+\Delta_i(v),\qquad v\in C_i.
+\end{aligned}
+\]</div>
+<p>最终选择为 <span class="arithmatex">\(\hat t_i=\arg\max_{v\in C_i}s_i(v)\)</span>。Prefix Transformer 编码前缀一次，候选通过查询向量与投影特征的内积并行评分。</p>
+<p><span class="arithmatex">\(W_o\)</span> 零初始化，并列分数优先保留原 DSpark 的选择，因此初始 greedy 选择与原模型一致。</p>
+<h3 id="_10">重排评估</h3>
+<p><code>train/tau_probabilistic</code> 和 <code>eval/tau_probabilistic</code> 使用重排后的分布：对 top-16 候选的修正分数做 softmax，候选之外的概率置零。Teacher 使用原始全词表分布。重排前的 DSpark 分布也在全词表上归一化。</p>
+<table>
+<thead>
+<tr>
+<th><strong>指标</strong></th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong><code>rerank_tau_gain</code></strong></td>
+<td>同一 checkpoint、同一批 anchor 上，重排后与重排前的 <span class="arithmatex">\(\tau_{\mathrm{prob}}\)</span> 之差</td>
+</tr>
+<tr>
+<td><strong><code>rerank_target_agreement_gain</code></strong></td>
+<td>重排前后选中 teacher argmax 的比例之差；0.02 表示增加 2 个百分点</td>
+</tr>
+<tr>
+<td><strong><code>reranker/candidate_recall</code></strong></td>
+<td>Teacher argmax 落在 Markov top-16 内的比例</td>
+</tr>
+<tr>
+<td><strong><code>rerank_teacher_forced_prefix_gain</code></strong></td>
+<td>与参考 token 序列连续匹配的前缀长度变化，仍在 teacher-forced 输入下计算</td>
+</tr>
+</tbody>
+</table>
+<p><code>rerank_tau_gain</code> 包含分数修正、top-16 截断和重新归一化的影响；整体效果另与相同训练步数的独立 baseline 比较。</p>
+<h3 id="_11">训练目标与更新范围</h3>
+<p>训练沿用现有隐藏状态缓存。每个 block 的前驱输入右移一位，以 anchor 开头，其后为参考序列中的 token。Prefix Transformer 使用因果掩码，一次前向计算编码所有位置。</p>
+<p>记 <span class="arithmatex">\(p_i\)</span> 为缓存参考前缀对应的 teacher 分布，重排监督标签为</p>
+<div class="arithmatex">\[
+v_i^\star=\arg\max_v p_i(v).
+\]</div>
+<p>记 <span class="arithmatex">\(\mathcal H\)</span> 为有效且 <span class="arithmatex">\(v_i^\star\in C_i\)</span> 的位置集合，在这些位置计算候选内的排序 CE：</p>
+<div class="arithmatex">\[
+L_{\mathrm{rank}}
+=-\frac{
+\sum_{i\in\mathcal H} w_i
+\log\frac{\exp s_i(v_i^\star)}
+{\sum_{v\in C_i}\exp s_i(v)}
+}{
+\sum_{i\in\mathcal H}w_i
+}.
+\]</div>
+<p>其中 <span class="arithmatex">\(w_i=\exp(-(i-1)/4)\)</span>，求和覆盖 batch 中各 block 的有效命中位置。没有命中位置时，该项为零。联合训练保留重排前的原始 DSpark 目标：</p>
+<div class="arithmatex">\[
+L=L_{\mathrm{base}}+L_{\mathrm{rank}}.
+\]</div>
+<p><span class="arithmatex">\(L_{\mathrm{base}}\)</span> 为 baseline 的三项损失，监督全部有效位置；排序损失仅监督候选命中位置。联合训练共同更新主干网络和共享 Markov 参数。</p>
+<p>冻结基线实验从训练 2,604 步的 baseline 开始，固定主干网络、Markov 和 confidence head，只训练 reranker 的新增参数，并重新初始化优化器与学习率调度。曲线横轴为此前训练步数加上本次新增步数，学习率按本次新增步数调度。</p>
+<h3 id="_12">推理开销</h3>
+<p>主干网络每轮只运行一次。第 <span class="arithmatex">\(i\)</span> 个位置利用上一个已选 token 更新 Prefix Transformer 的本地 K/V，得到 <span class="arithmatex">\(r_i\)</span>，并计算 Markov 修正后的 top-16 候选及其残差分数。选出的 token 进入下一位置，整块候选最后交给 Target 验证。</p>
+<p>Prefix K/V 在当前 block 内增长，每轮重新清空。</p>
+<h2 id="evaluation">Evaluation</h2>
+<h3 id="1experimental-setup">1.Experimental Setup</h3>
+<table>
+<thead>
+<tr>
+<th><strong>项目</strong></th>
+<th>设置</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Target</strong></td>
+<td>Qwen3.8-Flash-Next；Target backbone、token embedding 与 LM head 冻结</td>
+</tr>
+<tr>
+<td><strong>训练数据</strong></td>
+<td>PerfectBlend，经 Target 重新生成回复</td>
+</tr>
+<tr>
+<td><strong>离线 cache</strong></td>
+<td>通过 SGLang 提取并缓存 Target 的 aux hidden states 与 <code>target_last_hidden_states</code>；后者经冻结的 LM head 得到 teacher 分布</td>
+</tr>
+<tr>
+<td><strong>验证集</strong></td>
+<td>GSM8K 256 条问题对应的重新生成回复及 hidden cache</td>
+</tr>
+<tr>
+<td><strong>最大序列长度</strong></td>
+<td>4096 tokens，包含 prompt 与 response</td>
+</tr>
+<tr>
+<td><strong>Draft 架构</strong></td>
+<td>3 层；隐藏维度 2560；FFN 中间维度 9728；GQA：24 个 Q heads、2 个 KV heads，head dim 256</td>
+</tr>
+<tr>
+<td><strong>Attention 设置</strong></td>
+<td>三层均为 full attention，无滑动窗口；Q/K RMSNorm 与 RoPE，RoPE theta 为 <span class="arithmatex">\(10^6\)</span></td>
+</tr>
+<tr>
+<td><strong>Aux 层</strong></td>
+<td><code>[45, 46, 47]</code>，按配置中的零基层号记录</td>
+</tr>
+<tr>
+<td><strong>Block size</strong></td>
+<td>7；Baseline 输入为 <code>[anchor, MASK × 6]</code></td>
+</tr>
+<tr>
+<td><strong>Anchor 采样</strong></td>
+<td>每个样本最多 512 个</td>
+</tr>
+<tr>
+<td><strong>监督</strong></td>
+<td>Response-only</td>
+</tr>
+<tr>
+<td><strong>Markov head</strong></td>
+<td>Vanilla，rank 256</td>
+</tr>
+<tr>
+<td><strong>Batch size</strong></td>
+<td>4 GPUs × micro-batch 4 × 梯度累积 32；global batch 512</td>
+</tr>
+<tr>
+<td><strong>学习率</strong></td>
+<td>峰值 <span class="arithmatex">\(3\times10^{-4}\)</span>；warmup 比例 0.04</td>
+</tr>
+<tr>
+<td><strong>训练计划</strong></td>
+<td>完整 scheduler 为 26,040 optimizer steps；约 2,604 步 / epoch</td>
+</tr>
+<tr>
+<td><strong>Baseline loss</strong></td>
+<td><span class="arithmatex">\(0.1L_{\mathrm{CE}}+0.9L_{\mathrm{L1}}+L_{\mathrm{conf}}\)</span>；位置权重 <span class="arithmatex">\(\exp(-i/4)\)</span>，<span class="arithmatex">\(i=0,\ldots,6\)</span></td>
+</tr>
+<tr>
+<td><strong>精度与随机种子</strong></td>
+<td>BF16；seed 42</td>
+</tr>
+<tr>
+<td><strong>Checkpoint</strong></td>
+<td>每 651 步保存一次</td>
+</tr>
+</tbody>
+</table>
+<p>短程实验沿用完整学习率调度。</p>
+<h4 id="dataset">Dataset</h4>
+<p>训练使用 <a href="https://huggingface.co/datasets/xpzhao11/open-perfectblend-qwen38-flash-next-regen">Open PerfectBlend Regenerated with Qwen3.8-Flash-Next</a>：prompt 来自 <a href="https://huggingface.co/datasets/mlabonne/open-perfectblend">mlabonne/open-perfectblend</a>，response 由 <code>Qwen/Qwen3.8-Flash-Next</code> 在 non-thinking 模式下重新生成。采样参数为 temperature 0.7、top-p 0.8、top-k 20、min-p 0，单次最多生成 4096 tokens。</p>
+<p>数据共 <strong>1,349,859 条对话记录</strong>、1,790,298 次 assistant 回复；其中 204,494 条为多轮记录，占 15.15%。使用 Target tokenizer 统计截断前的长度：prompt 累计所有非 assistant 消息正文，response 累计所有 assistant 回复正文，总长度按 non-thinking 对话模板编码，包含特殊 token，不追加新回复提示。</p>
+<p>截断前，完整对话（含 chat template）共 <strong>1,782,301,322 tokens，约 1.782B</strong>；prompt 正文共 182,134,895 tokens，response 正文共 1,575,153,460 tokens（约 1.575B）。</p>
+<ul>
+<li><strong>Prompt</strong>：平均 134.9 tokens，中位数 72，P95 为 495，P99 为 973。</li>
+<li><strong>Response</strong>：平均 1,166.9 tokens，中位数 554，P95 为 4,242，P99 为 7,975。</li>
+<li><strong>总长度</strong>：平均 1,320.4 tokens，中位数 681，P95 为 4,621，P99 为 8,226。</li>
+</ul>
+<p>训练的 4096 tokens 上限包含 prompt 和 response；截断前总长度超过该上限的记录有 <strong>111,429 条，占 8.25%</strong>。多轮记录累计全部回复，因此 response 长度可以超过单次生成上限。</p>
+<h4 id="evaluation-metrics">Evaluation Metrics</h4>
+<p><strong>离线指标</strong></p>
+<p>给定相同的参考前缀，记 Target 的概率分布（teacher 分布）为 <span class="arithmatex">\(p_i\)</span>，draft 的概率分布为 <span class="arithmatex">\(q_i\)</span>。两者的分布重叠率为</p>
+<div class="arithmatex">\[
+a_i=\sum_v\min\bigl(p_i(v),q_i(v)\bigr)
+=1-\frac12\lVert p_i-q_i\rVert_1.
+\]</div>
+<p>每个有效 block 的概率接受长度定义为</p>
+<div class="arithmatex">\[
+\tau_{\mathrm{prob}}
+=1+\sum_{i=0}^{6}\prod_{j=0}^{i}a_j,
+\]</div>
+<p>不足 7 个有效位置时，将无效位置的 <span class="arithmatex">\(a_i\)</span> 置零，再对有效 block 求平均。各位置的 <code>accept_rate@i</code> 按有效 token 数求平均，各 token 等权。离线计算使用参考 token 作为前驱（teacher forcing）。</p>
+<p><strong>在线指标</strong></p>
+<p>接受统计使用各次评测的服务端计数增量。记 draft 轮数为 <span class="arithmatex">\(R\)</span>，前 <span class="arithmatex">\(i\)</span> 个候选连续被接受的轮数为 <span class="arithmatex">\(C_i\)</span>，则</p>
+<div class="arithmatex">\[
+A_i=\frac{C_i}{R},
+\qquad \mathrm{MAL}=1+\frac{\sum_{i=1}^{7}C_i}{R}.
+\]</div>
+<p>逐位置接受率 <span class="arithmatex">\(A_i\)</span> 表示一轮中前 <span class="arithmatex">\(i\)</span> 个候选均被接受的比例，结果表记为 <code>pos-1</code> 至 <code>pos-7</code>。MAL 包含每轮一个 bonus 或纠正 token。整体输出吞吐为总输出 tokens 除以评测总耗时。重复评测的准确率以均值 ± 样本标准差表示。</p>
+<p>服务器非独占，吞吐和耗时测量不稳定，不用于速度比较，仅作记录。</p>
+<p>每轮固定 7 个候选，整体 Draft 接受率为 <span class="arithmatex">\( (\mathrm{MAL}-1)/7 \)</span>。验证使用标准 rejection sampler。</p>
+<h2 id="_13">实验分组</h2>
+<table>
+<thead>
+<tr>
+<th><strong>实验</strong></th>
+<th>初始化与更新范围</th>
+<th>比较的问题</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Baseline</strong></td>
+<td>从头训练原 DSpark</td>
+<td>原结构随训练步数增加的收敛情况</td>
+</tr>
+<tr>
+<td><strong>Engram-Markov</strong></td>
+<td>从头联合训练 draft 与 Engram 门控投影</td>
+<td>Markov head 的 n-gram 条件对接受长度的影响</td>
+</tr>
+<tr>
+<td><strong>Engram-MASK：门控残差</strong></td>
+<td>从头联合训练 draft、输入投影与逐槽标量门</td>
+<td>保留 MASK embedding 的门控注入效果</td>
+</tr>
+<tr>
+<td><strong>Engram-MASK：直接替换</strong></td>
+<td>从头联合训练 draft 与输入投影</td>
+<td>内容相关输入替代固定 MASK 的效果</td>
+</tr>
+<tr>
+<td><strong>Draft Memory</strong></td>
+<td>从头训练 draft 与 memory adapter，仅第二阶段回传</td>
+<td>上一轮 draft 状态对新 anchor 下续写的作用</td>
+</tr>
+<tr>
+<td><strong>Prefix reranker：联合训练</strong></td>
+<td>从头联合训练 draft 与 reranker</td>
+<td>加入前缀重排后，相对独立 baseline 的效果</td>
+</tr>
+<tr>
+<td><strong>Prefix reranker：冻结基线</strong></td>
+<td>加载 baseline step 2604，仅训练新加的 reranker</td>
+<td>固定原模型后，重排模块能改善多少</td>
+</tr>
+</tbody>
+</table>
+<h3 id="evaluation-results">Evaluation Results</h3>
+<h4 id="1-acceptance-rate-vs-sampling">1. Acceptance rate vs. Sampling</h4>
+<p>固定 Baseline step 7812（3 epochs），在 non-thinking 模式下评测 GSM8K test 全集 1,319 题，使用 5-shot。Setting 1 使用 greedy draft，Setting 2、3 分别比较 greedy 与 probabilistic draft，共五种组合。</p>
+<p>Target 使用 TP4，最大并发为 256。每轮生成 7 个候选，关闭 adaptive verification。上下文上限为 8,192 tokens，原 non-thinking 评测输出上限为 1,024 tokens，Baseline Setting 2/3 为 4,096 tokens。</p>
+<ul>
+<li><strong>Setting 1</strong>：temperature=0、top-p=1.0、top-k=0、min-p=0。Target 与 Draft 均为 greedy。</li>
+<li><strong>Setting 2</strong>：temperature=0.7、top-p=0.8、top-k=20、min-p=0，与训练回复 regen 的采样参数相同。</li>
+<li><strong>Setting 3</strong>：temperature=1.0、top-p=0.95、top-k=20、min-p=0。</li>
+</ul>
+<h4 id="_14">整体结果</h4>
+<div class="js-sortable-table js-multisort js-row-reorder dspark-three-line dspark-compact">
+<table>
+<thead>
+<tr>
+<th>Target 采样</th>
+<th>Draft 采样</th>
+<th style="text-align: right;">MAL</th>
+<th style="text-align: right;">pos-1</th>
+<th style="text-align: right;">pos-2</th>
+<th style="text-align: right;">pos-3</th>
+<th style="text-align: right;">pos-4</th>
+<th style="text-align: right;">pos-5</th>
+<th style="text-align: right;">pos-6</th>
+<th style="text-align: right;">pos-7</th>
+<th style="text-align: right;">吞吐（tokens/s）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Setting 1</td>
+<td>greedy</td>
+<td style="text-align: right;">4.9568</td>
+<td style="text-align: right;">92.89%</td>
+<td style="text-align: right;">82.49%</td>
+<td style="text-align: right;">69.81%</td>
+<td style="text-align: right;">56.50%</td>
+<td style="text-align: right;">43.12%</td>
+<td style="text-align: right;">30.55%</td>
+<td style="text-align: right;">20.32%</td>
+<td style="text-align: right;">2,708.712</td>
+</tr>
+<tr>
+<td>Setting 2</td>
+<td>greedy</td>
+<td style="text-align: right;">4.9209</td>
+<td style="text-align: right;">92.47%</td>
+<td style="text-align: right;">81.82%</td>
+<td style="text-align: right;">68.99%</td>
+<td style="text-align: right;">55.55%</td>
+<td style="text-align: right;">42.63%</td>
+<td style="text-align: right;">30.39%</td>
+<td style="text-align: right;">20.25%</td>
+<td style="text-align: right;">2,643.963</td>
+</tr>
+<tr>
+<td>Setting 2</td>
+<td>probabilistic</td>
+<td style="text-align: right;">4.8986</td>
+<td style="text-align: right;">92.65%</td>
+<td style="text-align: right;">81.95%</td>
+<td style="text-align: right;">68.89%</td>
+<td style="text-align: right;">55.02%</td>
+<td style="text-align: right;">41.92%</td>
+<td style="text-align: right;">29.75%</td>
+<td style="text-align: right;">19.68%</td>
+<td style="text-align: right;">2,709.611</td>
+</tr>
+<tr>
+<td>Setting 3</td>
+<td>greedy</td>
+<td style="text-align: right;">4.7277</td>
+<td style="text-align: right;">90.03%</td>
+<td style="text-align: right;">78.29%</td>
+<td style="text-align: right;">65.36%</td>
+<td style="text-align: right;">52.04%</td>
+<td style="text-align: right;">39.82%</td>
+<td style="text-align: right;">28.27%</td>
+<td style="text-align: right;">18.97%</td>
+<td style="text-align: right;">2,653.968</td>
+</tr>
+<tr>
+<td>Setting 3</td>
+<td>probabilistic</td>
+<td style="text-align: right;">4.7048</td>
+<td style="text-align: right;">91.20%</td>
+<td style="text-align: right;">79.25%</td>
+<td style="text-align: right;">65.59%</td>
+<td style="text-align: right;">51.58%</td>
+<td style="text-align: right;">38.52%</td>
+<td style="text-align: right;">26.81%</td>
+<td style="text-align: right;">17.53%</td>
+<td style="text-align: right;">2,920.471</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Setting 1 的准确率为 96.7%。Setting 2 下，greedy 与 probabilistic draft 分别为 96.8% ± 0.0%、97.0% ± 0.0%。Setting 3 下分别为 96.7% ± 0.4%、96.6% ± 0.2%。</p>
+<p>Greedy draft 下，Setting 2 相比 Setting 1 的 MAL 降低 0.72%。Setting 2、3 切换为 probabilistic draft 后，MAL 分别降低约 0.45%、0.48%。</p>
+<h4 id="2-acceptance-rate-vs-epochs">2. Acceptance rate vs. Epochs</h4>
+<p>比较 Baseline step 7812（3 epochs）与 step 26040（10 epochs）在 GSM8K test 全集 1,319 题上的结果，使用 5-shot、Setting 1、greedy draft 与 non-thinking。10 epoch 数据来自 2026 年 10 月 9 日的两次评测，汇总值为各次指标的算术平均。</p>
+<div class="js-sortable-table js-multisort js-row-reorder dspark-three-line dspark-compact">
+<table>
+<thead>
+<tr>
+<th>Epochs</th>
+<th style="text-align: right;">MAL</th>
+<th style="text-align: right;">pos-1</th>
+<th style="text-align: right;">pos-2</th>
+<th style="text-align: right;">pos-3</th>
+<th style="text-align: right;">pos-4</th>
+<th style="text-align: right;">pos-5</th>
+<th style="text-align: right;">pos-6</th>
+<th style="text-align: right;">pos-7</th>
+<th style="text-align: right;">吞吐（tokens/s）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3</td>
+<td style="text-align: right;">4.9568</td>
+<td style="text-align: right;">92.89%</td>
+<td style="text-align: right;">82.49%</td>
+<td style="text-align: right;">69.81%</td>
+<td style="text-align: right;">56.50%</td>
+<td style="text-align: right;">43.12%</td>
+<td style="text-align: right;">30.55%</td>
+<td style="text-align: right;">20.32%</td>
+<td style="text-align: right;">2,708.712</td>
+</tr>
+<tr>
+<td>10</td>
+<td style="text-align: right;">5.1290</td>
+<td style="text-align: right;">93.29%</td>
+<td style="text-align: right;">83.60%</td>
+<td style="text-align: right;">71.72%</td>
+<td style="text-align: right;">59.13%</td>
+<td style="text-align: right;">46.67%</td>
+<td style="text-align: right;">34.46%</td>
+<td style="text-align: right;">24.05%</td>
+<td style="text-align: right;">2,888.485</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>从 3 epoch 到 10 epoch，MAL 提高约 3.47%，整体 Draft 接受率从 56.53% 升至 58.99%（提高 2.46 个百分点）。第 1 位接受率提高约 0.40 个百分点，第 5–7 位分别提高约 3.54、3.91、3.73 个百分点，提升主要体现在 block 后段。3 epoch 的准确率为 96.7%，10 epoch 两次日志均为 96.8%，invalid rate 均为 0%。</p>
+<h3 id="prefix-reranker_1">Prefix reranker 的效果</h3>
+<p>在 GSM8K 上固定 Target 采样、greedy draft 与 non-thinking，对比 Baseline 和联合训练的 Prefix reranker。两者均使用 step 7812 的导出模型。</p>
+<div class="js-sortable-table js-multisort js-row-reorder dspark-three-line dspark-sampling dspark-compact">
+<table>
+<thead>
+<tr>
+<th>方法</th>
+<th>Target 采样</th>
+<th>Draft 采样</th>
+<th>思考</th>
+<th style="text-align: right;">MAL</th>
+<th style="text-align: right;">pos-1</th>
+<th style="text-align: right;">pos-2</th>
+<th style="text-align: right;">pos-3</th>
+<th style="text-align: right;">pos-4</th>
+<th style="text-align: right;">pos-5</th>
+<th style="text-align: right;">pos-6</th>
+<th style="text-align: right;">pos-7</th>
+<th style="text-align: right;">吞吐（tokens/s）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Baseline</td>
+<td>Setting 1</td>
+<td>greedy</td>
+<td>non-thinking</td>
+<td style="text-align: right;">4.9568</td>
+<td style="text-align: right;">92.89%</td>
+<td style="text-align: right;">82.49%</td>
+<td style="text-align: right;">69.81%</td>
+<td style="text-align: right;">56.50%</td>
+<td style="text-align: right;">43.12%</td>
+<td style="text-align: right;">30.55%</td>
+<td style="text-align: right;">20.32%</td>
+<td style="text-align: right;">2,708.712</td>
+</tr>
+<tr>
+<td>Prefix reranker</td>
+<td>Setting 1</td>
+<td>greedy</td>
+<td>non-thinking</td>
+<td style="text-align: right;">5.0629</td>
+<td style="text-align: right;">93.48%</td>
+<td style="text-align: right;">82.22%</td>
+<td style="text-align: right;">70.65%</td>
+<td style="text-align: right;">57.83%</td>
+<td style="text-align: right;">45.17%</td>
+<td style="text-align: right;">33.64%</td>
+<td style="text-align: right;">23.30%</td>
+<td style="text-align: right;">3,711.9851</td>
+</tr>
+<tr>
+<td>Baseline</td>
+<td>Setting 2</td>
+<td>greedy</td>
+<td>non-thinking</td>
+<td style="text-align: right;">4.9209</td>
+<td style="text-align: right;">92.47%</td>
+<td style="text-align: right;">81.82%</td>
+<td style="text-align: right;">68.99%</td>
+<td style="text-align: right;">55.55%</td>
+<td style="text-align: right;">42.63%</td>
+<td style="text-align: right;">30.39%</td>
+<td style="text-align: right;">20.25%</td>
+<td style="text-align: right;">2,643.963</td>
+</tr>
+<tr>
+<td>Prefix reranker</td>
+<td>Setting 2</td>
+<td>greedy</td>
+<td>non-thinking</td>
+<td style="text-align: right;">4.9977</td>
+<td style="text-align: right;">92.69%</td>
+<td style="text-align: right;">81.30%</td>
+<td style="text-align: right;">69.36%</td>
+<td style="text-align: right;">56.68%</td>
+<td style="text-align: right;">44.33%</td>
+<td style="text-align: right;">32.69%</td>
+<td style="text-align: right;">22.71%</td>
+<td style="text-align: right;">3,563.909</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Reranker 在 Setting 1、2 下的准确率分别为 96.9%、96.5%。</p>
+<p>Reranker 在 Setting 1、2 下的 MAL 分别提高 2.14%、1.56%。</p>
+<h3 id="thinking">Thinking 的影响</h3>
+<p>Prefix reranker 在 GSM8K 上使用 greedy draft，比较 thinking 模式下的 Setting 2、3。Thinking 使用模板默认设置，每题输出上限为 4,096 tokens，不发送自定义 stop。</p>
+<div class="js-sortable-table js-multisort js-row-reorder dspark-three-line dspark-sampling dspark-compact">
+<table>
+<thead>
+<tr>
+<th>方法</th>
+<th>Target 采样</th>
+<th>Draft 采样</th>
+<th>思考</th>
+<th style="text-align: right;">MAL</th>
+<th style="text-align: right;">pos-1</th>
+<th style="text-align: right;">pos-2</th>
+<th style="text-align: right;">pos-3</th>
+<th style="text-align: right;">pos-4</th>
+<th style="text-align: right;">pos-5</th>
+<th style="text-align: right;">pos-6</th>
+<th style="text-align: right;">pos-7</th>
+<th style="text-align: right;">吞吐（tokens/s）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Prefix reranker</td>
+<td>Setting 2</td>
+<td>greedy</td>
+<td>thinking</td>
+<td style="text-align: right;">3.1763</td>
+<td style="text-align: right;">66.21%</td>
+<td style="text-align: right;">46.26%</td>
+<td style="text-align: right;">34.98%</td>
+<td style="text-align: right;">26.63%</td>
+<td style="text-align: right;">19.78%</td>
+<td style="text-align: right;">14.15%</td>
+<td style="text-align: right;">9.64%</td>
+<td style="text-align: right;">2,857.751</td>
+</tr>
+<tr>
+<td>Prefix reranker</td>
+<td>Setting 3</td>
+<td>greedy</td>
+<td>thinking</td>
+<td style="text-align: right;">2.8463</td>
+<td style="text-align: right;">59.63%</td>
+<td style="text-align: right;">39.70%</td>
+<td style="text-align: right;">29.25%</td>
+<td style="text-align: right;">21.76%</td>
+<td style="text-align: right;">15.84%</td>
+<td style="text-align: right;">11.07%</td>
+<td style="text-align: right;">7.38%</td>
+<td style="text-align: right;">2,565.931</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Thinking 在 Setting 2、3 下的准确率分别为 97.6%、97.3%。</p>
+<p>Thinking 的 Setting 3 相比 Setting 2，MAL 降低 10.39%。</p>
+<h3 id="math-500">MATH-500</h3>
+<p>2026 年 10 月 9 日，Baseline 在 non-thinking 模式下使用 Setting 1、2、3 评测全部 500 题。Setting 1 使用 greedy draft，Setting 2、3 使用 probabilistic draft。采用 0-shot 提示，由 Math-Verify 计分。输出上限为 4,096 tokens，最大并发为 256。</p>
+<div class="js-sortable-table js-multisort js-row-reorder dspark-three-line dspark-sampling dspark-compact">
+<table>
+<thead>
+<tr>
+<th>方法</th>
+<th>Target 采样</th>
+<th>Draft 采样</th>
+<th>思考</th>
+<th style="text-align: right;">MAL</th>
+<th style="text-align: right;">pos-1</th>
+<th style="text-align: right;">pos-2</th>
+<th style="text-align: right;">pos-3</th>
+<th style="text-align: right;">pos-4</th>
+<th style="text-align: right;">pos-5</th>
+<th style="text-align: right;">pos-6</th>
+<th style="text-align: right;">pos-7</th>
+<th style="text-align: right;">吞吐（tokens/s）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Baseline</td>
+<td>Setting 1</td>
+<td>greedy</td>
+<td>non-thinking</td>
+<td style="text-align: right;">5.6069</td>
+<td style="text-align: right;">92.35%</td>
+<td style="text-align: right;">82.67%</td>
+<td style="text-align: right;">73.38%</td>
+<td style="text-align: right;">64.73%</td>
+<td style="text-align: right;">56.71%</td>
+<td style="text-align: right;">49.06%</td>
+<td style="text-align: right;">41.81%</td>
+<td style="text-align: right;">4,638.802</td>
+</tr>
+<tr>
+<td>Baseline</td>
+<td>Setting 2</td>
+<td>probabilistic</td>
+<td>non-thinking</td>
+<td style="text-align: right;">5.4771</td>
+<td style="text-align: right;">91.80%</td>
+<td style="text-align: right;">81.68%</td>
+<td style="text-align: right;">71.63%</td>
+<td style="text-align: right;">62.49%</td>
+<td style="text-align: right;">54.15%</td>
+<td style="text-align: right;">46.58%</td>
+<td style="text-align: right;">39.34%</td>
+<td style="text-align: right;">4,516.657</td>
+</tr>
+<tr>
+<td>Baseline</td>
+<td>Setting 3</td>
+<td>probabilistic</td>
+<td>non-thinking</td>
+<td style="text-align: right;">5.2532</td>
+<td style="text-align: right;">90.66%</td>
+<td style="text-align: right;">79.45%</td>
+<td style="text-align: right;">68.61%</td>
+<td style="text-align: right;">58.87%</td>
+<td style="text-align: right;">50.15%</td>
+<td style="text-align: right;">42.41%</td>
+<td style="text-align: right;">35.15%</td>
+<td style="text-align: right;">4,108.819</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Setting 1、2、3 的准确率分别为 96.0%、95.4% ± 0.3%、95.6%。</p>
+<p>Setting 2 为两次评测的算术平均。Setting 1、2、3 的截断率分别为 3.6%、4.1%、3.4%。逐位置接受率由日志中的条件接受率换算，为近似值。</p>
+<h2 id="_15">附录</h2>
+<h3 id="_16">学习率与训练稳定性</h3>
+<p><img alt="两种峰值学习率的训练损失：左为前 3,300 步，右为全部记录" src="../../../assets/images/qwen3.8-flash-next-dspark/training-lr-stability.svg" width="100%" /></p>
+<p>峰值学习率为 <span class="arithmatex">\(6\times10^{-4}\)</span> 时，损失在 step 2110–2130 从约 0.926 突增至 3.239，到 step 3280 仍为 2.168，未恢复至突增前的水平。</p>
+<p>降低峰值学习率至 <span class="arithmatex">\(3\times10^{-4}\)</span> 后，训练保持稳定，损失整体下降，step 26040 时约为 0.610。后续实验采用这一学习率。</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": [], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}, "version": null}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+        <script src="../../../javascripts/mathjax.js"></script>
+      
+        <script src="../../../javascripts/cjk-spacing.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+      
+        <script src="../../../javascripts/mermaid.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/tablesort@5.3.0/dist/tablesort.min.js"></script>
+      
+        <script src="../../../javascripts/tablesort.js"></script>
+      
+    
+  </body>
+</html>
