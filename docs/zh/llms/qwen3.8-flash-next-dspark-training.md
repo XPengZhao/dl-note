@@ -175,7 +175,7 @@ $$
 
 Confidence head 同样读取增强后的 \(m_i\)。
 
-三个无偏置投影均为 \(2560\rightarrow256\)，新增 1,966,080 个参数。\(W_V\) 零初始化，初始 Engram 残差为零。
+三个无偏置投影均为 \(2560\rightarrow256\)，新增 1.97M 参数。\(W_V\) 零初始化，初始 Engram 残差为零。
 
 ### 训练与推理
 
@@ -372,23 +372,26 @@ Prefix K/V 在当前 block 内增长，每轮重新清空。每个 token 的选�
 
 ## 在线评测结果
 
-2026 年 10 月 5 日，对 baseline 与联合训练的 Prefix reranker 在 step 7812（3 epochs）进行 GSM8K test 全集 1,319 题评测，分别开启与关闭 thinking。训练缓存为 non-thinking；离线验证使用 256 题的重新生成回复及 hidden cache。其余结构的在线评测尚未完成。
+2026 年 10 月 5–8 日，对 baseline 与联合训练的 Prefix reranker 在 step 7812（3 epochs）进行 GSM8K test 全集 1,319 题评测。训练缓存为 non-thinking；离线验证使用 256 题的重新生成回复及 hidden cache。其余结构的在线评测尚未完成。
 
 ### 评测设置
 
-两组均在 `dspark-v1.4-prefix-reranker` 分支运行。导出模型分别为 `qwen38-baseline-lr3e4-step7812` 和 `qwen38-prefix-reranker-step7812`；baseline 对应训练 checkpoint `qwen38-flash-next-baseline-lr3e4-step7812`，沿用原有 anchor 设置和 Markov 修正。
+两组均在 `dspark-v1.4-prefix-reranker` 分支运行。Baseline 与 reranker 使用各自 step 7812 的导出模型，baseline 沿用原有 anchor 设置和 Markov 修正。
 
 | **项目** | 设置 |
 | --- | --- |
 | **Target** | Qwen3.8-Flash-Next |
 | **接口与 prompt** | `/v1/chat/completions`；5-shot 示例与问题拼接为单条 user message |
 | **Thinking** | Non-thinking 设置 `enable_thinking=False`；thinking 去掉该默认项并重启服务 |
-| **采样与验证** | Temperature 0；greedy draft；每轮 7 个候选；关闭 adaptive verification |
-| **并行与并发** | Target TP 4；服务端 `max_num_seqs=8`；客户端最大并发 256 |
-| **长度限制** | 上下文 8,192 tokens；每题最多生成 1,024 tokens |
+| **Target 采样** | Greedy：temperature 0；regen：temperature 0.7、top-p 0.8、top-k 20、min-p 0 |
+| **Draft 与验证** | Greedy draft；每轮 7 个候选；关闭 adaptive verification |
+| **并行与并发** | Target TP 4；客户端最大并发 256 |
+| **长度限制** | 上下文 8,192 tokens；non-thinking 输出上限 1,024 tokens，修正后的 thinking 评测为 4,096 tokens |
 | **计分** | 本地 `gsm8k_eval.py` 的答案提取与计分逻辑 |
 
-接受统计来自测试前清零的服务端计数。记 draft 轮数为 \(R\)，前 \(i\) 个候选连续被接受的轮数为 \(C_i\)，则
+早期 chat 评测使用 `Question`、`Assistant:`、`<|separator|>` 作为自定义 stop。其中 `Question` 会截断 thinking 中对题目的复述：一条回复仅生成 13 tokens 就停止并计为 invalid，移除 stop 后同题生成 210 tokens 并正确回答。下表 thinking 结果使用修正后的脚本，non-thinking 结果来自此前评测。旧 thinking 结果保留在折叠记录中。
+
+接受统计使用测试前清零的服务端计数，或同一服务评测前后 metrics 快照的差值。记 draft 轮数为 \(R\)，前 \(i\) 个候选连续被接受的轮数为 \(C_i\)，则
 
 $$
 A_i=\frac{C_i}{R},
@@ -396,68 +399,147 @@ A_i=\frac{C_i}{R},
 \qquad \mathrm{MAL}=1+\frac{\sum_{i=1}^{7}C_i}{R}.
 $$
 
-\(A_i\) 为连续接受率，\(a_i^{\mathrm{cond}}\) 为条件接受率，第一位置二者相同。MAL 包含每轮一个 bonus 或纠正 token。整体输出吞吐为总输出 tokens 除以评测总耗时。Temperature 0 时，接受判据为 draft token 与 Target argmax 一致；在线使用实际生成前缀，离线使用参考前缀。
+\(A_i\) 为连续接受率，\(a_i^{\mathrm{cond}}\) 为条件接受率，第一位置二者相同。MAL 包含每轮一个 bonus 或纠正 token。整体输出吞吐为总输出 tokens 除以评测总耗时。在线使用实际生成前缀，离线使用参考前缀。
 
 ### 整体结果
 
-| **指标** | Non-thinking Baseline | Non-thinking Reranker | Thinking Baseline | Thinking Reranker |
-| --- | --- | --- | --- | --- |
-| **GSM8K accuracy** | 97.0% | 96.8916%（1,278 / 1,319） | 76.0% | 76.4% |
-| **Invalid rate** | 0% | 0% | 7.4% | 5.6% |
-| **MAL** | 4.9866 | 5.0629 | 3.1342 | 3.2407 |
-| **评测总耗时（s）** | 51.224 | 51.6538 | 146.356 | 151.655 |
-| **整体输出吞吐（tokens/s）** | 3,755.970 | 3,711.9851 | 2,863.617 | 2,809.391 |
+点击表头可按该列排序，再次点击切换升序或降序。
 
-Reranker 的 MAL 在 non-thinking 和 thinking 下分别提高 1.53% 和 3.40%，本次测得的输出吞吐分别降低 1.17% 和 1.89%。两种模型在 non-thinking 下的接受长度和 GSM8K 准确率均更高；thinking 的结果对应每题最多生成 1,024 tokens 的设置。
+<div class="js-sortable-table dspark-three-line dspark-sampling" markdown="1">
+
+| 方法 | Target 采样参数 | Draft 采样 | 思考模式 | 准确率 | MAL | 吞吐（tokens/s） |
+| --- | --- | --- | --- | ---: | ---: | ---: |
+| Baseline | Setting 1 | greedy | non-thinking | 96.7% | 4.9568 | 2,708.712 |
+| Prefix reranker | Setting 1 | greedy | non-thinking | 96.9% | 5.0629 | 3,711.9851 |
+| Baseline | Setting 2 | greedy | non-thinking | 97.0% | 4.9239 | 2,818.826 |
+| Prefix reranker | Setting 2 | greedy | non-thinking | 96.5% | 4.9977 | 3,563.909 |
+| Prefix reranker | Setting 2 | greedy | thinking | 97.6% | 3.1763 | 2,857.751 |
+| Prefix reranker | Setting 3 | greedy | thinking | 97.3% | 2.8463 | 2,565.931 |
+
+</div>
+
+- **Setting 1**：temperature=0、top-p=1.0、top-k=0、min-p=0.0。(vLLM greedy 默认)
+- **Setting 2**：temperature=0.7、top-p=0.8、top-k=20、min-p=0，与训练数据 regen 使用的采样参数相同。
+- **Setting 3**：temperature=1.0、top-p=0.95、top-k=20、min-p=0。
+
+验证使用标准 rejection sampler。在 greedy draft 下，Setting 1 与 Target argmax 判等；Setting 2 和 Setting 3 在分布上等价于先从 Target 分布采样再判等。
+
+Reranker 的 non-thinking MAL 相对 baseline 在 greedy 和 regen 采样下分别提高 2.14% 和 1.50%。修正 stop 后，thinking 准确率为 97.6%、invalid rate 为 0%，MAL 仍低于 non-thinking。
 
 ### 条件接受率
 
 以下由原始计数计算，保留两位小数。
 
-| **预测位置** | Non-thinking Baseline | Non-thinking Reranker | Thinking Baseline | Thinking Reranker |
-| --- | --- | --- | --- | --- |
-| **1** | 93.20% | 93.48% | 65.87% | 68.21% |
-| **2** | 88.91% | 87.95% | 69.53% | 69.55% |
-| **3** | 84.91% | 85.93% | 74.89% | 74.71% |
-| **4** | 80.89% | 81.85% | 76.85% | 77.25% |
-| **5** | 76.55% | 78.11% | 72.74% | 75.11% |
-| **6** | 71.13% | 74.48% | 69.14% | 72.24% |
-| **7** | 66.98% | 69.27% | 65.35% | 68.49% |
+<div class="js-sortable-table dspark-three-line" markdown="1">
 
-Non-thinking 的条件接受率随位置下降；thinking 首位较低，中段上升后回落。Reranker 对后段位置的改善更明显，两种模式的第 5–7 位均高于 baseline。
+| 方法 | Target 采样参数 | 思考模式 | 位置 1 | 位置 2 | 位置 3 | 位置 4 | 位置 5 | 位置 6 | 位置 7 |
+| --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Baseline | Setting 1 | non-thinking | 92.89% | 88.80% | 84.64% | 80.92% | 76.33% | 70.85% | 66.50% |
+| Prefix reranker | Setting 1 | non-thinking | 93.48% | 87.95% | 85.93% | 81.85% | 78.11% | 74.48% | 69.27% |
+| Baseline | Setting 2 | non-thinking | 92.50% | 88.45% | 84.41% | 80.46% | 76.83% | 71.30% | 66.77% |
+| Prefix reranker | Setting 2 | non-thinking | 92.69% | 87.71% | 85.31% | 81.72% | 78.21% | 73.74% | 69.49% |
+| Prefix reranker | Setting 2 | thinking | 66.21% | 69.87% | 75.61% | 76.13% | 74.29% | 71.51% | 68.14% |
+| Prefix reranker | Setting 3 | thinking | 59.63% | 66.58% | 73.68% | 74.41% | 72.77% | 69.92% | 66.60% |
+
+</div>
+
+Non-thinking 的条件接受率随位置下降，reranker 在两种采样设置下的第 3–7 位均高于 baseline。Thinking 从首位 66.21% 上升至第 4 位 76.13%，随后回落至第 7 位 68.14%。与 non-thinking reranker 的 regen 结果相比，首位低 26.48 个百分点，第 7 位低 1.35 个百分点，差距主要集中在前段。
+
+### 采样参数
+
+Regen 使用与训练回复生成相同的 Target 采样参数，draft 的 greedy 选择保持不变。与 temperature 0 相比，non-thinking baseline 和 reranker 的 MAL 分别降低 0.66% 和 1.29%，逐位置条件接受率的衰减形状基本不变。本次改变采样参数没有改善后段接受率。
+
+Thinking 的 Setting 3 相比 Setting 2，MAL 从 3.1763 降至 2.8463（下降 10.39%），整体接受率从 31.09% 降至 26.38%。准确率分别为 97.3% 和 97.6%，输出吞吐分别为 2,565.931 和 2,857.751 tokens/s。首位条件接受率从 66.21% 降至 59.63%，后续位置下降约 1.52–3.29 个百分点；条件接受率仍先上升再下降，变化主要集中在首位。
+
+Thinking 的准确率低分来自评测 stop 误截断，修正后恢复，但低 MAL 仍存在。两组输出上限和生成内容不同，当前结果尚不能将接受长度差异单独归因于采样参数。
 
 <details markdown="1">
 <summary>原始计数与连续接受率</summary>
 
-| **指标** | Non-thinking Baseline | Non-thinking Reranker | Thinking Baseline | Thinking Reranker |
-| --- | --- | --- | --- | --- |
-| **Draft rounds** | 38,812 | 38,100 | 133,824 | 131,596 |
-| **Drafted tokens** | 271,684 | 266,700 | 936,768 | 921,172 |
-| **Accepted draft tokens** | 154,726 | 154,796 | 285,612 | 294,863 |
-| **Draft token acceptance rate** | 56.95% | 58.04% | 30.49% | 32.01% |
-| **Questions/s** | 25.750 | 25.5354 | 9.012 | 8.697 |
-| **总输出 tokens** | 192,395 | 191,738 | 419,107 | 426,057 |
+<div class="js-sortable-table dspark-three-line" markdown="1">
 
-| **预测位置** | Non-thinking Baseline 计数 | Non-thinking Reranker 计数 | Thinking Baseline 计数 | Thinking Reranker 计数 |
-| --- | --- | --- | --- | --- |
-| **1** | 36,173 | 35,616 | 88,152 | 89,759 |
-| **2** | 32,162 | 31,325 | 61,293 | 62,427 |
-| **3** | 27,308 | 26,918 | 45,902 | 46,642 |
-| **4** | 22,090 | 22,033 | 35,276 | 36,031 |
-| **5** | 16,909 | 17,209 | 25,658 | 27,063 |
-| **6** | 12,028 | 12,817 | 17,739 | 19,551 |
-| **7** | 8,056 | 8,878 | 11,592 | 13,390 |
+| 方法 | Target 采样参数 | 思考模式 | Draft 轮数 | Draft tokens | 接受 tokens | Questions/s | 输出 tokens | 耗时（s） | Invalid |
+| --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Baseline | Setting 1 | non-thinking | 39,720 | 278,040 | 157,166 | 18.253 | 195,738 | 72.262 | 0% |
+| Prefix reranker | Setting 1 | non-thinking | 38,100 | 266,700 | 154,796 | 25.5354 | 191,738 | 51.6538 | 0% |
+| Baseline | Setting 2 | non-thinking | 40,065 | 280,455 | 157,213 | 18.955 | 196,149 | 69.585 | 0% |
+| Prefix reranker | Setting 2 | non-thinking | 39,241 | 274,687 | 156,872 | 24.113 | 194,946 | 54.700 | 0% |
+| Prefix reranker | Setting 2 | thinking | 200,139 | 1,400,973 | 435,561 | 5.837 | 645,794 | 225.980 | 0% |
+| Prefix reranker | Setting 3 | thinking | 240,210 | 1,681,470 | 443,508 | 4.956 | 682,841 | 266.118 | 0% |
 
-| **预测位置** | Non-thinking Baseline 连续接受率 | Non-thinking Reranker 连续接受率 | Thinking Baseline 连续接受率 | Thinking Reranker 连续接受率 |
-| --- | --- | --- | --- | --- |
-| **1** | 93.20% | 93.48% | 65.87% | 68.21% |
-| **2** | 82.87% | 82.22% | 45.80% | 47.44% |
-| **3** | 70.36% | 70.65% | 34.30% | 35.44% |
-| **4** | 56.92% | 57.83% | 26.36% | 27.38% |
-| **5** | 43.57% | 45.17% | 19.17% | 20.57% |
-| **6** | 30.99% | 33.64% | 13.26% | 14.86% |
-| **7** | 20.76% | 23.30% | 8.66% | 10.18% |
+</div>
 
-Baseline 两次评测记录的结果文件路径相同：`/public/workspace/dspark/logs/eval-qwen38-flash-next/qwen38-baseline-lr3e4-step7812.json`。
+<div class="js-sortable-table dspark-three-line" markdown="1">
+
+| 方法 | Target 采样参数 | 思考模式 | 位置 1 | 位置 2 | 位置 3 | 位置 4 | 位置 5 | 位置 6 | 位置 7 |
+| --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Baseline | Setting 1 | non-thinking | 36,896 | 32,764 | 27,730 | 22,440 | 17,129 | 12,136 | 8,071 |
+| Prefix reranker | Setting 1 | non-thinking | 35,616 | 31,325 | 26,918 | 22,033 | 17,209 | 12,817 | 8,878 |
+| Baseline | Setting 2 | non-thinking | 37,059 | 32,780 | 27,670 | 22,263 | 17,104 | 12,195 | 8,142 |
+| Prefix reranker | Setting 2 | non-thinking | 36,374 | 31,904 | 27,216 | 22,242 | 17,396 | 12,827 | 8,913 |
+| Prefix reranker | Setting 2 | thinking | 132,504 | 92,576 | 70,000 | 53,289 | 39,589 | 28,311 | 19,292 |
+| Prefix reranker | Setting 3 | thinking | 143,236 | 95,366 | 70,261 | 52,279 | 38,046 | 26,603 | 17,717 |
+
+</div>
+
+<div class="js-sortable-table dspark-three-line" markdown="1">
+
+| 方法 | Target 采样参数 | 思考模式 | 位置 1 | 位置 2 | 位置 3 | 位置 4 | 位置 5 | 位置 6 | 位置 7 |
+| --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Baseline | Setting 1 | non-thinking | 92.89% | 82.49% | 69.81% | 56.50% | 43.12% | 30.55% | 20.32% |
+| Prefix reranker | Setting 1 | non-thinking | 93.48% | 82.22% | 70.65% | 57.83% | 45.17% | 33.64% | 23.30% |
+| Baseline | Setting 2 | non-thinking | 92.50% | 81.82% | 69.06% | 55.57% | 42.69% | 30.44% | 20.32% |
+| Prefix reranker | Setting 2 | non-thinking | 92.69% | 81.30% | 69.36% | 56.68% | 44.33% | 32.69% | 22.71% |
+| Prefix reranker | Setting 2 | thinking | 66.21% | 46.26% | 34.98% | 26.63% | 19.78% | 14.15% | 9.64% |
+| Prefix reranker | Setting 3 | thinking | 59.63% | 39.70% | 29.25% | 21.76% | 15.84% | 11.07% | 7.38% |
+
+</div>
 
 </details>
+
+<details markdown="1">
+<summary>修正 stop 前的 thinking 记录</summary>
+
+以下两组为 temperature 0、每题最多 1,024 tokens，并使用会误截断推理的自定义 stop。
+
+<div class="js-sortable-table dspark-three-line" markdown="1">
+
+| **指标** | Thinking Baseline | Thinking Reranker |
+| --- | --- | --- |
+| **GSM8K accuracy** | 76.0% | 76.4% |
+| **Invalid rate** | 7.4% | 5.6% |
+| **MAL** | 3.1342 | 3.2407 |
+| **Draft token acceptance rate** | 30.49% | 32.01% |
+| **评测总耗时（s）** | 146.356 | 151.655 |
+| **整体输出吞吐（tokens/s）** | 2,863.617 | 2,809.391 |
+| **Questions/s** | 9.012 | 8.697 |
+| **总输出 tokens** | 419,107 | 426,057 |
+
+</div>
+
+<div class="js-sortable-table dspark-three-line" markdown="1">
+
+| **预测位置** | Baseline 计数 | Reranker 计数 | Baseline 条件接受率 | Reranker 条件接受率 | Baseline 连续接受率 | Reranker 连续接受率 |
+| --- | --- | --- | --- | --- | --- | --- |
+| **1** | 88,152 | 89,759 | 65.87% | 68.21% | 65.87% | 68.21% |
+| **2** | 61,293 | 62,427 | 69.53% | 69.55% | 45.80% | 47.44% |
+| **3** | 45,902 | 46,642 | 74.89% | 74.71% | 34.30% | 35.44% |
+| **4** | 35,276 | 36,031 | 76.85% | 77.25% | 26.36% | 27.38% |
+| **5** | 25,658 | 27,063 | 72.74% | 75.11% | 19.17% | 20.57% |
+| **6** | 17,739 | 19,551 | 69.14% | 72.24% | 13.26% | 14.86% |
+| **7** | 11,592 | 13,390 | 65.35% | 68.49% | 8.66% | 10.18% |
+
+</div>
+
+</details>
+
+
+## 附录
+
+### 学习率与训练稳定性
+
+![两种峰值学习率的训练损失：左为前 3,300 步，右为全部记录](../../assets/images/qwen3.8-flash-next-dspark/training-lr-stability.svg){ width="100%" }
+
+峰值学习率为 \(6\times10^{-4}\) 时，损失在 step 2110–2130 从约 0.926 突增至 3.239，到 step 3280 仍为 2.168，未恢复至突增前的水平。训练继续运行，但收敛明显退化。
+
+降低峰值学习率至 \(3\times10^{-4}\) 后，训练保持稳定，损失整体下降，step 26040 时约为 0.610。后续实验采用这一学习率。
