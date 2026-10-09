@@ -1,83 +1,7 @@
-# Qwen3.8-Flash-Next DSpark 训练实验
+# Qwen3.8-Flash-Next DSpark 架构探索
 
 以 Qwen3.8-Flash-Next 为目标模型（Target），冻结其参数，训练三层 DSpark 草稿模型（draft）。各实验使用相同的数据和隐藏状态缓存，比较不同结构的收敛情况、候选选择和接受长度。
 
-## 实验设置
-
-各组实验共用以下训练设置，结构改动和额外损失在对应章节说明。
-
-| **项目** | 设置 |
-| --- | --- |
-| **Target** | Qwen3.8-Flash-Next；Target backbone、token embedding 与 LM head 冻结 |
-| **训练数据** | PerfectBlend，经 Target 重新生成回复 |
-| **离线 cache** | 通过 SGLang 提取并缓存 Target 的 aux hidden states 与 `target_last_hidden_states`；后者经冻结的 LM head 得到 teacher 分布 |
-| **验证集** | GSM8K 256 条问题对应的重新生成回复及 hidden cache |
-| **最大序列长度** | 4096 tokens，包含 prompt 与 response |
-| **Draft 架构** | 3 层；隐藏维度 2560；FFN 中间维度 9728；GQA：24 个 Q heads、2 个 KV heads，head dim 256 |
-| **Attention 设置** | 三层均为 full attention，无滑动窗口；Q/K RMSNorm 与 RoPE，RoPE theta 为 \(10^6\) |
-| **Aux 层** | `[45, 46, 47]`，按配置中的零基层号记录 |
-| **Block size** | 7；Baseline 输入为 `[anchor, MASK × 6]` |
-| **Anchor 采样** | 每个样本最多 512 个 |
-| **监督** | Response-only |
-| **Markov head** | Vanilla，rank 256 |
-| **Batch size** | 4 GPUs × micro-batch 4 × 梯度累积 32；global batch 512 |
-| **学习率** | 峰值 \(3\times10^{-4}\)；warmup 比例 0.04 |
-| **训练计划** | 完整 scheduler 为 26,040 optimizer steps；约 2,604 步 / epoch |
-| **Baseline loss** | \(0.1L_{\mathrm{CE}}+0.9L_{\mathrm{L1}}+L_{\mathrm{conf}}\)；位置权重 \(\exp(-i/4)\)，\(i=0,\ldots,6\) |
-| **精度与随机种子** | BF16；seed 42 |
-| **Checkpoint** | 本组对照实验每 651 步保存一次 |
-
-短程实验沿用完整学习率调度；从 checkpoint 继续训练时，分别记录已有步数与新增步数。
-
-## 数据集
-
-训练使用 [Open PerfectBlend Regenerated with Qwen3.8-Flash-Next](https://huggingface.co/datasets/xpzhao11/open-perfectblend-qwen38-flash-next-regen)：prompt 来自 [mlabonne/open-perfectblend](https://huggingface.co/datasets/mlabonne/open-perfectblend)，response 由 `Qwen/Qwen3.8-Flash-Next` 在 non-thinking 模式下重新生成。采样参数为 temperature 0.7、top-p 0.8、top-k 20、min-p 0，单次最多生成 4096 tokens。
-
-数据共 **1,349,859 条对话记录**、1,790,298 次 assistant 回复；其中 204,494 条为多轮记录，占 15.15%。使用 Target tokenizer 统计截断前的长度：prompt 累计所有非 assistant 消息正文，response 累计所有 assistant 回复正文，总长度按 non-thinking 对话模板编码，包含特殊 token，不追加新回复提示。
-
-截断前，完整对话（含 chat template）共 **1,782,301,322 tokens，约 1.782B**；prompt 正文共 182,134,895 tokens，response 正文共 1,575,153,460 tokens（约 1.575B）。
-
-- **Prompt**：平均 134.9 tokens，中位数 72，P95 为 495，P99 为 973。
-- **Response**：平均 1,166.9 tokens，中位数 554，P95 为 4,242，P99 为 7,975。
-- **总长度**：平均 1,320.4 tokens，中位数 681，P95 为 4,621，P99 为 8,226。
-
-训练的 4096 tokens 上限包含 prompt 和 response；截断前总长度超过该上限的记录有 **111,429 条，占 8.25%**。多轮记录累计全部回复，因此 response 长度可以超过单次生成上限。
-
-## 评估指标
-
-### 离线指标
-
-给定相同的参考前缀，记 Target 的概率分布（teacher 分布）为 \(p_i\)，draft 的概率分布为 \(q_i\)。两者的分布重叠率为
-
-$$
-a_i=\sum_v\min\bigl(p_i(v),q_i(v)\bigr)
-=1-\frac12\lVert p_i-q_i\rVert_1.
-$$
-
-每个有效 block 的概率接受长度定义为
-
-$$
-\tau_{\mathrm{prob}}
-=1+\sum_{i=0}^{6}\prod_{j=0}^{i}a_j,
-$$
-
-不足 7 个有效位置时，将无效位置的 \(a_i\) 置零，再对有效 block 求平均。各位置的 `accept_rate@i` 按有效 token 数求平均，各 token 等权。离线计算使用参考 token 作为前驱（teacher forcing）。在线推理的平均接受长度（MAL）则由实际生成和 Target 验证得到。
-
-### 推理指标
-
-在线评测记录实际接受长度（MAL）、耗时和 tokens/s，具体配置与统计定义见结果章节。
-
-## 实验分组
-
-| **实验** | 初始化与更新范围 | 比较的问题 |
-| --- | --- | --- |
-| **Baseline** | 从头训练原 DSpark | 原结构随训练步数增加的收敛情况 |
-| **Engram-Markov** | 从头联合训练 draft 与 Engram 门控投影 | Markov head 的 n-gram 条件对接受长度的影响 |
-| **Engram-MASK：门控残差** | 从头联合训练 draft、输入投影与逐槽标量门 | 保留 MASK embedding 的门控注入效果 |
-| **Engram-MASK：直接替换** | 从头联合训练 draft 与输入投影 | 内容相关输入替代固定 MASK 的效果 |
-| **Draft Memory** | 从头训练 draft 与 memory adapter，仅第二阶段回传 | 上一轮 draft 状态对新 anchor 下续写的作用 |
-| **Prefix reranker：联合训练** | 从头联合训练 draft 与 reranker | 加入前缀重排后，相对独立 baseline 的效果 |
-| **Prefix reranker：冻结基线** | 加载 baseline step 2604，仅训练新加的 reranker | 固定原模型后，重排模块能改善多少 |
 
 ## Baseline 架构
 
@@ -149,7 +73,7 @@ Engram-Markov 在前驱 token 的低秩表示中加入 n-gram 特征，由当前
 
 ### 门控与特征注入
 
-沿用 baseline 的位置编号。\(e_{i-1}\in\mathbb R^{2560}\) 为截至前驱 token \(t_{i-1}\) 的 n-gram 查表特征。
+\(e_{i-1}\in\mathbb R^{2560}\) 为截至前驱 token \(t_{i-1}\) 的 n-gram 查表特征。
 
 Draft 隐藏状态提供 query，Engram 特征提供 key 和 value。记 \(N\) 为无可训练 affine 参数的 RMSNorm，Markov rank 为 \(r=256\)，则
 
@@ -368,171 +292,196 @@ $$
 
 主干网络每轮只运行一次。第 \(i\) 个位置利用上一个已选 token 更新 Prefix Transformer 的本地 K/V，得到 \(r_i\)，并计算 Markov 修正后的 top-16 候选及其残差分数。选出的 token 进入下一位置，整块候选最后交给 Target 验证。
 
-Prefix K/V 在当前 block 内增长，每轮重新清空。每个 token 的选择依次执行前缀编码、候选筛选和残差评分。
+Prefix K/V 在当前 block 内增长，每轮重新清空。
 
-## 在线评测结果
+## Evaluation
 
-2026 年 10 月 5–8 日，对 baseline 与联合训练的 Prefix reranker 在 step 7812（3 epochs）进行 GSM8K test 全集 1,319 题评测。训练缓存为 non-thinking；离线验证使用 256 题的重新生成回复及 hidden cache。其余结构的在线评测尚未完成。
 
-### 评测设置
-
-两组均在 `dspark-v1.4-prefix-reranker` 分支运行。Baseline 与 reranker 使用各自 step 7812 的导出模型，baseline 沿用原有 anchor 设置和 Markov 修正。
+### 1.Experimental Setup
 
 | **项目** | 设置 |
 | --- | --- |
-| **Target** | Qwen3.8-Flash-Next |
-| **接口与 prompt** | `/v1/chat/completions`；5-shot 示例与问题拼接为单条 user message |
-| **Thinking** | Non-thinking 设置 `enable_thinking=False`；thinking 去掉该默认项并重启服务 |
-| **Target 采样** | Greedy：temperature 0；regen：temperature 0.7、top-p 0.8、top-k 20、min-p 0 |
-| **Draft 与验证** | Greedy draft；每轮 7 个候选；关闭 adaptive verification |
-| **并行与并发** | Target TP 4；客户端最大并发 256 |
-| **长度限制** | 上下文 8,192 tokens；non-thinking 输出上限 1,024 tokens，修正后的 thinking 评测为 4,096 tokens |
-| **计分** | 本地 `gsm8k_eval.py` 的答案提取与计分逻辑 |
+| **Target** | Qwen3.8-Flash-Next；Target backbone、token embedding 与 LM head 冻结 |
+| **训练数据** | PerfectBlend，经 Target 重新生成回复 |
+| **离线 cache** | 通过 SGLang 提取并缓存 Target 的 aux hidden states 与 `target_last_hidden_states`；后者经冻结的 LM head 得到 teacher 分布 |
+| **验证集** | GSM8K 256 条问题对应的重新生成回复及 hidden cache |
+| **最大序列长度** | 4096 tokens，包含 prompt 与 response |
+| **Draft 架构** | 3 层；隐藏维度 2560；FFN 中间维度 9728；GQA：24 个 Q heads、2 个 KV heads，head dim 256 |
+| **Attention 设置** | 三层均为 full attention，无滑动窗口；Q/K RMSNorm 与 RoPE，RoPE theta 为 \(10^6\) |
+| **Aux 层** | `[45, 46, 47]`，按配置中的零基层号记录 |
+| **Block size** | 7；Baseline 输入为 `[anchor, MASK × 6]` |
+| **Anchor 采样** | 每个样本最多 512 个 |
+| **监督** | Response-only |
+| **Markov head** | Vanilla，rank 256 |
+| **Batch size** | 4 GPUs × micro-batch 4 × 梯度累积 32；global batch 512 |
+| **学习率** | 峰值 \(3\times10^{-4}\)；warmup 比例 0.04 |
+| **训练计划** | 完整 scheduler 为 26,040 optimizer steps；约 2,604 步 / epoch |
+| **Baseline loss** | \(0.1L_{\mathrm{CE}}+0.9L_{\mathrm{L1}}+L_{\mathrm{conf}}\)；位置权重 \(\exp(-i/4)\)，\(i=0,\ldots,6\) |
+| **精度与随机种子** | BF16；seed 42 |
+| **Checkpoint** | 每 651 步保存一次 |
 
-早期 chat 评测使用 `Question`、`Assistant:`、`<|separator|>` 作为自定义 stop。其中 `Question` 会截断 thinking 中对题目的复述：一条回复仅生成 13 tokens 就停止并计为 invalid，移除 stop 后同题生成 210 tokens 并正确回答。下表 thinking 结果使用修正后的脚本，non-thinking 结果来自此前评测。旧 thinking 结果保留在折叠记录中。
+短程实验沿用完整学习率调度。
 
-接受统计使用测试前清零的服务端计数，或同一服务评测前后 metrics 快照的差值。记 draft 轮数为 \(R\)，前 \(i\) 个候选连续被接受的轮数为 \(C_i\)，则
+#### Dataset
+
+训练使用 [Open PerfectBlend Regenerated with Qwen3.8-Flash-Next](https://huggingface.co/datasets/xpzhao11/open-perfectblend-qwen38-flash-next-regen)：prompt 来自 [mlabonne/open-perfectblend](https://huggingface.co/datasets/mlabonne/open-perfectblend)，response 由 `Qwen/Qwen3.8-Flash-Next` 在 non-thinking 模式下重新生成。采样参数为 temperature 0.7、top-p 0.8、top-k 20、min-p 0，单次最多生成 4096 tokens。
+
+数据共 **1,349,859 条对话记录**、1,790,298 次 assistant 回复；其中 204,494 条为多轮记录，占 15.15%。使用 Target tokenizer 统计截断前的长度：prompt 累计所有非 assistant 消息正文，response 累计所有 assistant 回复正文，总长度按 non-thinking 对话模板编码，包含特殊 token，不追加新回复提示。
+
+截断前，完整对话（含 chat template）共 **1,782,301,322 tokens，约 1.782B**；prompt 正文共 182,134,895 tokens，response 正文共 1,575,153,460 tokens（约 1.575B）。
+
+- **Prompt**：平均 134.9 tokens，中位数 72，P95 为 495，P99 为 973。
+- **Response**：平均 1,166.9 tokens，中位数 554，P95 为 4,242，P99 为 7,975。
+- **总长度**：平均 1,320.4 tokens，中位数 681，P95 为 4,621，P99 为 8,226。
+
+训练的 4096 tokens 上限包含 prompt 和 response；截断前总长度超过该上限的记录有 **111,429 条，占 8.25%**。多轮记录累计全部回复，因此 response 长度可以超过单次生成上限。
+
+
+#### Evaluation Metrics
+
+**离线指标**
+
+给定相同的参考前缀，记 Target 的概率分布（teacher 分布）为 \(p_i\)，draft 的概率分布为 \(q_i\)。两者的分布重叠率为
+
+$$
+a_i=\sum_v\min\bigl(p_i(v),q_i(v)\bigr)
+=1-\frac12\lVert p_i-q_i\rVert_1.
+$$
+
+每个有效 block 的概率接受长度定义为
+
+$$
+\tau_{\mathrm{prob}}
+=1+\sum_{i=0}^{6}\prod_{j=0}^{i}a_j,
+$$
+
+不足 7 个有效位置时，将无效位置的 \(a_i\) 置零，再对有效 block 求平均。各位置的 `accept_rate@i` 按有效 token 数求平均，各 token 等权。离线计算使用参考 token 作为前驱（teacher forcing）。
+
+**在线指标**
+
+接受统计使用各次评测的服务端计数增量。记 draft 轮数为 \(R\)，前 \(i\) 个候选连续被接受的轮数为 \(C_i\)，则
 
 $$
 A_i=\frac{C_i}{R},
-\qquad a_i^{\mathrm{cond}}=\frac{C_i}{C_{i-1}},\quad C_0=R,
 \qquad \mathrm{MAL}=1+\frac{\sum_{i=1}^{7}C_i}{R}.
 $$
 
-\(A_i\) 为连续接受率，\(a_i^{\mathrm{cond}}\) 为条件接受率，第一位置二者相同。MAL 包含每轮一个 bonus 或纠正 token。整体输出吞吐为总输出 tokens 除以评测总耗时。在线使用实际生成前缀，离线使用参考前缀。
+逐位置接受率 \(A_i\) 表示一轮中前 \(i\) 个候选均被接受的比例，结果表记为 `pos-1` 至 `pos-7`。MAL 包含每轮一个 bonus 或纠正 token。整体输出吞吐为总输出 tokens 除以评测总耗时。重复评测的准确率以均值 ± 样本标准差表示。
 
-### 整体结果
+服务器非独占，吞吐和耗时测量不稳定，不用于速度比较，仅作记录。
 
-点击表头可按该列排序，再次点击切换升序或降序。
+每轮固定 7 个候选，整体 Draft 接受率为 \( (\mathrm{MAL}-1)/7 \)。验证使用标准 rejection sampler。
 
-<div class="js-sortable-table dspark-three-line dspark-sampling" markdown="1">
+## 实验分组
 
-| 方法 | Target 采样参数 | Draft 采样 | 思考模式 | 准确率 | MAL | 吞吐（tokens/s） |
-| --- | --- | --- | --- | ---: | ---: | ---: |
-| Baseline | Setting 1 | greedy | non-thinking | 96.7% | 4.9568 | 2,708.712 |
-| Prefix reranker | Setting 1 | greedy | non-thinking | 96.9% | 5.0629 | 3,711.9851 |
-| Baseline | Setting 2 | greedy | non-thinking | 97.0% | 4.9239 | 2,818.826 |
-| Prefix reranker | Setting 2 | greedy | non-thinking | 96.5% | 4.9977 | 3,563.909 |
-| Prefix reranker | Setting 2 | greedy | thinking | 97.6% | 3.1763 | 2,857.751 |
-| Prefix reranker | Setting 3 | greedy | thinking | 97.3% | 2.8463 | 2,565.931 |
+| **实验** | 初始化与更新范围 | 比较的问题 |
+| --- | --- | --- |
+| **Baseline** | 从头训练原 DSpark | 原结构随训练步数增加的收敛情况 |
+| **Engram-Markov** | 从头联合训练 draft 与 Engram 门控投影 | Markov head 的 n-gram 条件对接受长度的影响 |
+| **Engram-MASK：门控残差** | 从头联合训练 draft、输入投影与逐槽标量门 | 保留 MASK embedding 的门控注入效果 |
+| **Engram-MASK：直接替换** | 从头联合训练 draft 与输入投影 | 内容相关输入替代固定 MASK 的效果 |
+| **Draft Memory** | 从头训练 draft 与 memory adapter，仅第二阶段回传 | 上一轮 draft 状态对新 anchor 下续写的作用 |
+| **Prefix reranker：联合训练** | 从头联合训练 draft 与 reranker | 加入前缀重排后，相对独立 baseline 的效果 |
+| **Prefix reranker：冻结基线** | 加载 baseline step 2604，仅训练新加的 reranker | 固定原模型后，重排模块能改善多少 |
 
-</div>
+### Evaluation Results
 
-- **Setting 1**：temperature=0、top-p=1.0、top-k=0、min-p=0.0。(vLLM greedy 默认)
-- **Setting 2**：temperature=0.7、top-p=0.8、top-k=20、min-p=0，与训练数据 regen 使用的采样参数相同。
+#### 1. Acceptance rate vs. Sampling
+
+固定 Baseline step 7812（3 epochs），在 non-thinking 模式下评测 GSM8K test 全集 1,319 题，使用 5-shot。Setting 1 使用 greedy draft，Setting 2、3 分别比较 greedy 与 probabilistic draft，共五种组合。
+
+Target 使用 TP4，最大并发为 256。每轮生成 7 个候选，关闭 adaptive verification。上下文上限为 8,192 tokens，原 non-thinking 评测输出上限为 1,024 tokens，Baseline Setting 2/3 为 4,096 tokens。
+
+- **Setting 1**：temperature=0、top-p=1.0、top-k=0、min-p=0。Target 与 Draft 均为 greedy。
+- **Setting 2**：temperature=0.7、top-p=0.8、top-k=20、min-p=0，与训练回复 regen 的采样参数相同。
 - **Setting 3**：temperature=1.0、top-p=0.95、top-k=20、min-p=0。
 
-验证使用标准 rejection sampler。在 greedy draft 下，Setting 1 与 Target argmax 判等；Setting 2 和 Setting 3 在分布上等价于先从 Target 分布采样再判等。
+#### 整体结果
 
-Reranker 的 non-thinking MAL 相对 baseline 在 greedy 和 regen 采样下分别提高 2.14% 和 1.50%。修正 stop 后，thinking 准确率为 97.6%、invalid rate 为 0%，MAL 仍低于 non-thinking。
+<div class="js-sortable-table js-multisort js-row-reorder dspark-three-line dspark-compact" markdown="1">
 
-### 条件接受率
-
-以下由原始计数计算，保留两位小数。
-
-<div class="js-sortable-table dspark-three-line" markdown="1">
-
-| 方法 | Target 采样参数 | 思考模式 | 位置 1 | 位置 2 | 位置 3 | 位置 4 | 位置 5 | 位置 6 | 位置 7 |
-| --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| Baseline | Setting 1 | non-thinking | 92.89% | 88.80% | 84.64% | 80.92% | 76.33% | 70.85% | 66.50% |
-| Prefix reranker | Setting 1 | non-thinking | 93.48% | 87.95% | 85.93% | 81.85% | 78.11% | 74.48% | 69.27% |
-| Baseline | Setting 2 | non-thinking | 92.50% | 88.45% | 84.41% | 80.46% | 76.83% | 71.30% | 66.77% |
-| Prefix reranker | Setting 2 | non-thinking | 92.69% | 87.71% | 85.31% | 81.72% | 78.21% | 73.74% | 69.49% |
-| Prefix reranker | Setting 2 | thinking | 66.21% | 69.87% | 75.61% | 76.13% | 74.29% | 71.51% | 68.14% |
-| Prefix reranker | Setting 3 | thinking | 59.63% | 66.58% | 73.68% | 74.41% | 72.77% | 69.92% | 66.60% |
+| Target 采样 | Draft 采样 | MAL | pos-1 | pos-2 | pos-3 | pos-4 | pos-5 | pos-6 | pos-7 | 吞吐（tokens/s） |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Setting 1 | greedy | 4.9568 | 92.89% | 82.49% | 69.81% | 56.50% | 43.12% | 30.55% | 20.32% | 2,708.712 |
+| Setting 2 | greedy | 4.9209 | 92.47% | 81.82% | 68.99% | 55.55% | 42.63% | 30.39% | 20.25% | 2,643.963 |
+| Setting 2 | probabilistic | 4.8986 | 92.65% | 81.95% | 68.89% | 55.02% | 41.92% | 29.75% | 19.68% | 2,709.611 |
+| Setting 3 | greedy | 4.7277 | 90.03% | 78.29% | 65.36% | 52.04% | 39.82% | 28.27% | 18.97% | 2,653.968 |
+| Setting 3 | probabilistic | 4.7048 | 91.20% | 79.25% | 65.59% | 51.58% | 38.52% | 26.81% | 17.53% | 2,920.471 |
 
 </div>
 
-Non-thinking 的条件接受率随位置下降，reranker 在两种采样设置下的第 3–7 位均高于 baseline。Thinking 从首位 66.21% 上升至第 4 位 76.13%，随后回落至第 7 位 68.14%。与 non-thinking reranker 的 regen 结果相比，首位低 26.48 个百分点，第 7 位低 1.35 个百分点，差距主要集中在前段。
+Setting 1 的准确率为 96.7%。Setting 2 下，greedy 与 probabilistic draft 分别为 96.8% ± 0.0%、97.0% ± 0.0%。Setting 3 下分别为 96.7% ± 0.4%、96.6% ± 0.2%。
 
-### 采样参数
+Greedy draft 下，Setting 2 相比 Setting 1 的 MAL 降低 0.72%。Setting 2、3 切换为 probabilistic draft 后，MAL 分别降低约 0.45%、0.48%。
 
-Regen 使用与训练回复生成相同的 Target 采样参数，draft 的 greedy 选择保持不变。与 temperature 0 相比，non-thinking baseline 和 reranker 的 MAL 分别降低 0.66% 和 1.29%，逐位置条件接受率的衰减形状基本不变。本次改变采样参数没有改善后段接受率。
+#### 2. Acceptance rate vs. Epochs
 
-Thinking 的 Setting 3 相比 Setting 2，MAL 从 3.1763 降至 2.8463（下降 10.39%），整体接受率从 31.09% 降至 26.38%。准确率分别为 97.3% 和 97.6%，输出吞吐分别为 2,565.931 和 2,857.751 tokens/s。首位条件接受率从 66.21% 降至 59.63%，后续位置下降约 1.52–3.29 个百分点；条件接受率仍先上升再下降，变化主要集中在首位。
+比较 Baseline step 7812（3 epochs）与 step 26040（10 epochs）在 GSM8K test 全集 1,319 题上的结果，使用 5-shot、Setting 1、greedy draft 与 non-thinking。10 epoch 数据来自 2026 年 10 月 9 日的两次评测，汇总值为各次指标的算术平均。
 
-Thinking 的准确率低分来自评测 stop 误截断，修正后恢复，但低 MAL 仍存在。两组输出上限和生成内容不同，当前结果尚不能将接受长度差异单独归因于采样参数。
+<div class="js-sortable-table js-multisort js-row-reorder dspark-three-line dspark-compact" markdown="1">
 
-<details markdown="1">
-<summary>原始计数与连续接受率</summary>
-
-<div class="js-sortable-table dspark-three-line" markdown="1">
-
-| 方法 | Target 采样参数 | 思考模式 | Draft 轮数 | Draft tokens | 接受 tokens | Questions/s | 输出 tokens | 耗时（s） | Invalid |
-| --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| Baseline | Setting 1 | non-thinking | 39,720 | 278,040 | 157,166 | 18.253 | 195,738 | 72.262 | 0% |
-| Prefix reranker | Setting 1 | non-thinking | 38,100 | 266,700 | 154,796 | 25.5354 | 191,738 | 51.6538 | 0% |
-| Baseline | Setting 2 | non-thinking | 40,065 | 280,455 | 157,213 | 18.955 | 196,149 | 69.585 | 0% |
-| Prefix reranker | Setting 2 | non-thinking | 39,241 | 274,687 | 156,872 | 24.113 | 194,946 | 54.700 | 0% |
-| Prefix reranker | Setting 2 | thinking | 200,139 | 1,400,973 | 435,561 | 5.837 | 645,794 | 225.980 | 0% |
-| Prefix reranker | Setting 3 | thinking | 240,210 | 1,681,470 | 443,508 | 4.956 | 682,841 | 266.118 | 0% |
+| Epochs | MAL | pos-1 | pos-2 | pos-3 | pos-4 | pos-5 | pos-6 | pos-7 | 吞吐（tokens/s） |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| 3 | 4.9568 | 92.89% | 82.49% | 69.81% | 56.50% | 43.12% | 30.55% | 20.32% | 2,708.712 |
+| 10 | 5.1290 | 93.29% | 83.60% | 71.72% | 59.13% | 46.67% | 34.46% | 24.05% | 2,888.485 |
 
 </div>
 
-<div class="js-sortable-table dspark-three-line" markdown="1">
+从 3 epoch 到 10 epoch，MAL 提高约 3.47%，整体 Draft 接受率从 56.53% 升至 58.99%（提高 2.46 个百分点）。第 1 位接受率提高约 0.40 个百分点，第 5–7 位分别提高约 3.54、3.91、3.73 个百分点，提升主要体现在 block 后段。3 epoch 的准确率为 96.7%，10 epoch 两次日志均为 96.8%，invalid rate 均为 0%。
 
-| 方法 | Target 采样参数 | 思考模式 | 位置 1 | 位置 2 | 位置 3 | 位置 4 | 位置 5 | 位置 6 | 位置 7 |
-| --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| Baseline | Setting 1 | non-thinking | 36,896 | 32,764 | 27,730 | 22,440 | 17,129 | 12,136 | 8,071 |
-| Prefix reranker | Setting 1 | non-thinking | 35,616 | 31,325 | 26,918 | 22,033 | 17,209 | 12,817 | 8,878 |
-| Baseline | Setting 2 | non-thinking | 37,059 | 32,780 | 27,670 | 22,263 | 17,104 | 12,195 | 8,142 |
-| Prefix reranker | Setting 2 | non-thinking | 36,374 | 31,904 | 27,216 | 22,242 | 17,396 | 12,827 | 8,913 |
-| Prefix reranker | Setting 2 | thinking | 132,504 | 92,576 | 70,000 | 53,289 | 39,589 | 28,311 | 19,292 |
-| Prefix reranker | Setting 3 | thinking | 143,236 | 95,366 | 70,261 | 52,279 | 38,046 | 26,603 | 17,717 |
+### Prefix reranker 的效果
 
-</div>
+在 GSM8K 上固定 Target 采样、greedy draft 与 non-thinking，对比 Baseline 和联合训练的 Prefix reranker。两者均使用 step 7812 的导出模型。
 
-<div class="js-sortable-table dspark-three-line" markdown="1">
+<div class="js-sortable-table js-multisort js-row-reorder dspark-three-line dspark-sampling dspark-compact" markdown="1">
 
-| 方法 | Target 采样参数 | 思考模式 | 位置 1 | 位置 2 | 位置 3 | 位置 4 | 位置 5 | 位置 6 | 位置 7 |
-| --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| Baseline | Setting 1 | non-thinking | 92.89% | 82.49% | 69.81% | 56.50% | 43.12% | 30.55% | 20.32% |
-| Prefix reranker | Setting 1 | non-thinking | 93.48% | 82.22% | 70.65% | 57.83% | 45.17% | 33.64% | 23.30% |
-| Baseline | Setting 2 | non-thinking | 92.50% | 81.82% | 69.06% | 55.57% | 42.69% | 30.44% | 20.32% |
-| Prefix reranker | Setting 2 | non-thinking | 92.69% | 81.30% | 69.36% | 56.68% | 44.33% | 32.69% | 22.71% |
-| Prefix reranker | Setting 2 | thinking | 66.21% | 46.26% | 34.98% | 26.63% | 19.78% | 14.15% | 9.64% |
-| Prefix reranker | Setting 3 | thinking | 59.63% | 39.70% | 29.25% | 21.76% | 15.84% | 11.07% | 7.38% |
+| 方法 | Target 采样 | Draft 采样 | 思考 | MAL | pos-1 | pos-2 | pos-3 | pos-4 | pos-5 | pos-6 | pos-7 | 吞吐（tokens/s） |
+| --- | --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Baseline | Setting 1 | greedy | non-thinking | 4.9568 | 92.89% | 82.49% | 69.81% | 56.50% | 43.12% | 30.55% | 20.32% | 2,708.712 |
+| Prefix reranker | Setting 1 | greedy | non-thinking | 5.0629 | 93.48% | 82.22% | 70.65% | 57.83% | 45.17% | 33.64% | 23.30% | 3,711.9851 |
+| Baseline | Setting 2 | greedy | non-thinking | 4.9209 | 92.47% | 81.82% | 68.99% | 55.55% | 42.63% | 30.39% | 20.25% | 2,643.963 |
+| Prefix reranker | Setting 2 | greedy | non-thinking | 4.9977 | 92.69% | 81.30% | 69.36% | 56.68% | 44.33% | 32.69% | 22.71% | 3,563.909 |
 
 </div>
 
-</details>
+Reranker 在 Setting 1、2 下的准确率分别为 96.9%、96.5%。
 
-<details markdown="1">
-<summary>修正 stop 前的 thinking 记录</summary>
+Reranker 在 Setting 1、2 下的 MAL 分别提高 2.14%、1.56%。
 
-以下两组为 temperature 0、每题最多 1,024 tokens，并使用会误截断推理的自定义 stop。
+### Thinking 的影响
 
-<div class="js-sortable-table dspark-three-line" markdown="1">
+Prefix reranker 在 GSM8K 上使用 greedy draft，比较 thinking 模式下的 Setting 2、3。Thinking 使用模板默认设置，每题输出上限为 4,096 tokens，不发送自定义 stop。
 
-| **指标** | Thinking Baseline | Thinking Reranker |
-| --- | --- | --- |
-| **GSM8K accuracy** | 76.0% | 76.4% |
-| **Invalid rate** | 7.4% | 5.6% |
-| **MAL** | 3.1342 | 3.2407 |
-| **Draft token acceptance rate** | 30.49% | 32.01% |
-| **评测总耗时（s）** | 146.356 | 151.655 |
-| **整体输出吞吐（tokens/s）** | 2,863.617 | 2,809.391 |
-| **Questions/s** | 9.012 | 8.697 |
-| **总输出 tokens** | 419,107 | 426,057 |
+<div class="js-sortable-table js-multisort js-row-reorder dspark-three-line dspark-sampling dspark-compact" markdown="1">
+
+| 方法 | Target 采样 | Draft 采样 | 思考 | MAL | pos-1 | pos-2 | pos-3 | pos-4 | pos-5 | pos-6 | pos-7 | 吞吐（tokens/s） |
+| --- | --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Prefix reranker | Setting 2 | greedy | thinking | 3.1763 | 66.21% | 46.26% | 34.98% | 26.63% | 19.78% | 14.15% | 9.64% | 2,857.751 |
+| Prefix reranker | Setting 3 | greedy | thinking | 2.8463 | 59.63% | 39.70% | 29.25% | 21.76% | 15.84% | 11.07% | 7.38% | 2,565.931 |
 
 </div>
 
-<div class="js-sortable-table dspark-three-line" markdown="1">
+Thinking 在 Setting 2、3 下的准确率分别为 97.6%、97.3%。
 
-| **预测位置** | Baseline 计数 | Reranker 计数 | Baseline 条件接受率 | Reranker 条件接受率 | Baseline 连续接受率 | Reranker 连续接受率 |
-| --- | --- | --- | --- | --- | --- | --- |
-| **1** | 88,152 | 89,759 | 65.87% | 68.21% | 65.87% | 68.21% |
-| **2** | 61,293 | 62,427 | 69.53% | 69.55% | 45.80% | 47.44% |
-| **3** | 45,902 | 46,642 | 74.89% | 74.71% | 34.30% | 35.44% |
-| **4** | 35,276 | 36,031 | 76.85% | 77.25% | 26.36% | 27.38% |
-| **5** | 25,658 | 27,063 | 72.74% | 75.11% | 19.17% | 20.57% |
-| **6** | 17,739 | 19,551 | 69.14% | 72.24% | 13.26% | 14.86% |
-| **7** | 11,592 | 13,390 | 65.35% | 68.49% | 8.66% | 10.18% |
+Thinking 的 Setting 3 相比 Setting 2，MAL 降低 10.39%。
+
+### MATH-500
+
+2026 年 10 月 9 日，Baseline 在 non-thinking 模式下使用 Setting 1、2、3 评测全部 500 题。Setting 1 使用 greedy draft，Setting 2、3 使用 probabilistic draft。采用 0-shot 提示，由 Math-Verify 计分。输出上限为 4,096 tokens，最大并发为 256。
+
+<div class="js-sortable-table js-multisort js-row-reorder dspark-three-line dspark-sampling dspark-compact" markdown="1">
+
+| 方法 | Target 采样 | Draft 采样 | 思考 | MAL | pos-1 | pos-2 | pos-3 | pos-4 | pos-5 | pos-6 | pos-7 | 吞吐（tokens/s） |
+| --- | --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Baseline | Setting 1 | greedy | non-thinking | 5.6069 | 92.35% | 82.67% | 73.38% | 64.73% | 56.71% | 49.06% | 41.81% | 4,638.802 |
+| Baseline | Setting 2 | probabilistic | non-thinking | 5.4771 | 91.80% | 81.68% | 71.63% | 62.49% | 54.15% | 46.58% | 39.34% | 4,516.657 |
+| Baseline | Setting 3 | probabilistic | non-thinking | 5.2532 | 90.66% | 79.45% | 68.61% | 58.87% | 50.15% | 42.41% | 35.15% | 4,108.819 |
 
 </div>
 
-</details>
+Setting 1、2、3 的准确率分别为 96.0%、95.4% ± 0.3%、95.6%。
 
+Setting 2 为两次评测的算术平均。Setting 1、2、3 的截断率分别为 3.6%、4.1%、3.4%。逐位置接受率由日志中的条件接受率换算，为近似值。
 
 ## 附录
 
@@ -540,6 +489,6 @@ Thinking 的准确率低分来自评测 stop 误截断，修正后恢复，但�
 
 ![两种峰值学习率的训练损失：左为前 3,300 步，右为全部记录](../../assets/images/qwen3.8-flash-next-dspark/training-lr-stability.svg){ width="100%" }
 
-峰值学习率为 \(6\times10^{-4}\) 时，损失在 step 2110–2130 从约 0.926 突增至 3.239，到 step 3280 仍为 2.168，未恢复至突增前的水平。训练继续运行，但收敛明显退化。
+峰值学习率为 \(6\times10^{-4}\) 时，损失在 step 2110–2130 从约 0.926 突增至 3.239，到 step 3280 仍为 2.168，未恢复至突增前的水平。
 
 降低峰值学习率至 \(3\times10^{-4}\) 后，训练保持稳定，损失整体下降，step 26040 时约为 0.610。后续实验采用这一学习率。

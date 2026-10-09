@@ -84,6 +84,48 @@ $$
 </div>
 
 
+## GSM8K 在线评测
+
+2026 年 10 月 9 日，对训练 1 epoch（step 2616）的 GQA baseline 进行 GSM8K test 全集 1,319 题、5-shot 评测。接受统计使用评测前后服务端 metrics 快照的差值，MAL 包含每轮一个 bonus 或纠正 token。
+
+<div class="js-sortable-table" markdown="1">
+
+| 实验 | Epoch | Step | 准确率 | MAL | 吞吐（tokens/s） |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| GQA baseline | 1 | 2,616 | 85.4% | 4.5908 | 6,171.976 |
+
+</div>
+
+Invalid rate 为 0%。评测耗时为 31.668 秒，共生成 195,457 tokens，处理速度为 41.650 题/秒。
+
+<div class="js-sortable-table" markdown="1">
+
+| 接受率 | 位置 1 | 位置 2 | 位置 3 | 位置 4 | 位置 5 | 位置 6 | 位置 7 |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| 连续接受率 | 86.33% | 73.03% | 60.17% | 48.10% | 38.23% | 29.82% | 23.40% |
+| 条件接受率 | 86.33% | 84.59% | 82.38% | 79.94% | 79.47% | 78.02% | 78.46% |
+
+</div>
+
+<details markdown="1">
+<summary>GSM8K 原始记录</summary>
+
+| 位置 | 连续接受计数 |
+| --- | ---: |
+| 1 | 36,761 |
+| 2 | 31,097 |
+| 3 | 25,619 |
+| 4 | 20,481 |
+| 5 | 16,277 |
+| 6 | 12,699 |
+| 7 | 9,964 |
+
+```text
+/public/workspace/dspark/logs/eval-qwen3-4b/qwen3-4b-deepspec-baseline-step2616-20261009-171341-0oISaS/gsm8k.json
+```
+
+</details>
+
 ## 结果分析
 
 ### Tau loss
