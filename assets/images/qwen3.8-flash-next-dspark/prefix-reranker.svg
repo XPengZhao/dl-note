@@ -1,0 +1,1092 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xl="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:dc="http://purl.org/dc/elements/1.1/" viewBox="-3 -1 1506 731" width="1506" height="731">
+  <defs>
+    <filter id="Shadow" filterUnits="userSpaceOnUse" x="-153.6" y="-74.1">
+      <feGaussianBlur in="SourceAlpha" result="blur" stdDeviation="1.308"/>
+      <feOffset in="blur" result="offset" dx="0" dy="2"/>
+      <feFlood flood-color="black" flood-opacity="0" result="flood"/>
+      <feComposite in="flood" in2="offset" operator="in"/>
+    </filter>
+    <filter id="Shadow_2" filterUnits="userSpaceOnUse" x="-153.6" y="-74.1">
+      <feGaussianBlur in="SourceAlpha" result="blur" stdDeviation="1.308"/>
+      <feOffset in="blur" result="offset" dx="0" dy="2"/>
+      <feFlood flood-color="black" flood-opacity=".5" result="flood"/>
+      <feComposite in="flood" in2="offset" operator="in"/>
+    </filter>
+    <marker orient="auto" overflow="visible" markerUnits="strokeWidth" id="FilledArrow_Marker" stroke-linejoin="miter" stroke-miterlimit="10" viewBox="-1 -3 7 6" markerWidth="7" markerHeight="6" color="#292929">
+      <g>
+        <path d="M 4.223158 0 L 0 -1.5836842 L 0 1.5836842 Z" fill="currentColor" stroke="currentColor" stroke-width="1"/>
+      </g>
+    </marker>
+  </defs>
+  <g id="DSpark_Prefix_Reranker" stroke="none" fill-opacity="1" stroke-opacity="1" stroke-dasharray="none" fill="none">
+    <title>DSpark Prefix Reranker</title>
+    <g id="DSpark_Prefix_Reranker_Layer_1">
+      <title>Layer 1</title>
+      <g id="Graphic_182_shadow" filter="url(#Shadow)">
+        <rect x="0" y="0" width="1500" height="725" fill="white"/>
+        <rect x="0" y="0" width="1500" height="725" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0"/>
+      </g>
+      <g id="Graphic_183_shadow" filter="url(#Shadow)">
+        <rect x="120" y="555" width="70" height="50" fill="#fce8ce"/>
+        <rect x="120" y="555" width="70" height="50" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.35"/>
+      </g>
+      <g id="Graphic_184_shadow" filter="url(#Shadow)">
+        <rect x="250" y="555" width="70" height="50" fill="#ded5e8"/>
+        <rect x="250" y="555" width="70" height="50" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.35"/>
+      </g>
+      <g id="Graphic_185_shadow" filter="url(#Shadow)">
+        <rect x="380" y="555" width="70" height="50" fill="#ded5e8"/>
+        <rect x="380" y="555" width="70" height="50" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.35"/>
+      </g>
+      <g id="Graphic_186_shadow" filter="url(#Shadow)">
+        <rect x="510" y="555" width="70" height="50" fill="#ded5e8"/>
+        <rect x="510" y="555" width="70" height="50" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.35"/>
+      </g>
+      <g id="Graphic_187_shadow" filter="url(#Shadow)">
+        <rect x="110" y="438" width="490" height="74" fill="#d9e9d5"/>
+        <rect x="110" y="438" width="490" height="74" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0"/>
+      </g>
+      <g id="Graphic_188_shadow" filter="url(#Shadow)">
+        <rect x="85" y="463" width="25" height="24" fill="#d9e9d5"/>
+        <rect x="85" y="463" width="25" height="24" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0"/>
+      </g>
+      <g id="Graphic_189_shadow" filter="url(#Shadow)">
+        <rect x="600" y="463" width="25" height="24" fill="#d9e9d5"/>
+        <rect x="600" y="463" width="25" height="24" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0"/>
+      </g>
+      <g id="Graphic_190_shadow" filter="url(#Shadow_2)">
+        <circle cx="110" cy="463" r="25.0000399475474" fill="#d9e9d5"/>
+        <circle cx="110" cy="463" r="25.0000399475474" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0"/>
+      </g>
+      <g id="Graphic_191_shadow" filter="url(#Shadow_2)">
+        <circle cx="600" cy="463" r="25.0000399475474" fill="#d9e9d5"/>
+        <circle cx="600" cy="463" r="25.0000399475474" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0"/>
+      </g>
+      <g id="Graphic_192_shadow" filter="url(#Shadow_2)">
+        <circle cx="110" cy="487" r="25.0000399475474" fill="#d9e9d5"/>
+        <circle cx="110" cy="487" r="25.0000399475474" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0"/>
+      </g>
+      <g id="Graphic_193_shadow" filter="url(#Shadow_2)">
+        <circle cx="600" cy="487" r="25.0000399475474" fill="#d9e9d5"/>
+        <circle cx="600" cy="487" r="25.0000399475474" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0"/>
+      </g>
+      <g id="Graphic_194_shadow" filter="url(#Shadow)">
+        <rect x="85" y="438" width="540" height="74"/>
+        <rect x="85" y="438" width="540" height="74" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0"/>
+      </g>
+      <g id="Graphic_195_shadow" filter="url(#Shadow)">
+        <rect x="114" y="357" width="82" height="46" fill="#f3f3f3"/>
+        <rect x="114" y="357" width="82" height="46" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.35"/>
+      </g>
+      <g id="Graphic_196_shadow" filter="url(#Shadow)">
+        <rect x="244" y="357" width="82" height="46" fill="#f3f3f3"/>
+        <rect x="244" y="357" width="82" height="46" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.35"/>
+      </g>
+      <g id="Graphic_197_shadow" filter="url(#Shadow)">
+        <rect x="374" y="357" width="82" height="46" fill="#f3f3f3"/>
+        <rect x="374" y="357" width="82" height="46" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.35"/>
+      </g>
+      <g id="Graphic_198_shadow" filter="url(#Shadow)">
+        <rect x="504" y="357" width="82" height="46" fill="#f3f3f3"/>
+        <rect x="504" y="357" width="82" height="46" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.35"/>
+      </g>
+      <g id="Graphic_199_shadow" filter="url(#Shadow)">
+        <rect x="110" y="250" width="490" height="65" fill="#ded5e8"/>
+        <rect x="110" y="250" width="490" height="65" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0"/>
+      </g>
+      <g id="Graphic_200_shadow" filter="url(#Shadow)">
+        <rect x="85" y="275" width="25" height="15" fill="#ded5e8"/>
+        <rect x="85" y="275" width="25" height="15" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0"/>
+      </g>
+      <g id="Graphic_201_shadow" filter="url(#Shadow)">
+        <rect x="600" y="275" width="25" height="15" fill="#ded5e8"/>
+        <rect x="600" y="275" width="25" height="15" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0"/>
+      </g>
+      <g id="Graphic_202_shadow" filter="url(#Shadow_2)">
+        <circle cx="110" cy="275" r="25.0000399475474" fill="#ded5e8"/>
+        <circle cx="110" cy="275" r="25.0000399475474" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0"/>
+      </g>
+      <g id="Graphic_203_shadow" filter="url(#Shadow_2)">
+        <circle cx="600" cy="275" r="25.0000399475474" fill="#ded5e8"/>
+        <circle cx="600" cy="275" r="25.0000399475474" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0"/>
+      </g>
+      <g id="Graphic_204_shadow" filter="url(#Shadow_2)">
+        <circle cx="110" cy="290" r="25.0000399475474" fill="#ded5e8"/>
+        <circle cx="110" cy="290" r="25.0000399475474" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0"/>
+      </g>
+      <g id="Graphic_205_shadow" filter="url(#Shadow_2)">
+        <circle cx="600" cy="290" r="25.0000399475474" fill="#ded5e8"/>
+        <circle cx="600" cy="290" r="25.0000399475474" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0"/>
+      </g>
+      <g id="Graphic_206_shadow" filter="url(#Shadow)">
+        <rect x="85" y="250" width="540" height="65"/>
+        <rect x="85" y="250" width="540" height="65" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0"/>
+      </g>
+      <g id="Graphic_207_shadow" filter="url(#Shadow)">
+        <rect x="120" y="135" width="70" height="52" fill="#ded5e8"/>
+        <rect x="120" y="135" width="70" height="52" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.35"/>
+      </g>
+      <g id="Graphic_208_shadow" filter="url(#Shadow)">
+        <rect x="250" y="135" width="70" height="52" fill="#ded5e8"/>
+        <rect x="250" y="135" width="70" height="52" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.35"/>
+      </g>
+      <g id="Graphic_209_shadow" filter="url(#Shadow)">
+        <rect x="380" y="135" width="70" height="52" fill="#c5b1d9"/>
+        <rect x="380" y="135" width="70" height="52" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.35"/>
+      </g>
+      <g id="Graphic_210_shadow" filter="url(#Shadow)">
+        <rect x="510" y="135" width="70" height="52" fill="#ded5e8"/>
+        <rect x="510" y="135" width="70" height="52" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.35"/>
+      </g>
+      <g id="Graphic_211_shadow" filter="url(#Shadow)">
+        <rect x="205" y="68" width="300" height="37"/>
+        <rect x="205" y="68" width="300" height="37" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0"/>
+      </g>
+      <g id="Graphic_212_shadow" filter="url(#Shadow)">
+        <rect x="1e3" y="61" width="220" height="28"/>
+        <rect x="1e3" y="61" width="220" height="28" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0"/>
+      </g>
+      <g id="Graphic_213_shadow" filter="url(#Shadow)">
+        <rect x="1078" y="103" width="64" height="52" fill="#c5b1d9"/>
+        <rect x="1078" y="103" width="64" height="52" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.35"/>
+      </g>
+      <g id="Graphic_214_shadow" filter="url(#Shadow_2)">
+        <circle cx="1110" cy="219" r="24.0000383496456" fill="white"/>
+        <circle cx="1110" cy="219" r="24.0000383496456" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.35"/>
+      </g>
+      <g id="Graphic_215_shadow" filter="url(#Shadow)">
+        <rect x="1025" y="294" width="124" height="60" fill="#ded5e8"/>
+        <rect x="1025" y="294" width="124" height="60" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0"/>
+      </g>
+      <g id="Graphic_216_shadow" filter="url(#Shadow)">
+        <rect x="1e3" y="319" width="25" height="10" fill="#ded5e8"/>
+        <rect x="1e3" y="319" width="25" height="10" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0"/>
+      </g>
+      <g id="Graphic_217_shadow" filter="url(#Shadow)">
+        <rect x="1149" y="319" width="25" height="10" fill="#ded5e8"/>
+        <rect x="1149" y="319" width="25" height="10" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0"/>
+      </g>
+      <g id="Graphic_218_shadow" filter="url(#Shadow_2)">
+        <circle cx="1025" cy="319" r="25.0000399475474" fill="#ded5e8"/>
+        <circle cx="1025" cy="319" r="25.0000399475474" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0"/>
+      </g>
+      <g id="Graphic_219_shadow" filter="url(#Shadow_2)">
+        <circle cx="1149" cy="319" r="25.0000399475475" fill="#ded5e8"/>
+        <circle cx="1149" cy="319" r="25.0000399475475" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0"/>
+      </g>
+      <g id="Graphic_220_shadow" filter="url(#Shadow_2)">
+        <circle cx="1025" cy="329" r="25.0000399475474" fill="#ded5e8"/>
+        <circle cx="1025" cy="329" r="25.0000399475474" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0"/>
+      </g>
+      <g id="Graphic_221_shadow" filter="url(#Shadow_2)">
+        <circle cx="1149" cy="329" r="25.0000399475474" fill="#ded5e8"/>
+        <circle cx="1149" cy="329" r="25.0000399475474" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0"/>
+      </g>
+      <g id="Graphic_222_shadow" filter="url(#Shadow)">
+        <rect x="1e3" y="294" width="174" height="60"/>
+        <rect x="1e3" y="294" width="174" height="60" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0"/>
+      </g>
+      <g id="Graphic_223_shadow" filter="url(#Shadow)">
+        <rect x="777" y="408" width="194" height="60" fill="#ded5e8"/>
+        <rect x="777" y="408" width="194" height="60" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0"/>
+      </g>
+      <g id="Graphic_224_shadow" filter="url(#Shadow)">
+        <rect x="752" y="433" width="25" height="10" fill="#ded5e8"/>
+        <rect x="752" y="433" width="25" height="10" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0"/>
+      </g>
+      <g id="Graphic_225_shadow" filter="url(#Shadow)">
+        <rect x="971" y="433" width="25" height="10" fill="#ded5e8"/>
+        <rect x="971" y="433" width="25" height="10" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0"/>
+      </g>
+      <g id="Graphic_226_shadow" filter="url(#Shadow_2)">
+        <circle cx="777" cy="433" r="25.0000399475474" fill="#ded5e8"/>
+        <circle cx="777" cy="433" r="25.0000399475474" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0"/>
+      </g>
+      <g id="Graphic_227_shadow" filter="url(#Shadow_2)">
+        <circle cx="971" cy="433" r="25.0000399475474" fill="#ded5e8"/>
+        <circle cx="971" cy="433" r="25.0000399475474" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0"/>
+      </g>
+      <g id="Graphic_228_shadow" filter="url(#Shadow_2)">
+        <circle cx="777" cy="443" r="25.0000399475474" fill="#ded5e8"/>
+        <circle cx="777" cy="443" r="25.0000399475474" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0"/>
+      </g>
+      <g id="Graphic_229_shadow" filter="url(#Shadow_2)">
+        <circle cx="971" cy="443" r="25.0000399475474" fill="#ded5e8"/>
+        <circle cx="971" cy="443" r="25.0000399475474" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0"/>
+      </g>
+      <g id="Graphic_230_shadow" filter="url(#Shadow)">
+        <rect x="752" y="408" width="244" height="60"/>
+        <rect x="752" y="408" width="244" height="60" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0"/>
+      </g>
+      <g id="Graphic_231_shadow" filter="url(#Shadow)">
+        <rect x="759" y="551" width="64" height="50" fill="#fce8ce"/>
+        <rect x="759" y="551" width="64" height="50" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.35"/>
+      </g>
+      <g id="Graphic_232_shadow" filter="url(#Shadow)">
+        <rect x="839" y="551" width="64" height="50" fill="#ded5e8"/>
+        <rect x="839" y="551" width="64" height="50" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.35"/>
+      </g>
+      <g id="Graphic_233_shadow" filter="url(#Shadow)">
+        <rect x="919" y="551" width="64" height="50" fill="#ded5e8"/>
+        <rect x="919" y="551" width="64" height="50" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.35"/>
+      </g>
+      <g id="Graphic_234_shadow" filter="url(#Shadow)">
+        <rect x="1048" y="551" width="66" height="50" fill="#f3f3f3"/>
+        <rect x="1048" y="551" width="66" height="50" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.35"/>
+      </g>
+      <g id="Graphic_235_shadow" filter="url(#Shadow)">
+        <rect x="1259" y="393" width="118" height="195" fill="#fffbf4"/>
+        <rect x="1259" y="393" width="118" height="195" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.35"/>
+      </g>
+      <g id="Graphic_236_shadow" filter="url(#Shadow)">
+        <rect x="1257" y="352" width="160" height="32"/>
+        <rect x="1257" y="352" width="160" height="32" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0"/>
+      </g>
+      <g id="Graphic_237_shadow" filter="url(#Shadow)">
+        <rect x="1283" y="406" width="70" height="46" fill="#fce8ce"/>
+        <rect x="1283" y="406" width="70" height="46" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.35"/>
+      </g>
+      <g id="Graphic_238_shadow" filter="url(#Shadow)">
+        <rect x="1283" y="464" width="70" height="46" fill="#fce8ce"/>
+        <rect x="1283" y="464" width="70" height="46" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.35"/>
+      </g>
+      <g id="Graphic_239_shadow" filter="url(#Shadow)">
+        <rect x="1283" y="522" width="70" height="46" fill="white"/>
+        <rect x="1283" y="522" width="70" height="46" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.35"/>
+      </g>
+      <g id="Graphic_240_shadow" filter="url(#Shadow)">
+        <rect x="883" y="320" width="70" height="34"/>
+        <rect x="883" y="320" width="70" height="34" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0"/>
+      </g>
+      <g id="Graphic_241_shadow" filter="url(#Shadow)">
+        <rect x="1270" y="180" width="140" height="30"/>
+        <rect x="1270" y="180" width="140" height="30" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0"/>
+      </g>
+      <g id="Graphic_242_shadow" filter="url(#Shadow)">
+        <rect x="1120" y="252" width="80" height="30"/>
+        <rect x="1120" y="252" width="80" height="30" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0"/>
+      </g>
+      <g id="Graphic_243_shadow" filter="url(#Shadow)">
+        <rect x="65" y="664" width="580" height="43"/>
+        <rect x="65" y="664" width="580" height="43" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0"/>
+      </g>
+      <g id="Graphic_244_shadow" filter="url(#Shadow)">
+        <rect x="756" y="664" width="690" height="43"/>
+        <rect x="756" y="664" width="690" height="43" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0"/>
+      </g>
+      <g id="Graphic_245_shadow" filter="url(#Shadow)">
+        <rect x="1147" y="153" width="103" height="32"/>
+        <rect x="1147" y="153" width="103" height="32" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0"/>
+      </g>
+      <g id="Line_246_shadow" filter="url(#Shadow_2)">
+        <line x1="64" y1="40" x2="646" y2="40" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_247_shadow" filter="url(#Shadow_2)">
+        <line x1="680" y1="74" x2="680" y2="606" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_248_shadow" filter="url(#Shadow_2)">
+        <line x1="646" y1="640" x2="64" y2="640" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_249_shadow" filter="url(#Shadow_2)">
+        <line x1="30" y1="606" x2="30" y2="74" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_250_shadow" filter="url(#Shadow_2)">
+        <path d="M 646 40 L 652.6331 40.6533 L 659.0112 42.588096 L 664.8894 45.730033 L 670.0416 49.95837 L 674.27 55.11061 L 677.4119 60.98876 L 679.3467 67.36693 L 680 74" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_251_shadow" filter="url(#Shadow_2)">
+        <path d="M 680 606 L 679.3467 612.6331 L 677.4119 619.0112 L 674.27 624.8894 L 670.0416 630.0416 L 664.8894 634.27 L 659.0112 637.4119 L 652.6331 639.3467 L 646 640" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_252_shadow" filter="url(#Shadow_2)">
+        <path d="M 64 640 L 57.36693 639.3467 L 50.988763 637.4119 L 45.11061 634.27 L 39.95837 630.0416 L 35.730033 624.8894 L 32.588096 619.0112 L 30.6533 612.6331 L 30 606" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_253_shadow" filter="url(#Shadow_2)">
+        <path d="M 30 74 L 30.6533 67.36693 L 32.588096 60.98876 L 35.730033 55.11061 L 39.95837 49.95837 L 45.11061 45.730033 L 50.988763 42.588096 L 57.36693 40.6533 L 64 40" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_254_shadow" filter="url(#Shadow_2)">
+        <line x1="754" y1="40" x2="1436" y2="40" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_255_shadow" filter="url(#Shadow_2)">
+        <line x1="1470" y1="74" x2="1470" y2="606" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_256_shadow" filter="url(#Shadow_2)">
+        <line x1="1436" y1="640" x2="754" y2="640" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_257_shadow" filter="url(#Shadow_2)">
+        <line x1="720" y1="606" x2="720" y2="74" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_258_shadow" filter="url(#Shadow_2)">
+        <path d="M 1436 40 L 1442.633 40.6533 L 1449.0112 42.588096 L 1454.8894 45.730033 L 1460.0416 49.95837 L 1464.27 55.11061 L 1467.4119 60.98876 L 1469.3467 67.36693 L 1470 74" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_259_shadow" filter="url(#Shadow_2)">
+        <path d="M 1470 606 L 1469.3467 612.6331 L 1467.4119 619.0112 L 1464.27 624.8894 L 1460.0416 630.0416 L 1454.8894 634.27 L 1449.0112 637.4119 L 1442.633 639.3467 L 1436 640" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_260_shadow" filter="url(#Shadow_2)">
+        <path d="M 754 640 L 747.3669 639.3467 L 740.9888 637.4119 L 735.1106 634.27 L 729.9584 630.0416 L 725.73 624.8894 L 722.5881 619.0112 L 720.6533 612.6331 L 720 606" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_261_shadow" filter="url(#Shadow_2)">
+        <path d="M 720 74 L 720.6533 67.36693 L 722.5881 60.98876 L 725.73 55.11061 L 729.9584 49.95837 L 735.1106 45.730033 L 740.9888 42.588096 L 747.3669 40.6533 L 754 40" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_262_shadow" filter="url(#Shadow_2)">
+        <line x1="110" y1="438" x2="600" y2="438" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_263_shadow" filter="url(#Shadow_2)">
+        <line x1="625" y1="463" x2="625" y2="487" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_264_shadow" filter="url(#Shadow_2)">
+        <line x1="600" y1="512" x2="110" y2="512" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_265_shadow" filter="url(#Shadow_2)">
+        <line x1="85" y1="487" x2="85" y2="463" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_266_shadow" filter="url(#Shadow_2)">
+        <path d="M 600 438 L 604.87726 438.48037 L 609.5671 439.903 L 613.88926 442.21326 L 617.6777 445.32233 L 620.78674 449.11074 L 623.097 453.4329 L 624.5196 458.12274 L 625 463" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_267_shadow" filter="url(#Shadow_2)">
+        <path d="M 625 487 L 624.5196 491.87726 L 623.097 496.5671 L 620.78674 500.88926 L 617.6777 504.67767 L 613.88926 507.78674 L 609.5671 510.097 L 604.87726 511.51963 L 600 512" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_268_shadow" filter="url(#Shadow_2)">
+        <path d="M 110 512 L 105.12274 511.51963 L 100.43291 510.097 L 96.11074 507.78674 L 92.32233 504.67767 L 89.21326 500.88926 L 86.90301 496.5671 L 85.48037 491.87726 L 85 487" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_269_shadow" filter="url(#Shadow_2)">
+        <path d="M 85 463 L 85.48037 458.12274 L 86.90301 453.4329 L 89.21326 449.11074 L 92.32233 445.32233 L 96.11074 442.21326 L 100.43291 439.903 L 105.12274 438.48037 L 110 438" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_270_shadow" filter="url(#Shadow_2)">
+        <line x1="110" y1="250" x2="600" y2="250" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_271_shadow" filter="url(#Shadow_2)">
+        <line x1="625" y1="275" x2="625" y2="290" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_272_shadow" filter="url(#Shadow_2)">
+        <line x1="600" y1="315" x2="110" y2="315" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_273_shadow" filter="url(#Shadow_2)">
+        <line x1="85" y1="290" x2="85" y2="275" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_274_shadow" filter="url(#Shadow_2)">
+        <path d="M 600 250 L 604.87726 250.48037 L 609.5671 251.903 L 613.88926 254.21326 L 617.6777 257.32233 L 620.78674 261.11074 L 623.097 265.4329 L 624.5196 270.12274 L 625 275" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_275_shadow" filter="url(#Shadow_2)">
+        <path d="M 625 290 L 624.5196 294.87726 L 623.097 299.5671 L 620.78674 303.88926 L 617.6777 307.67767 L 613.88926 310.78674 L 609.5671 313.097 L 604.87726 314.51963 L 600 315" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_276_shadow" filter="url(#Shadow_2)">
+        <path d="M 110 315 L 105.12274 314.51963 L 100.43291 313.097 L 96.11074 310.78674 L 92.32233 307.67767 L 89.21326 303.88926 L 86.90301 299.5671 L 85.48037 294.87726 L 85 290" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_277_shadow" filter="url(#Shadow_2)">
+        <path d="M 85 275 L 85.48037 270.12274 L 86.90301 265.4329 L 89.21326 261.11074 L 92.32233 257.32233 L 96.11074 254.21326 L 100.43291 251.903 L 105.12274 250.48037 L 110 250" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_278_shadow" filter="url(#Shadow_2)">
+        <line x1="1025" y1="294" x2="1149" y2="294" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_279_shadow" filter="url(#Shadow_2)">
+        <line x1="1174" y1="319" x2="1174" y2="329" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_280_shadow" filter="url(#Shadow_2)">
+        <line x1="1149" y1="354" x2="1025" y2="354" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_281_shadow" filter="url(#Shadow_2)">
+        <line x1="1e3" y1="329" x2="1e3" y2="319" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_282_shadow" filter="url(#Shadow_2)">
+        <path d="M 1149 294 L 1153.8773 294.48037 L 1158.5671 295.903 L 1162.8893 298.21326 L 1166.6777 301.32233 L 1169.7867 305.11074 L 1172.097 309.4329 L 1173.5196 314.12274 L 1174 319" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_283_shadow" filter="url(#Shadow_2)">
+        <path d="M 1174 329 L 1173.5196 333.87726 L 1172.097 338.5671 L 1169.7867 342.88926 L 1166.6777 346.67767 L 1162.8893 349.78674 L 1158.5671 352.097 L 1153.8773 353.51963 L 1149 354" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_284_shadow" filter="url(#Shadow_2)">
+        <path d="M 1025 354 L 1020.1227 353.51963 L 1015.4329 352.097 L 1011.1107 349.78674 L 1007.3223 346.67767 L 1004.2133 342.88926 L 1001.903 338.5671 L 1000.4804 333.87726 L 1e3 329" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_285_shadow" filter="url(#Shadow_2)">
+        <path d="M 1e3 319 L 1000.4804 314.12274 L 1001.903 309.4329 L 1004.2133 305.11074 L 1007.3223 301.32233 L 1011.1107 298.21326 L 1015.4329 295.903 L 1020.1227 294.48037 L 1025 294" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_286_shadow" filter="url(#Shadow_2)">
+        <line x1="777" y1="408" x2="971" y2="408" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_287_shadow" filter="url(#Shadow_2)">
+        <line x1="996" y1="433" x2="996" y2="443" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_288_shadow" filter="url(#Shadow_2)">
+        <line x1="971" y1="468" x2="777" y2="468" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_289_shadow" filter="url(#Shadow_2)">
+        <line x1="752" y1="443" x2="752" y2="433" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_290_shadow" filter="url(#Shadow_2)">
+        <path d="M 971 408 L 975.8773 408.48037 L 980.5671 409.903 L 984.8893 412.21326 L 988.6777 415.32233 L 991.7867 419.11074 L 994.097 423.4329 L 995.5196 428.12274 L 996 433" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_291_shadow" filter="url(#Shadow_2)">
+        <path d="M 996 443 L 995.5196 447.87726 L 994.097 452.5671 L 991.7867 456.88926 L 988.6777 460.67767 L 984.8893 463.78674 L 980.5671 466.097 L 975.8773 467.51963 L 971 468" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_292_shadow" filter="url(#Shadow_2)">
+        <path d="M 777 468 L 772.1227 467.51963 L 767.4329 466.097 L 763.1107 463.78674 L 759.3223 460.67767 L 756.2133 456.88926 L 753.903 452.5671 L 752.4804 447.87726 L 752 443" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_293_shadow" filter="url(#Shadow_2)">
+        <path d="M 752 433 L 752.4804 428.12274 L 753.903 423.4329 L 756.2133 419.11074 L 759.3223 415.32233 L 763.1107 412.21326 L 767.4329 409.903 L 772.1227 408.48037 L 777 408" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_294_shadow" filter="url(#Shadow_2)">
+        <line x1="155" y1="555" x2="155" y2="523.184" marker-end="url(#FilledArrow_Marker)" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.9"/>
+      </g>
+      <g id="Line_295_shadow" filter="url(#Shadow_2)">
+        <line x1="155" y1="438" x2="155" y2="414.184" marker-end="url(#FilledArrow_Marker)" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.9"/>
+      </g>
+      <g id="Line_296_shadow" filter="url(#Shadow_2)">
+        <line x1="155" y1="357" x2="155" y2="326.184" marker-end="url(#FilledArrow_Marker)" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.9"/>
+      </g>
+      <g id="Line_297_shadow" filter="url(#Shadow_2)">
+        <line x1="155" y1="250" x2="155" y2="198.184" marker-end="url(#FilledArrow_Marker)" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.9"/>
+      </g>
+      <g id="Line_298_shadow" filter="url(#Shadow_2)">
+        <line x1="285" y1="555" x2="285" y2="523.184" marker-end="url(#FilledArrow_Marker)" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.9"/>
+      </g>
+      <g id="Line_299_shadow" filter="url(#Shadow_2)">
+        <line x1="285" y1="438" x2="285" y2="414.184" marker-end="url(#FilledArrow_Marker)" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.9"/>
+      </g>
+      <g id="Line_300_shadow" filter="url(#Shadow_2)">
+        <line x1="285" y1="357" x2="285" y2="326.184" marker-end="url(#FilledArrow_Marker)" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.9"/>
+      </g>
+      <g id="Line_301_shadow" filter="url(#Shadow_2)">
+        <line x1="285" y1="250" x2="285" y2="198.184" marker-end="url(#FilledArrow_Marker)" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.9"/>
+      </g>
+      <g id="Line_302_shadow" filter="url(#Shadow_2)">
+        <line x1="415" y1="555" x2="415" y2="523.184" marker-end="url(#FilledArrow_Marker)" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.9"/>
+      </g>
+      <g id="Line_303_shadow" filter="url(#Shadow_2)">
+        <line x1="415" y1="438" x2="415" y2="414.184" marker-end="url(#FilledArrow_Marker)" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.9"/>
+      </g>
+      <g id="Line_304_shadow" filter="url(#Shadow_2)">
+        <line x1="415" y1="357" x2="415" y2="326.184" marker-end="url(#FilledArrow_Marker)" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.9"/>
+      </g>
+      <g id="Line_305_shadow" filter="url(#Shadow_2)">
+        <line x1="415" y1="250" x2="415" y2="198.184" marker-end="url(#FilledArrow_Marker)" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.9"/>
+      </g>
+      <g id="Line_306_shadow" filter="url(#Shadow_2)">
+        <line x1="545" y1="555" x2="545" y2="523.184" marker-end="url(#FilledArrow_Marker)" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.9"/>
+      </g>
+      <g id="Line_307_shadow" filter="url(#Shadow_2)">
+        <line x1="545" y1="438" x2="545" y2="414.184" marker-end="url(#FilledArrow_Marker)" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.9"/>
+      </g>
+      <g id="Line_308_shadow" filter="url(#Shadow_2)">
+        <line x1="545" y1="357" x2="545" y2="326.184" marker-end="url(#FilledArrow_Marker)" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.9"/>
+      </g>
+      <g id="Line_309_shadow" filter="url(#Shadow_2)">
+        <line x1="545" y1="250" x2="545" y2="198.184" marker-end="url(#FilledArrow_Marker)" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.9"/>
+      </g>
+      <g id="Line_310_shadow" filter="url(#Shadow_2)">
+        <path d="M 190 161 L 216 161 L 216 217 L 238 217 L 238 238.816" marker-end="url(#FilledArrow_Marker)" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="7.6,7.6" stroke-width="1.9"/>
+      </g>
+      <g id="Line_311_shadow" filter="url(#Shadow_2)">
+        <path d="M 320 161 L 346 161 L 346 217 L 368 217 L 368 238.816" marker-end="url(#FilledArrow_Marker)" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="7.6,7.6" stroke-width="1.9"/>
+      </g>
+      <g id="Line_312_shadow" filter="url(#Shadow_2)">
+        <path d="M 450 161 L 476 161 L 476 217 L 498 217 L 498 238.816" marker-end="url(#FilledArrow_Marker)" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="7.6,7.6" stroke-width="1.9"/>
+      </g>
+      <g id="Line_313_shadow" filter="url(#Shadow_2)">
+        <line x1="791" y1="551" x2="791" y2="479.184" marker-end="url(#FilledArrow_Marker)" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.9"/>
+      </g>
+      <g id="Line_314_shadow" filter="url(#Shadow_2)">
+        <line x1="871" y1="551" x2="871" y2="479.184" marker-end="url(#FilledArrow_Marker)" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.9"/>
+      </g>
+      <g id="Line_315_shadow" filter="url(#Shadow_2)">
+        <line x1="951" y1="551" x2="951" y2="479.184" marker-end="url(#FilledArrow_Marker)" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.9"/>
+      </g>
+      <g id="Line_316_shadow" filter="url(#Shadow_2)">
+        <path d="M 874 408 L 874 324 L 988.816 324" marker-end="url(#FilledArrow_Marker)" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.9"/>
+      </g>
+      <g id="Line_317_shadow" filter="url(#Shadow_2)">
+        <line x1="1081" y1="551" x2="1081" y2="365.184" marker-end="url(#FilledArrow_Marker)" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.9"/>
+      </g>
+      <g id="Line_318_shadow" filter="url(#Shadow_2)">
+        <path d="M 1259 488 L 1212 488 L 1212 324 L 1185.184 324" marker-end="url(#FilledArrow_Marker)" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.9"/>
+      </g>
+      <g id="Line_319_shadow" filter="url(#Shadow_2)">
+        <path d="M 1377 488 L 1425 488 L 1425 219 L 1145.184 219" marker-end="url(#FilledArrow_Marker)" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.9"/>
+      </g>
+      <g id="Line_320_shadow" filter="url(#Shadow_2)">
+        <line x1="1110" y1="294" x2="1110" y2="254.184" marker-end="url(#FilledArrow_Marker)" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.9"/>
+      </g>
+      <g id="Line_321_shadow" filter="url(#Shadow_2)">
+        <line x1="1110" y1="195" x2="1110" y2="166.184" marker-end="url(#FilledArrow_Marker)" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.9"/>
+      </g>
+      <g id="Line_322_shadow" filter="url(#Shadow_2)">
+        <path d="M 625 282 L 692 282 L 692 92 L 719 92" stroke="#929292" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="5.2,5.2" stroke-width="1.3"/>
+      </g>
+      <g id="Graphic_182">
+        <rect x="0" y="0" width="1500" height="725" fill="white"/>
+        <rect x="0" y="0" width="1500" height="725" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0"/>
+      </g>
+      <g id="Graphic_183">
+        <rect x="120" y="555" width="70" height="50" fill="#fce8ce"/>
+        <rect x="120" y="555" width="70" height="50" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.35"/>
+        <text transform="translate(124 565.15)" fill="#1a1a1a">
+          <tspan font-family="Helvetica Neue" font-size="25" fill="#1a1a1a" x="22.2" y="24" xml:space="preserve">D</tspan>
+        </text>
+      </g>
+      <g id="Graphic_184">
+        <rect x="250" y="555" width="70" height="50" fill="#ded5e8"/>
+        <rect x="250" y="555" width="70" height="50" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.35"/>
+        <text transform="translate(254 565.15)" fill="#1a1a1a">
+          <tspan font-family="Helvetica Neue" font-size="25" fill="#1a1a1a" x="13.6375" y="24" xml:space="preserve">[M]</tspan>
+        </text>
+      </g>
+      <g id="Graphic_185">
+        <rect x="380" y="555" width="70" height="50" fill="#ded5e8"/>
+        <rect x="380" y="555" width="70" height="50" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.35"/>
+        <text transform="translate(384 565.15)" fill="#1a1a1a">
+          <tspan font-family="Helvetica Neue" font-size="25" fill="#1a1a1a" x="13.6375" y="24" xml:space="preserve">[M]</tspan>
+        </text>
+      </g>
+      <g id="Graphic_186">
+        <rect x="510" y="555" width="70" height="50" fill="#ded5e8"/>
+        <rect x="510" y="555" width="70" height="50" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.35"/>
+        <text transform="translate(514 565.15)" fill="#1a1a1a">
+          <tspan font-family="Helvetica Neue" font-size="25" fill="#1a1a1a" x="13.6375" y="24" xml:space="preserve">[M]</tspan>
+        </text>
+      </g>
+      <g id="Graphic_187">
+        <rect x="110" y="438" width="490" height="74" fill="#d9e9d5"/>
+        <rect x="110" y="438" width="490" height="74" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0"/>
+      </g>
+      <g id="Graphic_188">
+        <rect x="85" y="463" width="25" height="24" fill="#d9e9d5"/>
+        <rect x="85" y="463" width="25" height="24" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0"/>
+      </g>
+      <g id="Graphic_189">
+        <rect x="600" y="463" width="25" height="24" fill="#d9e9d5"/>
+        <rect x="600" y="463" width="25" height="24" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0"/>
+      </g>
+      <g id="Graphic_190">
+        <circle cx="110" cy="463" r="25.0000399475474" fill="#d9e9d5"/>
+        <circle cx="110" cy="463" r="25.0000399475474" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0"/>
+      </g>
+      <g id="Graphic_191">
+        <circle cx="600" cy="463" r="25.0000399475474" fill="#d9e9d5"/>
+        <circle cx="600" cy="463" r="25.0000399475474" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0"/>
+      </g>
+      <g id="Graphic_192">
+        <circle cx="110" cy="487" r="25.0000399475474" fill="#d9e9d5"/>
+        <circle cx="110" cy="487" r="25.0000399475474" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0"/>
+      </g>
+      <g id="Graphic_193">
+        <circle cx="600" cy="487" r="25.0000399475474" fill="#d9e9d5"/>
+        <circle cx="600" cy="487" r="25.0000399475474" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0"/>
+      </g>
+      <g id="Graphic_194">
+        <rect x="85" y="438" width="540" height="74" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0"/>
+        <text transform="translate(89 458.622)" fill="#1a1a1a">
+          <tspan font-family="Helvetica Neue" font-size="27" fill="#1a1a1a" x="188.7665" y="26" xml:space="preserve">Parallel Draft</tspan>
+        </text>
+      </g>
+      <g id="Graphic_195">
+        <rect x="114" y="357" width="82" height="46" fill="#f3f3f3"/>
+        <rect x="114" y="357" width="82" height="46" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.35"/>
+        <text transform="translate(118 366.178)" fill="#1a1a1a">
+          <tspan font-family="Helvetica Neue" font-size="23" fill="#1a1a1a" x="10.182" y="22" xml:space="preserve">h₁, z₁</tspan>
+        </text>
+      </g>
+      <g id="Graphic_196">
+        <rect x="244" y="357" width="82" height="46" fill="#f3f3f3"/>
+        <rect x="244" y="357" width="82" height="46" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.35"/>
+        <text transform="translate(248 366.178)" fill="#1a1a1a">
+          <tspan font-family="Helvetica Neue" font-size="23" fill="#1a1a1a" x="10.182" y="22" xml:space="preserve">h₂, z₂</tspan>
+        </text>
+      </g>
+      <g id="Graphic_197">
+        <rect x="374" y="357" width="82" height="46" fill="#f3f3f3"/>
+        <rect x="374" y="357" width="82" height="46" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.35"/>
+        <text transform="translate(378 366.178)" fill="#1a1a1a">
+          <tspan font-family="Helvetica Neue" font-size="23" fill="#1a1a1a" x="10.182" y="22" xml:space="preserve">h₃, z₃</tspan>
+        </text>
+      </g>
+      <g id="Graphic_198">
+        <rect x="504" y="357" width="82" height="46" fill="#f3f3f3"/>
+        <rect x="504" y="357" width="82" height="46" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.35"/>
+        <text transform="translate(508 366.178)" fill="#1a1a1a">
+          <tspan font-family="Helvetica Neue" font-size="23" fill="#1a1a1a" x="10.182" y="22" xml:space="preserve">h₄, z₄</tspan>
+        </text>
+      </g>
+      <g id="Graphic_199">
+        <rect x="110" y="250" width="490" height="65" fill="#ded5e8"/>
+        <rect x="110" y="250" width="490" height="65" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0"/>
+      </g>
+      <g id="Graphic_200">
+        <rect x="85" y="275" width="25" height="15" fill="#ded5e8"/>
+        <rect x="85" y="275" width="25" height="15" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0"/>
+      </g>
+      <g id="Graphic_201">
+        <rect x="600" y="275" width="25" height="15" fill="#ded5e8"/>
+        <rect x="600" y="275" width="25" height="15" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0"/>
+      </g>
+      <g id="Graphic_202">
+        <circle cx="110" cy="275" r="25.0000399475474" fill="#ded5e8"/>
+        <circle cx="110" cy="275" r="25.0000399475474" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0"/>
+      </g>
+      <g id="Graphic_203">
+        <circle cx="600" cy="275" r="25.0000399475474" fill="#ded5e8"/>
+        <circle cx="600" cy="275" r="25.0000399475474" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0"/>
+      </g>
+      <g id="Graphic_204">
+        <circle cx="110" cy="290" r="25.0000399475474" fill="#ded5e8"/>
+        <circle cx="110" cy="290" r="25.0000399475474" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0"/>
+      </g>
+      <g id="Graphic_205">
+        <circle cx="600" cy="290" r="25.0000399475474" fill="#ded5e8"/>
+        <circle cx="600" cy="290" r="25.0000399475474" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0"/>
+      </g>
+      <g id="Graphic_206">
+        <rect x="85" y="250" width="540" height="65" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0"/>
+        <text transform="translate(89 266.636)" fill="#1a1a1a">
+          <tspan font-family="Helvetica Neue" font-size="26" fill="#1a1a1a" x="118.567" y="25" xml:space="preserve">Markov + Prefix Reranker</tspan>
+        </text>
+      </g>
+      <g id="Graphic_207">
+        <rect x="120" y="135" width="70" height="52" fill="#ded5e8"/>
+        <rect x="120" y="135" width="70" height="52" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.35"/>
+        <text transform="translate(124 146.15)" fill="#1a1a1a">
+          <tspan font-family="Helvetica Neue" font-size="25" fill="#1a1a1a" x="23.3625" y="24" xml:space="preserve">E</tspan>
+        </text>
+      </g>
+      <g id="Graphic_208">
+        <rect x="250" y="135" width="70" height="52" fill="#ded5e8"/>
+        <rect x="250" y="135" width="70" height="52" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.35"/>
+        <text transform="translate(254 146.15)" fill="#1a1a1a">
+          <tspan font-family="Helvetica Neue" font-size="25" fill="#1a1a1a" x="23.825" y="24" xml:space="preserve">F</tspan>
+        </text>
+      </g>
+      <g id="Graphic_209">
+        <rect x="380" y="135" width="70" height="52" fill="#c5b1d9"/>
+        <rect x="380" y="135" width="70" height="52" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.35"/>
+        <text transform="translate(384 146.15)" fill="#1a1a1a">
+          <tspan font-family="Helvetica Neue" font-size="25" fill="#1a1a1a" x="21.5125" y="24" xml:space="preserve">G</tspan>
+        </text>
+      </g>
+      <g id="Graphic_210">
+        <rect x="510" y="135" width="70" height="52" fill="#ded5e8"/>
+        <rect x="510" y="135" width="70" height="52" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.35"/>
+        <text transform="translate(514 146.15)" fill="#1a1a1a">
+          <tspan font-family="Helvetica Neue" font-size="25" fill="#1a1a1a" x="21.975" y="24" xml:space="preserve">H</tspan>
+        </text>
+      </g>
+      <g id="Graphic_211">
+        <rect x="205" y="68" width="300" height="37" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0"/>
+        <text transform="translate(209 72.164)" fill="#1a1a1a">
+          <tspan font-family="Helvetica Neue" font-size="24" fill="#1a1a1a" x="37.988" y="23" xml:space="preserve">Sequential selection</tspan>
+        </text>
+      </g>
+      <g id="Graphic_212">
+        <rect x="1e3" y="61" width="220" height="28" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0"/>
+        <text transform="translate(1004 61.692)" fill="#1a1a1a">
+          <tspan font-family="Helvetica Neue" font-size="22" fill="#1a1a1a" x="73.803" y="21" xml:space="preserve">Step 3</tspan>
+        </text>
+      </g>
+      <g id="Graphic_213">
+        <rect x="1078" y="103" width="64" height="52" fill="#c5b1d9"/>
+        <rect x="1078" y="103" width="64" height="52" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.35"/>
+        <text transform="translate(1082 114.15)" fill="#1a1a1a">
+          <tspan font-family="Helvetica Neue" font-size="25" fill="#1a1a1a" x="18.5125" y="24" xml:space="preserve">G</tspan>
+        </text>
+      </g>
+      <g id="Graphic_214">
+        <circle cx="1110" cy="219" r="24.0000383496456" fill="white"/>
+        <circle cx="1110" cy="219" r="24.0000383496456" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.35"/>
+        <text transform="translate(1094.8 201.08)" fill="#1a1a1a">
+          <tspan font-family="Helvetica Neue" font-size="30" fill="#1a1a1a" x="6.2" y="29" xml:space="preserve">+</tspan>
+        </text>
+      </g>
+      <g id="Graphic_215">
+        <rect x="1025" y="294" width="124" height="60" fill="#ded5e8"/>
+        <rect x="1025" y="294" width="124" height="60" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0"/>
+      </g>
+      <g id="Graphic_216">
+        <rect x="1e3" y="319" width="25" height="10" fill="#ded5e8"/>
+        <rect x="1e3" y="319" width="25" height="10" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0"/>
+      </g>
+      <g id="Graphic_217">
+        <rect x="1149" y="319" width="25" height="10" fill="#ded5e8"/>
+        <rect x="1149" y="319" width="25" height="10" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0"/>
+      </g>
+      <g id="Graphic_218">
+        <circle cx="1025" cy="319" r="25.0000399475474" fill="#ded5e8"/>
+        <circle cx="1025" cy="319" r="25.0000399475474" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0"/>
+      </g>
+      <g id="Graphic_219">
+        <circle cx="1149" cy="319" r="25.0000399475475" fill="#ded5e8"/>
+        <circle cx="1149" cy="319" r="25.0000399475475" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0"/>
+      </g>
+      <g id="Graphic_220">
+        <circle cx="1025" cy="329" r="25.0000399475474" fill="#ded5e8"/>
+        <circle cx="1025" cy="329" r="25.0000399475474" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0"/>
+      </g>
+      <g id="Graphic_221">
+        <circle cx="1149" cy="329" r="25.0000399475474" fill="#ded5e8"/>
+        <circle cx="1149" cy="329" r="25.0000399475474" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0"/>
+      </g>
+      <g id="Graphic_222">
+        <rect x="1e3" y="294" width="174" height="60" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0"/>
+        <text transform="translate(1004 309.15)" fill="#1a1a1a">
+          <tspan font-family="Helvetica Neue" font-size="25" fill="#1a1a1a" x="46.2" y="24" xml:space="preserve">Scorer</tspan>
+        </text>
+      </g>
+      <g id="Graphic_223">
+        <rect x="777" y="408" width="194" height="60" fill="#ded5e8"/>
+        <rect x="777" y="408" width="194" height="60" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0"/>
+      </g>
+      <g id="Graphic_224">
+        <rect x="752" y="433" width="25" height="10" fill="#ded5e8"/>
+        <rect x="752" y="433" width="25" height="10" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0"/>
+      </g>
+      <g id="Graphic_225">
+        <rect x="971" y="433" width="25" height="10" fill="#ded5e8"/>
+        <rect x="971" y="433" width="25" height="10" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0"/>
+      </g>
+      <g id="Graphic_226">
+        <circle cx="777" cy="433" r="25.0000399475474" fill="#ded5e8"/>
+        <circle cx="777" cy="433" r="25.0000399475474" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0"/>
+      </g>
+      <g id="Graphic_227">
+        <circle cx="971" cy="433" r="25.0000399475474" fill="#ded5e8"/>
+        <circle cx="971" cy="433" r="25.0000399475474" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0"/>
+      </g>
+      <g id="Graphic_228">
+        <circle cx="777" cy="443" r="25.0000399475474" fill="#ded5e8"/>
+        <circle cx="777" cy="443" r="25.0000399475474" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0"/>
+      </g>
+      <g id="Graphic_229">
+        <circle cx="971" cy="443" r="25.0000399475474" fill="#ded5e8"/>
+        <circle cx="971" cy="443" r="25.0000399475474" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0"/>
+      </g>
+      <g id="Graphic_230">
+        <rect x="752" y="408" width="244" height="60" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0"/>
+        <text transform="translate(756 424.692)" fill="#1a1a1a">
+          <tspan font-family="Helvetica Neue" font-size="22" fill="#1a1a1a" x="28.372" y="21" xml:space="preserve">Prefix Transformer</tspan>
+        </text>
+      </g>
+      <g id="Graphic_231">
+        <rect x="759" y="551" width="64" height="50" fill="#fce8ce"/>
+        <rect x="759" y="551" width="64" height="50" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.35"/>
+        <text transform="translate(763 561.15)" fill="#1a1a1a">
+          <tspan font-family="Helvetica Neue" font-size="25" fill="#1a1a1a" x="19.2" y="24" xml:space="preserve">D</tspan>
+        </text>
+      </g>
+      <g id="Graphic_232">
+        <rect x="839" y="551" width="64" height="50" fill="#ded5e8"/>
+        <rect x="839" y="551" width="64" height="50" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.35"/>
+        <text transform="translate(843 561.15)" fill="#1a1a1a">
+          <tspan font-family="Helvetica Neue" font-size="25" fill="#1a1a1a" x="20.3625" y="24" xml:space="preserve">E</tspan>
+        </text>
+      </g>
+      <g id="Graphic_233">
+        <rect x="919" y="551" width="64" height="50" fill="#ded5e8"/>
+        <rect x="919" y="551" width="64" height="50" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.35"/>
+        <text transform="translate(923 561.15)" fill="#1a1a1a">
+          <tspan font-family="Helvetica Neue" font-size="25" fill="#1a1a1a" x="20.825" y="24" xml:space="preserve">F</tspan>
+        </text>
+      </g>
+      <g id="Graphic_234">
+        <rect x="1048" y="551" width="66" height="50" fill="#f3f3f3"/>
+        <rect x="1048" y="551" width="66" height="50" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.35"/>
+        <text transform="translate(1052 561.15)" fill="#1a1a1a">
+          <tspan font-family="Helvetica Neue" font-size="25" fill="#1a1a1a" x="17.425" y="24" xml:space="preserve">h₃</tspan>
+        </text>
+      </g>
+      <g id="Graphic_235">
+        <rect x="1259" y="393" width="118" height="195" fill="#fffbf4"/>
+        <rect x="1259" y="393" width="118" height="195" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.35"/>
+      </g>
+      <g id="Graphic_236">
+        <rect x="1257" y="352" width="160" height="32" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0"/>
+        <text transform="translate(1261 355.706)" fill="#1a1a1a">
+          <tspan font-family="Helvetica Neue" font-size="21" fill="#1a1a1a" x="5.1985" y="20" xml:space="preserve">Markov Top-16</tspan>
+        </text>
+      </g>
+      <g id="Graphic_237">
+        <rect x="1283" y="406" width="70" height="46" fill="#fce8ce"/>
+        <rect x="1283" y="406" width="70" height="46" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.35"/>
+        <text transform="translate(1287 414.15)" fill="#1a1a1a">
+          <tspan font-family="Helvetica Neue" font-size="25" fill="#1a1a1a" x="21.975" y="24" xml:space="preserve">H</tspan>
+        </text>
+      </g>
+      <g id="Graphic_238">
+        <rect x="1283" y="464" width="70" height="46" fill="#fce8ce"/>
+        <rect x="1283" y="464" width="70" height="46" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.35"/>
+        <text transform="translate(1287 472.15)" fill="#1a1a1a">
+          <tspan font-family="Helvetica Neue" font-size="25" fill="#1a1a1a" x="21.5125" y="24" xml:space="preserve">G</tspan>
+        </text>
+      </g>
+      <g id="Graphic_239">
+        <rect x="1283" y="522" width="70" height="46" fill="white"/>
+        <rect x="1283" y="522" width="70" height="46" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.35"/>
+        <text transform="translate(1287 532.4563)" fill="#1a1a1a">
+          <tspan font-family="Apple Symbols" font-size="25" fill="#1a1a1a" x="25.866943" y="17" xml:space="preserve">⋮</tspan>
+        </text>
+      </g>
+      <g id="Graphic_240">
+        <rect x="883" y="320" width="70" height="34" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0"/>
+        <text transform="translate(887 323.692)" fill="#1a1a1a">
+          <tspan font-family="Helvetica Neue" font-size="22" fill="#1a1a1a" x="23.267" y="21" xml:space="preserve">r₃</tspan>
+        </text>
+      </g>
+      <g id="Graphic_241">
+        <rect x="1270" y="180" width="140" height="30" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0"/>
+        <text transform="translate(1274 183.22)" fill="#1a1a1a">
+          <tspan font-family="Helvetica Neue" font-size="20" fill="#1a1a1a" x="16.92" y="19" xml:space="preserve">base score</tspan>
+        </text>
+      </g>
+      <g id="Graphic_242">
+        <rect x="1120" y="252" width="80" height="30" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0"/>
+        <text transform="translate(1124 253.178)" fill="#1a1a1a">
+          <tspan font-family="Helvetica Neue" font-size="23" fill="#1a1a1a" x="28.548" y="22" xml:space="preserve">Δ</tspan>
+        </text>
+      </g>
+      <g id="Graphic_243">
+        <rect x="65" y="664" width="580" height="43" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0"/>
+        <text transform="translate(69 669.636)" fill="#1a1a1a">
+          <tspan font-family="Helvetica Neue" font-size="26" fill="#1a1a1a" x="177.658" y="25" xml:space="preserve">(a) Block decoding</tspan>
+        </text>
+      </g>
+      <g id="Graphic_244">
+        <rect x="756" y="664" width="690" height="43" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0"/>
+        <text transform="translate(760 669.636)" fill="#1a1a1a">
+          <tspan font-family="Helvetica Neue" font-size="26" fill="#1a1a1a" x="158.74" y="25" xml:space="preserve">(b) Prefix-conditioned reranking</tspan>
+        </text>
+      </g>
+      <g id="Graphic_245">
+        <rect x="1147" y="153" width="103" height="32" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="0"/>
+        <text transform="translate(1151 157.734)" fill="#1a1a1a">
+          <tspan font-family="Helvetica Neue" font-size="19" fill="#1a1a1a" x="15.922" y="18" xml:space="preserve">argmax</tspan>
+        </text>
+      </g>
+      <g id="Line_246">
+        <line x1="64" y1="40" x2="646" y2="40" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_247">
+        <line x1="680" y1="74" x2="680" y2="606" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_248">
+        <line x1="646" y1="640" x2="64" y2="640" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_249">
+        <line x1="30" y1="606" x2="30" y2="74" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_250">
+        <path d="M 646 40 L 652.6331 40.6533 L 659.0112 42.588096 L 664.8894 45.730033 L 670.0416 49.95837 L 674.27 55.11061 L 677.4119 60.98876 L 679.3467 67.36693 L 680 74" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_251">
+        <path d="M 680 606 L 679.3467 612.6331 L 677.4119 619.0112 L 674.27 624.8894 L 670.0416 630.0416 L 664.8894 634.27 L 659.0112 637.4119 L 652.6331 639.3467 L 646 640" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_252">
+        <path d="M 64 640 L 57.36693 639.3467 L 50.988763 637.4119 L 45.11061 634.27 L 39.95837 630.0416 L 35.730033 624.8894 L 32.588096 619.0112 L 30.6533 612.6331 L 30 606" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_253">
+        <path d="M 30 74 L 30.6533 67.36693 L 32.588096 60.98876 L 35.730033 55.11061 L 39.95837 49.95837 L 45.11061 45.730033 L 50.988763 42.588096 L 57.36693 40.6533 L 64 40" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_254">
+        <line x1="754" y1="40" x2="1436" y2="40" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_255">
+        <line x1="1470" y1="74" x2="1470" y2="606" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_256">
+        <line x1="1436" y1="640" x2="754" y2="640" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_257">
+        <line x1="720" y1="606" x2="720" y2="74" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_258">
+        <path d="M 1436 40 L 1442.633 40.6533 L 1449.0112 42.588096 L 1454.8894 45.730033 L 1460.0416 49.95837 L 1464.27 55.11061 L 1467.4119 60.98876 L 1469.3467 67.36693 L 1470 74" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_259">
+        <path d="M 1470 606 L 1469.3467 612.6331 L 1467.4119 619.0112 L 1464.27 624.8894 L 1460.0416 630.0416 L 1454.8894 634.27 L 1449.0112 637.4119 L 1442.633 639.3467 L 1436 640" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_260">
+        <path d="M 754 640 L 747.3669 639.3467 L 740.9888 637.4119 L 735.1106 634.27 L 729.9584 630.0416 L 725.73 624.8894 L 722.5881 619.0112 L 720.6533 612.6331 L 720 606" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_261">
+        <path d="M 720 74 L 720.6533 67.36693 L 722.5881 60.98876 L 725.73 55.11061 L 729.9584 49.95837 L 735.1106 45.730033 L 740.9888 42.588096 L 747.3669 40.6533 L 754 40" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_262">
+        <line x1="110" y1="438" x2="600" y2="438" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_263">
+        <line x1="625" y1="463" x2="625" y2="487" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_264">
+        <line x1="600" y1="512" x2="110" y2="512" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_265">
+        <line x1="85" y1="487" x2="85" y2="463" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_266">
+        <path d="M 600 438 L 604.87726 438.48037 L 609.5671 439.903 L 613.88926 442.21326 L 617.6777 445.32233 L 620.78674 449.11074 L 623.097 453.4329 L 624.5196 458.12274 L 625 463" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_267">
+        <path d="M 625 487 L 624.5196 491.87726 L 623.097 496.5671 L 620.78674 500.88926 L 617.6777 504.67767 L 613.88926 507.78674 L 609.5671 510.097 L 604.87726 511.51963 L 600 512" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_268">
+        <path d="M 110 512 L 105.12274 511.51963 L 100.43291 510.097 L 96.11074 507.78674 L 92.32233 504.67767 L 89.21326 500.88926 L 86.90301 496.5671 L 85.48037 491.87726 L 85 487" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_269">
+        <path d="M 85 463 L 85.48037 458.12274 L 86.90301 453.4329 L 89.21326 449.11074 L 92.32233 445.32233 L 96.11074 442.21326 L 100.43291 439.903 L 105.12274 438.48037 L 110 438" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_270">
+        <line x1="110" y1="250" x2="600" y2="250" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_271">
+        <line x1="625" y1="275" x2="625" y2="290" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_272">
+        <line x1="600" y1="315" x2="110" y2="315" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_273">
+        <line x1="85" y1="290" x2="85" y2="275" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_274">
+        <path d="M 600 250 L 604.87726 250.48037 L 609.5671 251.903 L 613.88926 254.21326 L 617.6777 257.32233 L 620.78674 261.11074 L 623.097 265.4329 L 624.5196 270.12274 L 625 275" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_275">
+        <path d="M 625 290 L 624.5196 294.87726 L 623.097 299.5671 L 620.78674 303.88926 L 617.6777 307.67767 L 613.88926 310.78674 L 609.5671 313.097 L 604.87726 314.51963 L 600 315" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_276">
+        <path d="M 110 315 L 105.12274 314.51963 L 100.43291 313.097 L 96.11074 310.78674 L 92.32233 307.67767 L 89.21326 303.88926 L 86.90301 299.5671 L 85.48037 294.87726 L 85 290" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_277">
+        <path d="M 85 275 L 85.48037 270.12274 L 86.90301 265.4329 L 89.21326 261.11074 L 92.32233 257.32233 L 96.11074 254.21326 L 100.43291 251.903 L 105.12274 250.48037 L 110 250" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_278">
+        <line x1="1025" y1="294" x2="1149" y2="294" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_279">
+        <line x1="1174" y1="319" x2="1174" y2="329" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_280">
+        <line x1="1149" y1="354" x2="1025" y2="354" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_281">
+        <line x1="1e3" y1="329" x2="1e3" y2="319" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_282">
+        <path d="M 1149 294 L 1153.8773 294.48037 L 1158.5671 295.903 L 1162.8893 298.21326 L 1166.6777 301.32233 L 1169.7867 305.11074 L 1172.097 309.4329 L 1173.5196 314.12274 L 1174 319" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_283">
+        <path d="M 1174 329 L 1173.5196 333.87726 L 1172.097 338.5671 L 1169.7867 342.88926 L 1166.6777 346.67767 L 1162.8893 349.78674 L 1158.5671 352.097 L 1153.8773 353.51963 L 1149 354" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_284">
+        <path d="M 1025 354 L 1020.1227 353.51963 L 1015.4329 352.097 L 1011.1107 349.78674 L 1007.3223 346.67767 L 1004.2133 342.88926 L 1001.903 338.5671 L 1000.4804 333.87726 L 1e3 329" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_285">
+        <path d="M 1e3 319 L 1000.4804 314.12274 L 1001.903 309.4329 L 1004.2133 305.11074 L 1007.3223 301.32233 L 1011.1107 298.21326 L 1015.4329 295.903 L 1020.1227 294.48037 L 1025 294" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_286">
+        <line x1="777" y1="408" x2="971" y2="408" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_287">
+        <line x1="996" y1="433" x2="996" y2="443" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_288">
+        <line x1="971" y1="468" x2="777" y2="468" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_289">
+        <line x1="752" y1="443" x2="752" y2="433" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_290">
+        <path d="M 971 408 L 975.8773 408.48037 L 980.5671 409.903 L 984.8893 412.21326 L 988.6777 415.32233 L 991.7867 419.11074 L 994.097 423.4329 L 995.5196 428.12274 L 996 433" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_291">
+        <path d="M 996 443 L 995.5196 447.87726 L 994.097 452.5671 L 991.7867 456.88926 L 988.6777 460.67767 L 984.8893 463.78674 L 980.5671 466.097 L 975.8773 467.51963 L 971 468" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_292">
+        <path d="M 777 468 L 772.1227 467.51963 L 767.4329 466.097 L 763.1107 463.78674 L 759.3223 460.67767 L 756.2133 456.88926 L 753.903 452.5671 L 752.4804 447.87726 L 752 443" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_293">
+        <path d="M 752 433 L 752.4804 428.12274 L 753.903 423.4329 L 756.2133 419.11074 L 759.3223 415.32233 L 763.1107 412.21326 L 767.4329 409.903 L 772.1227 408.48037 L 777 408" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+      </g>
+      <g id="Line_294">
+        <line x1="155" y1="555" x2="155" y2="523.184" marker-end="url(#FilledArrow_Marker)" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.9"/>
+      </g>
+      <g id="Line_295">
+        <line x1="155" y1="438" x2="155" y2="414.184" marker-end="url(#FilledArrow_Marker)" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.9"/>
+      </g>
+      <g id="Line_296">
+        <line x1="155" y1="357" x2="155" y2="326.184" marker-end="url(#FilledArrow_Marker)" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.9"/>
+      </g>
+      <g id="Line_297">
+        <line x1="155" y1="250" x2="155" y2="198.184" marker-end="url(#FilledArrow_Marker)" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.9"/>
+      </g>
+      <g id="Line_298">
+        <line x1="285" y1="555" x2="285" y2="523.184" marker-end="url(#FilledArrow_Marker)" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.9"/>
+      </g>
+      <g id="Line_299">
+        <line x1="285" y1="438" x2="285" y2="414.184" marker-end="url(#FilledArrow_Marker)" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.9"/>
+      </g>
+      <g id="Line_300">
+        <line x1="285" y1="357" x2="285" y2="326.184" marker-end="url(#FilledArrow_Marker)" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.9"/>
+      </g>
+      <g id="Line_301">
+        <line x1="285" y1="250" x2="285" y2="198.184" marker-end="url(#FilledArrow_Marker)" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.9"/>
+      </g>
+      <g id="Line_302">
+        <line x1="415" y1="555" x2="415" y2="523.184" marker-end="url(#FilledArrow_Marker)" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.9"/>
+      </g>
+      <g id="Line_303">
+        <line x1="415" y1="438" x2="415" y2="414.184" marker-end="url(#FilledArrow_Marker)" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.9"/>
+      </g>
+      <g id="Line_304">
+        <line x1="415" y1="357" x2="415" y2="326.184" marker-end="url(#FilledArrow_Marker)" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.9"/>
+      </g>
+      <g id="Line_305">
+        <line x1="415" y1="250" x2="415" y2="198.184" marker-end="url(#FilledArrow_Marker)" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.9"/>
+      </g>
+      <g id="Line_306">
+        <line x1="545" y1="555" x2="545" y2="523.184" marker-end="url(#FilledArrow_Marker)" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.9"/>
+      </g>
+      <g id="Line_307">
+        <line x1="545" y1="438" x2="545" y2="414.184" marker-end="url(#FilledArrow_Marker)" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.9"/>
+      </g>
+      <g id="Line_308">
+        <line x1="545" y1="357" x2="545" y2="326.184" marker-end="url(#FilledArrow_Marker)" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.9"/>
+      </g>
+      <g id="Line_309">
+        <line x1="545" y1="250" x2="545" y2="198.184" marker-end="url(#FilledArrow_Marker)" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.9"/>
+      </g>
+      <g id="Line_310">
+        <path d="M 190 161 L 216 161 L 216 217 L 238 217 L 238 238.816" marker-end="url(#FilledArrow_Marker)" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="7.6,7.6" stroke-width="1.9"/>
+      </g>
+      <g id="Line_311">
+        <path d="M 320 161 L 346 161 L 346 217 L 368 217 L 368 238.816" marker-end="url(#FilledArrow_Marker)" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="7.6,7.6" stroke-width="1.9"/>
+      </g>
+      <g id="Line_312">
+        <path d="M 450 161 L 476 161 L 476 217 L 498 217 L 498 238.816" marker-end="url(#FilledArrow_Marker)" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="7.6,7.6" stroke-width="1.9"/>
+      </g>
+      <g id="Line_313">
+        <line x1="791" y1="551" x2="791" y2="479.184" marker-end="url(#FilledArrow_Marker)" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.9"/>
+      </g>
+      <g id="Line_314">
+        <line x1="871" y1="551" x2="871" y2="479.184" marker-end="url(#FilledArrow_Marker)" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.9"/>
+      </g>
+      <g id="Line_315">
+        <line x1="951" y1="551" x2="951" y2="479.184" marker-end="url(#FilledArrow_Marker)" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.9"/>
+      </g>
+      <g id="Line_316">
+        <path d="M 874 408 L 874 324 L 988.816 324" marker-end="url(#FilledArrow_Marker)" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.9"/>
+      </g>
+      <g id="Line_317">
+        <line x1="1081" y1="551" x2="1081" y2="365.184" marker-end="url(#FilledArrow_Marker)" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.9"/>
+      </g>
+      <g id="Line_318">
+        <path d="M 1259 488 L 1212 488 L 1212 324 L 1185.184 324" marker-end="url(#FilledArrow_Marker)" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.9"/>
+      </g>
+      <g id="Line_319">
+        <path d="M 1377 488 L 1425 488 L 1425 219 L 1145.184 219" marker-end="url(#FilledArrow_Marker)" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.9"/>
+      </g>
+      <g id="Line_320">
+        <line x1="1110" y1="294" x2="1110" y2="254.184" marker-end="url(#FilledArrow_Marker)" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.9"/>
+      </g>
+      <g id="Line_321">
+        <line x1="1110" y1="195" x2="1110" y2="166.184" marker-end="url(#FilledArrow_Marker)" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.9"/>
+      </g>
+      <g id="Line_322">
+        <path d="M 625 282 L 692 282 L 692 92 L 719 92" stroke="#929292" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="5.2,5.2" stroke-width="1.3"/>
+      </g>
+    </g>
+  </g>
+</svg>

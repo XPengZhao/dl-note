@@ -1,0 +1,1681 @@
+
+<!doctype html>
+<html lang="zh" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://XPengZhao.github.io/dl-note/zh/hardware/">
+      
+      
+        <link rel="prev" href="../llms/overview/">
+      
+      
+        <link rel="next" href="../llms/request-lifecycle/">
+      
+      
+        
+          <link rel="alternate" href="../../hardware/" hreflang="en">
+        
+          <link rel="alternate" href="./" hreflang="zh">
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>硬件 - DL Notes</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../stylesheets/bootstrap.min.css">
+    
+      <link rel="stylesheet" href="../../stylesheets/basic.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#hardware" class="md-skip">
+          跳转至
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="页眉">
+    <a href="../" title="DL Notes" class="md-header__button md-logo" aria-label="DL Notes" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            DL Notes
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              硬件
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+      <div class="md-header__option">
+  <div class="md-select">
+    
+    <button class="md-header__button md-icon" aria-label="选择当前语言">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12.87 15.07-2.54-2.51.03-.03A17.5 17.5 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2zm-2.62 7 1.62-4.33L19.12 17z"/></svg>
+    </button>
+    <div class="md-select__inner">
+      <ul class="md-select__list">
+        
+          <li class="md-select__item">
+            <a href="../../hardware/" hreflang="en" class="md-select__link">
+              English
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="./" hreflang="zh" class="md-select__link">
+              简体中文
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="搜索" placeholder="搜索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="查找">
+        
+        <button type="reset" class="md-search__icon md-icon" title="清空当前内容" aria-label="清空当前内容" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            正在初始化搜索引擎
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="导航栏" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../" title="DL Notes" class="md-nav__button md-logo" aria-label="DL Notes" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    DL Notes
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    首页
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tensor/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    张量操作
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../neural-graphics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    神经图形
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AI Infra
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    AI Infra
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../llms/overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    硬件
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    硬件
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Overview
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-compute" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Compute
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Compute">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#21-ai-accelerators" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.1 AI Accelerators
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2.1 AI Accelerators">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#211-gpu" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.1.1 GPU
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#212-specialized-ai-accelerators" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.1.2 Specialized AI Accelerators
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2.1.2 Specialized AI Accelerators">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tpu" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TPU
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ascend-npu" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Ascend NPU
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cerebras-wafer-scale-engine" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cerebras Wafer-Scale Engine
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#22-matrix-engines-and-gemm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.2 Matrix Engines and GEMM
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2.2 Matrix Engines and GEMM">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#221-matrix-engines" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.2.1 Matrix Engines
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#222-gemm-shape-and-tiling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.2.2 GEMM Shape and Tiling
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#223-data-reuse-and-arithmetic-intensity" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.2.3 Data Reuse and Arithmetic Intensity
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#23-peak-flops-vs-effective-performance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.3 Peak FLOPS vs. Effective Performance
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2.3 Peak FLOPS vs. Effective Performance">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#231-precision-and-peak-flops" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.3.1 Precision and Peak FLOPS
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#232-dense-sparse-and-tensor-core-throughput" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.3.2 Dense, Sparse, and Tensor Core Throughput
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#233-from-peak-flops-to-achieved-throughput" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.3.3 From Peak FLOPS to Achieved Throughput
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../llms/request-lifecycle/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    请求生命周期
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../llms/metrics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    指标
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../llms/roofline/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Roofline 模型
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../llms/data-movement/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    数据搬运与通信
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../llms/kv-cache/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    KV Cache
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../llms/serving-runtime/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    推理运行时
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../llms/parallelism/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    并行策略
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../llms/decoding/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    解码与采样
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_11" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_11" id="__nav_4_11_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Speculative Decoding
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_11_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_11">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Speculative Decoding
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../llms/speculative-decoding/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Speculative Decoding
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../llms/glm-5.2-dspark-design/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GLM-5.2 DSpark 训练设计
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../llms/qwen3-4b-dspark-ablation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Qwen3-4B DSpark 消融报告
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../llms/qwen3.8-flash-next-dspark-training/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Qwen3.8-Flash-Next DSpark 训练实验
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../llms/training-objective/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    训练目标
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    模型
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    模型
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../llms/position-encoding/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    位置编码
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../llms/models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    模型笔记
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../llms/glm-5.2-inference-path/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GLM-5.2 推理路径
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Overview
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-compute" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Compute
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Compute">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#21-ai-accelerators" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.1 AI Accelerators
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2.1 AI Accelerators">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#211-gpu" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.1.1 GPU
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#212-specialized-ai-accelerators" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.1.2 Specialized AI Accelerators
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2.1.2 Specialized AI Accelerators">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tpu" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TPU
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ascend-npu" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Ascend NPU
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cerebras-wafer-scale-engine" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cerebras Wafer-Scale Engine
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#22-matrix-engines-and-gemm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.2 Matrix Engines and GEMM
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2.2 Matrix Engines and GEMM">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#221-matrix-engines" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.2.1 Matrix Engines
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#222-gemm-shape-and-tiling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.2.2 GEMM Shape and Tiling
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#223-data-reuse-and-arithmetic-intensity" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.2.3 Data Reuse and Arithmetic Intensity
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#23-peak-flops-vs-effective-performance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.3 Peak FLOPS vs. Effective Performance
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2.3 Peak FLOPS vs. Effective Performance">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#231-precision-and-peak-flops" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.3.1 Precision and Peak FLOPS
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#232-dense-sparse-and-tensor-core-throughput" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.3.2 Dense, Sparse, and Tensor Core Throughput
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#233-from-peak-flops-to-achieved-throughput" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.3.3 From Peak FLOPS to Achieved Throughput
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="hardware">Hardware</h1>
+<h2 id="1-overview">1. Overview</h2>
+<p>现在讨论 AI Infra，已经很难只看一张 GPU。一个模型真正跑起来，需要计算芯片执行矩阵运算，需要 HBM 持续提供权重和中间数据，需要多颗加速器之间交换 activation 和梯度，还需要 CPU、PCIe、NIC、存储以及更上层的集群网络共同完成数据搬运。再往外扩展，供电、散热和封装又决定了这些硬件最终能够以什么规模组合在一起。</p>
+<p>从系统结构上看，可以把 AI 硬件粗略分成几个层次。最里面是 <strong>GPU、NPU 或其他 accelerator</strong>，负责主要计算；紧挨着它的是 <strong>HBM 和片上 memory hierarchy</strong>，决定数据能否及时送到计算单元。多颗 accelerator 通过 <strong>scale-up interconnect</strong> 组成更大的计算域，再进一步形成 supernode 或 rack-scale system；多个计算域之间则通过 <strong>scale-out network</strong> 连接成更大的训练或推理集群。CPU、PCIe、NIC 和 storage 位于这些层次之间，负责控制、数据交换和 I/O。</p>
+<p>这些硬件并不是彼此独立地决定性能。一个 workload 可能拥有很高的理论 FLOPS，却受限于 HBM bandwidth。也可能单卡计算很快，却在 tensor parallel 或 MoE 中等待通信；继续增加 accelerator 数量后，瓶颈还可能从计算迁移到网络、内存容量，甚至供电和散热。很多 AI 系统问题，本质上都是同一个问题：<strong>当前 critical path 上，计算和数据搬运分别花了多少时间？</strong></p>
+<p>因此，这篇文章沿着 <strong>chip → memory → server → interconnect → supernode → cluster</strong> 的路径逐层展开。对每一层，我们都会关注三个问题：它在系统中负责什么、哪些硬件指标真正影响 AI workload，以及当模型规模、batch size、context length 或并行方式发生变化时，瓶颈会如何迁移。</p>
+<h2 id="2-compute">2. Compute</h2>
+<p>对今天的大模型来说，计算的主体是矩阵乘法。Transformer 中的 QKV projection、attention projection 和 MLP，以及 MoE 中的 expert computation，都包含大量 GEMM。因此，理解一颗 AI accelerator 的计算能力，可以先抓住两个问题：<strong>矩阵算得有多快，以及数据能否持续喂给计算单元。</strong></p>
+<h3 id="21-ai-accelerators">2.1 AI Accelerators</h3>
+<h4 id="211-gpu">2.1.1 GPU</h4>
+<p>GPU 最初面向图形渲染设计，其中大量像素和顶点可以同时处理，这推动了 GPU 朝着高并行吞吐的方向发展。今天的 GPU 已经是一种通用并行计算平台：一颗芯片包含大量计算单元，可以让成千上万个线程同时执行。神经网络恰好具有很强的数据并行性，矩阵乘法中的大量乘加操作可以同时展开，因此 GPU 很早就成为深度学习训练和推理的主要计算平台。</p>
+<p>现代 GPU 内部通常同时存在两类重要的计算路径。CUDA Core 一类的通用计算单元负责标量、向量和各种普通算术操作，而 Tensor Core 这样的 matrix engine 专门执行小块矩阵乘加。Transformer 中的 QKV projection、MLP 和 MoE expert 等主要计算最终都会落到大量 GEMM 上，因此它们可以大量使用 Tensor Core；normalization、element-wise operation、routing、sampling 等计算则继续依赖更通用的执行单元。GPU 因此可以在同一颗芯片上覆盖模型中的多种计算模式。</p>
+<p>GPU 的另一个重要特征是较强的 programmability。硬件通过大量线程、warp 调度和 memory hierarchy 隐藏计算与数据访问延迟，软件则可以通过 CUDA 等编程模型定义新的 kernel。模型结构发生变化时，很多新算子可以通过修改软件实现，而不需要重新设计芯片。这种灵活性对 AI 尤其重要，因为模型架构、数据类型和推理算法仍在快速变化。</p>
+<p>这种通用性也意味着 GPU 需要为调度、通用执行、缓存和复杂控制逻辑投入相当多的芯片面积与功耗。对于计算模式更加固定的 neural network workload，如果进一步限制支持的数据类型、算子和执行方式，就可以把更多硬件资源集中到 matrix engine、片上 memory 和数据搬运上，从而追求更高的 compute density 和 energy efficiency。这也是 TPU、NPU 以及其他 specialized AI accelerators 试图探索的方向。</p>
+<h4 id="212-specialized-ai-accelerators">2.1.2 Specialized AI Accelerators</h4>
+<h5 id="tpu">TPU</h5>
+<p>沿着更强 specialization 的方向，Google 的 TPU 是一个很典型的例子。TPU 是专门面向 machine learning workload 设计的 ASIC，其核心任务就是高效执行神经网络中的矩阵运算。相比需要覆盖广泛 workload 的 GPU，TPU 可以把更多硬件资源直接围绕 matrix computation 和相应的数据流组织。</p>
+<p>一颗 TPU 的核心计算单元包含 Matrix Multiply Unit（MXU）、vector unit 和 scalar unit。MXU 承担主要的矩阵计算，内部由大量 multiply-accumulate 单元组成 systolic array；vector unit 处理 activation、softmax 等计算，scalar unit 则负责控制流和地址计算。这个划分和现代 GPU 中“matrix engine + general-purpose execution unit”的思路有些相似，但 TPU 把整个架构进一步围绕机器学习 workload 收紧。</p>
+<p>Systolic array 最值得理解的地方是它的数据流。矩阵数据进入阵列后，会在相邻的 multiply-accumulate 单元之间逐级传递，同时不断累积 partial sum。这样，同一份数据进入阵列后可以连续参与多次计算，不需要每次乘加都重新访问外部 memory。Google 对 TPU 的架构描述中也强调，参数从 HBM 送入 MXU 后，矩阵乘法过程中的中间结果沿阵列传递，从而减少计算过程中的 memory access。</p>
+<p>TPU 展示了 specialized accelerator 的一个基本思路：<strong>当主要 workload 已经比较明确时，可以围绕最重要的计算和数据移动路径重新组织硬件。</strong> 这样可以把更多芯片面积和功耗投入 matrix engine、片上数据传输和低精度计算，从而提高目标 workload 上的 compute density 和 energy efficiency。代价则是硬件适用范围会更集中，因此 compiler 和软件栈需要把模型有效映射到这些固定的计算与数据流上。</p>
+<h5 id="ascend-npu">Ascend NPU</h5>
+<p>Ascend 是另一类典型的 specialized AI accelerator。它的基本计算单元称为 <strong>AI Core</strong>，内部将不同类型的计算进一步拆分为 Cube、Vector 和 Scalar。Cube Unit 主要负责矩阵乘加，Vector Unit 处理向量计算，Scalar Unit 则负责控制流和地址计算。这样的划分直接对应了神经网络中的几类主要 workload：大规模矩阵计算交给 Cube，element-wise、activation 等操作交给 Vector，控制和调度则由 Scalar 完成。</p>
+<p>Ascend 中很值得关注的一点是 <strong>compute 和 data movement 被一起设计</strong>。AI Core 内部除了计算单元，还包含 L1 Buffer、L0A/L0B/L0C、Unified Buffer 等多级 local memory，以及专门负责不同存储层级之间数据搬运的 MTE。以矩阵乘法为例，输入矩阵会进入 L0A 和 L0B，Cube Unit 完成矩阵运算后，中间结果保存在 L0C。这样，计算过程中频繁使用的数据可以停留在距离计算单元更近的位置，减少对 global memory 的反复访问。</p>
+<p>不同代 Ascend NPU 还会调整这些计算单元之间的组织方式。例如在部分较新的架构中，Cube 和 Vector 被分别部署到独立的 AIC 和 AIV core 上，各自拥有 Scalar Unit，可以独立执行不同类型的程序。这说明 specialized accelerator 的设计并不只有“增加更多矩阵单元”这一条路径，还可以通过重新划分计算资源、local memory 和 data path，让不同类型的 AI 算子获得更适合自己的执行方式。</p>
+<p>如果说 TPU 展示了如何围绕 matrix computation 和 systolic dataflow 构建高度专用的执行路径，那么 Ascend NPU 展示了另一种思路：<strong>将 matrix、vector、scalar 和 data movement 显式拆分，再通过软件把一个 AI workload 映射到这些不同的硬件资源上。</strong> 两者的具体实现不同，但目标是一致的——让神经网络中最常见的计算和数据移动获得更高的执行效率。</p>
+<h5 id="cerebras-wafer-scale-engine">Cerebras Wafer-Scale Engine</h5>
+<p>Cerebras 走了一条更激进的路线：直接扩大一颗 accelerator 的物理边界。传统芯片会把一片 wafer 切成许多独立 die，再通过 package、board 和高速 interconnect 把多颗芯片连接起来；Cerebras 的 Wafer-Scale Engine（WSE）则保留整片 wafer，并通过跨越 reticle boundary 的片上互联把不同区域连接成一个统一的计算 fabric。这样，原本需要跨 package 或跨设备完成的一部分数据交换，可以留在 silicon 上完成。</p>
+<p>Wafer-scale integration 的价值来自 <strong>compute、memory 和 communication 被放到了同一个巨大计算域中</strong>。以 WSE-3 为例，一片 wafer 集成约 900,000 个 AI cores 和 44 GB distributed SRAM，片上 memory bandwidth 达到 21 PB/s。每个计算区域都有靠近 compute core 的 local SRAM，数据通过二维片上 fabric 在不同 core 之间显式传递。对于大量需要频繁访问权重和中间结果的 AI workload，这种设计能够缩短数据移动距离，并提供远高于片外 memory 的局部带宽。</p>
+<p>把整片 wafer 做成一个处理器也带来了传统芯片很少遇到的问题。单个小 die 即使出现制造缺陷，也可以在封装前直接丢弃；wafer-scale processor 无法要求整片 wafer 上所有区域都完美，因此必须在架构层面处理 defect tolerance。Cerebras 在 compute fabric 和通信路径中加入冗余，通过绕过失效区域仍然形成完整的逻辑计算阵列。同时，整片 wafer 的 power delivery、cooling 和 packaging 也需要围绕这种尺寸重新设计。</p>
+<p>因此，WSE 展示的是另一种 accelerator specialization：<strong>通过扩大单个高速计算域，把更多 compute、SRAM 和 communication 留在 silicon 内部，从体系结构层面减少跨芯片的数据移动。</strong> 它也揭示了 AI hardware 的一个重要趋势——随着模型越来越依赖大规模并行，性能不仅取决于单个计算单元有多快，也越来越取决于能够以多低的代价把多少计算和 memory 连接在一起。</p>
+<h3 id="22-matrix-engines-and-gemm">2.2 Matrix Engines and GEMM</h3>
+<h4 id="221-matrix-engines">2.2.1 Matrix Engines</h4>
+<p>现代 AI accelerator 通常同时包含 scalar、vector 和 matrix 三类计算单元。Scalar unit 一次处理少量标量操作，适合地址计算、控制流等任务；vector unit 可以对一组数据同时执行相同运算，常用于 activation、normalization 和 element-wise operation。Transformer 中占据大部分计算量的 linear layer 和 MoE expert 则主要由 matrix engine 执行。</p>
+<p>Matrix engine 针对的核心操作是矩阵乘加，例如</p>
+<div class="arithmatex">\[
+D = AB + C.
+\]</div>
+<p>矩阵乘法本身可以展开成大量 multiply-accumulate（MAC）。如果完全依靠普通 scalar 或 vector instruction 执行，需要发出大量独立指令并不断读取和写回中间结果。Matrix engine 会把一小块矩阵作为一个整体交给专门的数据通路，在硬件内部同时完成大量 MAC。NVIDIA 的 Tensor Core、TPU 的 MXU 和 Ascend 的 Cube Unit 虽然实现方式不同，都体现了这种设计思路。</p>
+<p>以 Tensor Core 为例，软件通常不会要求它直接计算完整的 <span class="arithmatex">\(M\times N\)</span> 矩阵，而是提交较小的 matrix multiply-accumulate operation。大量这样的操作再组合成完整 GEMM。这样做的价值在于，数据进入 matrix engine 后，可以在内部计算路径中连续参与多次乘加，控制和指令开销也能够被大量 MAC 分摊。对于以 GEMM 为主的 neural network workload，这种专用数据通路能够提供远高于普通通用计算单元的矩阵吞吐。</p>
+<p>因此，现代 AI accelerator 的计算能力可以理解为两部分的配合：<strong>matrix engine 承担大规模、规则的矩阵计算，scalar 和 vector unit 处理剩余的通用算子。</strong> 拥有大量 matrix engine 仍然只提供了计算能力的上限；这些单元能否真正被填满，还取决于 GEMM 的矩阵形状以及任务如何被切分到硬件上，这也是下一节要讨论的问题。</p>
+<h4 id="222-gemm-shape-and-tiling">2.2.2 GEMM Shape and Tiling</h4>
+<p>考虑一个最常见的 linear layer：</p>
+<div class="arithmatex">\[
+Y=XW,
+\qquad
+X\in\mathbb{R}^{M\times K},
+\quad
+W\in\mathbb{R}^{K\times N}.
+\]</div>
+<p>这次 GEMM 需要大约 <span class="arithmatex">\(2MNK\)</span> FLOPs，其中 <span class="arithmatex">\(K\)</span> 和 <span class="arithmatex">\(N\)</span> 通常由模型维度决定，而 <span class="arithmatex">\(M\)</span> 往往对应这次 forward 中一起处理的 token 数。对于 LLM prefill，多个 prompt token 可以同时进入 linear layer，因此 <span class="arithmatex">\(M\)</span> 通常较大；decode 时每个请求每一步只有一个新 token，<span class="arithmatex">\(M\)</span> 基本随 batch size 增长。这也是为什么同一个模型在 prefill 和 decode 阶段，会表现出非常不同的计算效率。</p>
+<p>GPU 不会把整个 <span class="arithmatex">\(M\times N\)</span> 输出矩阵一次交给一个计算单元，而是将它划分成许多更小的 <strong>tiles</strong>。例如一个 thread block 负责一个 <span class="arithmatex">\(M_{\mathrm{tile}}\times N_{\mathrm{tile}}\)</span> 的输出区域，再沿着 <span class="arithmatex">\(K\)</span> 维分块读取 <span class="arithmatex">\(X\)</span> 和 <span class="arithmatex">\(W\)</span>，不断执行 matrix multiply-accumulate。这样，大 GEMM 会产生大量彼此独立的 tiles，可以同时分配到不同的 SM 上执行。矩阵较小时，能够产生的 tiles 也更少，即使每个 Tensor Core 本身很快，整块 GPU 仍然可能没有足够的并行工作可以执行。</p>
+<p>Tiling 还会带来两个容易被忽略的量化效应。如果 <span class="arithmatex">\(M\)</span> 或 <span class="arithmatex">\(N\)</span> 不能被 tile size 整除，边缘 tile 中只有部分位置是真正有效的，但硬件仍需要执行这个 tile，这称为 <strong>tile quantization</strong>。即使 tile 本身都很满，总 tile 数也可能无法刚好填满 GPU：假设一次可以并行执行 <span class="arithmatex">\(S\)</span> 个 tiles，而 GEMM 最终产生 <span class="arithmatex">\(S+1\)</span> 个，那么最后那个 tile 还需要额外启动一轮计算，其余大部分计算单元却处于空闲状态，这就是 <strong>wave quantization</strong>。因此，GEMM latency 并不一定随着 FLOPs 平滑增长，有时矩阵尺寸只增加一点，就可能因为多出一个 tile 或一个 wave 而出现明显的 latency 跳变。</p>
+<p>所以，矩阵“更大”本身并不是重点，关键是它是否产生了足够多、足够规整的计算工作。Prefill 的大 <span class="arithmatex">\(M\)</span> 通常能够产生更多 tiles，把更多计算单元同时利用起来；小 batch decode 的 <span class="arithmatex">\(M\)</span> 很窄，则更容易受到 tile parallelism 和 wave quantization 的限制。这也解释了 AI Infra 中一个很常见的现象：<strong>增加 batch size 或一次处理更多 token 后，计算量虽然增加了，执行时间却可能增长得远慢于计算量。</strong> 接下来还需要考虑另一个原因——更大的 GEMM 同时能够带来更好的数据复用。</p>
+<h4 id="223-data-reuse-and-arithmetic-intensity">2.2.3 Data Reuse and Arithmetic Intensity</h4>
+<p>GEMM 的效率还取决于另一件事：<strong>搬进来的数据能够参与多少次计算。</strong> 仍然考虑</p>
+<div class="arithmatex">\[
+Y=XW,
+\qquad
+X\in\mathbb{R}^{M\times K},
+\quad
+W\in\mathbb{R}^{K\times N}.
+\]</div>
+<p>完成这次矩阵乘法需要大约 <span class="arithmatex">\(2MNK\)</span> FLOPs，但真正的执行时间还取决于 <span class="arithmatex">\(X\)</span>、<span class="arithmatex">\(W\)</span> 和中间结果需要在不同 memory level 之间搬动多少数据。通常用 <strong>arithmetic intensity</strong> 描述这种关系：</p>
+<div class="arithmatex">\[
+I=
+\frac{\text{FLOPs}}
+{\text{Bytes Moved}}.
+\]</div>
+<p><span class="arithmatex">\(I\)</span> 越高，说明每搬运一个 byte 的数据能够完成更多计算。</p>
+<p>如果暂时只考虑 HBM traffic，并假设 <span class="arithmatex">\(X\)</span>、<span class="arithmatex">\(W\)</span> 各读取一次、<span class="arithmatex">\(Y\)</span> 写回一次，每个元素占 <span class="arithmatex">\(s\)</span> bytes，那么一个理想化的 GEMM arithmetic intensity 可以写成</p>
+<div class="arithmatex">\[
+I
+\approx
+\frac{2MNK}
+{s(MK+KN+MN)}.
+\]</div>
+<p>这个式子可以直观看出 <span class="arithmatex">\(M\)</span> 为什么重要。Decode 中 <span class="arithmatex">\(M\)</span> 很小时，庞大的权重矩阵 <span class="arithmatex">\(W\)</span> 被读进来后只服务少量 token，每读取一次权重只能完成有限计算；随着 batch size 或同时处理的 token 数增加，同一份 <span class="arithmatex">\(W\)</span> 可以被更多行的 <span class="arithmatex">\(X\)</span> 复用，计算量增长得比权重读取量更快，因此 arithmetic intensity 随之提高。</p>
+<p>实际 GPU 会进一步通过 tiling 把这种 reuse 留在更靠近计算单元的位置。一个 tile 的 <span class="arithmatex">\(X\)</span> 或 <span class="arithmatex">\(W\)</span> 被加载到 register、shared memory 或其他片上存储后，可以参与多次 matrix multiply-accumulate，再去处理下一块数据。这里需要区分 <strong>理论上存在的数据复用</strong> 和 <strong>硬件真正实现的数据复用</strong>：矩阵形状、tile size、cache behavior 和 kernel implementation 都会决定有多少数据最终仍然需要从更远的 memory hierarchy 重新读取。</p>
+<p>因此，扩大 GEMM 的工作规模通常同时产生两种收益：更多 tiles 提供更高的并行度，而更高的数据复用又提高 arithmetic intensity。当前者不足时，计算单元没有被填满；后者不足时，计算单元可能在等待数据。只有两者都足够高，GEMM 才有机会接近 accelerator 的峰值计算能力。这也自然引出了下一节的问题：<strong>规格表上的 Peak FLOPS，究竟在什么条件下才能真正转化成有效性能？</strong></p>
+<h3 id="23-peak-flops-vs-effective-performance">2.3 Peak FLOPS vs. Effective Performance</h3>
+<h4 id="231-precision-and-peak-flops">2.3.1 Precision and Peak FLOPS</h4>
+<p>硬件规格中的 FLOPS（floating-point operations per second）描述的是单位时间能够完成多少浮点运算。对于矩阵乘法中最常见的 fused multiply-add（FMA），一次乘法和一次加法通常计作两次 floating-point operations。因此，如果一颗 accelerator 每秒能够执行 <span class="arithmatex">\(N_{\mathrm{FMA}}\)</span> 次这样的操作，其理论计算吞吐可以写成</p>
+<div class="arithmatex">\[
+P_{\mathrm{peak}}
+=
+2N_{\mathrm{FMA}}.
+\]</div>
+<p>同一颗 accelerator 往往会给出多组完全不同的 peak throughput，例如 FP32、TF32、BF16、FP16 和 FP8。原因很直接：precision 越低，一个数需要的 bit 越少，同样的芯片面积和数据通路通常能够并行处理更多元素。以 matrix engine 为例，一条面向低精度数据设计的计算路径可以在一个周期内完成更多 multiply-accumulate，因此通常有</p>
+<div class="arithmatex">\[
+P_{\mathrm{FP8}}
+&gt;
+P_{\mathrm{BF16}}
+&gt;
+P_{\mathrm{FP32}}.
+\]</div>
+<p>更低的 precision 同时也减少了数据量。相同数量的参数和 activation 使用 BF16 时只需要 FP32 一半的存储空间，FP8 又进一步减半，因此 HBM、cache 和片上数据通路可以在相同时间内搬运更多元素。低精度计算带来的收益于是同时出现在 <strong>compute throughput</strong> 和 <strong>memory traffic</strong> 两侧，这也是现代 AI accelerator 越来越强调 BF16、FP8 甚至更低精度计算的重要原因。</p>
+<p>不过，“FP8 compute”并不意味着整条计算链路中的所有数据都以 FP8 完成运算。Matrix multiplication 经常使用较低精度的 input 执行乘法，再使用更高精度保存和累加 partial sum，例如低精度 multiply 配合 FP16 或 FP32 accumulation。这样可以在提高吞吐的同时控制长序列乘加带来的数值误差。因此，阅读一项 peak FLOPS 时，需要同时确认 <strong>input precision、accumulation precision 和实际使用的计算单元</strong>。只有这些口径一致，两颗 accelerator 的峰值算力才具有直接可比性。</p>
+<h4 id="232-dense-sparse-and-tensor-core-throughput">2.3.2 Dense, Sparse, and Tensor Core Throughput</h4>
+<p>即使 precision 相同，一颗 accelerator 的规格表中也可能出现多组完全不同的 peak throughput。以 NVIDIA GPU 为例，普通 FP32 CUDA Core、Tensor Core dense GEMM 和 Tensor Core sparse GEMM 使用的是不同的执行路径，因此对应的峰值算力也不同。Tensor Core 针对规则的 matrix multiply-accumulate 提供更高吞吐，而普通计算单元还需要支持更广泛的 arithmetic 和 control operation。因此，看到一个很高的 TFLOPS 数字时，首先需要确认它描述的是哪条计算路径。</p>
+<p>Sparse throughput 又引入了另一层区别。以 NVIDIA Ampere 及后续架构支持的 structured sparsity 为例，对于一些数据类型，硬件可以利用 <strong>2:4 sparsity</strong>：每连续四个 weight 中至少有两个为零，非零值和对应 metadata 被压缩后送入 Sparse Tensor Core。硬件只对保留下来的非零元素执行实际乘加，因此在满足这种结构约束时，同一套 matrix hardware 可以完成大约两倍的等效 dense computation。 这也是为什么规格表中的 sparse Tensor Core throughput 经常明显高于对应的 dense throughput。</p>
+<p>这里的关键在于，<strong>sparse FLOPS 描述的是满足特定 sparsity pattern 时的有效计算能力，并不代表任意稀疏模型都能获得同样的加速。</strong> 模型权重首先需要满足硬件支持的结构，例如 2:4 sparsity，kernel 和软件栈也必须真正使用对应的 sparse execution path；普通 unstructured sparsity 并不会自动映射到 Sparse Tensor Core。以 2:4 为例，NVIDIA 的实现通过只保存和计算非零值来减少权重 footprint 和相关 bandwidth，并在支持的 Tensor Core 路径上提高理论吞吐。</p>
+<p>因此，比较两颗 accelerator 的“算力”时，至少需要同时对齐 <strong>precision、accumulation precision、dense/sparse 口径，以及实际使用的 compute path</strong>。例如一个 BF16 dense Transformer，应该首先比较 BF16 dense matrix throughput；直接拿另一颗芯片的 FP8 sparse peak 与它相比，得到的数字几乎没有实际意义。规格表给出的始终是某种特定条件下的硬件上限，下一步真正需要回答的是：实际 workload 最终能够利用其中多少。</p>
+<h4 id="233-from-peak-flops-to-achieved-throughput">2.3.3 From Peak FLOPS to Achieved Throughput</h4>
+<p>Peak FLOPS 给出了 accelerator 在特定 precision 和计算路径下的理论上限，实际 workload 能达到的计算吞吐则可以写成</p>
+<div class="arithmatex">\[
+P_{\mathrm{achieved}}
+=
+\frac{\text{executed FLOPs}}
+{\text{execution time}},
+\]</div>
+<p>进一步定义相对于峰值算力的利用率</p>
+<div class="arithmatex">\[
+U_{\mathrm{compute}}
+=
+\frac{P_{\mathrm{achieved}}}{P_{\mathrm{peak}}}.
+\]</div>
+<p>这个比例通常远小于 1，而且会随着 workload 改变。同一颗 GPU、同一个模型，仅仅改变 batch size、sequence length 或 GEMM shape，就可能得到完全不同的 <span class="arithmatex">\(U_{\mathrm{compute}}\)</span>。</p>
+<p>前面讨论的几个机制都会影响这个比例。矩阵较窄时，tile 数量不足，matrix engine 无法全部填满；tile 或 wave 没有很好对齐时，一部分计算资源会处于空闲；arithmetic intensity 较低时，计算单元又可能需要等待数据从 memory hierarchy 中搬进来。可以粗略地把实际计算性能理解为同时受到两个上限约束：</p>
+<div class="arithmatex">\[
+P_{\mathrm{achieved}}
+\lesssim
+\min
+\left(
+P_{\mathrm{peak}},
+\;
+I\cdot BW_{\mathrm{memory}}
+\right),
+\]</div>
+<p>其中 <span class="arithmatex">\(I\)</span> 是 arithmetic intensity，<span class="arithmatex">\(BW_{\mathrm{memory}}\)</span> 是可用 memory bandwidth。前者对应 compute ceiling，后者对应数据供给能够支撑的计算速度。这也是 Roofline Model 最核心的直觉：提高 Peak FLOPS 只有在 workload 能够提供足够高 arithmetic intensity 时，才会真正转化成性能提升。</p>
+<p>端到端模型性能还会进一步低于单个 GEMM 所能达到的吞吐。Transformer 中除了 matrix multiplication，还有 normalization、softmax、sampling、routing、memory copy 等操作；多卡运行时还会加入 collective communication 和 synchronization。即使 GEMM 已经接近 Tensor Core 的峰值，其他部分仍然可能处在 critical path 上。因此，分析硬件性能时，需要从单个 kernel 的 achieved throughput 一直看到完整模型的 execution timeline。</p>
+<p>这里也要区分不同意义上的 utilization。监控工具显示的“GPU utilization”通常表示一段时间内 GPU 是否有 kernel 在执行，并不能直接说明 Tensor Core 已经达到多少 Peak FLOPS。一块 GPU 可以长期处于 busy 状态，同时只达到很低的理论计算吞吐。真正评价 accelerator 是否被有效使用，需要结合 <strong>achieved FLOPS、matrix shape、memory bandwidth、kernel breakdown 和端到端 latency</strong> 一起看。规格表告诉我们硬件的上限，而 workload 决定了最终能够接近这个上限多少。</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": [], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+        <script src="../../javascripts/mathjax.js"></script>
+      
+        <script src="../../javascripts/cjk-spacing.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+      
+        <script src="../../javascripts/mermaid.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/tablesort@5.3.0/dist/tablesort.min.js"></script>
+      
+        <script src="../../javascripts/tablesort.js"></script>
+      
+    
+  </body>
+</html>

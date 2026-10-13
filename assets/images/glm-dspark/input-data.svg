@@ -1,0 +1,550 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg xmlns:xl="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="-47.108724 1.1972656 595.37956 419" width="595.37956" height="419">
+  <defs/>
+  <g id="Canvas_2" stroke="none" stroke-opacity="1" stroke-dasharray="none" fill="none" fill-opacity="1">
+    <title>Canvas 2</title>
+    <rect fill="white" x="-47.108724" y="1.1972656" width="595.37956" height="419"/>
+    <g id="Canvas_2_Layer_1">
+      <title>Layer 1</title>
+      <g id="Group_218">
+        <g id="Group_219">
+          <g id="Group_220">
+            <g id="Group_389">
+              <g id="Group_393">
+                <g id="Graphic_394"/>
+              </g>
+              <g id="Group_390">
+                <g id="Group_391">
+                  <g id="Graphic_392">
+                    <title>Text</title>
+                    <text transform="translate(85.23275 17.457031)" fill="#f4d35e">
+                      <tspan font-family="Helvetica" font-size="14" fill="#f4d35e" x="0" y="14" xml:space="preserve">input_ids</tspan>
+                    </text>
+                  </g>
+                </g>
+              </g>
+            </g>
+            <g id="Group_383">
+              <g id="Group_387">
+                <g id="Graphic_388">
+                  <rect x="151.77083" y="1.6972656" width="50" height="50" fill="#f4d35e"/>
+                  <rect x="151.77083" y="1.6972656" width="50" height="50" stroke="#c9a227" stroke-linecap="butt" stroke-linejoin="round" stroke-width="1"/>
+                </g>
+              </g>
+              <g id="Group_384">
+                <g id="Group_385">
+                  <g id="Graphic_386">
+                    <title>Text</title>
+                    <text transform="translate(170.26815 14.916992)" fill="#1a1a1a">
+                      <tspan font-family="Helvetica" font-size="14" fill="#1a1a1a" x="0" y="14" xml:space="preserve">x</tspan>
+                      <tspan font-family="Helvetica" font-size="9" fill="#1a1a1a" y="18" xml:space="preserve">0</tspan>
+                    </text>
+                  </g>
+                </g>
+              </g>
+            </g>
+            <g id="Group_377">
+              <g id="Group_381">
+                <g id="Graphic_382">
+                  <rect x="219.77083" y="1.6972656" width="50" height="50" fill="#f4d35e"/>
+                  <rect x="219.77083" y="1.6972656" width="50" height="50" stroke="#c9a227" stroke-linecap="butt" stroke-linejoin="round" stroke-width="1"/>
+                </g>
+              </g>
+              <g id="Group_378">
+                <g id="Group_379">
+                  <g id="Graphic_380">
+                    <title>Text</title>
+                    <text transform="translate(238.26815 14.916992)" fill="#1a1a1a">
+                      <tspan font-family="Helvetica" font-size="14" fill="#1a1a1a" x="0" y="14" xml:space="preserve">x</tspan>
+                      <tspan font-family="Helvetica" font-size="9" fill="#1a1a1a" y="18" xml:space="preserve">1</tspan>
+                    </text>
+                  </g>
+                </g>
+              </g>
+            </g>
+            <g id="Group_371">
+              <g id="Group_375">
+                <g id="Graphic_376">
+                  <rect x="287.77083" y="1.6972656" width="50" height="50" fill="#f4d35e"/>
+                  <rect x="287.77083" y="1.6972656" width="50" height="50" stroke="#c9a227" stroke-linecap="butt" stroke-linejoin="round" stroke-width="1"/>
+                </g>
+              </g>
+              <g id="Group_372">
+                <g id="Group_373">
+                  <g id="Graphic_374">
+                    <title>Text</title>
+                    <text transform="translate(306.26815 14.916992)" fill="#1a1a1a">
+                      <tspan font-family="Helvetica" font-size="14" fill="#1a1a1a" x="0" y="14" xml:space="preserve">x</tspan>
+                      <tspan font-family="Helvetica" font-size="9" fill="#1a1a1a" y="18" xml:space="preserve">2</tspan>
+                    </text>
+                  </g>
+                </g>
+              </g>
+            </g>
+            <g id="Group_365">
+              <g id="Group_369">
+                <g id="Graphic_370">
+                  <rect x="355.77083" y="1.6972656" width="50" height="50" fill="#f4d35e"/>
+                  <rect x="355.77083" y="1.6972656" width="50" height="50" stroke="#c9a227" stroke-linecap="butt" stroke-linejoin="round" stroke-width="1"/>
+                </g>
+              </g>
+              <g id="Group_366">
+                <g id="Group_367">
+                  <g id="Graphic_368">
+                    <title>Text</title>
+                    <text transform="translate(374.26815 14.916992)" fill="#1a1a1a">
+                      <tspan font-family="Helvetica" font-size="14" fill="#1a1a1a" x="0" y="14" xml:space="preserve">x</tspan>
+                      <tspan font-family="Helvetica" font-size="9" fill="#1a1a1a" y="18" xml:space="preserve">3</tspan>
+                    </text>
+                  </g>
+                </g>
+              </g>
+            </g>
+            <g id="Group_359">
+              <g id="Group_363">
+                <g id="Graphic_364">
+                  <rect x="423.77083" y="1.6972656" width="50" height="50" fill="#f4d35e"/>
+                  <rect x="423.77083" y="1.6972656" width="50" height="50" stroke="#c9a227" stroke-linecap="butt" stroke-linejoin="round" stroke-width="1"/>
+                </g>
+              </g>
+              <g id="Group_360">
+                <g id="Group_361">
+                  <g id="Graphic_362">
+                    <title>Text</title>
+                    <text transform="translate(440.27083 15.876953)" fill="#1a1a1a">
+                      <tspan font-family="Helvetica" font-size="16" fill="#1a1a1a" x="0" y="15" xml:space="preserve">…</tspan>
+                    </text>
+                  </g>
+                </g>
+              </g>
+            </g>
+            <g id="Group_353">
+              <g id="Group_357">
+                <g id="Graphic_358">
+                  <rect x="491.77083" y="1.6972656" width="56" height="50" fill="#f4d35e"/>
+                  <rect x="491.77083" y="1.6972656" width="56" height="50" stroke="#c9a227" stroke-linecap="butt" stroke-linejoin="round" stroke-width="1"/>
+                </g>
+              </g>
+              <g id="Group_354">
+                <g id="Group_355">
+                  <g id="Graphic_356">
+                    <title>Text</title>
+                    <text transform="translate(510.0462 17.457031)" fill="#1a1a1a">
+                      <tspan font-family="Helvetica" font-size="12" fill="#1a1a1a" x="0" y="11" xml:space="preserve">x</tspan>
+                      <tspan font-family="Helvetica" font-size="8" fill="#1a1a1a" y="15" xml:space="preserve">S-1</tspan>
+                    </text>
+                  </g>
+                </g>
+              </g>
+            </g>
+            <g id="Group_347">
+              <g id="Group_351">
+                <g id="Graphic_352">
+                  <rect x="151.77083" y="77.69727" width="396" height="48" fill="#9ccc65"/>
+                  <rect x="151.77083" y="77.69727" width="396" height="48" stroke="#7cb342" stroke-linecap="butt" stroke-linejoin="round" stroke-width="1"/>
+                </g>
+              </g>
+              <g id="Group_348">
+                <g id="Group_349">
+                  <g id="Graphic_350">
+                    <title>Text</title>
+                    <text transform="translate(303.02474 90.87695)" fill="#1a1a1a">
+                      <tspan font-family="Helvetica" font-size="16" fill="#1a1a1a" x="0" y="15" xml:space="preserve">Target Model</tspan>
+                    </text>
+                  </g>
+                </g>
+              </g>
+            </g>
+            <g id="Group_341">
+              <g id="Group_345">
+                <g id="Graphic_346"/>
+              </g>
+              <g id="Group_342">
+                <g id="Group_343">
+                  <g id="Graphic_344">
+                    <title>Text</title>
+                    <text transform="translate(56.31917 169.45703)" fill="#a5a5a5">
+                      <tspan font-family="Helvetica" font-size="14" fill="#a5a5a5" x="0" y="14" xml:space="preserve">hidden_states</tspan>
+                    </text>
+                  </g>
+                </g>
+              </g>
+            </g>
+            <g id="Group_335">
+              <g id="Group_339">
+                <g id="Graphic_340">
+                  <path d="M 159.27083 153.69727 L 194.27083 153.69727 C 198.41297 153.69727 201.77083 157.05513 201.77083 161.19727 L 201.77083 196.19727 C 201.77083 200.3394 198.41297 203.69727 194.27083 203.69727 L 159.27083 203.69727 C 155.1287 203.69727 151.77083 200.3394 151.77083 196.19727 L 151.77083 161.19727 C 151.77083 157.05513 155.1287 153.69727 159.27083 153.69727 Z" fill="white"/>
+                  <path d="M 159.27083 153.69727 L 194.27083 153.69727 C 198.41297 153.69727 201.77083 157.05513 201.77083 161.19727 L 201.77083 196.19727 C 201.77083 200.3394 198.41297 203.69727 194.27083 203.69727 L 159.27083 203.69727 C 155.1287 203.69727 151.77083 200.3394 151.77083 196.19727 L 151.77083 161.19727 C 151.77083 157.05513 155.1287 153.69727 159.27083 153.69727 Z" stroke="#bdbdbd" stroke-linecap="butt" stroke-linejoin="round" stroke-width="1"/>
+                </g>
+              </g>
+              <g id="Group_336">
+                <g id="Group_337">
+                  <g id="Graphic_338">
+                    <title>Text</title>
+                    <text transform="translate(169.87508 166.917)" fill="#333">
+                      <tspan font-family="Helvetica" font-size="14" fill="#333" x="0" y="14" xml:space="preserve">h</tspan>
+                      <tspan font-family="Helvetica" font-size="9" fill="#333" y="18" xml:space="preserve">0</tspan>
+                    </text>
+                  </g>
+                </g>
+              </g>
+            </g>
+            <g id="Group_329">
+              <g id="Group_333">
+                <g id="Graphic_334">
+                  <path d="M 227.27083 153.69727 L 262.27083 153.69727 C 266.41297 153.69727 269.77083 157.05513 269.77083 161.19727 L 269.77083 196.19727 C 269.77083 200.3394 266.41297 203.69727 262.27083 203.69727 L 227.27083 203.69727 C 223.1287 203.69727 219.77083 200.3394 219.77083 196.19727 L 219.77083 161.19727 C 219.77083 157.05513 223.1287 153.69727 227.27083 153.69727 Z" fill="white"/>
+                  <path d="M 227.27083 153.69727 L 262.27083 153.69727 C 266.41297 153.69727 269.77083 157.05513 269.77083 161.19727 L 269.77083 196.19727 C 269.77083 200.3394 266.41297 203.69727 262.27083 203.69727 L 227.27083 203.69727 C 223.1287 203.69727 219.77083 200.3394 219.77083 196.19727 L 219.77083 161.19727 C 219.77083 157.05513 223.1287 153.69727 227.27083 153.69727 Z" stroke="#bdbdbd" stroke-linecap="butt" stroke-linejoin="round" stroke-width="1"/>
+                </g>
+              </g>
+              <g id="Group_330">
+                <g id="Group_331">
+                  <g id="Graphic_332">
+                    <title>Text</title>
+                    <text transform="translate(237.87508 166.917)" fill="#333">
+                      <tspan font-family="Helvetica" font-size="14" fill="#333" x="0" y="14" xml:space="preserve">h</tspan>
+                      <tspan font-family="Helvetica" font-size="9" fill="#333" y="18" xml:space="preserve">1</tspan>
+                    </text>
+                  </g>
+                </g>
+              </g>
+            </g>
+            <g id="Group_323">
+              <g id="Group_327">
+                <g id="Graphic_328">
+                  <path d="M 295.27083 153.69727 L 330.27083 153.69727 C 334.41297 153.69727 337.77083 157.05513 337.77083 161.19727 L 337.77083 196.19727 C 337.77083 200.3394 334.41297 203.69727 330.27083 203.69727 L 295.27083 203.69727 C 291.1287 203.69727 287.77083 200.3394 287.77083 196.19727 L 287.77083 161.19727 C 287.77083 157.05513 291.1287 153.69727 295.27083 153.69727 Z" fill="white"/>
+                  <path d="M 295.27083 153.69727 L 330.27083 153.69727 C 334.41297 153.69727 337.77083 157.05513 337.77083 161.19727 L 337.77083 196.19727 C 337.77083 200.3394 334.41297 203.69727 330.27083 203.69727 L 295.27083 203.69727 C 291.1287 203.69727 287.77083 200.3394 287.77083 196.19727 L 287.77083 161.19727 C 287.77083 157.05513 291.1287 153.69727 295.27083 153.69727 Z" stroke="#bdbdbd" stroke-linecap="butt" stroke-linejoin="round" stroke-width="1"/>
+                </g>
+              </g>
+              <g id="Group_324">
+                <g id="Group_325">
+                  <g id="Graphic_326">
+                    <title>Text</title>
+                    <text transform="translate(305.87508 166.917)" fill="#333">
+                      <tspan font-family="Helvetica" font-size="14" fill="#333" x="0" y="14" xml:space="preserve">h</tspan>
+                      <tspan font-family="Helvetica" font-size="9" fill="#333" y="18" xml:space="preserve">2</tspan>
+                    </text>
+                  </g>
+                </g>
+              </g>
+            </g>
+            <g id="Group_317">
+              <g id="Group_321">
+                <g id="Graphic_322">
+                  <path d="M 363.27083 153.69727 L 398.27083 153.69727 C 402.41297 153.69727 405.77083 157.05513 405.77083 161.19727 L 405.77083 196.19727 C 405.77083 200.3394 402.41297 203.69727 398.27083 203.69727 L 363.27083 203.69727 C 359.1287 203.69727 355.77083 200.3394 355.77083 196.19727 L 355.77083 161.19727 C 355.77083 157.05513 359.1287 153.69727 363.27083 153.69727 Z" fill="white"/>
+                  <path d="M 363.27083 153.69727 L 398.27083 153.69727 C 402.41297 153.69727 405.77083 157.05513 405.77083 161.19727 L 405.77083 196.19727 C 405.77083 200.3394 402.41297 203.69727 398.27083 203.69727 L 363.27083 203.69727 C 359.1287 203.69727 355.77083 200.3394 355.77083 196.19727 L 355.77083 161.19727 C 355.77083 157.05513 359.1287 153.69727 363.27083 153.69727 Z" stroke="#bdbdbd" stroke-linecap="butt" stroke-linejoin="round" stroke-width="1"/>
+                </g>
+              </g>
+              <g id="Group_318">
+                <g id="Group_319">
+                  <g id="Graphic_320">
+                    <title>Text</title>
+                    <text transform="translate(373.8751 166.917)" fill="#333">
+                      <tspan font-family="Helvetica" font-size="14" fill="#333" x="0" y="14" xml:space="preserve">h</tspan>
+                      <tspan font-family="Helvetica" font-size="9" fill="#333" y="18" xml:space="preserve">3</tspan>
+                    </text>
+                  </g>
+                </g>
+              </g>
+            </g>
+            <g id="Group_311">
+              <g id="Group_315">
+                <g id="Graphic_316">
+                  <path d="M 431.27083 153.69727 L 466.27083 153.69727 C 470.41297 153.69727 473.77083 157.05513 473.77083 161.19727 L 473.77083 196.19727 C 473.77083 200.3394 470.41297 203.69727 466.27083 203.69727 L 431.27083 203.69727 C 427.1287 203.69727 423.77083 200.3394 423.77083 196.19727 L 423.77083 161.19727 C 423.77083 157.05513 427.1287 153.69727 431.27083 153.69727 Z" fill="white"/>
+                  <path d="M 431.27083 153.69727 L 466.27083 153.69727 C 470.41297 153.69727 473.77083 157.05513 473.77083 161.19727 L 473.77083 196.19727 C 473.77083 200.3394 470.41297 203.69727 466.27083 203.69727 L 431.27083 203.69727 C 427.1287 203.69727 423.77083 200.3394 423.77083 196.19727 L 423.77083 161.19727 C 423.77083 157.05513 427.1287 153.69727 431.27083 153.69727 Z" stroke="#bdbdbd" stroke-linecap="butt" stroke-linejoin="round" stroke-width="1"/>
+                </g>
+              </g>
+              <g id="Group_312">
+                <g id="Group_313">
+                  <g id="Graphic_314">
+                    <title>Text</title>
+                    <text transform="translate(440.27083 167.87695)" fill="#333">
+                      <tspan font-family="Helvetica" font-size="16" fill="#333" x="0" y="15" xml:space="preserve">…</tspan>
+                    </text>
+                  </g>
+                </g>
+              </g>
+            </g>
+            <g id="Group_305">
+              <g id="Group_309">
+                <g id="Graphic_310">
+                  <path d="M 499.27083 153.69727 L 540.27083 153.69727 C 544.413 153.69727 547.77083 157.05513 547.77083 161.19727 L 547.77083 196.19727 C 547.77083 200.3394 544.413 203.69727 540.27083 203.69727 L 499.27083 203.69727 C 495.1287 203.69727 491.77083 200.3394 491.77083 196.19727 L 491.77083 161.19727 C 491.77083 157.05513 495.1287 153.69727 499.27083 153.69727 Z" fill="white"/>
+                  <path d="M 499.27083 153.69727 L 540.27083 153.69727 C 544.413 153.69727 547.77083 157.05513 547.77083 161.19727 L 547.77083 196.19727 C 547.77083 200.3394 544.413 203.69727 540.27083 203.69727 L 499.27083 203.69727 C 495.1287 203.69727 491.77083 200.3394 491.77083 196.19727 L 491.77083 161.19727 C 491.77083 157.05513 495.1287 153.69727 499.27083 153.69727 Z" stroke="#bdbdbd" stroke-linecap="butt" stroke-linejoin="round" stroke-width="1"/>
+                </g>
+              </g>
+              <g id="Group_306">
+                <g id="Group_307">
+                  <g id="Graphic_308">
+                    <title>Text</title>
+                    <text transform="translate(509.7093 169.45703)" fill="#333">
+                      <tspan font-family="Helvetica" font-size="12" fill="#333" x="0" y="11" xml:space="preserve">h</tspan>
+                      <tspan font-family="Helvetica" font-size="8" fill="#333" y="15" xml:space="preserve">S-1</tspan>
+                    </text>
+                  </g>
+                </g>
+              </g>
+            </g>
+            <g id="Group_299">
+              <g id="Group_303">
+                <g id="Graphic_304"/>
+              </g>
+              <g id="Group_300">
+                <g id="Group_301">
+                  <g id="Graphic_302">
+                    <title>Text</title>
+                    <text transform="translate(-16.910212 241.49707)" fill="#ef9a9a">
+                      <tspan font-family="Helvetica" font-size="14" fill="#ef9a9a" x="0" y="14" xml:space="preserve">target_last_hidden_states</tspan>
+                    </text>
+                  </g>
+                </g>
+              </g>
+            </g>
+            <g id="Group_293">
+              <g id="Group_297">
+                <g id="Graphic_298">
+                  <path d="M 159.27083 225.69727 L 194.27083 225.69727 C 198.41297 225.69727 201.77083 229.05513 201.77083 233.19727 L 201.77083 268.19727 C 201.77083 272.3394 198.41297 275.69727 194.27083 275.69727 L 159.27083 275.69727 C 155.1287 275.69727 151.77083 272.3394 151.77083 268.19727 L 151.77083 233.19727 C 151.77083 229.05513 155.1287 225.69727 159.27083 225.69727 Z" fill="#ef9a9a"/>
+                  <path d="M 159.27083 225.69727 L 194.27083 225.69727 C 198.41297 225.69727 201.77083 229.05513 201.77083 233.19727 L 201.77083 268.19727 C 201.77083 272.3394 198.41297 275.69727 194.27083 275.69727 L 159.27083 275.69727 C 155.1287 275.69727 151.77083 272.3394 151.77083 268.19727 L 151.77083 233.19727 C 151.77083 229.05513 155.1287 225.69727 159.27083 225.69727 Z" stroke="#e57373" stroke-linecap="butt" stroke-linejoin="round" stroke-width="1"/>
+                </g>
+              </g>
+              <g id="Group_294">
+                <g id="Group_295">
+                  <g id="Graphic_296">
+                    <title>Text</title>
+                    <text transform="translate(170.26815 238.917)" fill="#333">
+                      <tspan font-family="Helvetica" font-size="14" fill="#333" x="0" y="14" xml:space="preserve">z</tspan>
+                      <tspan font-family="Helvetica" font-size="9" fill="#333" y="18" xml:space="preserve">0</tspan>
+                    </text>
+                  </g>
+                </g>
+              </g>
+            </g>
+            <g id="Group_287">
+              <g id="Group_291">
+                <g id="Graphic_292">
+                  <path d="M 227.27083 225.69727 L 262.27083 225.69727 C 266.41297 225.69727 269.77083 229.05513 269.77083 233.19727 L 269.77083 268.19727 C 269.77083 272.3394 266.41297 275.69727 262.27083 275.69727 L 227.27083 275.69727 C 223.1287 275.69727 219.77083 272.3394 219.77083 268.19727 L 219.77083 233.19727 C 219.77083 229.05513 223.1287 225.69727 227.27083 225.69727 Z" fill="#ef9a9a"/>
+                  <path d="M 227.27083 225.69727 L 262.27083 225.69727 C 266.41297 225.69727 269.77083 229.05513 269.77083 233.19727 L 269.77083 268.19727 C 269.77083 272.3394 266.41297 275.69727 262.27083 275.69727 L 227.27083 275.69727 C 223.1287 275.69727 219.77083 272.3394 219.77083 268.19727 L 219.77083 233.19727 C 219.77083 229.05513 223.1287 225.69727 227.27083 225.69727 Z" stroke="#e57373" stroke-linecap="butt" stroke-linejoin="round" stroke-width="1"/>
+                </g>
+              </g>
+              <g id="Group_288">
+                <g id="Group_289">
+                  <g id="Graphic_290">
+                    <title>Text</title>
+                    <text transform="translate(238.26815 238.917)" fill="#333">
+                      <tspan font-family="Helvetica" font-size="14" fill="#333" x="0" y="14" xml:space="preserve">z</tspan>
+                      <tspan font-family="Helvetica" font-size="9" fill="#333" y="18" xml:space="preserve">1</tspan>
+                    </text>
+                  </g>
+                </g>
+              </g>
+            </g>
+            <g id="Group_281">
+              <g id="Group_285">
+                <g id="Graphic_286">
+                  <path d="M 295.27083 225.69727 L 330.27083 225.69727 C 334.41297 225.69727 337.77083 229.05513 337.77083 233.19727 L 337.77083 268.19727 C 337.77083 272.3394 334.41297 275.69727 330.27083 275.69727 L 295.27083 275.69727 C 291.1287 275.69727 287.77083 272.3394 287.77083 268.19727 L 287.77083 233.19727 C 287.77083 229.05513 291.1287 225.69727 295.27083 225.69727 Z" fill="#ef9a9a"/>
+                  <path d="M 295.27083 225.69727 L 330.27083 225.69727 C 334.41297 225.69727 337.77083 229.05513 337.77083 233.19727 L 337.77083 268.19727 C 337.77083 272.3394 334.41297 275.69727 330.27083 275.69727 L 295.27083 275.69727 C 291.1287 275.69727 287.77083 272.3394 287.77083 268.19727 L 287.77083 233.19727 C 287.77083 229.05513 291.1287 225.69727 295.27083 225.69727 Z" stroke="#e57373" stroke-linecap="butt" stroke-linejoin="round" stroke-width="1"/>
+                </g>
+              </g>
+              <g id="Group_282">
+                <g id="Group_283">
+                  <g id="Graphic_284">
+                    <title>Text</title>
+                    <text transform="translate(306.26815 238.917)" fill="#333">
+                      <tspan font-family="Helvetica" font-size="14" fill="#333" x="0" y="14" xml:space="preserve">z</tspan>
+                      <tspan font-family="Helvetica" font-size="9" fill="#333" y="18" xml:space="preserve">2</tspan>
+                    </text>
+                  </g>
+                </g>
+              </g>
+            </g>
+            <g id="Group_275">
+              <g id="Group_279">
+                <g id="Graphic_280">
+                  <path d="M 363.27083 225.69727 L 398.27083 225.69727 C 402.41297 225.69727 405.77083 229.05513 405.77083 233.19727 L 405.77083 268.19727 C 405.77083 272.3394 402.41297 275.69727 398.27083 275.69727 L 363.27083 275.69727 C 359.1287 275.69727 355.77083 272.3394 355.77083 268.19727 L 355.77083 233.19727 C 355.77083 229.05513 359.1287 225.69727 363.27083 225.69727 Z" fill="#ef9a9a"/>
+                  <path d="M 363.27083 225.69727 L 398.27083 225.69727 C 402.41297 225.69727 405.77083 229.05513 405.77083 233.19727 L 405.77083 268.19727 C 405.77083 272.3394 402.41297 275.69727 398.27083 275.69727 L 363.27083 275.69727 C 359.1287 275.69727 355.77083 272.3394 355.77083 268.19727 L 355.77083 233.19727 C 355.77083 229.05513 359.1287 225.69727 363.27083 225.69727 Z" stroke="#e57373" stroke-linecap="butt" stroke-linejoin="round" stroke-width="1"/>
+                </g>
+              </g>
+              <g id="Group_276">
+                <g id="Group_277">
+                  <g id="Graphic_278">
+                    <title>Text</title>
+                    <text transform="translate(374.26815 238.917)" fill="#333">
+                      <tspan font-family="Helvetica" font-size="14" fill="#333" x="0" y="14" xml:space="preserve">z</tspan>
+                      <tspan font-family="Helvetica" font-size="9" fill="#333" y="18" xml:space="preserve">3</tspan>
+                    </text>
+                  </g>
+                </g>
+              </g>
+            </g>
+            <g id="Group_269">
+              <g id="Group_273">
+                <g id="Graphic_274">
+                  <path d="M 431.27083 225.69727 L 466.27083 225.69727 C 470.41297 225.69727 473.77083 229.05513 473.77083 233.19727 L 473.77083 268.19727 C 473.77083 272.3394 470.41297 275.69727 466.27083 275.69727 L 431.27083 275.69727 C 427.1287 275.69727 423.77083 272.3394 423.77083 268.19727 L 423.77083 233.19727 C 423.77083 229.05513 427.1287 225.69727 431.27083 225.69727 Z" fill="#ef9a9a"/>
+                  <path d="M 431.27083 225.69727 L 466.27083 225.69727 C 470.41297 225.69727 473.77083 229.05513 473.77083 233.19727 L 473.77083 268.19727 C 473.77083 272.3394 470.41297 275.69727 466.27083 275.69727 L 431.27083 275.69727 C 427.1287 275.69727 423.77083 272.3394 423.77083 268.19727 L 423.77083 233.19727 C 423.77083 229.05513 427.1287 225.69727 431.27083 225.69727 Z" stroke="#e57373" stroke-linecap="butt" stroke-linejoin="round" stroke-width="1"/>
+                </g>
+              </g>
+              <g id="Group_270">
+                <g id="Group_271">
+                  <g id="Graphic_272">
+                    <title>Text</title>
+                    <text transform="translate(440.27083 239.87695)" fill="#333">
+                      <tspan font-family="Helvetica" font-size="16" fill="#333" x="0" y="15" xml:space="preserve">…</tspan>
+                    </text>
+                  </g>
+                </g>
+              </g>
+            </g>
+            <g id="Group_263">
+              <g id="Group_267">
+                <g id="Graphic_268">
+                  <path d="M 499.27083 225.69727 L 540.27083 225.69727 C 544.413 225.69727 547.77083 229.05513 547.77083 233.19727 L 547.77083 268.19727 C 547.77083 272.3394 544.413 275.69727 540.27083 275.69727 L 499.27083 275.69727 C 495.1287 275.69727 491.77083 272.3394 491.77083 268.19727 L 491.77083 233.19727 C 491.77083 229.05513 495.1287 225.69727 499.27083 225.69727 Z" fill="#ef9a9a"/>
+                  <path d="M 499.27083 225.69727 L 540.27083 225.69727 C 544.413 225.69727 547.77083 229.05513 547.77083 233.19727 L 547.77083 268.19727 C 547.77083 272.3394 544.413 275.69727 540.27083 275.69727 L 499.27083 275.69727 C 495.1287 275.69727 491.77083 272.3394 491.77083 268.19727 L 491.77083 233.19727 C 491.77083 229.05513 495.1287 225.69727 499.27083 225.69727 Z" stroke="#e57373" stroke-linecap="butt" stroke-linejoin="round" stroke-width="1"/>
+                </g>
+              </g>
+              <g id="Group_264">
+                <g id="Group_265">
+                  <g id="Graphic_266">
+                    <title>Text</title>
+                    <text transform="translate(510.0462 241.45703)" fill="#333">
+                      <tspan font-family="Helvetica" font-size="12" fill="#333" x="0" y="11" xml:space="preserve">z</tspan>
+                      <tspan font-family="Helvetica" font-size="8" fill="#333" y="15" xml:space="preserve">S-1</tspan>
+                    </text>
+                  </g>
+                </g>
+              </g>
+            </g>
+            <g id="Group_257">
+              <g id="Group_261">
+                <g id="Graphic_262">
+                  <rect x="151.77083" y="297.69727" width="396" height="48" fill="#90caf9"/>
+                  <rect x="151.77083" y="297.69727" width="396" height="48" stroke="#64b5f6" stroke-linecap="butt" stroke-linejoin="round" stroke-width="1"/>
+                </g>
+              </g>
+              <g id="Group_258">
+                <g id="Group_259">
+                  <g id="Graphic_260">
+                    <title>Text</title>
+                    <text transform="translate(318.58333 310.87695)" fill="#1a1a1a">
+                      <tspan font-family="Helvetica" font-size="16" fill="#1a1a1a" x="0" y="15" xml:space="preserve">lm_head</tspan>
+                    </text>
+                  </g>
+                </g>
+              </g>
+            </g>
+            <g id="Group_251">
+              <g id="Group_255">
+                <g id="Graphic_256">
+                  <rect x="151.77083" y="369.69727" width="50" height="50" fill="#f4d35e"/>
+                  <rect x="151.77083" y="369.69727" width="50" height="50" stroke="#c9a227" stroke-linecap="butt" stroke-linejoin="round" stroke-width="1"/>
+                </g>
+              </g>
+              <g id="Group_252">
+                <g id="Group_253">
+                  <g id="Graphic_254">
+                    <title>Text</title>
+                    <text transform="translate(170.26815 382.917)" fill="#1a1a1a">
+                      <tspan font-family="Helvetica" font-size="14" fill="#1a1a1a" x="0" y="14" xml:space="preserve">x</tspan>
+                      <tspan font-family="Helvetica" font-size="9" fill="#1a1a1a" y="18" xml:space="preserve">1</tspan>
+                    </text>
+                  </g>
+                </g>
+              </g>
+            </g>
+            <g id="Group_245">
+              <g id="Group_249">
+                <g id="Graphic_250">
+                  <rect x="219.77083" y="369.69727" width="50" height="50" fill="#f4d35e"/>
+                  <rect x="219.77083" y="369.69727" width="50" height="50" stroke="#c9a227" stroke-linecap="butt" stroke-linejoin="round" stroke-width="1"/>
+                </g>
+              </g>
+              <g id="Group_246">
+                <g id="Group_247">
+                  <g id="Graphic_248">
+                    <title>Text</title>
+                    <text transform="translate(238.26815 382.917)" fill="#1a1a1a">
+                      <tspan font-family="Helvetica" font-size="14" fill="#1a1a1a" x="0" y="14" xml:space="preserve">x</tspan>
+                      <tspan font-family="Helvetica" font-size="9" fill="#1a1a1a" y="18" xml:space="preserve">2</tspan>
+                    </text>
+                  </g>
+                </g>
+              </g>
+            </g>
+            <g id="Group_239">
+              <g id="Group_243">
+                <g id="Graphic_244">
+                  <rect x="287.77083" y="369.69727" width="50" height="50" fill="#f4d35e"/>
+                  <rect x="287.77083" y="369.69727" width="50" height="50" stroke="#c9a227" stroke-linecap="butt" stroke-linejoin="round" stroke-width="1"/>
+                </g>
+              </g>
+              <g id="Group_240">
+                <g id="Group_241">
+                  <g id="Graphic_242">
+                    <title>Text</title>
+                    <text transform="translate(306.26815 382.917)" fill="#1a1a1a">
+                      <tspan font-family="Helvetica" font-size="14" fill="#1a1a1a" x="0" y="14" xml:space="preserve">x</tspan>
+                      <tspan font-family="Helvetica" font-size="9" fill="#1a1a1a" y="18" xml:space="preserve">3</tspan>
+                    </text>
+                  </g>
+                </g>
+              </g>
+            </g>
+            <g id="Group_233">
+              <g id="Group_237">
+                <g id="Graphic_238">
+                  <rect x="355.77083" y="369.69727" width="50" height="50" fill="#f4d35e"/>
+                  <rect x="355.77083" y="369.69727" width="50" height="50" stroke="#c9a227" stroke-linecap="butt" stroke-linejoin="round" stroke-width="1"/>
+                </g>
+              </g>
+              <g id="Group_234">
+                <g id="Group_235">
+                  <g id="Graphic_236">
+                    <title>Text</title>
+                    <text transform="translate(374.26815 382.917)" fill="#1a1a1a">
+                      <tspan font-family="Helvetica" font-size="14" fill="#1a1a1a" x="0" y="14" xml:space="preserve">x</tspan>
+                      <tspan font-family="Helvetica" font-size="9" fill="#1a1a1a" y="18" xml:space="preserve">4</tspan>
+                    </text>
+                  </g>
+                </g>
+              </g>
+            </g>
+            <g id="Group_227">
+              <g id="Group_231">
+                <g id="Graphic_232">
+                  <rect x="423.77083" y="369.69727" width="50" height="50" fill="#f4d35e"/>
+                  <rect x="423.77083" y="369.69727" width="50" height="50" stroke="#c9a227" stroke-linecap="butt" stroke-linejoin="round" stroke-width="1"/>
+                </g>
+              </g>
+              <g id="Group_228">
+                <g id="Group_229">
+                  <g id="Graphic_230">
+                    <title>Text</title>
+                    <text transform="translate(440.27083 383.87695)" fill="#1a1a1a">
+                      <tspan font-family="Helvetica" font-size="16" fill="#1a1a1a" x="0" y="15" xml:space="preserve">…</tspan>
+                    </text>
+                  </g>
+                </g>
+              </g>
+            </g>
+            <g id="Group_221">
+              <g id="Group_225">
+                <g id="Graphic_226">
+                  <rect x="491.77083" y="369.69727" width="56" height="50" fill="#f4d35e"/>
+                  <rect x="491.77083" y="369.69727" width="56" height="50" stroke="#c9a227" stroke-linecap="butt" stroke-linejoin="round" stroke-width="1"/>
+                </g>
+              </g>
+              <g id="Group_222">
+                <g id="Group_223">
+                  <g id="Graphic_224">
+                    <title>Text</title>
+                    <text transform="translate(512.76937 382.917)" fill="#1a1a1a">
+                      <tspan font-family="Helvetica" font-size="14" fill="#1a1a1a" x="0" y="14" xml:space="preserve">x</tspan>
+                      <tspan font-family="Helvetica" font-size="9" fill="#1a1a1a" y="18" xml:space="preserve">S</tspan>
+                    </text>
+                  </g>
+                </g>
+              </g>
+            </g>
+          </g>
+        </g>
+      </g>
+    </g>
+  </g>
+</svg>
