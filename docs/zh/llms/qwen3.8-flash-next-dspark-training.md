@@ -53,7 +53,7 @@ $$
 
 ### Confidence head 与训练目标
 
-Confidence 分支读取 draft 隐藏状态 \(h_i\) 与词表投影之前的 Markov 表示 \(m_i\)，通过线性层与 sigmoid 得到预测值：
+Confidence head 将 draft 隐藏状态 \(h_i\in\mathbb R^{2560}\) 与词表投影前的 Markov 表示 \(m_i\in\mathbb R^{256}\) 拼接为 2816 维向量，经线性层与 sigmoid 预测分布重叠率：
 
 $$
 s_i=w_c^\top[h_i;m_i]+b_c,
@@ -61,9 +61,16 @@ s_i=w_c^\top[h_i;m_i]+b_c,
 \hat a_i=\sigma(s_i).
 $$
 
-输入维度为 2816，监督目标为 teacher 与修正后 draft 分布的重叠率 \(a_i\)。标签停止梯度，以二元交叉熵训练 confidence head；token 仍由 logits 选择。
+监督目标为 teacher 与 Markov 修正后 draft 分布的重叠率 \(a_i\in[0,1]\)。将 \(a_i\) 作为停止梯度的软标签，以二元交叉熵训练：
 
-基础损失中，CE 监督记录的下一个 token，L1 拟合 teacher 全词表分布，confidence loss 拟合分布重叠率。三项损失均在有效 response 位置按实验设置中的衰减权重求平均。
+$$
+L_{\mathrm{conf},i}
+=-a_i\log\hat a_i-(1-a_i)\log(1-\hat a_i).
+$$
+
+该损失推动预测值 \(\hat a_i\) 接近标签 \(a_i\)。Confidence head 估计分布重叠率，token 仍由修正后的 logits 选择。
+
+基础训练目标由三项损失组成：CE 监督数据中记录的下一个 token，L1 拟合 teacher 的全词表分布，confidence loss 拟合分布重叠率。三项损失均在有效 response 位置按实验设置中的位置衰减权重求平均。
 
 ## Engram 增强 Markov head
 
@@ -75,13 +82,13 @@ Engram-Markov 在前驱 token 的低秩表示中加入 n-gram 特征，由当前
 
 \(e_{i-1}\in\mathbb R^{2560}\) 为截至前驱 token \(t_{i-1}\) 的 n-gram 查表特征。
 
-Draft 隐藏状态提供 query，Engram 特征提供 key 和 value。记 \(N\) 为无可训练 affine 参数的 RMSNorm，Markov rank 为 \(r=256\)，则
+Draft 隐藏状态提供 query，Engram 特征提供 key 和 value。以下 RMSNorm 均不含可训练缩放参数，Markov rank 为 \(r=256\)，则
 
 $$
 \begin{aligned}
-\bar e_{i-1}&=N(e_{i-1}),\\
-\mathbf q_i&=N\!\left(W_QN(h_i)\right),\\
-\mathbf k_i&=N(W_K\bar e_{i-1}),\qquad
+\bar e_{i-1}&=\operatorname{RMSNorm}(e_{i-1}),\\
+\mathbf q_i&=\operatorname{RMSNorm}\!\left(W_Q\operatorname{RMSNorm}(h_i)\right),\\
+\mathbf k_i&=\operatorname{RMSNorm}(W_K\bar e_{i-1}),\qquad
 \mathbf v_i=W_V\bar e_{i-1},\\
 s_i&=\frac{\mathbf q_i^\top\mathbf k_i}{\sqrt r},\\
 g_i&=\sigma\!\left(\operatorname{sign}(s_i)
@@ -105,9 +112,77 @@ Confidence head 同样读取增强后的 \(m_i\)。
 
 训练读取参考前驱位置的 Engram 缓存，并行计算各位置的门控与修正；推理随实际生成前缀逐 token 查表。Engram 表另占存储空间，查表和特征传输增加推理耗时。
 
+### 训练准确率
+
+![Baseline 与 Engram-Markov 的训练 token 准确率（train/acc）：左为完整训练过程，右为后半程放大](../../assets/images/qwen3.8-flash-next-dspark/engram-markov-training-accuracy.svg){ width="100%" }
+
+两种方法的准确率均在训练初期快速提高，随后逐渐趋缓，整体收敛形态接近。Engram-Markov 在后半程整体略高于 Baseline。第 10 epoch 结束时，两者的训练准确率分别为 81.21% 和 80.88%，相差约 0.34 个百分点。
+
+#### 第 10 epoch 的逐位置准确率
+
+![第 10 epoch 的逐位置训练准确率：左为 Baseline 与 Engram-Markov 对比，右为 Engram-Markov 相对 Baseline 的提升（百分点）](../../assets/images/qwen3.8-flash-next-dspark/engram-markov-position-accuracy-epoch10.svg){ width="100%" }
+
+两种方法的准确率均随预测位置后移而下降，前两个位置基本重合。Engram-Markov 的优势主要出现在后段，第 5–7 位分别提高约 0.49、0.69、0.88 个百分点。
+
+### 训练损失
+
+![Baseline 与 Engram-Markov 的总训练损失（train/loss）：左为完整训练过程，右为后半程放大](../../assets/images/qwen3.8-flash-next-dspark/engram-markov-training-loss.svg){ width="100%" }
+
+两种方法的总训练损失整体下降，Engram-Markov 的后期损失整体更低。第 10 epoch 结束时，Baseline 与 Engram-Markov 的损失分别为 0.6103 和 0.5944，后者相对降低约 2.62%。
+
+
+### 置信度误差
+
+`confidence_abs_error` 聚合各有效位置的置信度预测绝对误差：
+
+$$
+\left|\hat a_i-a_i\right|,
+\qquad
+a_i=\sum_v\min\bigl(p_i(v),q_i(v)\bigr).
+$$
+
+其中，\(p_i\) 与 \(q_i\) 分别为 teacher 和 draft 的概率分布，\(a_i\) 是二者的分布重叠率，也是训练时的监督目标；\(\hat a_i\) 是 confidence head 经 sigmoid 得到的预测值。误差越小，预测越接近监督目标。
+
+![Baseline 与 Engram-Markov 的 confidence_abs_error：左为完整训练过程，右为后半程放大](../../assets/images/qwen3.8-flash-next-dspark/engram-markov-training-confidence-abs-error.svg){ width="100%" }
+
+两种方法的误差在训练初期升至约 0.16，随后逐步下降。Engram-Markov 的后期误差整体低于 Baseline。第 10 epoch 结束时，Baseline 与 Engram-Markov 的误差分别为 0.0942 和 0.0874，后者相对降低约 7.26%，置信度预测更接近监督目标。
+
+### 归一化设计与理论分析
+
+本实验的 Engram-Markov 使用不含可训练缩放参数的 RMSNorm。Target 自带的 PLE 模块则在 query、key 与卷积分支的归一化中保留逐维缩放，形式为 \((1+w)\odot\operatorname{RMSNorm}_0(x)\)，其中 \(w\) 初始化为零，\(\operatorname{RMSNorm}_0\) 表示仅归一化的操作。[Target 参考实现](https://github.com/huggingface/transformers/blob/main/src/transformers/models/qwen4_exp/modeling_qwen4_exp.py#L1067-L1129)
+
+Query 路径在投影前后各做一次归一化。由于两处均无可训练缩放、\(W_Q\) 无偏置，对非零投影，忽略 \(\epsilon\) 与浮点误差时有
+
+$$
+\operatorname{RMSNorm}_0\!\left(W_Q\operatorname{RMSNorm}_0(h_i)\right)
+=\operatorname{RMSNorm}_0(W_Qh_i).
+$$
+
+投影前的归一化只改变整个向量的幅度，该缩放会被投影后的归一化抵消，因此在上述条件下不增加表达能力。它仍会改变中间计算的数值范围。
+
+不含缩放参数的 RMSNorm 将 query 和 key 的范数固定为约 \(\sqrt r\)。记二者夹角为 \(\theta_i\)，忽略数值稳定项，则
+
+$$
+s_i=\sqrt r\cos\theta_i,
+\qquad
+g_i=\sigma\!\left(r^{1/4}\operatorname{sign}(\cos\theta_i)
+\sqrt{|\cos\theta_i|}\right).
+$$
+
+当 \(r=256\) 时，门值范围约为 \([0.018,0.982]\)，足以实现较强的开启与关闭，但方向相似性到门控强度的映射尺度是固定的。若加入可训练缩放，分数变为
+
+$$
+s_i=\frac{1}{\sqrt r}\sum_j
+\gamma_{q,j}\gamma_{k,j}\bar q_{i,j}\bar k_{i,j},
+$$
+
+其中 \(\bar q_i,\bar k_i\) 为仅归一化后的向量。缩放参数可调整各维度的贡献及整体门控强度。例如，当 \(\gamma_{q,j}\gamma_{k,j}=c>0\) 对所有维度成立时，signed-square-root 后的分数乘上 \(\sqrt c\)，相当于调整 sigmoid 的温度。可训练的 \(W_Q,W_K\) 已能学习特征选择与方向匹配，但整体放大投影权重会被归一化抵消，无法以这种方式调整门控温度。
+
+Query 双重归一化在理想条件下存在计算冗余，当前门控也缺少独立的可学习尺度。后者可能影响 Engram 特征的注入强度，具体效果尚无归一化消融验证。这两点只涉及新增的 Engram 分支，不能解释 vanilla baseline 中已有的接受率衰减。
+
 ## Engram 增强 MASK 输入
 
-两种方案均读取 anchor 前一个位置的 Engram 特征，投影后填入六个 MASK 槽，anchor 保留 token embedding，后续使用 vanilla Markov head。设 anchor 位置为 \(a\)，共享特征为
+两种方案均读取 anchor 前一个位置的 Engram 特征，经投影后用于构造六个 MASK 槽的输入。直接替换方案使用投影特征替换 MASK embedding，门控残差方案将其叠加到原 MASK embedding 上。两者的 anchor 均保留 token embedding，后续使用 vanilla Markov head。设 anchor 位置为 \(a\)，共享特征为
 
 $$
 z_a=\operatorname{RMSNorm}(Pe_{a-1}),
@@ -116,7 +191,27 @@ $$
 
 \(P\) 为随机初始化的无偏置投影，RMSNorm 无可训练仿射参数。六个槽共享 \(z_a\)，保留各自的位置编号、RoPE 和块内双向 attention。
 
+
+### 直接替换
+
+![Engram 替换 MASK：共享特征经投影和归一化后填充 draft 输入槽](../../assets/images/qwen3.8-flash-next-dspark/engram-fix-mask.svg){ width="67%" }
+
+$$
+X_a=[E(x_a),\underbrace{z_a,\ldots,z_a}_{6\text{ 个槽}}].
+$$
+
+\(z_a\) 从训练开始直接替换六个 MASK embedding。新增参数为投影矩阵 \(P\)，共 \(2560^2=6{,}553{,}600\)。
+
+#### 训练曲线
+
+![Fixed mask 与 Baseline 的训练曲线：左为 loss，右为 acc，横轴上限为两种方法较小的最终 step 4,000](../../assets/images/qwen3.8-flash-next-dspark/engram-fixed-mask-training-loss-accuracy.svg){ width="100%" }
+
+前 4,000 步中，Fixed mask 与 Baseline 的损失和准确率曲线大部分重合，整体收敛趋势接近。
+
+
 ### 门控残差
+
+保留原 MASK embedding，通过逐槽标量门控制 Engram 残差的注入幅度。
 
 ![Engram 门控增强 MASK：共享特征经逐槽 tanh 门缩放后，与 MASK embedding 相加](../../assets/images/qwen3.8-flash-next-dspark/engram-gate-mask.svg){ width="100%" }
 
@@ -128,20 +223,6 @@ u_{a,j}=E(\mathrm{MASK})+\tanh(\theta_j)z_a,
 $$
 
 每槽一个可训练标量 \(\theta_j\)，由所有样本共享，零初始化后输入与 baseline 相同。门值离开零后，投影 \(P\) 开始获得任务梯度。新增参数为 \(2560^2+6=6{,}553{,}606\)。
-
-### 直接替换
-
-![Engram 替换 MASK：共享特征经投影和归一化后填充 draft 输入槽](../../assets/images/qwen3.8-flash-next-dspark/engram-fix-mask.svg){ width="100%" }
-
-$$
-X_a=[E(x_a),\underbrace{z_a,\ldots,z_a}_{6\text{ 个槽}}].
-$$
-
-省去标量门，从训练开始替换 MASK embedding。新增参数仅为 \(P\)，共 \(2560^2=6{,}553{,}600\)。
-
-### 训练与推理
-
-训练按 anchor 读取 \(a-1\) 位置的缓存，缺少有效前驱或 block 无效时特征置零，新增参数由基础损失优化。推理每轮查表并投影一次，特征整轮保持不变；查表可在新 anchor 产生前进行，尝试与 Target 计算并行。
 
 ## Draft Memory
 
