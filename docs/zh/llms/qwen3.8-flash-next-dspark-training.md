@@ -149,36 +149,9 @@ $$
 
 ### 归一化设计与理论分析
 
-本实验的 Engram-Markov 使用不含可训练缩放参数的 RMSNorm。Target 自带的 PLE 模块则在 query、key 与卷积分支的归一化中保留逐维缩放，形式为 \((1+w)\odot\operatorname{RMSNorm}_0(x)\)，其中 \(w\) 初始化为零，\(\operatorname{RMSNorm}_0\) 表示仅归一化的操作。[Target 参考实现](https://github.com/huggingface/transformers/blob/main/src/transformers/models/qwen4_exp/modeling_qwen4_exp.py#L1067-L1129)
+**双重归一化的冗余。** Query 在投影前后各做一次 RMSNorm。由于归一化不含可训练缩放、投影无偏置，忽略数值稳定项与浮点误差时，第一次归一化产生的整体缩放会被第二次抵消。因此，投影前的归一化不增加表达能力，但会改变中间计算的数值范围。
 
-Query 路径在投影前后各做一次归一化。由于两处均无可训练缩放、\(W_Q\) 无偏置，对非零投影，忽略 \(\epsilon\) 与浮点误差时有
-
-$$
-\operatorname{RMSNorm}_0\!\left(W_Q\operatorname{RMSNorm}_0(h_i)\right)
-=\operatorname{RMSNorm}_0(W_Qh_i).
-$$
-
-投影前的归一化只改变整个向量的幅度，该缩放会被投影后的归一化抵消，因此在上述条件下不增加表达能力。它仍会改变中间计算的数值范围。
-
-不含缩放参数的 RMSNorm 将 query 和 key 的范数固定为约 \(\sqrt r\)。记二者夹角为 \(\theta_i\)，忽略数值稳定项，则
-
-$$
-s_i=\sqrt r\cos\theta_i,
-\qquad
-g_i=\sigma\!\left(r^{1/4}\operatorname{sign}(\cos\theta_i)
-\sqrt{|\cos\theta_i|}\right).
-$$
-
-当 \(r=256\) 时，门值范围约为 \([0.018,0.982]\)，足以实现较强的开启与关闭，但方向相似性到门控强度的映射尺度是固定的。若加入可训练缩放，分数变为
-
-$$
-s_i=\frac{1}{\sqrt r}\sum_j
-\gamma_{q,j}\gamma_{k,j}\bar q_{i,j}\bar k_{i,j},
-$$
-
-其中 \(\bar q_i,\bar k_i\) 为仅归一化后的向量。缩放参数可调整各维度的贡献及整体门控强度。例如，当 \(\gamma_{q,j}\gamma_{k,j}=c>0\) 对所有维度成立时，signed-square-root 后的分数乘上 \(\sqrt c\)，相当于调整 sigmoid 的温度。可训练的 \(W_Q,W_K\) 已能学习特征选择与方向匹配，但整体放大投影权重会被归一化抵消，无法以这种方式调整门控温度。
-
-Query 双重归一化在理想条件下存在计算冗余，当前门控也缺少独立的可学习尺度。后者可能影响 Engram 特征的注入强度，具体效果尚无归一化消融验证。这两点只涉及新增的 Engram 分支，不能解释 vanilla baseline 中已有的接受率衰减。
+**缺少可训练缩放的影响。** 本实验固定 query/key 归一化后的幅度，而 Target 的 PLE 保留逐维可训练缩放。[Target 参考实现](https://github.com/huggingface/transformers/blob/main/src/transformers/models/qwen4_exp/modeling_qwen4_exp.py#L1067-L1129) 可训练缩放能够调整各维度对匹配分数的贡献，以及整体门控强度。现有投影层已能学习特征选择和方向匹配，但整体放大投影权重会被归一化抵消，不能以此调整门控温度。缺少缩放可能使门控偏软或偏硬，影响 Engram 特征的注入强度，实际效果尚无消融验证。
 
 ## Engram 增强 MASK 输入
 
@@ -213,7 +186,7 @@ $$
 
 保留原 MASK embedding，通过逐槽标量门控制 Engram 残差的注入幅度。
 
-![Engram 门控增强 MASK：共享特征经逐槽 tanh 门缩放后，与 MASK embedding 相加](../../assets/images/qwen3.8-flash-next-dspark/engram-gate-mask.svg){ width="100%" }
+![Engram 门控增强 MASK：共享特征经逐槽 tanh 门缩放后，与 MASK embedding 相加](../../assets/images/qwen3.8-flash-next-dspark/engram-gate-mask.svg){ width="67%" }
 
 $$
 u_{a,0}=E(x_a),
@@ -223,6 +196,152 @@ u_{a,j}=E(\mathrm{MASK})+\tanh(\theta_j)z_a,
 $$
 
 每槽一个可训练标量 \(\theta_j\)，由所有样本共享，零初始化后输入与 baseline 相同。门值离开零后，投影 \(P\) 开始获得任务梯度。新增参数为 \(2560^2+6=6{,}553{,}606\)。
+
+#### 训练曲线
+
+![Gate mask 与 Baseline 的训练曲线：左为 loss，右为 acc，横轴上限为两种方法较小的最终 step 760](../../assets/images/qwen3.8-flash-next-dspark/engram-gate-mask-training-loss-accuracy.svg){ width="100%" }
+
+两种方法在训练初期的曲线接近。约 300 步后，Gate mask 的损失整体高于 Baseline，准确率整体低于 Baseline。
+
+## Prefix reranker
+
+Prefix reranker 用块内因果 Transformer 编码 anchor 与已选 token，结合当前 draft 隐藏状态，对 Markov top-16 候选进行残差打分，使候选选择利用整个块内前缀。
+
+![DSpark prefix reranker：左为整块生成，右为第三个位置的候选重排](../../assets/images/qwen3.8-flash-next-dspark/prefix-reranker.svg){ width="100%" }
+
+### 候选与前缀表示
+
+在第 \(i\) 个预测位置，先构造待重排的候选 token 集合 \(C_i\)，并将当前块内前缀编码为向量 \(r_i\)。令 \(t_0\) 为 anchor，\(t_1,\ldots,t_{i-1}\) 为其后的前缀 token。训练时使用参考 token，推理时使用当前轮已经选出的 token。
+
+候选集合来自原 DSpark 的预测。Markov head 使用前驱 token \(t_{i-1}\) 查表得到低秩表示，再通过输出矩阵 \(W_2\) 修正主干网络给出的初始 logits：
+
+$$
+\ell_i(v)=\ell_i^0(v)+W_2[v,:]\,W_1[t_{i-1}],
+\qquad
+C_i=\operatorname{Top16}(\ell_i).
+$$
+
+其中，\(v\) 为词表中的 token，\(W_2[v,:]\) 为输出矩阵中对应 token 的一行。\(C_i\) 包含修正后分数最高的 16 个 token，reranker 随后在这 16 个候选中重新评分和选择。
+
+前缀表示由一个因果 Prefix Transformer 生成。它读取当前 block 内从 anchor 到前驱 token 的序列 \([t_0,\ldots,t_{i-1}]\)。每个 token 复用 Markov head 的参数表 \(W_1\) 得到 256 维向量，再经过线性投影，加上可学习的块内位置 embedding，送入 Transformer。取最后一个输入 token \(t_{i-1}\) 对应的输出，经 LayerNorm 得到 \(r_i\in\mathbb R^{256}\)。该位置通过因果 attention 读取整个已有块内前缀。
+
+例如，以 D 为 anchor，前两步已选出 E、F，当前要预测第三个 token G。Markov head 使用 F 修正 \(\ell_3^0\)，得到候选集合 \(C_3\)；Prefix Transformer 读取 `[D, E, F]`，取 F 所在位置的输出形成 \(r_3\)。下一节将 \(r_3\) 与当前 draft 隐藏状态 \(h_3\) 结合，对 \(C_3\) 中的候选进行残差打分。
+
+Prefix Transformer 只编码当前 block 内的前缀，anchor 之前的历史上下文由 draft 隐藏状态 \(h_i\) 提供。该 Transformer 采用一个 pre-norm 因果层，宽度为 256，包含 4 个 attention heads，FFN 为 \(256\rightarrow1024\rightarrow256\)，使用 SiLU。
+
+### 残差打分
+
+对于候选集合 \(C_i\) 中的每个 token，reranker 计算一个分数修正量 \(\Delta_i(v)\)，加到原 DSpark 分数 \(\ell_i(v)\) 上。修正量由两个向量的内积得到：查询向量 \(u_i\) 表示当前位置的上下文与块内前缀，候选向量 \(k_v\) 表示待评分的 token。
+
+查询向量由 draft 隐藏状态 \(h_i\) 和前缀表示 \(r_i\) 共同构造。先用 \(W_h\) 将 2560 维的 \(h_i\) 投影到 256 维，再与 256 维的 \(r_i\) 拼接为 512 维向量，经线性变换、SiLU 激活和输出投影得到 \(u_i\in\mathbb R^{256}\)：
+
+$$
+u_i=W_o\,\operatorname{SiLU}\!\left(W_q[W_hh_i;r_i]+\beta_q\right).
+$$
+
+其中，\([\,;\,]\) 表示向量拼接，\(W_q\) 与 \(\beta_q\) 为拼接后的线性变换参数，\(W_o\) 为输出投影。当前位置的 16 个候选共享同一个 \(u_i\)。
+
+候选向量复用 Markov head 的输出矩阵 \(W_2\)。对每个候选 token \(v\)，取其对应的 256 维行向量 \(W_2[v,:]\)，转为列向量后，通过可训练投影 \(W_c\) 得到 \(k_v\in\mathbb R^{256}\)：
+
+$$
+k_v=W_cW_2[v,:]^\top.
+$$
+
+将查询向量与各候选向量做内积，并除以 \(\sqrt{256}\) 缩放，得到残差分数。最终分数和 greedy 选择为
+
+$$
+\begin{aligned}
+\Delta_i(v)&=\frac{u_i^\top k_v}{\sqrt{256}},\\
+s_i(v)&=\ell_i(v)+\Delta_i(v),\qquad v\in C_i,\\
+\hat t_i&=\arg\max_{v\in C_i}s_i(v).
+\end{aligned}
+$$
+
+\(\Delta_i(v)\) 为正时提高该候选的分数，为负时降低其分数。重排后的选择由原分数与修正量共同决定，候选范围仍为 \(C_i\)。
+
+沿用预测 G 的例子，\(h_3\) 与编码了 `[D, E, F]` 的 \(r_3\) 共同形成 \(u_3\)。对 \(C_3\) 中的 16 个候选，分别计算 \(u_3^\top k_v/\sqrt{256}\)，加到各自的 \(\ell_3(v)\) 上，再选择总分最高的 token。前缀表示与查询向量在该位置各计算一次，16 个候选的内积评分可以并行完成。
+
+输出投影 \(W_o\) 零初始化，因此初始 \(u_i=0\)，所有候选的修正量 \(\Delta_i(v)=0\)，重排分数与原 DSpark 分数相同。并列最高分时优先保留原 DSpark 的选择，使初始 greedy 选择与原模型一致。
+
+### 训练目标与更新范围
+
+训练沿用现有的 Target 隐藏状态缓存，并使用参考 token 构造块内前缀。例如，以 D 为 anchor、参考预测序列为 `[E, F, G, H, I, J, K]` 时，Prefix Transformer 的输入为 `[D, E, F, G, H, I, J]`，即在预测序列前放入 anchor，并去掉最后一个 token。因果掩码使各位置只读取截至自身的输入：预测 E 的位置读取 D，预测 F 的位置读取 `[D, E]`，预测 G 的位置读取 `[D, E, F]`。因此，一次前向计算即可得到所有预测位置的前缀表示 \(r_1,\ldots,r_7\)。Markov head 同样使用对应的参考前驱 token，生成各位置的 top-16 候选集合 \(C_i\)。
+
+重排训练要求模型在候选中选出 teacher 分数最高的 token。记 \(p_i\) 为缓存参考前缀对应的 teacher 分布，监督标签为
+
+$$
+v_i^\star=\arg\max_v p_i(v).
+$$
+
+这里，参考 token 用于构造训练输入，teacher argmax 用作重排标签。由于参考回复由采样生成，记录的下一个 token 与 \(v_i^\star\) 可能不同。
+
+排序损失只在具有有效监督、且 \(v_i^\star\) 已进入候选集合 \(C_i\) 的位置计算。例如，在预测 G 的位置，若 teacher argmax 为 G 且 \(G\in C_3\)，就对 \(C_3\) 中的 16 个重排分数做 softmax，以 G 为标签计算交叉熵。如果 G 没有进入 \(C_3\)，该位置跳过排序损失，因为 reranker 只能在已有候选中选择。
+
+记这些有效且候选命中的位置构成集合 \(\mathcal H\)。对每个命中位置，候选内 softmax 给标签 \(v_i^\star\) 分配的概率越高，交叉熵越小。将各位置的损失按位置权重求平均，得到
+
+$$
+L_{\mathrm{rank}}
+=-\frac{
+\sum_{i\in\mathcal H} w_i
+\log\frac{\exp s_i(v_i^\star)}
+{\sum_{v\in C_i}\exp s_i(v)}
+}{
+\sum_{i\in\mathcal H}w_i
+}.
+$$
+
+其中，\(s_i(v)\) 为上一节定义的重排分数，\(w_i=\exp(-(i-1)/4)\)，\(i\) 为块内预测位置，从 1 开始。越靠后的预测位置权重越小。公式省略样本和 block 下标，求和覆盖当前 batch 中所有 block 的有效命中位置，分母为这些位置的权重之和。当前 batch 没有命中位置时，令 \(L_{\mathrm{rank}}=0\)。
+
+联合训练同时保留基于重排前预测计算的原 DSpark 基础目标：
+
+$$
+L=L_{\mathrm{base}}+L_{\mathrm{rank}}.
+$$
+
+\(L_{\mathrm{base}}\) 包含 token CE、teacher 分布的 L1 拟合损失和 confidence loss，作用于全部有效监督位置。\(L_{\mathrm{rank}}\) 作用于候选命中位置，训练候选之间的相对分数。因此，未命中的位置仍参与基础训练。
+
+两组实验的初始化和参数更新范围如下：
+
+| 实验 | 初始化 | 更新范围 |
+| --- | --- | --- |
+| 联合训练 | 从头训练 DSpark 与 reranker | 更新 draft 主干网络、Markov head、confidence head 和 reranker 新增参数；Target backbone、token embedding 与 LM head 保持冻结 |
+| 冻结基线 | 加载已训练 2,604 步的 baseline，初始化 reranker 新增参数 | 固定已有主干网络、Markov head 和 confidence head，仅更新 reranker 新增参数 |
+
+Markov 参数 \(W_1,W_2\) 被原 DSpark 和 reranker 共同使用：联合训练时参与更新，冻结基线实验中保持固定。
+
+冻结基线实验会重新初始化优化器与学习率调度。曲线横轴显示“此前 2,604 步 + 本次新增步数”，学习率则只按本次新增步数调度。例如，新增训练 100 步后，曲线横轴为 2,704，学习率调度对应本次训练的第 100 步。
+
+### 训练曲线
+
+比较联合训练的 Prefix reranker 与 Baseline，横轴取两种方法较小的最终 step 18,630。
+
+![Prefix reranker 与 Baseline 的训练曲线：左为 loss，右为 acc，横轴上限为 step 18,630](../../assets/images/qwen3.8-flash-next-dspark/prefix-reranker-training-loss-accuracy.svg){ width="67%" }
+
+两条损失曲线均逐步下降。Baseline 的训练目标为 \(L_{\mathrm{base}}\)，联合训练的 reranker 目标为 \(L_{\mathrm{base}}+L_{\mathrm{rank}}\)。在共同终点 step 18,630，损失分别为 0.6321 和 1.0037。
+
+Prefix reranker 的后期训练准确率整体更高。在 step 18,630，Baseline 与 Prefix reranker 的准确率分别为 80.57% 和 82.00%，后者提高约 1.43 个百分点。
+
+#### 逐位置准确率
+
+![共同终点 step 18,630 的逐位置训练准确率：左为 Baseline 与 Prefix reranker 对比，右为 reranker 相对 Baseline 的提升（百分点）](../../assets/images/qwen3.8-flash-next-dspark/prefix-reranker-position-accuracy-step18630.svg){ width="67%" }
+
+Prefix reranker 在第 1、2 位的准确率分别降低约 0.51、0.13 个百分点，第 3–7 位均有提高。收益主要集中在后段，第 5–7 位分别提高约 1.34、1.82、2.29 个百分点。
+
+### 重排评估
+
+以下四项指标来自 Prefix reranker 的导出记录，每项包含 1,000 个数据点，覆盖 step 50–18,630，曲线未做平滑。三项增益均比较同一 checkpoint、同一批 anchor 上重排前后的结果。
+
+![Prefix reranker 的重排评估：左上为候选覆盖率，右上为 teacher argmax 一致率增益，左下为概率接受长度增益，右下为参考前缀连续匹配长度增益；曲线未做平滑](../../assets/images/qwen3.8-flash-next-dspark/prefix-reranker-rerank-evaluation.svg){ width="100%" }
+
+**候选覆盖率。** `reranker/candidate_recall` 统计 teacher argmax 落在 Markov top-16 内的比例。覆盖率从首个记录点的 30.57% 整体提高，后期增幅趋缓，在 step 18,630 达到 93.97%。该指标反映候选生成阶段能否保留目标 token。在相同评估位置和统计口径下，它也是重排后选中 teacher argmax 的比例上界。终点仍有约 6.03% 的位置未覆盖 teacher argmax，这些位置无法仅靠候选内重排选中目标。
+
+**Teacher argmax 一致率增益。** `rerank_target_agreement_gain` 是重排后与重排前选中 teacher argmax 的比例之差，图中转换为百分点。增益在训练早期快速上升，随后回落，后期趋于稳定。step 18,630 的增益为 2.70 个百分点，说明此时重排仍能改善候选选择。这一差值比较的是同一个联合训练模型内部的两种选择结果，与上一节相对独立 Baseline 的训练准确率提升采用不同的比较对象和标签口径。
+
+**概率接受长度增益。** `rerank_tau_gain` 表示重排后与重排前的 \(\tau_{\mathrm{prob}}\) 之差。其在早期达到较高水平后逐渐回落，终点仍为正，约为 0.0770。重排后的分布由 top-16 修正分数经过 softmax 得到，候选之外的概率置零；重排前的 DSpark 分布与 teacher 分布均在全词表上归一化。因此，该增益同时包含残差打分、top-16 截断和重新归一化的影响。`train/tau_probabilistic` 和 `eval/tau_probabilistic` 使用上述重排后的分布。
+
+**参考前缀连续匹配长度增益。** `rerank_teacher_forced_prefix_gain` 衡量重排前后，与参考 token 序列连续匹配的前缀长度之差。其变化趋势与一致率增益接近，终点为 0.0924 个 token。该指标使用参考 token 作为前驱输入，在 teacher forcing 条件下计算，不能直接视为在线 Target 验证得到的 MAL 增益。
+
+四条曲线表明，训练后期候选覆盖率仍在提高，而重排带来的额外收益逐渐缩小并保持为正。覆盖更多目标 token，并不必然带来更大的重排增益：增益还取决于重排前的排序质量，以及 reranker 对这些候选的区分能力。仅凭差值曲线，无法判断增益回落是由重排前预测改善还是重排后预测变化主导；整体效果仍需结合独立 Baseline 对照和后文的在线评测判断。
 
 ## Draft Memory
 
@@ -281,99 +400,6 @@ $$
 在线推理为每个请求保存上一轮 draft 的最终隐藏表示。Target 验证后，移除已接受位置和首次拒绝位置的状态，将剩余后缀按预测位置用于下一轮。各层通过自身投影生成 memory K/V。
 
 训练用参考序列确定拒绝位置，memory 来自未输入 memory 的第一阶段。在线推理由 Target 验证确定拒绝位置，并连续复用上一轮的隐藏状态，因此可能累积更早轮次的 memory 信息。
-
-## Prefix reranker
-
-Prefix reranker 用块内因果 Transformer 编码 anchor 与已选 token，结合当前 draft 隐藏状态，对 Markov top-16 候选进行残差打分，使候选选择利用整个块内前缀。
-
-![DSpark prefix reranker：左为整块生成，右为第三个位置的候选重排](../../assets/images/qwen3.8-flash-next-dspark/prefix-reranker.svg){ width="100%" }
-
-### 候选与前缀表示
-
-沿用 baseline 记号，训练使用参考 token，推理使用当前轮已选 token。
-
-复用 Markov head 的两张秩为 256 的 token 表 \(E_{\mathrm{in}}\) 与 \(E_{\mathrm{out}}\)，得到原 DSpark 分数
-
-$$
-\ell_i(v)=\ell_i^0(v)+E_{\mathrm{in}}(t_{i-1})^\top E_{\mathrm{out}}(v),
-\qquad
-C_i=\operatorname{Top16}(\ell_i).
-$$
-
-候选集合由 Markov 修正后的分数确定。因此，teacher argmax 的候选覆盖率构成重排选择准确率的上界。
-
-Prefix Transformer 的输入为 \([t_0,\ldots,t_{i-1}]\)。各 token 经共享的 \(E_{\mathrm{in}}\) 查表、线性投影并加上可学习的块内位置 embedding。一个 pre-norm 因果 Transformer 层生成前缀表示 \(r_i\)。其宽度为 256，包含 4 个 attention heads，FFN 为 \(256\rightarrow1024\rightarrow256\)，使用 SiLU，输出经过 LayerNorm。
-
-前缀编码范围限于当前 block，历史上下文由 \(h_i\) 提供。
-
-### 残差打分
-
-将 \(h_i\) 投影到 256 维，与 \(r_i\) 拼接，再经过 MLP 和输出投影形成查询向量 \(u_i\)。候选 token 则从共享的 \(E_{\mathrm{out}}\) 查表并投影为 \(k_v\)：
-
-$$
-\begin{aligned}
-u_i&=W_o\,\operatorname{SiLU}\!\left(W_q[W_hh_i;r_i]+\beta_q\right),\\
-k_v&=W_cE_{\mathrm{out}}(v),\\
-\Delta_i(v)&=\frac{u_i^\top k_v}{\sqrt{256}},\\
-s_i(v)&=\ell_i(v)+\Delta_i(v),\qquad v\in C_i.
-\end{aligned}
-$$
-
-最终选择为 \(\hat t_i=\arg\max_{v\in C_i}s_i(v)\)。Prefix Transformer 编码前缀一次，候选通过查询向量与投影特征的内积并行评分。
-
-\(W_o\) 零初始化，并列分数优先保留原 DSpark 的选择，因此初始 greedy 选择与原模型一致。
-
-### 重排评估
-
-`train/tau_probabilistic` 和 `eval/tau_probabilistic` 使用重排后的分布：对 top-16 候选的修正分数做 softmax，候选之外的概率置零。Teacher 使用原始全词表分布。重排前的 DSpark 分布也在全词表上归一化。
-
-| **指标** | 含义 |
-| --- | --- |
-| **`rerank_tau_gain`** | 同一 checkpoint、同一批 anchor 上，重排后与重排前的 \(\tau_{\mathrm{prob}}\) 之差 |
-| **`rerank_target_agreement_gain`** | 重排前后选中 teacher argmax 的比例之差；0.02 表示增加 2 个百分点 |
-| **`reranker/candidate_recall`** | Teacher argmax 落在 Markov top-16 内的比例 |
-| **`rerank_teacher_forced_prefix_gain`** | 与参考 token 序列连续匹配的前缀长度变化，仍在 teacher-forced 输入下计算 |
-
-`rerank_tau_gain` 包含分数修正、top-16 截断和重新归一化的影响；整体效果另与相同训练步数的独立 baseline 比较。
-
-### 训练目标与更新范围
-
-训练沿用现有隐藏状态缓存。每个 block 的前驱输入右移一位，以 anchor 开头，其后为参考序列中的 token。Prefix Transformer 使用因果掩码，一次前向计算编码所有位置。
-
-记 \(p_i\) 为缓存参考前缀对应的 teacher 分布，重排监督标签为
-
-$$
-v_i^\star=\arg\max_v p_i(v).
-$$
-
-记 \(\mathcal H\) 为有效且 \(v_i^\star\in C_i\) 的位置集合，在这些位置计算候选内的排序 CE：
-
-$$
-L_{\mathrm{rank}}
-=-\frac{
-\sum_{i\in\mathcal H} w_i
-\log\frac{\exp s_i(v_i^\star)}
-{\sum_{v\in C_i}\exp s_i(v)}
-}{
-\sum_{i\in\mathcal H}w_i
-}.
-$$
-
-其中 \(w_i=\exp(-(i-1)/4)\)，求和覆盖 batch 中各 block 的有效命中位置。没有命中位置时，该项为零。联合训练保留重排前的原始 DSpark 目标：
-
-$$
-L=L_{\mathrm{base}}+L_{\mathrm{rank}}.
-$$
-
-\(L_{\mathrm{base}}\) 为 baseline 的三项损失，监督全部有效位置；排序损失仅监督候选命中位置。联合训练共同更新主干网络和共享 Markov 参数。
-
-冻结基线实验从训练 2,604 步的 baseline 开始，固定主干网络、Markov 和 confidence head，只训练 reranker 的新增参数，并重新初始化优化器与学习率调度。曲线横轴为此前训练步数加上本次新增步数，学习率按本次新增步数调度。
-
-### 推理开销
-
-主干网络每轮只运行一次。第 \(i\) 个位置利用上一个已选 token 更新 Prefix Transformer 的本地 K/V，得到 \(r_i\)，并计算 Markov 修正后的 top-16 候选及其残差分数。选出的 token 进入下一位置，整块候选最后交给 Target 验证。
-
-Prefix K/V 在当前 block 内增长，每轮重新清空。
 
 ## Evaluation
 
