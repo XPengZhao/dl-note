@@ -128,19 +128,19 @@ DeepSpec 评测的输出上限为 2048 tokens，并发数为 32，seed 从 98040
 
 在 vLLM 协议中加入五个示例问答后，MOL 从 248.38 降至 143.73，MAL 从 6.1511 降至 5.1025，降幅为 17.05%。这组结果显示，few-shot prompt 伴随着更短的输出和更低的 draft 接受率。后续实验统一采用 vLLM 协议与 0-shot 设置。
 
-### 采样参数对接受率的影响
+### 接受率 vs. 采样参数
 
 使用官方权重，在 vLLM 0-shot、non-thinking 设置下比较 target 采样参数与 draft 采样方式，每轮提出 7 个 draft tokens。表中的 Temperature、Top-p 和 Top-k 为 target 请求参数，min-p 固定为 0。Draft 采用 probabilistic 时按 target 的温度进行概率采样，top-p/top-k 截断仅作用于 target；采用 greedy 时直接选择概率最高的 token。T=0 时，target 与 draft 均采用 greedy。
 
 <div class="js-sortable-table js-multisort js-row-reorder dspark-three-line dspark-compact" markdown="1">
 
-| Temperature | Top-p | Top-k | Draft 采样 | MOL | MAL | 整体接受率 | pos-1 | pos-2 | pos-3 | pos-4 | pos-5 | pos-6 | pos-7 |
+| Temperature | Top-p | Top-k | Draft 采样 | MOL | **MAL** | 整体接受率 | pos-1 | pos-2 | pos-3 | pos-4 | pos-5 | pos-6 | pos-7 |
 | ---: | ---: | ---: | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| 1.0 | 1.0 | -1 | probabilistic | 248.38 | 6.1511 | 73.59% | 93.63% | 86.72% | 79.56% | 73.08% | 66.52% | 60.68% | 54.92% |
-| 1.0 | 1.0 | -1 | greedy | 247.51 | 5.8528 | 69.33% | 90.82% | 82.53% | 74.72% | 68.03% | 61.80% | 56.39% | 51.00% |
-| 0.7 | 0.8 | 20 | probabilistic | 247.77 | 6.2480 | 74.97% | 93.65% | 87.11% | 80.51% | 74.49% | 68.52% | 63.03% | 57.49% |
-| 0.7 | 0.8 | 20 | greedy | 251.56 | 6.2437 | 74.91% | 93.43% | 86.86% | 80.05% | 74.34% | 68.54% | 63.24% | 57.91% |
-| 0.0 | 1.0 | -1 | greedy | 248.44 | 6.3085 | 75.84% | 94.02% | 87.69% | 81.16% | 75.44% | 69.54% | 64.18% | 58.82% |
+| 1.0 | 1.0 | -1 | probabilistic | 248.38 | **6.1511** | 73.59% | 93.63% | 86.72% | 79.56% | 73.08% | 66.52% | 60.68% | 54.92% |
+| 1.0 | 1.0 | -1 | greedy | 247.51 | **5.8528** | 69.33% | 90.82% | 82.53% | 74.72% | 68.03% | 61.80% | 56.39% | 51.00% |
+| 0.7 | 0.8 | 20 | probabilistic | 247.77 | **6.2480** | 74.97% | 93.65% | 87.11% | 80.51% | 74.49% | 68.52% | 63.03% | 57.49% |
+| 0.7 | 0.8 | 20 | greedy | 251.56 | **6.2437** | 74.91% | 93.43% | 86.86% | 80.05% | 74.34% | 68.54% | 63.24% | 57.91% |
+| 0.0 | 1.0 | -1 | greedy | 248.44 | **6.3085** | 75.84% | 94.02% | 87.69% | 81.16% | 75.44% | 69.54% | 64.18% | 58.82% |
 
 </div>
 
@@ -151,6 +151,21 @@ DeepSpec 评测的输出上限为 2048 tokens，并发数为 32，seed 从 98040
 固定 target 为 T=0.7、top-p=0.8、top-k=20 时，probabilistic 与 greedy draft 的 MAL 分别为 6.2480 和 6.2437，仅相差 0.0043，整体接受率相差 0.06 个百分点。这组实验中，两种 draft 采样方式的接受率接近。
 
 固定 target 为 T=1、top-p=1、top-k=-1 时，probabilistic draft 的 MAL 为 6.1511，较 greedy 的 5.8528 提高 5.10%，整体接受率提高 4.26 个百分点。两组的 MOL 分别为 248.38 和 247.51 tokens/题。与 T=0.7、top-p=0.8、top-k=20 下接近的接受率相比，probabilistic draft 在 T=1、无 top-p/top-k 截断的设置下表现出更明显的接受长度收益。
+
+### 接受率：Baseline vs. DrawSpec（1 epoch）
+
+两组模型均训练约 1 epoch，在 GSM8K test 全集 1,319 题上评测，target temperature 为 0.7，每轮提出 7 个 draft tokens。DrawSpec 采用四层预计算、一层条件化的架构，使用 late-conditioning 分支训练的 12-state 权重，最后一层输入为 anchor + 6 states。表中 pos-1 至 pos-7 为连续接受率。
+
+<div class="js-sortable-table js-multisort js-row-reorder dspark-three-line dspark-compact" markdown="1">
+
+| 模型 | MOL | **MAL** | 整体接受率 | pos-1 | pos-2 | pos-3 | pos-4 | pos-5 | pos-6 | pos-7 |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Baseline | 247.98 | **5.5271** | 64.67% | 90.67% | 81.04% | 71.74% | 63.77% | 55.84% | 48.34% | 41.32% |
+| DrawSpec | 248.58 | **4.7163** | 53.09% | 85.80% | 70.82% | 59.19% | 49.87% | 41.73% | 35.07% | 29.14% |
+
+</div>
+
+两组平均输出长度接近。DrawSpec 的 MAL 较 baseline 降低 0.8108（14.67%），整体接受率降低 11.58 个百分点。
 
 ### vLLM 协议：Online training 与官方权重
 
