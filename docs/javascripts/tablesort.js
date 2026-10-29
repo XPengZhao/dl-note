@@ -359,6 +359,19 @@ function enableRowReorder(table) {
 }
 
 document$.subscribe(() => {
+  // Pair colors follow sampling settings even after sorting or dragging rows.
+  document.querySelectorAll(".dspark-paired table").forEach((table) => {
+    const groups = new Map();
+    Array.from(table.tBodies).forEach((body) => {
+      Array.from(body.rows).forEach((row) => {
+        if (row.dataset.pairTone !== undefined) return;
+        const key = JSON.stringify(Array.from(row.cells).slice(0, 4)
+          .map((cell) => cell.textContent.trim()));
+        if (!groups.has(key)) groups.set(key, groups.size % 2);
+        row.dataset.pairTone = String(groups.get(key));
+      });
+    });
+  });
   document.querySelectorAll(".js-multisort table").forEach(enableMultiSort);
   document.querySelectorAll(".js-row-reorder table").forEach(enableRowReorder);
   if (typeof Tablesort === "undefined") return;

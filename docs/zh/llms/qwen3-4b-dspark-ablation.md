@@ -2,7 +2,7 @@
 
 ## 实验设置
 
-训练消融采用 **offline training**：预先缓存 target hidden states，再训练 draft。GSM8K 部分另列 online training baseline 的生成评测结果。
+训练消融采用 **offline training**：预先缓存 target hidden states，再训练 draft。GSM8K 部分另列 online training baseline 与 Backbone MLA + Markov MLA 的生成评测结果。
 
 以 Qwen3-4B 为冻结的 target 模型，训练五层 DSpark draft。目标模型的 token embedding 与 LM head 保持冻结。除延长训练实验外，各实验训练 2,616 个 optimizer steps，约一个 epoch，占完整学习率计划的 10%。
 
@@ -84,7 +84,7 @@ $$
 
 ## GSM8K 生成评测
 
-生成评测使用 GSM8K test 全集 1,319 题，报告平均输出长度（MOL，tokens/题）、平均接受长度（MAL）及各位置的接受率。MAL 包含 target 生成的 bonus token，计算为 `1 + accepted / rounds`。整体接受率为 `accepted / drafted`，`pos-i` 表示前 i 个 draft tokens 全部被接受的比例。
+生成评测使用 GSM8K test 全集 1,319 题，报告平均输出长度（MOL，tokens/题）、平均接受长度（MAL）及各位置的接受率。MAL 包含 target 生成的 bonus token，计算为 `1 + accepted / rounds`。`pos-i` 表示前 i 个 draft tokens 全部被接受的比例。
 
 ### 评测协议与 shot 数对比
 
@@ -116,11 +116,11 @@ DeepSpec 评测的输出上限为 2048 tokens，并发数为 32，seed 从 98040
 
 <div class="js-sortable-table js-multisort js-row-reorder dspark-three-line dspark-compact" markdown="1">
 
-| 评测协议 | MOL | MAL | 整体接受率 | pos-1 | pos-2 | pos-3 | pos-4 | pos-5 | pos-6 | pos-7 |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| DeepSpec 0-shot | 305.63 | **6.1305** | **73.29%** | 93.25% | 86.04% | 79.01% | 72.63% | 66.44% | 60.60% | 55.08% |
-| vLLM 0-shot | 248.38 | **6.1511** | **73.59%** | 93.63% | 86.72% | 79.56% | 73.08% | 66.52% | 60.68% | 54.92% |
-| vLLM 5-shot | 143.73 | **5.1025** | **58.61%** | 88.73% | 78.02% | 67.69% | 57.29% | 47.69% | 39.33% | 31.51% |
+| 评测协议 | MAL | pos-1 | pos-2 | pos-3 | pos-4 | pos-5 | pos-6 | pos-7 | MOL |
+| --- | :---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | :---: |
+| DeepSpec 0-shot | **6.1305** | 93.25% | 86.04% | 79.01% | 72.63% | 66.44% | 60.60% | 55.08% | 305.63 |
+| vLLM 0-shot | **6.1511** | 93.63% | 86.72% | 79.56% | 73.08% | 66.52% | 60.68% | 54.92% | 248.38 |
+| vLLM 5-shot | **5.1025** | 88.73% | 78.02% | 67.69% | 57.29% | 47.69% | 39.33% | 31.51% | 143.73 |
 
 </div>
 
@@ -130,70 +130,95 @@ DeepSpec 评测的输出上限为 2048 tokens，并发数为 32，seed 从 98040
 
 ### 接受率 vs. 采样参数
 
-使用官方权重，在 vLLM 0-shot、non-thinking 设置下比较 target 采样参数与 draft 采样方式，每轮提出 7 个 draft tokens。表中的 Temperature、Top-p 和 Top-k 为 target 请求参数，min-p 固定为 0。Draft 采用 probabilistic 时按 target 的温度进行概率采样，top-p/top-k 截断仅作用于 target；采用 greedy 时直接选择概率最高的 token。T=0 时，target 与 draft 均采用 greedy。
+在 vLLM 0-shot、non-thinking 设置下比较 target 采样参数与 draft 采样方式，每轮提出 7 个 draft tokens。表中的 T 表示 target temperature；T、Top-p 和 Top-k 均为 target 请求参数，min-p 固定为 0。Draft 采用 probabilistic 时按 target 的温度进行概率采样，top-p/top-k 截断仅作用于 target；采用 greedy 时直接选择概率最高的 token。T=0 时，target 与 draft 均采用 greedy。
 
-<div class="js-sortable-table js-multisort js-row-reorder dspark-three-line dspark-compact" markdown="1">
+#### 官方权重
 
-| Temperature | Top-p | Top-k | Draft 采样 | MOL | **MAL** | 整体接受率 | pos-1 | pos-2 | pos-3 | pos-4 | pos-5 | pos-6 | pos-7 |
-| ---: | ---: | ---: | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| 1.0 | 1.0 | -1 | probabilistic | 248.38 | **6.1511** | 73.59% | 93.63% | 86.72% | 79.56% | 73.08% | 66.52% | 60.68% | 54.92% |
-| 1.0 | 1.0 | -1 | greedy | 247.51 | **5.8528** | 69.33% | 90.82% | 82.53% | 74.72% | 68.03% | 61.80% | 56.39% | 51.00% |
-| 0.7 | 0.8 | 20 | probabilistic | 247.77 | **6.2480** | 74.97% | 93.65% | 87.11% | 80.51% | 74.49% | 68.52% | 63.03% | 57.49% |
-| 0.7 | 0.8 | 20 | greedy | 251.56 | **6.2437** | 74.91% | 93.43% | 86.86% | 80.05% | 74.34% | 68.54% | 63.24% | 57.91% |
-| 0.0 | 1.0 | -1 | greedy | 248.44 | **6.3085** | 75.84% | 94.02% | 87.69% | 81.16% | 75.44% | 69.54% | 64.18% | 58.82% |
+使用 `deepseek-ai/dspark_qwen3_4b_block7`。
+
+<div class="js-sortable-table js-multisort js-row-reorder dspark-three-line dspark-compact dspark-sampling" markdown="1">
+
+| T | Top-p | Top-k | Draft 采样 | **MAL** | pos-1 | pos-2 | pos-3 | pos-4 | pos-5 | pos-6 | pos-7 | MOL |
+| :---: | ---: | ---: | --- | :---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | :---: |
+| 1.0 | 1.0 | -1 | probabilistic | **6.1511** | 93.63% | 86.72% | 79.56% | 73.08% | 66.52% | 60.68% | 54.92% | 248.38 |
+| 1.0 | 1.0 | -1 | greedy | **5.8528** | 90.82% | 82.53% | 74.72% | 68.03% | 61.80% | 56.39% | 51.00% | 247.51 |
+| 0.7 | 0.8 | 20 | probabilistic | **6.2480** | 93.65% | 87.11% | 80.51% | 74.49% | 68.52% | 63.03% | 57.49% | 247.77 |
+| 0.7 | 0.8 | 20 | greedy | **6.2437** | 93.43% | 86.86% | 80.05% | 74.34% | 68.54% | 63.24% | 57.91% | 251.56 |
+| 0.0 | 1.0 | -1 | greedy | **6.3085** | 94.02% | 87.69% | 81.16% | 75.44% | 69.54% | 64.18% | 58.82% | 248.44 |
 
 </div>
 
 固定 draft 为 probabilistic，以 T=1、top-p=1、top-k=-1 为基准，T=0.7、top-p=0.8、top-k=20 这一参数组合的 MAL 提高 1.58%，达到 6.2480。
 
-保持 top-p=1、top-k=-1，将 T 从 1 降至 0 后，MAL 提高 2.56%，达到 6.3085，整体接受率提高 2.25 个百分点。位置 1 的连续接受率从 93.63% 升至 94.02%，位置 7 从 54.92% 升至 58.82%，后段的累计改善更明显。
+保持 top-p=1、top-k=-1，将 T 从 1 降至 0 后，MAL 提高 2.56%，达到 6.3085。位置 1 的连续接受率从 93.63% 升至 94.02%，位置 7 从 54.92% 升至 58.82%，后段的累计改善更明显。
 
-固定 target 为 T=0.7、top-p=0.8、top-k=20 时，probabilistic 与 greedy draft 的 MAL 分别为 6.2480 和 6.2437，仅相差 0.0043，整体接受率相差 0.06 个百分点。这组实验中，两种 draft 采样方式的接受率接近。
+固定 target 为 T=0.7、top-p=0.8、top-k=20 时，probabilistic 与 greedy draft 的 MAL 分别为 6.2480 和 6.2437，仅相差 0.0043。这组实验中，两种 draft 采样方式的接受率接近。
 
-固定 target 为 T=1、top-p=1、top-k=-1 时，probabilistic draft 的 MAL 为 6.1511，较 greedy 的 5.8528 提高 5.10%，整体接受率提高 4.26 个百分点。两组的 MOL 分别为 248.38 和 247.51 tokens/题。与 T=0.7、top-p=0.8、top-k=20 下接近的接受率相比，probabilistic draft 在 T=1、无 top-p/top-k 截断的设置下表现出更明显的接受长度收益。
+固定 target 为 T=1、top-p=1、top-k=-1 时，probabilistic draft 的 MAL 为 6.1511，较 greedy 的 5.8528 提高 5.10%。两组的 MOL 分别为 248.38 和 247.51 tokens/题。与 T=0.7、top-p=0.8、top-k=20 下接近的接受率相比，probabilistic draft 在 T=1、无 top-p/top-k 截断的设置下表现出更明显的接受长度收益。
 
-### 接受率：Baseline vs. DrawSpec（1 epoch）
+#### Backbone MLA + Markov MLA
 
-两组模型均训练约 1 epoch，在 GSM8K test 全集 1,319 题上评测，target temperature 为 0.7，每轮提出 7 个 draft tokens。DrawSpec 采用四层预计算、一层条件化的架构，使用 late-conditioning 分支训练的 12-state 权重，最后一层输入为 anchor + 6 states。表中 pos-1 至 pos-7 为连续接受率。
+Baseline 与 Markov MLA 均训练 1 epoch。表中的 Markov MLA 指 backbone 与 Markov head 均使用 MLA 的模型，投影权重与 KV cache 不共享。Markov 通路为 `W1 → MLA → W2`，不加 residual，K/V 来自融合后的 target features，head 关注早于 anchor 的 context。客户端并发数与服务端最大请求数均为 32，每轮提出 7 个 draft tokens。
 
-<div class="js-sortable-table js-multisort js-row-reorder dspark-three-line dspark-compact" markdown="1">
+<b> GSM8K 测试 </b>
 
-| 模型 | MOL | **MAL** | 整体接受率 | pos-1 | pos-2 | pos-3 | pos-4 | pos-5 | pos-6 | pos-7 |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| Baseline | 247.98 | **5.5271** | 64.67% | 90.67% | 81.04% | 71.74% | 63.77% | 55.84% | 48.34% | 41.32% |
-| DrawSpec | 248.58 | **4.7163** | 53.09% | 85.80% | 70.82% | 59.19% | 49.87% | 41.73% | 35.07% | 29.14% |
+<div class="js-sortable-table js-multisort js-row-reorder dspark-three-line dspark-compact dspark-sampling dspark-paired" markdown="1">
 
-</div>
-
-两组平均输出长度接近。DrawSpec 的 MAL 较 baseline 降低 0.8108（14.67%），整体接受率降低 11.58 个百分点。
-
-### vLLM 协议：Online training 与官方权重
-
-在 vLLM 服务上评测 GSM8K test 全集 1,319 题，invalid rate 均为 0%。自训练 baseline 训练至 step 2616（约 1 epoch）。Prompt 使用 `Question: {question}\nAnswer:` 格式。Target 使用 **non-thinking**，采样参数为 **temperature=0.7、top-p=0.8、top-k=20、min-p=0**；Draft 均采用 **greedy**，每轮提出 7 个 draft tokens。
-
-<div class="js-sortable-table js-multisort js-row-reorder dspark-three-line dspark-compact" markdown="1">
-
-| 权重 | 峰值学习率 | 准确率 | MAL | 整体接受率 | pos-1 | pos-2 | pos-3 | pos-4 | pos-5 | pos-6 | pos-7 |
-| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| 自训练 Online | \(3\times10^{-4}\) | 85.5% | 4.3013 | 47.16% | 85.29% | 70.73% | 56.23% | 42.57% | 32.30% | 24.66% | 18.34% |
-| 官方权重 | — | 86.7% | 5.1804 | 59.72% | 89.00% | 78.72% | 68.65% | 58.42% | 49.22% | 40.80% | 33.21% |
+| T | Top-p | Top-k | Draft 采样 | 模型 | **MAL** | pos-1 | pos-2 | pos-3 | pos-4 | pos-5 | pos-6 | pos-7 | MOL |
+| :---: | ---: | ---: | --- | --- | :---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | :---: |
+| 0.7 | 0.8 | 20 | probabilistic | Baseline | **5.5296** | 90.66% | 80.98% | 71.91% | 63.88% | 55.85% | 48.38% | 41.32% | 245.48 |
+| 0.7 | 0.8 | 20 | probabilistic | Markov MLA | **5.5191** | 90.11% | 80.34% | 71.45% | 63.58% | 55.78% | 48.67% | 41.99% | 246.44 |
+| 0.7 | 0.8 | 20 | greedy | Baseline | **5.5286** | 90.15% | 80.46% | 71.62% | 63.67% | 55.85% | 48.84% | 42.27% | 247.83 |
+| 0.7 | 0.8 | 20 | greedy | Markov MLA | **5.5041** | 89.79% | 79.81% | 70.92% | 63.17% | 55.67% | 48.76% | 42.30% | 246.93 |
+| 1.0 | 1.0 | -1 | probabilistic | Baseline | **5.3181** | 89.75% | 79.12% | 69.09% | 60.25% | 51.88% | 44.34% | 37.36% | 249.02 |
+| 1.0 | 1.0 | -1 | probabilistic | Markov MLA | **5.3552** | 89.37% | 78.82% | 69.21% | 60.69% | 52.76% | 45.70% | 38.98% | 247.19 |
+| 1.0 | 1.0 | -1 | greedy | Baseline | **5.2065** | 87.52% | 76.22% | 66.42% | 58.17% | 50.62% | 44.03% | 37.68% | 249.29 |
+| 1.0 | 1.0 | -1 | greedy | Markov MLA | **5.2404** | 87.78% | 76.47% | 66.93% | 58.78% | 51.21% | 44.56% | 38.32% | 246.08 |
+| 0.0 | 1.0 | -1 | greedy | Baseline | **5.6057** | 90.94% | 81.60% | 72.69% | 64.87% | 57.19% | 50.05% | 43.24% | 252.05 |
+| 0.0 | 1.0 | -1 | greedy | Markov MLA | **5.6015** | 90.49% | 81.18% | 72.38% | 64.56% | 57.24% | 50.39% | 43.91% | 251.15 |
 
 </div>
 
-本组保留早期实验的 prompt 与 greedy draft 设置，用于比较自训练权重和官方权重。
 
-### Offline training 历史结果
+### 接受率：Baseline vs. DrawSpec
 
-以下为采用 5-shot 评测的 Offline training 历史结果。
+两组模型均训练约 1 epoch，在 GSM8K test 全集 1,319 题上评测，target temperature 为 0.7，每轮提出 7 个 draft tokens。DrawSpec 采用四层预计算、一层条件化的架构，使用 late-conditioning 分支训练的 12-state 权重，最后一层输入为 anchor + 6 states。
 
 <div class="js-sortable-table js-multisort js-row-reorder dspark-three-line dspark-compact" markdown="1">
 
-| 权重 | 峰值学习率 | 准确率 | MAL | pos-1 | pos-2 | pos-3 | pos-4 | pos-5 | pos-6 | pos-7 |
-| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| 自训练 Offline | \(6\times10^{-4}\) | 85.4% | 4.5908 | 86.33% | 73.03% | 60.17% | 48.10% | 38.23% | 29.82% | 23.40% |
+| 模型 | **MAL** | pos-1 | pos-2 | pos-3 | pos-4 | pos-5 | pos-6 | pos-7 | MOL |
+| --- | :---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | :---: |
+| Baseline | **5.5271** | 90.67% | 81.04% | 71.74% | 63.77% | 55.84% | 48.34% | 41.32% | 247.98 |
+| DrawSpec | **4.7163** | 85.80% | 70.82% | 59.19% | 49.87% | 41.73% | 35.07% | 29.14% | 248.58 |
 
 </div>
 
+两组平均输出长度接近。DrawSpec 的 MAL 较 baseline 降低 0.8108（14.67%）。
+
+### 历史评测
+
+#### Online training 与官方权重
+
+在 vLLM 服务上评测 GSM8K test 全集 1,319 题。自训练 baseline 训练至 step 2616（约 1 epoch）。Prompt 使用 `Question: {question}\nAnswer:` 格式。Target 使用 **non-thinking**，采样参数为 **temperature=0.7、top-p=0.8、top-k=20、min-p=0**；Draft 均采用 **greedy**，每轮提出 7 个 draft tokens。
+
+<div class="js-sortable-table js-multisort js-row-reorder dspark-three-line dspark-compact" markdown="1">
+
+| 权重 | 峰值学习率 | MAL | pos-1 | pos-2 | pos-3 | pos-4 | pos-5 | pos-6 | pos-7 |
+| --- | --- | :---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| 自训练 Online | \(3\times10^{-4}\) | 4.3013 | 85.29% | 70.73% | 56.23% | 42.57% | 32.30% | 24.66% | 18.34% |
+| 官方权重 | — | 5.1804 | 89.00% | 78.72% | 68.65% | 58.42% | 49.22% | 40.80% | 33.21% |
+
+</div>
+
+#### Offline training（5-shot）
+
+<div class="js-sortable-table js-multisort js-row-reorder dspark-three-line dspark-compact" markdown="1">
+
+| 权重 | 峰值学习率 | MAL | pos-1 | pos-2 | pos-3 | pos-4 | pos-5 | pos-6 | pos-7 |
+| --- | --- | :---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| 自训练 Offline | \(6\times10^{-4}\) | 4.5908 | 86.33% | 73.03% | 60.17% | 48.10% | 38.23% | 29.82% | 23.40% |
+
+</div>
 
 ## 结果分析
 
@@ -225,7 +250,7 @@ MLA 将可训练参数减少约 0.51%，每层每 token 的 KV 元素数从 2048
 
 SWA 叠加在 MLA 上。窗口从 1024 缩到 512、128 时，末段 \(\tau\) 相对 MLA 分别下降 0.73%、1.71%、5.47%。
 
-<span class="ablation-sq">\(\blacksquare\)</span>**窗口越小，各位置接受率下降越大。** SWA128 在第 1 个位置下降约 1.49 pp，第 4–5 个位置下降约 3.28 pp，第 7 个位置下降约 2.94 pp。在这组实验中，保留块内双向 attention 仍未抵消 history 缩短带来的损失。
+<span class="ablation-sq">\(\blacksquare\)</span>**窗口越小，各位置接受率下降越大。** SWA128 在第 1 个位置下降约 1.49 pp，第 4–5 个位置下降约 3.28 pp，第 7 个位置下降约 2.94 pp。保留块内双向 attention 时，缩短 history 仍会降低训练接受率。
 
 ![末段各位置接受率相对 MLA 的差异](../../assets/images/qwen3-4b-dspark-ablation/swa-position.svg){ width="50%" }
 
@@ -279,8 +304,8 @@ Auxiliary layers 改为 `[1, 17, 33]` 后，输入投影参数从 32.77M 降到 
 
 ## 总结
 
+训练消融表明：
+
 - MLA 明显压缩 KV 表示，训练 \(\tau\) 的损失较小。进一步限制 history 时，窗口缩小带来的损失更大。
 - Anchor 输入与块内 K/V 对各位置的作用不同：移除 anchor 主要影响首位置，移除块内 K/V 主要影响后续位置。
 - Tau loss 的收益较小且偏向后续位置，延长训练带来的收益更大。三层 aux 则以一定质量损失换取参数减少。
-
-上述架构结论来自训练指标。除 GQA baseline 外，各消融尚未在本文报告 GSM8K 生成评测结果。

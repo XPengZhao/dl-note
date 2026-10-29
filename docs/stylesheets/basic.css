@@ -592,6 +592,12 @@ p:has(+ .arithmatex) {
   text-align: left !important;
 }
 
+/* Preserve explicitly centered Markdown columns in compact tables. */
+.md-typeset .dspark-compact table:not([class]) :is(th, td)[style*="text-align: center"],
+.md-typeset .dspark-compact table:not([class]) :is(th, td)[align="center"] {
+  text-align: center !important;
+}
+
 .md-typeset .dspark-compact .table-sort-header {
   gap: 0.15em;
   white-space: nowrap;
@@ -600,4 +606,28 @@ p:has(+ .arithmatex) {
 .md-typeset .dspark-compact .table-row-handle {
   width: 0.65rem;
   margin: 0 0.15rem 0 0;
+}
+
+/* Center temperature independently of the first-column drag handle. */
+.md-typeset .dspark-compact.dspark-sampling table:not([class]) :is(th, td):first-child {
+  position: relative;
+  padding-inline: 0.9rem;
+  text-align: center !important;
+}
+
+.md-typeset .dspark-compact.dspark-sampling td:first-child > .table-row-handle {
+  position: absolute;
+  left: 0.1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  margin: 0;
+}
+
+/* Keep baseline and MLA rows under the same sampling settings together. */
+.md-typeset .dspark-paired table:not([class]) tbody tr[data-pair-tone="0"] td {
+  background-color: #fff;
+}
+
+.md-typeset .dspark-paired table:not([class]) tbody tr[data-pair-tone="1"] td {
+  background-color: #e6e6e6;
 }
