@@ -1,184 +1,77 @@
 # 推理系统中的 Roofline Model
 
-延迟和吞吐指标告诉我们用户最终看到了什么，但它们本身并不能解释为什么某个 serving 配置在继续调优后还是提不上去。一个系统可能表现为 TPOT 很高、TPS 很低，或者 batch 变大后扩展性依然很差，但这些现象背后仍然有一个核心问题没有被回答：当前 workload 主要受限于算力，还是受限于数据搬运？`Roofline model` 正是用来回答这个问题的一种紧凑方法。
+Roofline model 用算力和内存带宽估计计算任务的性能上界。它帮助我们判断：一个算子需要的数据能否被足够快地送到计算单元，还是计算本身更可能成为瓶颈。
 
-在推理场景里，这一点尤其重要，因为不同阶段对硬件的施压方式并不相同。Prefill 和 decode 可以运行在同一个模型、同一张 GPU 上，却落在完全不同的性能区间里。很多实际优化，包括 batching、KV 压缩、量化和 speculative decoding，本质上都可以理解为试图把 workload 从一个更低的 ceiling 推向一个更高的 ceiling。
+## 算力与带宽的性能上界
 
-## 为什么 Roofline 重要
-
-当人们说某个推理优化“提升了利用率”时，这句话往往还不够完整。利用率提高，可能来自完全不同的原因：
-
-- 同样的数据搬运量上做了更多计算
-- 为得到同样的数学结果，搬运的数据更少了
-- 固定运行时开销被更宽的一步摊薄了
-- 原来的主瓶颈被解除，系统转而受另一个 ceiling 限制
-
-`Roofline model` 的价值，就在于它为这些情况提供了一套共同语言。它不会替代 request-level 分析、scheduler 分析或通信分析，但它提供了一个从硬件第一性原理出发的设备侧性能上界视角。
-
-## 基本模型
-
-经典 roofline model 把可达到性能与两个硬件上限联系起来：
-
-- 峰值计算吞吐
-- 峰值内存带宽
-
-记：
-
-- $P$ 为实际达到的性能，单位可写为 FLOPs/s
-- $P_{\max}$ 为峰值计算吞吐
-- $B_{\max}$ 为峰值内存带宽，单位为 bytes/s
-- $I$ 为 arithmetic intensity，即每搬运 1 byte 数据对应的 FLOPs
-
-则可达到性能满足：
+设一个算子的一次执行需要 $F$ 次浮点运算，从设备内存读写 $D$ 字节，其**算术强度**为：
 
 $$
-P \le \min \left(P_{\max},\; I \cdot B_{\max}\right)
+I = \frac{F}{D}\quad\text{(FLOPs/byte)}
 $$
 
-这个表达式把系统分成两个典型区间。
-
-### Memory-Bound 区间
-
-当 arithmetic intensity $I$ 较小时，$I \cdot B_{\max}$ 会低于峰值算力，此时性能主要受限于数据搬运速度：
+如果设备的峰值计算吞吐为 $P_{\max}$，峰值内存带宽为 $B_{\max}$，则该算子的性能上界为：
 
 $$
-P \approx I \cdot B_{\max}
+P \leq \min(P_{\max},\ I B_{\max})
 $$
 
-在这个区间里，单纯提高理论算力通常帮助不大，除非带宽本身提高了，或者 workload 的 arithmetic intensity 提高了。
-
-### Compute-Bound 区间
-
-当 arithmetic intensity 足够高时，由带宽导出的上界会上升到峰值算力之上：
+其中 $I B_{\max}$ 是内存带宽能够支撑的计算吞吐。算术强度较低时，数据供应速度不足以支撑峰值算力，性能上界由内存带宽决定，对应图中的 **memory-bound** 区域。随着算术强度提高，单位数据对应的计算量增加，带宽所能支撑的计算吞吐随之上升。当它达到设备的算力上限 $P_{\max}$ 后，继续提高算术强度也不会抬高性能上界，此时进入 **compute-bound** 区域。两条上界相交时的算术强度等于设备的**算力带宽比**：
 
 $$
-I \cdot B_{\max} \ge P_{\max}
+I_{\mathrm{ridge}} = \frac{P_{\max}}{B_{\max}}
 $$
 
-这时 workload 更接近计算 roof：
+![Roofline 的带宽上界、算力上界与转折点](../../assets/images/ai-infra/roofline-model.svg){ width="100%" }
+
+比较算子的 $I$ 和设备的 $I_{\mathrm{ridge}}$，可以初步判断哪个上界更紧。这里的带宽和数据量必须对应同一层内存：例如分析 HBM 时，$D$ 应统计 HBM 与芯片之间的流量。实际性能通常低于上界，还取决于矩阵形状、kernel 实现和硬件利用率。
+
+## Batch 如何提高权重复用
+
+考虑一个线性层 $Y=XW$。设输入 $X$ 的形状为 $[b,d]$，权重 $W$ 的形状为 $[d,d]$，其中 $b$ 是一次计算中处理的 token 数。矩阵乘的计算量约为：
 
 $$
-P \approx P_{\max}
+F \approx 2bd^2
 $$
 
-在这个区间里，性能提升更依赖 kernel 效率、tensor core 利用率和并行执行质量，而不只是减少内存流量。
-
-## Arithmetic Intensity
-
-Arithmetic intensity 是连接 workload 结构与硬件上限的桥梁：
+假设权重为每个元素 2 字节，且这次计算从 HBM 读取一遍权重，权重读取量为 $2d^2$ 字节。暂时忽略输入和输出的读写，得到：
 
 $$
-I = \frac{\text{FLOPs}}{\text{Bytes moved}}
+I \approx \frac{2bd^2}{2d^2} = b\quad\text{FLOPs/byte}
 $$
 
-这里的重点并不是为每一个 kernel 都精确算出一个完美值，而是判断某个 workload 相对于它必须读写的数据量，到底做了多少数学计算。
+Batch 从 1 增加到 32 时，同一份权重服务的 token 数增加到 32 倍，算术强度也从约 1 增加到 32 FLOPs/byte。
 
-Arithmetic intensity 较低的 workload 往往会：
+假设设备的有效算力带宽比为 100 FLOPs/byte，按照这个简化估算，两种情况都在带宽受限一侧，但 $b=32$ 的带宽性能上界是 $b=1$ 的 32 倍。这里比较的是 FLOPs/s 上界，并不意味着单个请求的延迟会降低 32 倍。
 
-- 大量时间耗在等待内存流量上
-- 难以从更高的峰值 FLOPs 中直接受益
-- 更依赖减少 bytes moved 或提升数据复用的技术
 
-Arithmetic intensity 较高的 workload 往往会：
+## Prefill 和 Decode 的区别
 
-- 更容易用好 tensor cores 或 SIMD 单元
-- 更直接地受益于更强的 kernel 和更多可用算力
-- 在 batch 或 step width 增加时，不那么快出现收益展平
+**Prefill** 处理输入 prompt。多个输入 token 可以一起参与线性层计算，使权重在更多 token 间复用，因此算术强度通常较高。长 prompt 或较大的 batch 往往能形成更大的矩阵运算，使计算吞吐成为更重要的约束。
 
-## 把 Roofline 映射到推理
+**Decode** 每轮为每个活跃请求推进一个 token。低并发时，一轮中的 token 数较少，模型权重的复用有限。Attention 还需要读取已有 KV Cache。尤其在模型权重较大或上下文较长时，HBM 流量可能成为主要约束。较大的并发 batch 可以提高权重复用，但也会增加 KV 读取和排队压力。
 
-Roofline 在 AI Infra 里的价值，不在于那张抽象图本身，而在于它解释了为什么不同推理阶段会有完全不同的性能表现。
 
-### Prefill
+## 常见优化如何改变计算与数据搬运
 
-Prefill 会成批处理整个 prompt。序列长度更大，矩阵形状更宽，硬件在单次执行中通常也能拿到更多并行工作。因此，prefill 往往比 decode 更接近 compute-bound 一侧，尤其是在 prompt 较长或 batch 较大时。
+**Batching** 通过权重复用提高算术强度。在带宽受限时，增大 batch 可以提高吞吐，但也会增加排队和单步执行时间。
 
-这并不意味着 prefill 总是 compute-bound。小 batch、多模态预处理开销，或分布式通信压力都可能让其它 ceiling 更早成为主导。更稳妥的说法是：prefill 通常比 decode 更有利于计算单元被充分利用。
+**量化。** 权重量化减少每个权重占用的字节数，能降低模型加载和执行中的权重流量。KV 量化则减少缓存容量和读取流量。在带宽受限的算子中，这些变化可能缩短执行时间。
 
-### Decode
+量化也可能改变可用的计算指令和峰值吞吐。实际收益取决于低精度 kernel 的效率，以及量化和反量化的额外开销。
 
-Decode 每次只执行一步自回归迭代。每一步都很窄、对延迟敏感，而且会反复访问之前所有 token 积累下来的 KV 状态。因此在实际 serving 中，decode 更容易落入 memory-bound 或 overhead-dominated 区间。
+**KV Cache** 避免每个 decode step 都重新计算历史 token 的 Key 和 Value，但 attention 仍需要访问缓存状态。上下文越长或活跃请求越多，KV 读取量通常越大。压缩 KV 或减少需要访问的位置可以降低流量。相关机制见 [KV Cache](kv-cache.md)。
 
-这也是在线推理常常让人感觉反直觉的原因：数学上更“小”的阶段，反而可能成为系统级主瓶颈。每个 decode step 的总计算量虽然比 prefill 小得多，但由于工作过窄、串行性太强，设备往往并没有被真正喂饱。
+**Speculative decoding** 先生成候选 token，再由 target model 一次验证多个位置。较宽的验证步骤可能提高权重复用，并减少 target model 串行执行的轮数。草稿生成和验证本身也有成本，最终收益取决于接受长度、batch 和实现效率。详见 [Speculative Decoding](speculative-decoding.md)。
 
-## Roofline 能解释什么，不能解释什么
+## 如何判断实际瓶颈
 
-Roofline 很有用，但它并不是完整的 serving 模型。
+先确定分析对象：是单个 kernel、一个模型层，还是整个 decode step？然后估算 FLOPs 和目标内存层的读写字节数，将算术强度与对应设备、精度下的算力带宽比比较。
 
-它比较擅长解释：
+再结合实测判断：
 
-- 一个设备侧 workload 主要是受算力约束还是受内存流量约束
-- 为什么更宽的 batch shape 往往能带来更好的性能
-- 为什么有些优化在 decode 中更有效，而在 prefill 中不明显
-- 为什么减少 bytes moved 有时和减少 FLOPs 一样重要
+- 实际带宽已接近可达到的带宽，且算术强度较低，说明减少流量或提高复用可能有效。
+- 实际计算吞吐已接近该算子可达到的上限，说明减少计算量或使用更高效的计算实现可能更有帮助。
+- 带宽和计算吞吐都不高时，应检查 kernel 规模、启动开销、同步和并行度。这些问题需要结合其他方法定位。
 
-它不能完整解释：
-
-- request queueing 和 scheduler delay
-- 多副本之间 prefix routing 碎片化
-- kernel 视角之外的 host-device synchronization 开销
-- 分布式执行中的跨 GPU 通信 ceiling
-- 应用层 fan-out 和编排开销
-
-因此，更合理的使用方式是：把 roofline 当作更大 request lifecycle 里的一个局部性能模型，而不是用它去替代整个 lifecycle 分析。
-
-## 用 Roofline 理解常见推理优化
-
-一旦有了 roofline 视角，很多优化点就更容易归类了。
-
-### KV Cache 与内存流量
-
-Decode 往往需要读取大量缓存下来的 attention 状态，而单步新引入的计算却相对有限，这会把 arithmetic intensity 向下拉。KV 量化、更好的 cache layout，以及更高效的 block 复用之所以重要，正是因为它们可以在已经接近带宽 ceiling 的区间里降低内存压力或提高有效复用。
-
-### Batching 与更宽的执行形状
-
-更大的有效 batch 往往能提高利用率，因为 kernel 会更宽，固定开销也更容易被摊薄。从 roofline 角度看，batching 往往会把 workload 推向一个更有利于计算单元发挥的区间，并让实际性能点更接近上方的 envelope。
-
-这也解释了为什么 batching 的收益最终会递减。一旦 workload 已经接近当前的主 roof，再继续加宽，边际收益就会明显变小。
-
-### Quantization
-
-量化有时被说成是计算优化，有时又被说成是内存优化。在推理场景里，它往往两者都是，但主收益取决于原始瓶颈在哪里。如果 workload 本来就是 memory-bound，那么更小的 activations、weights 或 KV tensors 往往能直接降低带宽压力和容量压力；如果 workload 已经接近 compute roof，那么除非低精度 kernel 也显著提升了实际计算吞吐，否则最终收益可能远小于理论想象。
-
-### Speculative Decoding
-
-更合适的理解方式，是把 speculative decoding 看成对 target model 工作粒度的一次改变。普通自回归 decode 中，target model 需要执行很多次窄而串行的 step；而 speculative decoding 会把多个候选 token 的验证合并成更宽的一步。
-
-它可能带来收益，主要有两个相关原因：
-
-- 固定开销被更多有效工作摊薄了
-- 更宽的 verification step 往往比许多孤立的窄 step 更容易让硬件跑得高效
-
-但这并不意味着 speculative decoding 可以被简化成“提高 arithmetic intensity”这一句话。更准确的说法是：它减少了 target-side 昂贵的串行 decode 次数，并且在基线 decode 路径本来就喂不饱硬件时，可能改善 target-side utilization。当 serving batch 本来就已经很大、target 路径已经接近其有效 roof 时，这种收益就会明显缩小。
-
-## 超出单设备 Roofline 的部分
-
-经典 roofline model 最自然的适用对象是一台设备或一类 kernel。真实推理系统往往还会撞上更高一层的 ceiling。
-
-在分布式或 MoE serving 中，实际吞吐不仅可能受 HBM 带宽和单设备算力约束，还可能受以下因素限制：
-
-- all-reduce 或 all-to-all 带宽
-- collective start-up latency
-- pipeline bubbles
-- scheduler 层面的准入和 preemption 行为
-
-因此，roofline 更适合被介绍成“第一层有用的 ceiling model”，而不是最终模型。它回答的是局部计算究竟更偏 bandwidth-limited 还是 compute-limited；而更广义的系统分析还需要继续判断：通信、runtime policy 或 workload shaping 是否施加了一个更低的 ceiling。
-
-## 实际分析时该问什么
-
-当一个推理优化声称自己能提速时，用 roofline 视角去读它，最先应该问的是四个问题：
-
-1. 它减少的是 FLOPs、减少的是 bytes moved，还是主要在摊薄固定开销？
-2. 它改善的是 prefill、decode，还是两者都有？
-3. 当前基线 workload 是 memory-bound、compute-bound，还是被更高层的系统 ceiling 卡住？
-4. 这个优化是解除了当前主瓶颈，还是只是把瓶颈转移到了别处？
-
-这些问题往往比抽象地讨论某个技巧“好不好”更有用。一个 serving 优化只有在真正抬高了当前 workload 所受的活动 ceiling 时，才算在系统里产生了实际价值。
-
-## 相关页面
-
-- [指标](metrics.md) 定义 TTFT、TPOT 和 TPS，它们描述的是用户可见现象。
-- [KV Cache](kv-cache.md) 解释为什么 decode 往往伴随明显的内存压力。
-- [推理运行时](serving-runtime.md) 讨论 roofline 本身无法捕获的调度与准入效应。
-- [解码与采样](decoding.md) 讨论 temperature、top-k、top-p 与 min-p。
-- [Speculative Decoding](speculative-decoding.md) 写出验证宽度、接受长度和每 token 延迟。
+请求排队、跨设备通信和应用编排也会影响端到端性能，并不直接包含在单设备 HBM Roofline 中。应结合[推理请求生命周期](request-lifecycle.md)、[指标](metrics.md)和[并行策略](parallelism.md)一起分析。

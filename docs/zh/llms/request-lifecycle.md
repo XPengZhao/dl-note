@@ -1,203 +1,73 @@
 # 推理请求生命周期
 
-在线推理请求一旦表现出“慢”或“不稳定”，根因往往并不显然，因为一条请求在真正产出 token 之前，需要穿过很多层。理解系统时，一个很有用的视角不是只看分层结构，还要看时间顺序：什么先发生，什么在等待什么，延迟和吞吐是在哪一段被消耗掉的。
+一次在线推理请求从应用发出后，需要经过路由、排队和模型计算，才能生成输出。模型先处理输入 prompt，生成第一个 token；随后反复执行 decode，逐步生成后续 token。请求结束后，系统释放该请求占用的运行时资源。
 
-本页沿着一条请求，从应用层一直跟到 GPU 执行，再回到用户，目的是把抽象的系统分层和真实的执行路径对应起来，让性能分析更具体。
-
-## 为什么要看生命周期
-
-从请求生命周期的角度看问题，是因为很多在 API 边界上看起来相同的现象，底层根因其实完全不同。
-
-- TTFT 高，可能来自 prompt 组装、排队、prefill 成本，或者 runtime 准入延迟。
-- 吞吐低，可能来自路由碎片化、batch 不成形、KV 压力，或者 kernel 效率不高。
-- 延迟抖动，可能来自上层 fan-out、runtime preemption，或者通信不均衡。
-
-如果只看最终响应时间，这些差异会被全部压扁。生命周期视角的价值，就是把时间花在哪里、由哪一层负责，重新摊开来看。
-
-## 先看请求经过了哪些层
-
-理解这条生命周期，最自然的方式通常不是一上来就看细粒度时序，而是先看请求在系统中的路径。一次推理请求从应用层发起，向下进入 serving 系统，再落到硬件执行层，最后携带着输出 token 沿着同一条链路返回。光是这条路径，本身就已经说明了很多问题：谁在塑造 workload，谁在决定它何时运行，谁在管理状态，谁在真正做计算。
-
-```mermaid
-flowchart TB
-
-    subgraph L1["应用 / 编排层"]
-        U["用户 / 应用"]
-        A["Agent / Orchestrator"]
-    end
-
-    subgraph L2["Serving 系统"]
-        R["Edge LB / Router / Gateway / API Proxy"]
-        E["Serving Engine"]
-        S["Scheduler"]
-        K["KV Manager"]
-        M["Model Executor"]
-    end
-
-    subgraph L3["硬件执行层"]
-        G["GPU / Kernels"]
-    end
-
-    U --> A
-    A --> R
-    R --> E
-    E --> S
-    S --> K
-    S --> M
-    K --> M
-    M --> G
-    G --> M
-    M --> S
-    S --> E
-    E --> R
-    R --> A
-    A --> U
-```
-
-这张图有一个好处，它把现实里很容易混在一起的几类职责拆开了。
-
-### 1. 应用 / 编排层决定进入系统的 workload 长什么样
-
-生命周期真正的起点，其实并不在 serving engine，而是在更上层。聊天系统、编码助手、搜索产品或 workflow service 决定当前是否需要一次模型调用。在 agent 系统里，这里还可能包含工具规划、检索、多轮记忆和 prompt 模板化。
-
-这一层之所以重要，是因为它直接决定了下游要处理什么样的请求。过长的 prompt、激进的 fan-out、重复的检索上下文，或者组织得很差的工具轨迹，都会把负担提前压给下面的 serving system。请求如果在这里就已经膨胀，后面的 scheduler 或 kernel 再高效，也只能是在更重的 workload 上工作。
-
-### 2. Serving 系统把一个 API 请求变成可管理的执行对象
-
-真正的系统复杂度，大多集中在中间这一层。请求到了这里以后，就不再只是一个 payload，而会变成一个需要被路由、调度、分配状态、执行并流式返回的运行时对象。
-
-#### Router / Gateway
-
-当 **LiteLLM** 被用作统一模型 API 层或模型代理时，它通常就位于这里。
-
-在这条路径更外侧的位置，还常常会先有一个基础设施负载均衡器，比如 **ELB**，它先把流量分发到多台 LiteLLM 或 API gateway 实例上。
-
-路由层决定请求应该被送往哪个模型端点、哪个副本组或哪个 engine 实例。它影响的不只是基础设施利用率，也会直接影响 cache 局部性和 batch 的形成方式。两个前缀相同的请求，是否真的能从 prefix cache 里受益，很大程度上取决于它们有没有被送到同一个 backend。
-
-在实践里，LiteLLM 通常位于 **serving engine 之上**、**应用或 agent 层之下**：
-
-- 它向上层应用提供一个统一的 OpenAI-compatible 或统一模型 API。
-- 它负责在多个模型 provider 或后端之间做请求适配与参数归一化。
-- 它还可以承载路由策略、fallback、限流、日志、鉴权或成本控制。
-
-但 LiteLLM 通常**不负责真正执行模型 step**。一旦它把请求转发给 vLLM、SGLang、OpenAI、Anthropic 或其它后端，下面的 serving/runtime 层才会继续负责请求准入、batching、KV 管理和 GPU 执行。
-
-所以在这条 lifecycle 里，LiteLLM 属于 **Router / Gateway / API Proxy**，而不属于 **Serving Engine**、**Scheduler** 或 **Model Executor**。
-
-像 ELB 这样的组件则还要更外一层。它通常负责通用的网络流量分发或 HTTP 入口负载均衡，而不是理解模型语义本身。换句话说：
-
-- **ELB** 决定一个连接或请求先落到哪台 gateway 实例。
-- **LiteLLM** 决定这个模型请求最终应该转发到哪个模型后端或 provider。
-
-#### Serving Engine
-
-像 vLLM、SGLang 这样的框架，会在这一层接收请求并把它变成内部 engine 对象。从这里开始，外部 API 的责任就结束了，serving framework 自己的运行时生命周期开始接管。engine 负责请求准入、生命周期追踪和流式输出。
-
-#### Scheduler 和 KV Manager
-
-进入 engine 之后，请求什么时候真正开始运行，要由 scheduler 决定。它可能立刻进入 prefill，也可能先在队列里等待，或者在 continuous batching 下与别的请求交错执行。很多延迟现象之所以难以直觉判断，就是因为请求虽然已经“进了 engine”，却还没有真正推进。
-
-scheduler 也不是单独工作的。它依赖 KV manager 去分配、挂接、复用和回收 KV 状态。prefill 会物化新的 KV blocks，decode 会继续扩展或复用已有 blocks。在内存压力高的时候，scheduler 和 KV manager 之间的边界会变成系统里最关键的控制点之一，因为它决定了 engine 还能不能继续接纳更多工作，还是必须转向更保守的策略。
-
-#### Model Executor
-
-model executor 负责把 runtime 的决策真正翻译成模型执行。它拿到 scheduler 形成的 batch、KV manager 准备好的状态，然后发起 prefill 或 decode。也正是在这一层，调度策略、batch 形状和内存管理开始具体地表现为执行形状。
-
-### 3. 硬件执行层完成真正的计算
-
-最底部才是设备上的真实工作：GEMM、attention kernel、通信 collectives、fused ops、sampling kernels，以及各种内存搬运。算子效率、互联带宽和 kernel launch 开销，都会在这一层体现成最终性能。
-
-如果这一层利用率不高，根因却不一定就在这一层。每个 decode step 工作量太小、并行策略带来过多同步，或者请求流本身始终无法形成高效 batch，都可能最终表现成 GPU 利用率偏低，即使 kernels 本身写得并不差。
-
-### 4. 输出 token 再沿着这条路径返回
-
-每个 decode step 结束后，输出会从 model executor 回到 engine，从 engine 回到 router，再回到应用层，最后送达用户。对流式产品来说，这条返回路径本身就是用户体验的一部分，因为用户感知到的不是“一次性完成”，而是一串带着节奏感的 token。
-
-## 再用时序图看一遍
-
-分层流图回答的是一个结构问题：请求会经过哪些组件。时序图回答的是另一个问题：这些组件在一次请求里是按什么顺序协同工作的。
+这条路径将用户看到的延迟与系统内部的工作联系起来：首 token 到达前的时间受路由、排队和 prefill 等环节影响；生成过程中的速度则主要取决于 decode 和流式传输。
 
 ```mermaid
 sequenceDiagram
-    participant U as 用户 / 应用
-    participant A as Agent / 编排层
-    participant R as ELB / 网关 / 路由层 / LiteLLM
-    participant E as Serving Engine
-    participant S as Runtime Scheduler
-    participant K as KV Manager
-    participant M as Model Executor
-    participant G as GPU / Kernels
+    participant A as 应用
+    participant R as 网关 / 路由
+    participant E as 推理引擎
+    participant G as GPU
 
-    U->>A: 提交任务或查询
-    A->>A: 组装 prompt, 检索上下文, 调用工具
-    A->>R: 发送模型请求
-    R->>R: 负载分发, API 归一化, 应用策略, 选择路由
-    R->>E: 转发请求
-    E->>S: 将请求送入 engine 内部
-    S->>K: 申请 KV blocks / 准备元数据
-    S->>M: 调度 prefill 或 decode
-    M->>G: 发起 kernels 和 collectives
-    G-->>M: 返回 logits / 更新状态
-    M-->>S: 本轮执行结束
-    S-->>E: 输出 token 或继续 decode
-    E-->>R: 返回部分结果
-    R-->>A: 转发响应
-    A-->>U: 输出 token / 最终结果
+    A->>R: 发送 prompt 和生成参数
+    R->>E: 选择后端并转发
+    E->>E: 预处理、排队和调度
+    E->>G: Prefill：处理 prompt
+    G-->>E: 生成首 token，保存 KV Cache
+    E-->>A: 流式返回首 token
+    loop 直到满足停止条件
+        E->>G: Decode：处理当前 token 和已有 KV
+        G-->>E: 生成下一 token，更新 KV Cache
+        E-->>A: 流式返回 token
+    end
+    E->>E: 结束请求，回收或复用资源
 ```
 
-把这两张图放在一起看，会更容易建立稳定的心智模型。分层流图给出的是系统的固定骨架，时序图给出的是一次请求如何穿过这套骨架。性能问题出现时，更实用的问题通常不是“这一页里提到了哪些组件”，而是“流程图里的哪一个节点出了问题，以及它是在时序上的哪一步开始主导延迟或吞吐”。
+图中省略了返回流经过网关的转发过程，也省略了多个请求之间的调度交错。下面沿着单个请求展开。
 
-## LiteLLM 在哪里
+## 1. 构造与路由请求
 
-更合适的理解方式，是把 LiteLLM 看成一个 **统一模型访问层 / 代理层**。它向上层应用暴露一致的接口，把下游多个 provider 或 serving backend 的差异隐藏起来。
+应用先构造模型输入，包括用户消息、系统提示词、历史对话，以及可能的检索结果或工具调用结果。输入长度在这里就基本确定，并直接影响后续 prefill 的计算量和 KV Cache 占用。
 
-在请求路径里，它最自然的位置是：
+请求随后到达网关或路由层。网关可以完成鉴权、限流、模型选择和请求转发；路由策略决定请求最终到哪个后端或副本。对于使用 prefix cache 的系统，把相同前缀的请求送到持有对应缓存的副本，有机会减少重复的 prefill 计算。
 
-`Application / Agent -> LiteLLM -> serving backend (vLLM, SGLang, OpenAI API, Anthropic API, etc.)`
+例如，一种部署方式是 `应用 → ELB → LiteLLM → vLLM`：ELB 将流量分发给网关实例，LiteLLM 选择并访问模型后端，vLLM 则负责后端的调度和模型执行。应用构造 prompt 的时间属于用户感知的端到端延迟，但不一定包含在从模型 API 发出请求开始测量的 TTFT 中。
 
-这意味着 LiteLLM 属于推理请求进入系统时的 **南北向入口路径**，而不属于推理系统内部真正执行 prefill/decode 的那一段内循环。
+## 2. 预处理与排队
 
-- 如果 LiteLLM 做了 retry、fallback 或 provider 选择，它影响的是请求路由行为和尾延迟。
-- 如果 LiteLLM 承担了观测、鉴权、预算或配额控制，它扮演的是推理外围的 control-plane middleware。
-- 如果真正慢的是下游 backend 的排队、KV 压力或 GPU 利用率不足，那么问题就在 LiteLLM 之下。
+推理引擎接收请求后，将文本转换为 token，并根据生成参数创建内部请求。请求进入等待队列，直到调度器为它安排计算和所需资源。具体预处理发生在网关还是引擎内，取决于部署方式。
 
-这个边界在调试时很重要。API 边界看到的“慢”或“不稳定”，可能来自 LiteLLM 自己的策略和转发逻辑，也可能来自请求已经被转发之后的 serving engine 与硬件执行路径。
+排队时间受到达速率、正在运行的请求、batch 容量和 KV Cache 可用空间等因素影响。系统繁忙时，即使 GPU 上的计算本身很快，新请求也可能在开始 prefill 前等待较长时间。
 
-## ELB 和 LiteLLM 的关系
+## 3. Prefill：处理输入
 
-ELB 和 LiteLLM 有关系，但通常不在同一层。
+调度器选中请求后，模型处理 prompt 中的 token，计算注意力所需的 Key 和 Value，并将它们保存在 KV Cache 中。模型利用 prompt 的计算结果得到首个输出 token；如果命中可复用的 prefix cache，则可以跳过已缓存前缀的部分重复计算。
 
-更常见的部署链路是：
+Prompt 越长，通常需要处理的输入和保存的 KV 状态越多。某些运行时会将长 prompt 分块处理，以便与其他请求交错调度；因此，一次请求的 prefill 不一定连续完成。更多 KV Cache 的细节见 [KV Cache](kv-cache.md)。
 
-`Client / Application -> ELB -> LiteLLM -> serving backend`
+首 token 到达用户之前，除了 prefill，还可能经历应用处理、网络传输、路由、排队和返回传输。分析 TTFT 时，需要先确认指标的起止时间，再判断时间花在哪一段。
 
-如果后端是混合 provider，也经常是：
+## 4. Decode：逐步生成输出
 
-`Client / Application -> ELB -> LiteLLM -> vLLM / SGLang / OpenAI / Anthropic / other providers`
+首 token 产生后，请求进入 decode。每一轮中，模型处理当前 token，读取此前保存的 KV Cache，计算下一个 token 的分布，再通过解码和采样策略选出输出。新产生的 KV 状态被保存，供后续轮次使用。
 
-两者的职责并不一样：
+推理引擎通常会把多个请求的工作组合成 batch。随着请求到达和完成，batch 的成员也会变化，这种方式称为 continuous batching。调度器需要在新请求的 prefill 和已有请求的 decode 之间分配计算资源：前者影响新请求等待首 token 的时间，后者影响正在生成的请求的输出节奏。
 
-- **ELB** 通常是基础设施层的负载均衡器。它把进入系统的流量分发到多台 LiteLLM 或 gateway 实例上，解决的是可用性、水平扩展和入口流量管理问题。
-- **LiteLLM** 是理解模型语义的网关层。它知道模型名、provider 差异、重试、fallback、鉴权、限流、日志，以及按成本或策略做路由。
+流式响应会在生成过程中持续返回结果，但用户收到的文本块不一定与模型生成的单个 token 一一对应。Decode 的执行效率、调度等待和传输缓冲，都可能影响用户感知到的输出间隔。采样过程见[解码与采样](decoding.md)，调度机制见[推理运行时](serving-runtime.md)。
 
-把这两层拆开有一个直接好处：网络流量均衡和模型路由决策不会混在一起。如果一台 LiteLLM 实例压力过高，ELB 可以把流量导向别的实例；如果某个模型 provider 出现退化、限额或成本不合适，LiteLLM 则可以在不改上游应用集成方式的情况下切换后端。
+## 5. 结束与资源回收
 
-## 把常见问题映射到生命周期
+当模型生成停止 token、达到最大输出长度，或请求被取消时，引擎结束该请求并停止后续调度。请求独占的资源会被释放；KV Cache 中可共享的前缀是否保留，取决于缓存策略。最终响应也可能包含 token 用量、停止原因等元数据。
 
-同一套生命周期视角，也可以直接用于调试。
+如果应用还要解析结果、调用工具或发起下一次模型请求，这些工作发生在本次模型调用之外，但仍属于用户任务的端到端生命周期。
 
-- **TTFT 高** 往往来自编排开销、排队、prefill 成本或准入延迟。
-- **TPS 低** 往往指向 batch 不成形、KV 压力、通信开销或 kernel 填充不足。
-- **Preemption** 通常说明问题出在 scheduler 和 KV manager 的交互边界。
-- **Prefix cache 收益差** 常常源于上层路由，而不只是 cache 机制本身。
-- **GPU 利用率低** 可能是 decode step 太小、并行拓扑通信太重，或者请求流本身无法形成高效 batch。
+## 从生命周期定位性能问题
 
-## 与其它 AI Infra 页面之间的关系
+- **TTFT 高**：先区分应用处理、路由、排队和 prefill 各占多少时间，再检查 prompt 长度、缓存命中和系统负载。
+- **生成速度慢或输出间隔不稳定**：检查 decode 调度、batch 组成、设备计算与通信，以及流式传输是否有缓冲。
+- **系统吞吐低**：结合请求长度和到达速率，检查 batch 是否足够有效、KV 容量是否限制并发，以及计算或通信是否成为瓶颈。
+- **Prefix cache 命中率或收益低**：检查请求前缀是否一致、路由是否保持缓存局部性，以及缓存是否被频繁淘汰。
 
-这个生命周期视角并不是为了替代总览页，而是与总览页互补。
-
-- [总览](overview.md) 解释每个组件在系统里处于哪一层。
-- [指标](metrics.md) 解释这条生命周期最终如何被测量。
-- [KV Cache](kv-cache.md) 解释 prefill 和 decode 中持续携带的核心状态对象。
-- [推理运行时](serving-runtime.md) 解释 scheduler 和 runtime policy 如何改变请求推进方式。
-- [并行策略](parallelism.md) 解释请求进入模型计算之后，执行如何分布到多个设备上。
+这些现象可能同时出现。定位时应结合各阶段的时间和资源指标，而不是仅凭最终响应时间判断。指标定义见 [AI Infra 指标](metrics.md)，跨设备执行见[并行策略](parallelism.md)。

@@ -23,6 +23,9 @@ plugins:
             - Neural Graphics: neural-graphics.md
             - AI Infra:
                 - Overview: llms/overview.md
+                - Model Architecture:
+                    - Position Encoding: llms/position-encoding.md
+                    - Model Notes: llms/models.md
                 - Hardware: hardware.md
                 - Request Lifecycle: llms/request-lifecycle.md
                 - Metrics: llms/metrics.md
@@ -30,6 +33,7 @@ plugins:
                 - Data Movement and Communication: llms/data-movement.md
                 - KV Cache: llms/kv-cache.md
                 - Serving Runtime: llms/serving-runtime.md
+                - GLM-5.2 Inference Case Study: llms/glm-5.2-inference-path.md
                 - Parallelism: llms/parallelism.md
                 - Decoding: llms/decoding.md
                 - Speculative Decoding:
@@ -38,10 +42,6 @@ plugins:
                     - Qwen3-4B DSpark Ablation: llms/qwen3-4b-dspark-ablation.md
                     - Qwen3.8-Flash-Next DSpark Training: llms/qwen3.8-flash-next-dspark-training.md
                 - Training Objective: llms/training-objective.md
-            - Models:
-                - Position Encoding: llms/position-encoding.md
-                - Model Notes: llms/models.md
-                - GLM-5.2 Inference Path: llms/glm-5.2-inference-path.md
           nav_translations:
             Home: 首页
             Hardware: 硬件
@@ -59,10 +59,10 @@ plugins:
             Decoding: 解码与采样
             Speculative Decoding: Speculative Decoding
             Training Objective: 训练目标
-            Models: 模型
+            Model Architecture: 模型结构
             Position Encoding: 位置编码
             Model Notes: 模型笔记
-            GLM-5.2 Inference Path: GLM-5.2 推理路径
+            GLM-5.2 Inference Case Study: GLM-5.2 推理案例
             GLM-5.2 DSpark Design: GLM-5.2 DSpark 训练设计
             Qwen3-4B DSpark Ablation: Qwen3-4B DSpark 消融报告
             Qwen3.8-Flash-Next DSpark Training: Qwen3.8-Flash-Next DSpark 训练实验
@@ -72,6 +72,9 @@ nav:
   - Neural Graphics: neural-graphics.md
   - AI Infra:
       - Overview: llms/overview.md
+      - Model Architecture:
+          - Position Encoding: llms/position-encoding.md
+          - Model Notes: llms/models.md
       - Hardware: hardware.md
       - Request Lifecycle: llms/request-lifecycle.md
       - Metrics: llms/metrics.md
@@ -79,16 +82,14 @@ nav:
       - Data Movement and Communication: llms/data-movement.md
       - KV Cache: llms/kv-cache.md
       - Serving Runtime: llms/serving-runtime.md
+      - GLM-5.2 Inference Case Study: llms/glm-5.2-inference-path.md
       - Parallelism: llms/parallelism.md
       - Decoding: llms/decoding.md
-      - Speculative Decoding: llms/speculative-decoding.md
+      - Speculative Decoding:
+          - Speculative Decoding: llms/speculative-decoding.md
+          - GLM-5.2 DSpark Design: llms/glm-5.2-dspark-design.md
+          - Qwen3-4B DSpark Ablation: llms/qwen3-4b-dspark-ablation.md
       - Training Objective: llms/training-objective.md
-  - Models:
-      - Position Encoding: llms/position-encoding.md
-      - Model Notes: llms/models.md
-      - GLM-5.2 Inference Path: llms/glm-5.2-inference-path.md
-      - GLM-5.2 DSpark Design: llms/glm-5.2-dspark-design.md
-      - Qwen3-4B DSpark Ablation: llms/qwen3-4b-dspark-ablation.md
 markdown_extensions:
   - pymdownx.highlight:
       anchor_linenums: true
