@@ -11,7 +11,7 @@ A focused knowledge base for modern deep learning systems, from hardware fundame
 4. [Inference Request Lifecycle](llms/request-lifecycle.md) - how one request moves through the whole online system
 5. [AI Infra Metrics](llms/metrics.md) - TTFT, TPOT, and TPS
 6. [Roofline Model for Inference](llms/roofline.md) - compute ceilings, bandwidth ceilings, and how optimizations move bottlenecks
-7. [Data Movement and Communication](llms/data-movement.md) - memory hierarchy, runtime state flow, and cross-device tensor exchange
+7. [Collective Communication](llms/collective-communication.md) - collective operations, inference use cases, and communication cost
 8. [KV Cache](llms/kv-cache.md) - KV memory semantics, paged blocks, and prefix reuse
 9. [Serving Runtime](llms/serving-runtime.md) - chunked prefill, admission control, and runtime-side stability
 10. [Parallelism](llms/parallelism.md) - DP and TP from the perspective of memory, throughput, and communication
@@ -35,7 +35,7 @@ A focused knowledge base for modern deep learning systems, from hardware fundame
 - [Request Lifecycle](llms/request-lifecycle.md)
 - [Metrics](llms/metrics.md)
 - [Roofline Model for Inference](llms/roofline.md)
-- [Data Movement and Communication](llms/data-movement.md)
+- [Collective Communication](llms/collective-communication.md)
 - [KV Cache](llms/kv-cache.md)
 - [Serving Runtime](llms/serving-runtime.md)
 - [Parallelism](llms/parallelism.md)

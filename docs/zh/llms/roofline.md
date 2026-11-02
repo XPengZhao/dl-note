@@ -16,7 +16,10 @@ $$
 P \leq \min(P_{\max},\ I B_{\max})
 $$
 
-![Roofline 的带宽上界、算力上界与转折点](../../assets/images/ai-infra/roofline-model.svg){ width="100%" }
+<figure markdown="span">
+  ![Roofline 的带宽上界、算力上界与转折点](../../assets/images/ai-infra/roofline-model.svg){ width="88%" style="display: block; margin: 0 auto;" }
+  <figcaption style="color: var(--md-default-fg-color--light); font-style: normal; margin-top: 0;">Fig. 1: Roofline 模型</figcaption>
+</figure>
 
 其中 $I B_{\max}$ 是内存带宽能够支撑的计算吞吐。算术强度较低时，数据供应速度不足以支撑峰值算力，性能上界由内存带宽决定，对应图中的 **memory-bound** 区域。随着算术强度提高，单位数据对应的计算量增加，带宽所能支撑的计算吞吐随之上升。当它达到设备的算力上限 $P_{\max}$ 后，继续提高算术强度也不会抬高性能上界，此时进入 **compute-bound** 区域。两条上界相交时的算术强度等于设备的**算力带宽比**：
 
@@ -68,7 +71,10 @@ $$
 
 考虑一个按行连续存储的 $32\times32$ 矩阵，每个元素占 4 字节。在这个简化例子中，假设一次事务访问一个 32 字节块，矩阵起点与块边界对齐。每块容纳 8 个元素，一行的 32 个元素正好占 4 个块。
 
-![按行与按列读取时覆盖的内存块](../../assets/images/ai-infra/memory-access.svg){ width="100%" }
+<figure markdown="span">
+  ![按行与按列读取时覆盖的内存块](../../assets/images/ai-infra/memory-access.svg){ width="88%" style="display: block; margin: 0 auto;" }
+  <figcaption style="color: var(--md-default-fg-color--light); font-style: normal; margin-top: 0;">Fig. 2: 按行与按列访存</figcaption>
+</figure>
 
 图中每个小格代表一个元素，深蓝色表示线程需要的数据。一个 warp 的 32 个线程在同一次访存指令中各请求一个 4 字节元素：
 
@@ -83,11 +89,11 @@ $$
 
 ### 访存并行度
 
-带宽描述单位时间能传输多少数据，延迟描述一次请求要等多久。如果 kernel 发出一个请求后，必须等数据返回才能发出下一个请求，即使还有可用带宽，也无法充分利用。
+一次内存请求从发出到数据返回，需要一定时间。如果每次都等上一个请求完成后才发出下一个请求，内存系统就难以持续传输数据，即使峰值带宽很高，也无法充分利用。
 
-同时发出多个独立请求，可以让它们的等待时间重叠。GPU 通过多个 warp，以及线程内的独立访存，维持足够多的在途请求，隐藏访存延迟。增加 batch 可以提供更多独立任务，但需要 kernel 将这些任务转化为并发访问。
+访存并行度指同时尚未完成的内存请求数量。对于相互独立的请求，GPU 可以在等待前一个请求返回时，继续发出其他请求。多个 warp，以及同一线程内的独立访存，都可以提供这种并行性。如果下一次访问的地址依赖前一次读取的结果，就必须等待，难以形成并行访问。
 
-在 HBM 流量不变时，提高访存并行度可以缩短执行时间，提高实际带宽 $B_{\mathrm{actual}}$。对应到 Roofline 图上，算术强度不变，实测点向上移动，上界本身保持不变。
+在 HBM 流量不变时，更充分的访存并行可以缩短耗时，提高实际带宽 $B_{\mathrm{actual}}$。对应到 Roofline 图上，算术强度不变，实测点向上靠近性能上界。
 
 ## Compute Throughput
 

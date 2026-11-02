@@ -30,7 +30,7 @@ plugins:
                 - Request Lifecycle: llms/request-lifecycle.md
                 - Metrics: llms/metrics.md
                 - Roofline Model: llms/roofline.md
-                - Data Movement and Communication: llms/data-movement.md
+                - Collective Communication: llms/collective-communication.md
                 - KV Cache: llms/kv-cache.md
                 - Serving Runtime: llms/serving-runtime.md
                 - GLM-5.2 Inference Case Study: llms/glm-5.2-inference-path.md
@@ -52,7 +52,7 @@ plugins:
             Request Lifecycle: 请求生命周期
             Metrics: 指标
             Roofline Model: Roofline 模型
-            Data Movement and Communication: 数据搬运与通信
+            Collective Communication: 集合通信
             KV Cache: KV Cache
             Serving Runtime: 推理运行时
             Parallelism: 并行策略
@@ -79,7 +79,7 @@ nav:
       - Request Lifecycle: llms/request-lifecycle.md
       - Metrics: llms/metrics.md
       - Roofline Model: llms/roofline.md
-      - Data Movement and Communication: llms/data-movement.md
+      - Collective Communication: llms/collective-communication.md
       - KV Cache: llms/kv-cache.md
       - Serving Runtime: llms/serving-runtime.md
       - GLM-5.2 Inference Case Study: llms/glm-5.2-inference-path.md
