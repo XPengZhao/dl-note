@@ -7,6 +7,8 @@
 
 Baseline 采用标准 DSpark 结构。三层 draft 主干网络一次生成各预测位置的隐藏状态，LM head 将其映射为初始 logits。Markov head 根据前驱 token 添加偏置，confidence head 预测对应位置的分布重叠率。
 
+> 标准 DSpark 架构的通用描述见 [Speculative Decoding §5.2 DSpark](speculative-decoding.md#52-dspark)；本节保留 Qwen3.8-Flash-Next 实例化的具体设置。
+
 ![DSpark baseline：左为并行 draft 与顺序选择，右为首个预测位置的 Markov 修正及 confidence 分支](../../assets/images/qwen3.8-flash-next-dspark/dspark-baseline.svg){ width="100%" }
 
 图示以 D 为 anchor；实际 block size 为 7，预测 E–K。

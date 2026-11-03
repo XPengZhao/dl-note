@@ -428,7 +428,7 @@ $$
 ### 示例
 
 <div align="center">
-  <img src="../../assets/images/kv-offloading-swa-interval-layer-kv.png" alt="SWA interval-layer KV checkpoint" width="300px">
+  <img src="../../assets/images/kv-offloading-swa-interval-layer-kv.svg" alt="SWA interval-layer KV checkpoint" width="300px">
 </div>
 
 图中例子取 $L=4,W=2,S=2$，保存的是 Layer2 和 Layer4 的 KV。Layer1 和 Layer3 的 KV 需要在当前 step 恢复。为了得到 $h_N^{(4)}$，Layer4 可以直接读取已保存的 $KV_{N-1}^{(4)},KV_N^{(4)}$，但仍然需要输入 $h_N^{(3)}$。为了得到 $h_N^{(3)}$，Layer3 需要恢复窗口内 $KV_{N-1}^{(3)},KV_N^{(3)}$，因此需要下方 Layer2 提供 $h_{N-1}^{(2)},h_N^{(2)}$。这两个 hidden states 再由 Layer2 借助已保存的 KV 计算出来。
