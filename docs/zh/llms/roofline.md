@@ -51,6 +51,8 @@ $$
 
 Prefill 和 decode 在线性层上的差异也可以这样理解。Prefill 一次处理多个输入 token，权重可以在这些 token 之间复用。Decode 每轮为每个活跃请求处理一个 token，低并发时的 $b$ 较小，权重复用有限。将多个请求组成 batch，可以增大这一轮的 $b$。
 
+Speculative decoding 的 verification 沿着同一方向起作用。每个请求一次提交 $q$ 个候选 token 时，这一轮 target forward 的 $b$ 就从请求数扩大到请求数乘 $q$，权重因此能在更多 token 之间复用。这部分的展开见 [Speculative Decoding §6.2](speculative-decoding.md#62-batch-size-compute-and-memory-traffic)。
+
 ### 减少数据搬运
 
 量化通过减少数据量提高算术强度。在同一个例子中，如果每个权重从 2 字节减到 1 字节，忽略量化元数据和格式转换的开销，权重流量减半，算术强度变为：

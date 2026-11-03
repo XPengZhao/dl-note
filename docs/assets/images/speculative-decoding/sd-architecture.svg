@@ -310,14 +310,14 @@
           <path d="M 1111.6 304 L 1184.4 304 C 1193.0112 304 1200 312.512 1200 323 C 1200 333.488 1193.0112 342 1184.4 342 L 1111.6 342 C 1102.9888 342 1096 333.488 1096 323 C 1096 312.512 1102.9888 304 1111.6 304 Z" fill="#fff3d7"/>
           <path d="M 1111.6 304 L 1184.4 304 C 1193.0112 304 1200 312.512 1200 323 C 1200 333.488 1193.0112 342 1184.4 342 L 1111.6 342 C 1102.9888 342 1096 333.488 1096 323 C 1096 312.512 1102.9888 304 1111.6 304 Z" stroke="#d7943d" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.35"/>
           <text transform="translate(1110.4 313.776)" fill="#21262e">
-            <tspan font-family="Helvetica Neue" font-size="16" fill="#21262e" x="19.519998" y="15" xml:space="preserve">there</tspan>
+            <tspan font-family="Helvetica Neue" font-size="16" fill="#21262e" x="23.519998" y="15" xml:space="preserve">flies</tspan>
           </text>
         </g>
         <g id="Graphic_54">
           <path d="M 1111.6 56 L 1184.4 56 C 1193.0112 56 1200 64.512 1200 75 C 1200 85.488 1193.0112 94 1184.4 94 L 1111.6 94 C 1102.9888 94 1096 85.488 1096 75 C 1096 64.512 1102.9888 56 1111.6 56 Z" fill="#fad7d4"/>
           <path d="M 1111.6 56 L 1184.4 56 C 1193.0112 56 1200 64.512 1200 75 C 1200 85.488 1193.0112 94 1184.4 94 L 1111.6 94 C 1102.9888 94 1096 85.488 1096 75 C 1096 64.512 1102.9888 56 1111.6 56 Z" stroke="#c24540" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.35"/>
           <text transform="translate(1110.4 65.776)" fill="#21262e">
-            <tspan font-family="Helvetica Neue" font-size="16" fill="#21262e" x="19.519998" y="15" xml:space="preserve">there</tspan>
+            <tspan font-family="Helvetica Neue" font-size="16" fill="#21262e" x="23.519998" y="15" xml:space="preserve">flies</tspan>
           </text>
         </g>
         <g id="Graphic_55">
@@ -438,7 +438,7 @@
           <path d="M 463.8 56 L 542.2 56 C 551.4736 56 559 64.512 559 75 C 559 85.488 551.4736 94 542.2 94 L 463.8 94 C 454.5264 94 447 85.488 447 75 C 447 64.512 454.5264 56 463.8 56 Z" fill="#fff3d7"/>
           <path d="M 463.8 56 L 542.2 56 C 551.4736 56 559 64.512 559 75 C 559 85.488 551.4736 94 542.2 94 L 463.8 94 C 454.5264 94 447 85.488 447 75 C 447 64.512 454.5264 56 463.8 56 Z" stroke="#d7943d" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.35"/>
           <text transform="translate(462.2 65.776)" fill="#21262e">
-            <tspan font-family="Helvetica Neue" font-size="16" fill="#21262e" x="22.72" y="15" xml:space="preserve">there</tspan>
+            <tspan font-family="Helvetica Neue" font-size="16" fill="#21262e" x="26.72" y="15" xml:space="preserve">flies</tspan>
           </text>
         </g>
         <g id="Graphic_70">

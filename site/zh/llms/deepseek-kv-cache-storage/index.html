@@ -11,6 +11,10 @@
         <link rel="canonical" href="https://XPengZhao.github.io/dl-note/zh/llms/deepseek-kv-cache-storage/">
       
       
+        <link rel="prev" href="../kv-cache/">
+      
+      
+        <link rel="next" href="../kv-offloading-vllm/">
       
       
         
@@ -306,18 +310,20 @@
       
   
   
+    
   
   
+  
     
     
     
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
         
           
           <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
@@ -338,7 +344,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_4">
             <span class="md-nav__icon md-icon"></span>
             
@@ -632,6 +638,55 @@
                 
   
   
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_8" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_4_8" id="__nav_4_8_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    KV Cache
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_8_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    KV Cache
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
   
   
     <li class="md-nav__item">
@@ -651,6 +706,607 @@
   
 
       </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SWA KV Cache 存储方案
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SWA KV Cache 存储方案
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. 问题定义
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-swa-kv-cache-baseline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. 完全保存 SWA KV Cache Baseline
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. 完全保存 SWA KV Cache Baseline">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        示例
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        开销
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="开销">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#dram" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DRAM 存储开销
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hbm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HBM 搬运开销
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        计算开销
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-baseline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. 完全重算 Baseline
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. 完全重算 Baseline">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        示例
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        开销
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="开销">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#dram_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DRAM 存储开销
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hbm_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HBM 搬运开销
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        计算开销
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-kv" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. 保存浅层 KV 的恢复成本
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. 保存浅层 KV 的恢复成本">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        示例
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        开销
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="开销">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#dram_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DRAM 存储开销
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hbm_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HBM 搬运开销
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_9" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        计算开销
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-kv" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. 保存深层 KV 的恢复成本
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. 保存深层 KV 的恢复成本">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_10" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        示例
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_11" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        开销
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="开销">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#dram_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DRAM 存储开销
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hbm_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HBM 搬运开销
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_12" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        计算开销
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-kv" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. 间隔层保存 KV 的恢复成本
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6. 间隔层保存 KV 的恢复成本">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_13" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        示例
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_14" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        开销
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="开销">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#dram_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DRAM 存储开销
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hbm_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HBM 搬运开销
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_15" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        计算开销
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-token-checkpoint" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. 间隔 Token Checkpoint
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7. 间隔 Token Checkpoint">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_16" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        示例
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_17" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        开销
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="开销">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#dram_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DRAM 存储开销
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hbm_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HBM 搬运开销
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_18" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        计算开销
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. 总结
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../kv-offloading-vllm/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    vLLM KV Cache Offloading 源码梳理
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
     </li>
   
 
@@ -1534,10 +2190,7 @@
 <li>重复直到第 <span class="arithmatex">\(L\)</span> 层，得到 <span class="arithmatex">\(h_N^{(L)}\)</span></li>
 </ol>
 <h3 id="_1">示例</h3>
-<div align="center">
-  <img src="../../assets/images/kv-offloading-swa-full-storage.png" alt="SWA Full KV Baseline" width="300px">
-</div>
-
+<p><img alt="SWA Full KV Baseline" src="../../../assets/images/kv-offloading/kv-offloading-swa-full-storage.svg" style="display: block; margin: 0 auto;" width="300px" /></p>
 <p>图中的例子取 <span class="arithmatex">\(L=4, W=2\)</span>，因此位置 <span class="arithmatex">\(N\)</span> 在每一层只访问窗口 <span class="arithmatex">\(\mathcal{W}_N=\{N-1,N\}\)</span>。绿色块表示已经保存好的 full KV，橙色块表示当前位置 <span class="arithmatex">\(N\)</span> 沿层向上计算得到的 hidden state。虚线框表示当前 decode step 需要计算的，实线框表示已经缓存并可直接读取的。</p>
 <p>以第 4 层为例，<span class="arithmatex">\(h_N^{(4)}\)</span> 的计算读取 <span class="arithmatex">\(KV_{N-1}^{(4)}\)</span> 和 <span class="arithmatex">\(KV_N^{(4)}\)</span>。系统不需要重新计算 <span class="arithmatex">\(h_{N-1}^{(3)}\)</span>，因为位置 <span class="arithmatex">\(N-1\)</span> 在第 4 层需要贡献给 attention 的状态已经保存在 <span class="arithmatex">\(KV_{N-1}^{(4)}\)</span> 中。其它层同理：当前位置的 hidden state 逐层向上计算，窗口内历史 token 的影响通过各层已缓存的 full KV 进入 attention。</p>
 <h3 id="_2">开销</h3>
@@ -1579,10 +2232,7 @@ N_{\text{attn-read}}^{\text{full}} \approx 61 \times 128 = 7808
 \]</div>
 <p>为了得到第 <span class="arithmatex">\(\ell\)</span> 层、窗口内位置 <span class="arithmatex">\(t\)</span> 的 <span class="arithmatex">\(KV_t^{(\ell)}\)</span>，系统需要先得到该位置上一层的 hidden state <span class="arithmatex">\(h_t^{(\ell-1)}\)</span>。而 <span class="arithmatex">\(h_t^{(\ell-1)}\)</span> 又依赖更低层对位置 <span class="arithmatex">\(t\)</span> 的 SWA 窗口计算。完全重算因此会形成一个向低层、向更早 token 扩张的依赖锥。</p>
 <h3 id="_4">示例</h3>
-<div align="center">
-  <img src="../../assets/images/kv-offloading-swa-full-recompute.png" alt="SWA Full KV Baseline" width="300px">
-</div>
-
+<p><img alt="SWA Full KV Baseline" src="../../../assets/images/kv-offloading/kv-offloading-swa-full-recompute.png" style="display: block; margin: 0 auto;" width="300px" /></p>
 <p>仍取 <span class="arithmatex">\(L=4, W=2\)</span>。为了计算 <span class="arithmatex">\(h_N^{(4)}\)</span>，第 4 层需要第 3 层窗口内的 hidden states，即位置 <span class="arithmatex">\(\{N-1,N\}\)</span>。继续向低层展开。这正对应图里的依赖锥：虽然每一层 SWA 只看 2 个位置，但为了从零恢复最高层当前位置的输出，底部输入范围会扩展到 5 个 token。</p>
 <h3 id="_5">开销</h3>
 <h4 id="dram_1">DRAM 存储开销</h4>
@@ -1630,10 +2280,7 @@ L + \frac{L(L-1)}{2}(W-1) = 61 + \frac{61 \times 60}{2} \times 127 = 232471
 </ol>
 <p>这个路径的特点是：浅层 KV 已经保存，但系统仍然要把多个 token 位置推过浅层，给高层窗口状态恢复提供输入。</p>
 <h3 id="_7">示例</h3>
-<div align="center">
-  <img src="../../assets/images/kv-offloading-swa-shallow-kv.png" alt="SWA shallow-layer KV storage" width="300px">
-</div>
-
+<p><img alt="SWA shallow-layer KV storage" src="../../../assets/images/kv-offloading/kv-offloading-swa-shallow-kv.svg" style="display: block; margin: 0 auto;" width="300px" /></p>
 <p>图中例子取 <span class="arithmatex">\(L=4, W=2, m=2\)</span>。第 1、2 层的 KV 已经保存，第 3、4 层的 KV 需要恢复。为了得到最终的 <span class="arithmatex">\(h_N^{(4)}\)</span>，第 4 层需要窗口内 <span class="arithmatex">\(KV_{N-1}^{(4)},KV_N^{(4)}\)</span>；这些 KV 又需要第 3 层对应位置的 hidden states。因此第 3 层要恢复位置 <span class="arithmatex">\(\{N-1,N\}\)</span>，第 2 层需要提供位置 <span class="arithmatex">\(\{N-2,N-1,N\}\)</span> 的 hidden states。浅层 KV 虽然已经保存，但系统仍然要把这 3 个位置从输入侧推到第 2 层，形成一个浅层矩形带。</p>
 <p>在 <span class="arithmatex">\(L=4,W=2,m=2\)</span> 的例子里，未保存高层数为 <span class="arithmatex">\(q=L-m=2\)</span>。第 2 层需要提供的位置数为：</p>
 <div class="arithmatex">\[
@@ -1709,10 +2356,7 @@ N_{\text{hidden}}^{\text{shallow}} \approx 118141 + 55275 = 173416
 </ol>
 <p>这个路径的特点是：恢复扩张集中在低层；到达分界层后，高层窗口 KV 已经可读，后续主要是一条当前位置竖线。</p>
 <h3 id="_10">示例</h3>
-<div align="center">
-  <img src="../../assets/images/kv-offloading-swa-deep-kv.png" alt="SWA deep-layer KV storage" width="300px">
-</div>
-
+<p><img alt="SWA deep-layer KV storage" src="../../../assets/images/kv-offloading/kv-offloading-swa-deep-kv.png" style="display: block; margin: 0 auto;" width="300px" /></p>
 <p>图中例子取 <span class="arithmatex">\(L=4,W=2,m=2\)</span>。第 3、4 层的 KV 已经保存，第 1、2 层的 KV 需要恢复。为了得到 <span class="arithmatex">\(h_N^{(4)}\)</span>，第 4 层可以直接读取 <span class="arithmatex">\(KV_{N-1}^{(4)},KV_N^{(4)}\)</span>；第 3 层也可以直接读取 <span class="arithmatex">\(KV_{N-1}^{(3)},KV_N^{(3)}\)</span>。因此，高层只需要沿当前位置 <span class="arithmatex">\(N\)</span> 形成一条竖线：<span class="arithmatex">\(h_N^{(2)} \rightarrow h_N^{(3)} \rightarrow h_N^{(4)}\)</span>。</p>
 <p>剩下的问题是如何得到 <span class="arithmatex">\(h_N^{(2)}\)</span>。由于第 1、2 层 KV 没有保存，低层需要从输入侧恢复一个依赖锥。为了计算 <span class="arithmatex">\(h_N^{(2)}\)</span>，第 2 层需要窗口内 <span class="arithmatex">\(KV_{N-1}^{(2)},KV_N^{(2)}\)</span>；这些 KV 来自第 1 层的 hidden states。继续向下展开，第 1 层需要覆盖 <span class="arithmatex">\(\{N-2,N-1,N\}\)</span> 的输入 token。于是计算形状变成“低层依赖锥 + 高层竖线”。</p>
 <p>在 <span class="arithmatex">\(L=4,W=2,m=2\)</span> 的例子里，低层 hidden-state 计算量为：</p>
@@ -1787,10 +2431,7 @@ N_{\text{hidden}}^{\text{deep}} \approx 55275 + 31 = 55306
 </ol>
 <p>这个路径的特点是：完整依赖锥被多个保存层切成若干梯形段。每段都有一个已有宽度的输入集合，同时段内未保存层仍会继续向更早 token 扩张。</p>
 <h3 id="_13">示例</h3>
-<div align="center">
-  <img src="../../assets/images/kv-offloading-swa-interval-layer-kv.svg" alt="SWA interval-layer KV checkpoint" width="300px">
-</div>
-
+<p><img alt="SWA interval-layer KV checkpoint" src="../../../assets/images/kv-offloading/kv-offloading-swa-interval-layer-kv.svg" style="display: block; margin: 0 auto;" width="300px" /></p>
 <p>图中例子取 <span class="arithmatex">\(L=4,W=2,S=2\)</span>，保存的是 Layer2 和 Layer4 的 KV。Layer1 和 Layer3 的 KV 需要在当前 step 恢复。为了得到 <span class="arithmatex">\(h_N^{(4)}\)</span>，Layer4 可以直接读取已保存的 <span class="arithmatex">\(KV_{N-1}^{(4)},KV_N^{(4)}\)</span>，但仍然需要输入 <span class="arithmatex">\(h_N^{(3)}\)</span>。为了得到 <span class="arithmatex">\(h_N^{(3)}\)</span>，Layer3 需要恢复窗口内 <span class="arithmatex">\(KV_{N-1}^{(3)},KV_N^{(3)}\)</span>，因此需要下方 Layer2 提供 <span class="arithmatex">\(h_{N-1}^{(2)},h_N^{(2)}\)</span>。这两个 hidden states 再由 Layer2 借助已保存的 KV 计算出来。</p>
 <p>图中每个保存层提供一个横向边界，阻止依赖锥继续无界向下扩张；但在两个保存层之间，未保存层仍会把所需位置集合向更早 token 扩大。每一段可以看成“已有宽度的矩形带 + 段内小三角”。</p>
 <p>在这个例子里，把保存层按从上到下编号，顶段宽度为：</p>
@@ -1861,10 +2502,7 @@ N_{\text{hidden}}^{\text{interval}} \approx L + \frac{G(S-1)(S-2)}{2}(W-1) + \fr
 <li>使用恢复后的窗口状态完成当前 decode step</li>
 </ol>
 <h3 id="_16">示例</h3>
-<div align="center">
-  <img src="../../assets/images/kv-offloading-swa-token-checkpoint.png" alt="SWA token checkpoint recovery" width="300px">
-</div>
-
+<p><img alt="SWA token checkpoint recovery" src="../../../assets/images/kv-offloading/kv-offloading-swa-token-checkpoint.svg" style="display: block; margin: 0 auto;" width="300px" /></p>
 <p>图中的例子取 <span class="arithmatex">\(L=4,W=2\)</span>，最近的 token checkpoint 位于 <span class="arithmatex">\(c=N-2\)</span>。预测 <span class="arithmatex">\(\text{token}_{N+1}\)</span> 时，系统不从更早 token 展开完整依赖锥，而是从 checkpoint 边界状态出发，顺序恢复 <span class="arithmatex">\(N-1\)</span> 和 <span class="arithmatex">\(N\)</span> 两个位置。</p>
 <p>绿色实线块表示 checkpoint 已经提供的边界 KV。对第 1、2、3 层来说，恢复位置 <span class="arithmatex">\(N-1\)</span> 时需要读取对应层的 <span class="arithmatex">\(KV_{N-2}^{(\ell)}\)</span>；恢复出 <span class="arithmatex">\(KV_{N-1}^{(\ell)}\)</span> 后，位置 <span class="arithmatex">\(N\)</span> 又可以继续使用它作为窗口内的历史状态。绿色虚线块表示当前恢复过程中生成的局部 KV，橙色虚线块表示随恢复过程生成的 hidden state。</p>
 <p>这个例子对应恢复长度：</p>

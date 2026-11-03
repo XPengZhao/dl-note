@@ -8,7 +8,7 @@
 
 在每一步 decode 中，模型实际上只生成一个新的 token。尤其当 batch size 较小时，单次 forward 的计算量并不高，但仍然需要读取已有的 KV cache、执行 GPU kernel，并完成必要的同步。因此，生成四个 token 基本对应四次 target forward 的开销。Speculative decoding 的出发点正是在这里。如果可以先由一个**更小、更快**的模型生成若干候选 token，再让 target model 在一次 forward 中完成验证，就有可能显著减少昂贵的 target decode 次数。
 
-如图所示，draft model 首先连续生成 **upon → a → time → there**。随后，target model 不再逐个生成这些 token，而是在一次 forward 中同时计算多个位置的预测结果，并按照自左向右的顺序进行验证。在这个例子中，**upon、a、time** 均被接受，而 **there** 是第一个被拒绝的 token，因此本轮验证在该位置结束。
+如图所示，draft model 首先连续生成 **upon → a → time → flies**——小模型在句尾被 “time flies” 的局部搭配带偏了。随后，target model 不再逐个生成这些 token，而是在一次 forward 中同时计算多个位置的预测结果，并按照自左向右的顺序进行验证。在这个例子中，**upon、a、time** 均被接受，而 **flies** 是第一个被拒绝的 token，本轮验证在该位置结束。被拒绝的 token 不会进入输出：这个位置最终会由 target 自己重新生成，在这个例子中就是 **there**。
 
 这样，原本需要多次 target decode 才能确认的多个 token，可以通过一次 target forward 完成验证，只额外引入若干次成本更低的 draft forward。这构成了 speculative decoding 的基本思想。**由低成本的 draft model 提出候选序列，再利用 target model 并行验证多个候选 token，从而减少昂贵的 target decode 次数。** Draft model 与 target model 的预测越一致，一次 target forward 能够接受的 token 越多，speculative decoding 所带来的加速也就越明显。
 
@@ -17,7 +17,7 @@
 
 ### 2.1 Draft
 
-Speculative decoding 的第一步，是让一个更小的 draft model 先向前生成若干个候选 token。继续使用前面的例子，当前 prefix 以 **once** 结尾。如果 draft length 为 \(K=4\)，draft 会连续生成$\text{upon}\rightarrow\text{a}\rightarrow\text{time}\rightarrow\text{there}.$ 形式化地，令当前 prefix 为 \(y\)，draft model 的条件分布为 \(p_d\)。第 \(i\) 个候选 token 按照
+Speculative decoding 的第一步，是让一个更小的 draft model 先向前生成若干个候选 token。继续使用前面的例子，当前 prefix 以 **once** 结尾。如果 draft length 为 \(K=4\)，draft 会连续生成$\text{upon}\rightarrow\text{a}\rightarrow\text{time}\rightarrow\text{flies}.$ 形式化地，令当前 prefix 为 \(y\)，draft model 的条件分布为 \(p_d\)。第 \(i\) 个候选 token 按照
 
 $$
 x_i\sim p_d(\cdot\mid y,x_{<i})
@@ -25,7 +25,7 @@ $$
 
 依次生成，其中 \(x_{<i}=(x_1,\ldots,x_{i-1})\)。因此，draft 阶段本身仍然是 autoregressive 的：生成 \(K\) 个候选 token，依然需要 $K$ 次 draft forward。 这看起来似乎没有减少 forward 次数，关键在于 draft 通常远小于 target。Speculative decoding 实际上是在用 $K$ 次便宜的 draft forward 去换取后面若干次昂贵的 target forward。Draft 生成的 token 也只是候选，真正决定它们能否进入最终输出的仍然是 target。
 
-因此，一个好的 draft 并不需要完全复现 target，只需要同时做到两件事：**生成得足够快，并且经常猜中 target 接下来会接受的 token。** Draft 太大，候选更准但自身开销更高；draft 太小，虽然便宜，却可能频繁被拒绝。这个 trade-off 会直接决定 speculative decoding 最终能获得多少加速。
+因此，一个好的 draft 并不需要完全复现 target，只需要同时做到两件事：**生成得足够快，并且经常猜中 target 接下来会接受的 token。** Draft 太大，候选更准但自身开销更高。Draft 太小，虽然便宜，却可能频繁被拒绝。这个 trade-off 会直接决定 speculative decoding 最终能获得多少加速。
 
 ### 2.2 Verification
 
@@ -37,7 +37,7 @@ p_t(\cdot\mid y,x_1),\quad \ldots,\quad
 p_t(\cdot\mid y,x_{<K}).
 $$
 
-虽然这些位置在语义上仍然存在先后依赖，但它们的输入 token 已经由 draft 提供，因此 target 可以像 prefill 一样并行计算。回到前面的例子，draft 给出 **upon → a → time → there**，target 只需一次 forward，就能得到这四个位置对应的预测分布。
+虽然这些位置在语义上仍然存在先后依赖，但它们的输入 token 已经由 draft 提供，因此 target 可以像 prefill 一样并行计算。回到前面的例子，draft 给出 **upon → a → time → flies**，target 只需一次 forward，就能得到这四个位置对应的预测分布。
 
 接下来从左到右验证候选 token。对于第 \(i\) 个 draft token \(x_i\)，其接受概率为
 
@@ -50,7 +50,7 @@ $$
 \right).
 $$
 
-如果 \(x_i\) 被接受，就继续检查下一个；一旦某个位置被拒绝，它右边的候选全部失效，因为这些 token 都是在被拒绝的 token 条件下生成的。于是图中的 **upon、a、time** 可以连续通过，而 **there** 被拒绝，当前 speculative step 也就在这里结束。
+如果 \(x_i\) 被接受，就继续检查下一个。一旦某个位置被拒绝，它右边的候选全部失效，因为这些 token 都是在被拒绝的 token 条件下生成的。于是图中的 **upon、a、time** 可以连续通过，而 **flies** 被拒绝，当前 speculative step 也就在这里结束。
 
 Verification 的收益正来自这里：**target 用一次较宽的 forward，同时检查多个 draft token，再把可以接受的部分一次写入输出。** 如果一次 verification 平均能接受多个 token，就相当于用一次 target forward 替代了多次普通 decode。
 
@@ -76,7 +76,7 @@ p_{\mathrm{res}}(x)
 [a]_+=\max(a,0).
 $$
 
-直观来看，draft 已经通过候选过程“用掉”了一部分概率质量；当候选被拒绝时，只需要由 target 补上 draft 没有覆盖到的部分。正是 acceptance rule 和 residual resampling 的配合，使 speculative decoding 虽然先让 draft 猜测多个 token，最终得到的采样分布仍然与直接从 target autoregressive decoding 完全一致。
+直观来看，draft 已经通过候选过程“用掉”了一部分概率质量。当候选被拒绝时，只需要由 target 补上 draft 没有覆盖到的部分。正是 acceptance rule 和 residual resampling 的配合，使 speculative decoding 虽然先让 draft 猜测多个 token，最终得到的采样分布仍然与直接从 target autoregressive decoding 完全一致。
 
 
 ## 3. Why Is Speculative Decoding Exact?
@@ -122,7 +122,7 @@ $$
 
 ### 4.1 Acceptance Length
 
-Speculative decoding 的加速首先取决于：一次 target verification 能让生成序列向前推进多少个 token。假设 draft length 为 \(K\)，并且前 \(m\) 个 draft token 被连续接受，那么这一轮至少可以确认这 \(m\) 个 token；在标准 speculative decoding 中，target 还会在 verification 的末尾额外产生一个 token，因此这一轮通常能够推进
+Speculative decoding 的加速首先取决于：一次 target verification 能让生成序列向前推进多少个 token。假设 draft length 为 \(K\)，并且前 \(m\) 个 draft token 被连续接受，那么这一轮至少可以确认这 \(m\) 个 token。在标准 speculative decoding 中，target 还会在 verification 的末尾额外产生一个 token，因此这一轮通常能够推进
 
 $$
 m+1
@@ -134,7 +134,7 @@ $$
 A=\mathbb{E}[\text{tokens advanced per speculative step}].
 $$
 
-以 \(K=4\) 为例，如果 draft 给出 **upon → a → time → there**，其中前三个 token 被接受、第四个被拒绝，那么 target 会在第四个位置重新采样一个 token。这一轮最终向前推进 4 个 token，因此 acceptance length 为 4。相反，如果第一个 draft token 就被拒绝，那么这一轮只能推进 1 个 token，此时 speculative decoding 几乎没有利用到并行 verification 的优势。
+以 \(K=4\) 为例，如果 draft 给出 **upon → a → time → flies**，其中前三个 token 被接受、第四个被拒绝，那么 target 会在第四个位置重新采样出 **there**。这一轮最终向前推进 4 个 token，因此 acceptance length 为 4。相反，如果第一个 draft token 就被拒绝，那么这一轮只能推进 1 个 token，此时 speculative decoding 几乎没有利用到并行 verification 的优势。
 
 这里需要区分 **acceptance rate** 和 **acceptance length**。Acceptance rate 描述单个 draft token 被接受的比例，而 acceptance length 直接描述一次昂贵的 target verification 能换来多少个输出 token。对于实际推理性能，后者通常更加重要：**一次 verification 推进得越远，需要执行的 target forward 就越少。** 下一节可以据此建立一个简单的 speedup model，分析 acceptance length、draft cost 和 verification cost 如何共同决定最终加速比。
 
@@ -167,11 +167,11 @@ S
 {K T_{\mathrm{draft}}+T_{\mathrm{verify}}(K)}.
 $$
 
-这个公式也直接说明了 speculative decoding 的三个核心目标：让一次 verification 接受尽可能多的 token，即增大 \(A\)；让 draft 足够轻量，减小 \(T_{\mathrm{draft}}\)；同时控制一次多-token verification 的额外开销 \(T_{\mathrm{verify}}(K)\)。因此，**高 acceptance 并不自动意味着高 speedup**。如果为了提高 acceptance 使用了过大的 draft，或者 verification 本身变得很贵，最终节省下来的 target decode 时间仍然可能抵不过新增的开销。
+这个公式也直接说明了 speculative decoding 的三个核心目标：增大 \(A\)（让一次 verification 接受尽可能多的 token）、减小 \(T_{\mathrm{draft}}\)（让 draft 足够轻量）、控制 \(T_{\mathrm{verify}}(K)\)（一次多-token verification 的额外开销）。因此，**高 acceptance 并不自动意味着高 speedup**。如果为了提高 acceptance 使用了过大的 draft，或者 verification 本身变得很贵，最终节省下来的 target decode 时间仍然可能抵不过新增的开销。
 
 ### 4.3 What Actually Determines the Speedup?
 
-从上一节的公式可以看出，speculative decoding 的性能主要由三个因素决定：acceptance length \(A\)、draft cost \(T_{\mathrm{draft}}\) 和 verification cost \(T_{\mathrm{verify}}(K)\)。其中最直接的是 \(A\)。一次 verification 能接受的 token 越多，就越能摊薄 target forward 的成本；如果 draft 经常在前几个位置就被拒绝，那么即使 verification 能一次处理很多 candidate，大部分计算也没有真正转化成有效输出。
+从上一节的公式可以看出，speculative decoding 的性能主要由三个因素决定：acceptance length \(A\)、draft cost \(T_{\mathrm{draft}}\) 和 verification cost \(T_{\mathrm{verify}}(K)\)。其中最直接的是 \(A\)。一次 verification 能接受的 token 越多，就越能摊薄 target forward 的成本。如果 draft 经常在前几个位置就被拒绝，那么即使 verification 能一次处理很多 candidate，大部分计算也没有真正转化成有效输出。
 
 Draft length \(K\) 也存在明显的 trade-off。增大 \(K\) 给了一次 verification 接受更多 token 的机会，但同时需要更多 draft forward，而且越靠后的 candidate 越容易因为前面某个 token 被拒绝而直接作废。因此，\(K\) 并不是越大越好。类似地，更大的 draft model 往往能提高 acceptance，但自身生成 candidate 的成本也更高。一个好的 drafter 追求的不是单纯更准确，而是以尽可能低的代价获得较长的 acceptance length。
 
@@ -188,13 +188,13 @@ $$
 
 ## 5. Speculative Decoding Methods
 
-第 4 节的 speedup model 给出了三条优化路径：增大 acceptance length \(A\)、降低 draft cost \(T_{\mathrm{draft}}\)、控制 verification cost \(T_{\mathrm{verify}}(K)\)。Vanilla speculative decoding 使用一个独立的小模型 autoregressive 地生成 \(K\) 个候选 token，\(T_{\mathrm{draft}}\) 对应 \(K\) 次 draft forward。后续方法大多围绕同一件事展开：**用更便宜的方式产生与 target 更一致的候选序列。** 本节介绍两类代表做法：MTP 在 target 主干上附加轻量预测模块，以很低的额外成本产生候选；DSpark 用一次并行 forward 生成全部候选位置的草稿状态，再由轻量 Markov head 顺序修正 logits。
+第 4 节的 speedup model 给出了三条优化路径：增大 acceptance length \(A\)、降低 draft cost \(T_{\mathrm{draft}}\)、控制 verification cost \(T_{\mathrm{verify}}(K)\)。Vanilla speculative decoding 使用一个独立的小模型 autoregressive 地生成 \(K\) 个候选 token，\(T_{\mathrm{draft}}\) 对应 \(K\) 次 draft forward。后续方法大多围绕同一件事展开：**用更便宜的方式产生与 target 更一致的候选序列。** 本节介绍两类代表做法：MTP 在 target 主干上附加轻量预测模块，以很低的额外成本产生候选。DSpark 用一次并行 forward 生成全部候选位置的草稿状态，再由轻量 Markov head 顺序修正 logits。
 
 ### 5.1 Multi-Token Prediction (MTP)
 
 <!-- TODO: 补 MTP 模块级联结构图 -->
 
-MTP 的思路是把 draft 直接长在 target 身上：训练时在共享主干之外附加若干轻量预测模块，第 \(k\) 个模块学习预测当前位置之后第 \(k\) 个 token；推理时这些模块级联生成候选序列，充当 self-draft。它最早以多 token 预测训练目标的形式出现 [2]，DeepSeek-V3 将其用作辅助训练目标，并在推理时用 MTP 模块做 speculative decoding [3]。
+MTP 的思路是把 draft 直接长在 target 身上：训练时在共享主干之外附加若干轻量预测模块，第 \(k\) 个模块学习预测当前位置之后第 \(k\) 个 token。推理时这些模块级联生成候选序列，充当 self-draft。它最早以多 token 预测训练目标的形式出现 [2]，DeepSeek-V3 将其用作辅助训练目标，并在推理时用 MTP 模块做 speculative decoding [3]。
 
 **模块结构。** 设主干在位置 \(i\) 输出的隐藏状态为 \(h_i^0\)，token embedding 为 \(E(\cdot)\)，且 embedding 与输出头共享参数。第 \(k\) 个 MTP 模块接收前一模块的隐藏状态与下一个位置的 token embedding，各自归一化后拼接、投影，再送入一个轻量 transformer block：
 
@@ -215,7 +215,7 @@ W_{\mathrm{out}}\,\operatorname{RMSNorm}(h_i^k)
 \right).
 $$
 
-模块之间构成特征级的自回归链：第 \(k\) 个模块依赖第 \(k-1\) 个模块的输出以及真实的第 \(i+k\) 个 token。训练时这条链通过 teacher forcing 并行展开；推理时则把已经选出的候选 token 逐级喂给下一个模块。每个模块通常只含一个 transformer block，参数量和计算量都远小于主干。
+模块之间构成特征级的自回归链：第 \(k\) 个模块依赖第 \(k-1\) 个模块的输出以及真实的第 \(i+k\) 个 token。训练时这条链通过 teacher forcing 并行展开。推理时则把已经选出的候选 token 逐级喂给下一个模块。每个模块通常只含一个 transformer block，参数量和计算量都远小于主干。
 
 **训练目标。** 每个模块在自己负责的偏移位置上以交叉熵监督，作为主干 next-token 损失之外的辅助目标：
 
@@ -229,17 +229,17 @@ $$
 
 其中 \(D\) 为模块数，\(\lambda\) 为辅助损失权重。多 token 监督本身也被认为能改善主干表征，迫使隐藏状态包含更远位置的规划信息，因此 MTP 即使不用于投机也可能带来质量收益 [2]。
 
-**作为 self-draft 使用。** 推理时，主干一次 forward 得到 \(h^0\)，MTP 模块依次各执行一个小 block，即可给出候选分布 \(q_1,\ldots,q_D\)。放回 speedup model 中看：\(T_{\mathrm{draft}}\) 从独立 draft model 的 \(K\) 次 forward 变成 \(D\) 次极轻的 block 计算，几乎免费；但误差沿模块链累积，越靠后的位置越不准，因此实际保留的候选通常很短（DeepSeek-V3 推理时只保留一个模块，即每轮只多猜一个 token [3]）。候选分布 \(q_i\) 与第 2 节一样作为提议分布 \(p_d\) 参与 acceptance test 与 residual resampling，输出分布保持与 target 严格一致。
+**作为 self-draft 使用。** 推理时，主干一次 forward 得到 \(h^0\)，MTP 模块依次各执行一个小 block，即可给出候选分布 \(q_1,\ldots,q_D\)。放回 speedup model 中看：\(T_{\mathrm{draft}}\) 从独立 draft model 的 \(K\) 次 forward 变成 \(D\) 次极轻的 block 计算，几乎免费。但误差沿模块链累积，越靠后的位置越不准，因此实际保留的候选通常很短（DeepSeek-V3 推理时只保留一个模块，即每轮只多猜一个 token [3]）。候选分布 \(q_i\) 与第 2 节一样作为提议分布 \(p_d\) 参与 acceptance test 与 residual resampling，输出分布保持与 target 严格一致。
 
-与相关做法对比：Medusa 在同一个隐藏状态上并行挂多个互相独立的 head，候选通常组织成 tree 并用 tree attention 一次验证；MTP 模块之间顺序依赖，产生单链候选，与第 2 节的线性 verification 直接兼容。下一小节的 DSpark 介于两者之间：主干一次并行生成全部位置的草稿状态，顺序依赖则由 Markov head 在 logits 层面补上。
+与相关做法对比：Medusa 在同一个隐藏状态上并行挂多个互相独立的 head，候选通常组织成 tree 并用 tree attention 一次验证。MTP 模块之间顺序依赖，产生单链候选，与第 2 节的线性 verification 直接兼容。下一小节的 DSpark 介于两者之间：主干一次并行生成全部位置的草稿状态，顺序依赖则由 Markov head 在 logits 层面补上。
 
 ### 5.2 DSpark
 
-DSpark 属于复用 target 内部状态的一类 draft：读取 target 的中间层隐藏状态，用一个轻量 block 一次产出全部预测位置的草稿状态，再共享 target 的冻结 LM head 得到初始 logits；位置之间的顺序依赖则交给一个 Markov head 在 logits 层面补上。
+DSpark 属于复用 target 内部状态的一类 draft：读取 target 的中间层隐藏状态，用一个轻量 block 一次产出全部预测位置的草稿状态，再共享 target 的冻结 LM head 得到初始 logits。位置之间的顺序依赖则交给一个 Markov head 在 logits 层面补上。
 
 ![DSpark：左为并行 draft 与顺序选择，右为首个预测位置的 Markov 修正及 confidence 分支](../../assets/images/qwen3.8-flash-next-dspark/dspark-baseline.svg){ width="100%" }
 
-图示以 D 为 anchor；block size 为 7 时，依次预测后续的 E–K。
+图示以 D 为 anchor。block size 为 7 时，依次预测后续的 E–K。
 
 **并行 draft 主干。** 设 block size 为 \(B\)，token embedding 为 \(E(\cdot)\)，当前前缀以 anchor token \(t_0\) 结尾。Draft 输入由 anchor embedding 与 \(B-1\) 个 MASK 槽组成：
 
@@ -247,7 +247,7 @@ $$
 X=[E(t_0),\underbrace{E(\mathrm{MASK}),\ldots,E(\mathrm{MASK})}_{B-1\text{ 个槽}}].
 $$
 
-MASK 槽共享同一个输入 embedding，但使用不同的位置编号；第 \(i\) 个槽的输出 \(h_i\) 用于预测第 \(i\) 个未来 token。为了让 draft 读到 target 上下文，对 anchor 之前的每个位置 \(j\)，拼接 target 选定层集合 \(\Lambda\)（例如最后三层）的隐藏状态，经无偏置投影与归一化得到上下文特征：
+MASK 槽共享同一个输入 embedding，但使用不同的位置编号。第 \(i\) 个槽的输出 \(h_i\) 用于预测第 \(i\) 个未来 token。为了让 draft 读到 target 上下文，对 anchor 之前的每个位置 \(j\)，拼接 target 选定层集合 \(\Lambda\)（例如最后三层）的隐藏状态，经无偏置投影与归一化得到上下文特征：
 
 $$
 c_j=\operatorname{RMSNorm}\!\left(
@@ -257,7 +257,7 @@ W_{\mathrm{aux}}\,[H_j^{(\ell)}]_{\ell\in\Lambda}
 W_{\mathrm{aux}}:\mathbb R^{|\Lambda|\,d_t}\rightarrow\mathbb R^{d_d}.
 $$
 
-Attention 中，query 来自当前 draft 隐藏状态，上下文特征与当前 block 隐藏状态分别经过该层的 K/V 投影，沿序列维拼接后在同一次 attention 中读取；上下文特征在各层间共享，K/V 投影逐层独立。Block 末端经 RMSNorm 得到 \(h_1,\ldots,h_B\)，由冻结的 LM head 并行给出初始 logits \(\ell_1^0,\ldots,\ell_B^0\)——**一次 forward 覆盖全部 \(B\) 个位置，而不是像 vanilla drafter 那样逐 token 生成。**
+Attention 中，query 来自当前 draft 隐藏状态，上下文特征与当前 block 隐藏状态分别经过该层的 K/V 投影，沿序列维拼接后在同一次 attention 中读取。上下文特征在各层间共享，K/V 投影逐层独立。Block 末端经 RMSNorm 得到 \(h_1,\ldots,h_B\)，由冻结的 LM head 并行给出初始 logits \(\ell_1^0,\ldots,\ell_B^0\)——**一次 forward 覆盖全部 \(B\) 个位置，而不是像 vanilla drafter 那样逐 token 生成。**
 
 **Markov 顺序修正。** 并行的 MASK 槽无法看见彼此将要生成的 token，Markov head 用前驱 token 的低秩表示在 logits 上加偏置：
 
@@ -269,7 +269,7 @@ q_i=\operatorname{softmax}(\ell_i).
 \end{aligned}
 $$
 
-训练用参考前驱 token，各位置的修正可以并行计算；推理按实际选出的前驱 token 依次执行，主干隐藏状态整轮不变，每步只是**一次 embedding 查表、一次低秩投影和一次 logits 加法**，而不是一次完整的 draft forward。
+训练用参考前驱 token，各位置的修正可以并行计算。推理按实际选出的前驱 token 依次执行，主干隐藏状态整轮不变，每步只是**一次 embedding 查表、一次低秩投影和一次 logits 加法**，而不是一次完整的 draft forward。
 
 **Confidence head 与训练目标。** 将 \(h_i\) 与 \(m_i\) 拼接，经线性层与 sigmoid 预测该位置 target 与修正后 draft 分布的重叠率：
 
@@ -277,15 +277,15 @@ $$
 \hat a_i=\sigma\!\left(w_c^\top[h_i;m_i]+b_c\right),
 $$
 
-以真实重叠率 \(a_i\in[0,1]\) 为停止梯度的软标签，做二元交叉熵训练；\(\hat a_i\) 也可用于决定实际提交多少候选。完整训练目标为三项之和：next-token CE、对 target 全词表分布的 L1 蒸馏，以及 confidence loss。
+以真实重叠率 \(a_i\in[0,1]\) 为停止梯度的软标签，做二元交叉熵训练。\(\hat a_i\) 也可用于决定实际提交多少候选。完整训练目标为三项之和：next-token CE、对 target 全词表分布的 L1 蒸馏，以及 confidence loss。
 
-放回 speedup model，DSpark 把 \(T_{\mathrm{draft}}\) 从 \(K\) 次 draft forward 压成一次 block forward 加 \(K\) 次廉价修正；\(q_i\) 作为提议分布进入第 2 节的验证流程，精确性不受影响。以 Qwen3.8-Flash-Next 为 target 的实例化与训练实验见 [Qwen3.8-Flash-Next DSpark 架构探索](qwen3.8-flash-next-dspark-training.md)。
+放回 speedup model，DSpark 把 \(T_{\mathrm{draft}}\) 从 \(K\) 次 draft forward 压成一次 block forward 加 \(K\) 次廉价修正。\(q_i\) 作为提议分布进入第 2 节的验证流程，精确性不受影响。以 Qwen3.8-Flash-Next 为 target 的实例化与训练实验见 [Qwen3.8-Flash-Next DSpark 架构探索](qwen3.8-flash-next-dspark-training.md)。
 
 
 ## 6. A Systems View of Speculative Decoding
 ### 6.1 What Changes in a Speculative Step?
 
-前面的 speedup model 把 speculative decoding 简化成 draft cost、verification cost 和 acceptance length。要进一步分析 batch size、通信、MoE 和 KV cache，需要先把一次 speculative step 中发生的工作分开记账。设当前 batch size 为 \(B\)，draft 一次提出 \(K\) 个 candidate，一轮结束后每个请求平均向前推进 \(A\) 个 token。Target verification 实际处理的 query token 数记为 \(q\)；它通常与 \(K\) 同阶，但具体是 \(K\) 还是 \(K+1\) 取决于实现，因此这里不预先固定。
+前面的 speedup model 把 speculative decoding 简化成 draft cost、verification cost 和 acceptance length。要进一步分析 batch size、通信、MoE 和 KV cache，需要先把一次 speculative step 中发生的工作分开记账。设当前 batch size 为 \(B\)，draft 一次提出 \(K\) 个 candidate，一轮结束后每个请求平均向前推进 \(A\) 个 token。Target verification 实际处理的 query token 数记为 \(q\)。它通常与 \(K\) 同阶，但具体是 \(K\) 还是 \(K+1\) 取决于实现，因此这里不预先固定。
 
 在暂时忽略 draft 与 target 重叠执行的情况下，一轮 speculative decoding 的时间可以写成
 
@@ -345,7 +345,7 @@ T_{\mathrm{draft}}+T_{\mathrm{control}}<H.
 
 ### 6.2 Batch Size, Compute, and Memory Traffic
 
-普通 autoregressive decoding 中，一个 batch 为 \(B\) 的 decode step 只处理 \(B\) 个新 token；而 speculative verification 会同时处理每个请求的多个 candidate。设每个请求送入 target 的 query 数为 \(q\)，那么这一轮共有 \(Bq\) 个 query token。乍看之下，这似乎只是把 batch 从 \(B\) 扩大到了 \(Bq\)，但两者并不完全等价。对于 linear、MLP 等 dense layer，主要看到的是更宽的 token dimension；而对 attention 来说，\(Bq\) 个 query 实际上只属于 \(B\) 条序列，并共享各自已经存在的历史 KV cache。因此，verification 的成本不能只写成 \(Bq\) 的函数，更合适的分解是
+普通 autoregressive decoding 中，一个 batch 为 \(B\) 的 decode step 只处理 \(B\) 个新 token。Speculative verification 则会同时处理每个请求的多个 candidate。设每个请求送入 target 的 query 数为 \(q\)，那么这一轮共有 \(Bq\) 个 query token。乍看之下，这似乎只是把 batch 从 \(B\) 扩大到了 \(Bq\)，但两者并不完全等价。对于 linear、MLP 等 dense layer，主要看到的是更宽的 token dimension。而对 attention 来说，\(Bq\) 个 query 实际上只属于 \(B\) 条序列，并共享各自已经存在的历史 KV cache。因此，verification 的成本不能只写成 \(Bq\) 的函数，更合适的分解是
 
 \[
 T_{\mathrm{verify}}(B,q,\ell)
@@ -369,7 +369,7 @@ T_{\mathrm{attn}}(B,1,\ell)
 T_{\mathrm{misc}}(B,1).
 \]
 
-对 dense layer 来说，speculation 的机会来自把多次很窄的 GEMM 合并成一次更宽的 GEMM。Batch 较小时，一次 decode 中只有 \(B\) 个 token 参与计算，模型权重读取、kernel launch 以及较低的矩阵利用率都会占据较大比例；将宽度扩展到 \(Bq\) 后，这些成本可以被更多 token 分摊。因此，在尚未充分利用 GPU 的区间中，通常可能出现
+对 dense layer 来说，speculation 的机会来自把多次很窄的 GEMM 合并成一次更宽的 GEMM。Batch 较小时，一次 decode 中只有 \(B\) 个 token 参与计算，模型权重读取、kernel launch 以及较低的矩阵利用率都会占据较大比例。用 [Roofline model](roofline.md) 的语言说，小 batch decode 的 GEMM 算术强度只有 \(I\approx B\) FLOPs/byte，位于 memory-bound 区域，耗时几乎由权重读取决定。将宽度扩展到 \(Bq\) 后，权重仍只读一遍，这些成本可以被更多 token 分摊，相当于把算子沿 roofline 横轴向右推。因此，在尚未充分利用 GPU 的区间中，通常可能出现
 
 \[
 T_{\mathrm{dense}}(Bq)
@@ -377,7 +377,7 @@ T_{\mathrm{dense}}(Bq)
 q\,T_{\mathrm{dense}}(B).
 \]
 
-但这种收益不会无限持续。随着 \(B\) 增大，GEMM 逐渐接近设备的计算或带宽利用上限，继续增加 \(q\) 后，dense 部分的延迟会越来越接近随 token 数线性增长。真正决定 speculation 是否划算的也不是上式中的 \(q\)，而是最终推进的 token 数 \(A\)：dense 部分只有满足
+但这种收益不会无限持续。随着 \(B\) 或 \(q\) 增大，GEMM 的算术强度逐渐接近 roofline 的转折点（算力带宽比），进入 compute-bound 区域后，dense 部分的延迟会越来越接近随 token 数线性增长。真正决定 speculation 是否划算的也不是上式中的 \(q\)，而是最终推进的 token 数 \(A\)：dense 部分只有满足
 
 \[
 T_{\mathrm{dense}}(Bq)
@@ -387,13 +387,13 @@ A\,T_{\mathrm{dense}}(B)
 
 时，才比生成同样 \(A\) 个 token 的 autoregressive decode 更便宜。
 
-Attention 的情况不同。增加 \(q\) 会增加 query 相关的计算，但这些 query 属于同一条请求，因此都需要访问相同的历史 KV cache。可以把历史 KV 的实际读取放大倍数记为 \(r_{\mathrm{KV}}(B,q,\ell)\)：如果每个 query 都重新从 HBM 读取一遍历史 KV，那么 \(r_{\mathrm{KV}}\) 接近 \(q\)；如果 attention kernel 能够在多个 query 之间有效复用历史 KV，则这个值可以明显更小。只看历史 KV 访问这一部分，speculation 能降低每个输出 token 的成本需要满足
+Attention 的情况不同。增加 \(q\) 会增加 query 相关的计算，但这些 query 属于同一条请求，因此都需要访问相同的历史 KV cache。可以把历史 KV 的实际读取放大倍数记为 \(r_{\mathrm{KV}}(B,q,\ell)\)：如果每个 query 都重新从 HBM 读取一遍历史 KV，那么 \(r_{\mathrm{KV}}\) 接近 \(q\)。如果 attention kernel 能够在多个 query 之间有效复用历史 KV，则这个值可以明显更小。这对应 roofline 中减少数据搬运的一面：计算量不变，实际搬动的字节数下降，算术强度随之提高。只看历史 KV 访问这一部分，speculation 能降低每个输出 token 的成本需要满足
 
 \[
 r_{\mathrm{KV}}(B,q,\ell)<A.
 \]
 
-这也说明为什么 batch size 本身不足以判断 speculative decoding 的收益。小 batch 时，收益可能主要来自更宽的 dense computation；context 较长时，即使 baseline batch 已经很大，历史 KV 的读取与复用仍然可能成为新的收益来源。相反，如果 dense layer 已经充分饱和，而 attention kernel 又无法在多个 candidate 之间有效复用 KV，那么 verification 增加的大量计算最终只换回少量 accepted token，加速空间就会迅速缩小。因此后面的实验需要同时扫描 \(B\)、\(q\) 和 \(\ell\)，并分别观察 dense computation 与 attention/KV traffic 的变化，而不能仅用一个总 token 数 \(Bq\) 来解释 verification latency。
+这也说明为什么 batch size 本身不足以判断 speculative decoding 的收益。小 batch 时，收益可能主要来自更宽的 dense computation。Context 较长时，即使 baseline batch 已经很大，历史 KV 的读取与复用仍然可能成为新的收益来源。相反，如果 dense layer 已经充分饱和，而 attention kernel 又无法在多个 candidate 之间有效复用 KV，那么 verification 增加的大量计算最终只换回少量 accepted token，加速空间就会迅速缩小。因此后面的实验需要同时扫描 \(B\)、\(q\) 和 \(\ell\)，并分别观察 dense computation 与 attention/KV traffic 的变化，而不能仅用一个总 token 数 \(Bq\) 来解释 verification latency。
 
 ### 6.3 Communication: Fewer Synchronizations, More Bytes
 
@@ -431,11 +431,11 @@ A\left(c_0+\frac{V}{W}\right),
 (q-A)\frac{V}{W}.
 \]
 
-这个式子很好地刻画了通信侧的收益来源。左边是少执行 \(A-1\) 轮 target communication 所节省的固定启动与同步成本；右边则来自 verification 中那些最终没有转化为输出 token 的额外 candidate。若 \(A\) 接近 \(q\)，大部分 candidate 都被接受，额外 payload 很少浪费，此时 speculation 很容易摊薄 collective latency；如果 rejection 很早，使得 \(A\ll q\)，verification 已经通信过的数据却无法成为有效输出，通信效率就会下降。
+这个式子很好地刻画了通信侧的收益来源。左边是少执行 \(A-1\) 轮 target communication 所节省的固定启动与同步成本。右边则来自 verification 中那些最终没有转化为输出 token 的额外 candidate。若 \(A\) 接近 \(q\)，大部分 candidate 都被接受，额外 payload 很少浪费，此时 speculation 很容易摊薄 collective latency。如果 rejection 很早，使得 \(A\ll q\)，verification 已经通信过的数据却无法成为有效输出，通信效率就会下降。
 
-实际系统中，\(V/W\) 也不一定与消息大小严格线性。小消息往往更受 latency 和 synchronization 限制，而消息变大后才逐渐进入 bandwidth-bound 区间；collective algorithm、GPU 拓扑和并行方式也可能随消息大小改变。因此，speculative decoding 对通信的影响不能简单总结成“通信次数更少”或“通信量更多”。更准确的说法是：**它把多次小规模 collective 合并成更少的、更宽的 collective，而收益取决于减少的同步成本能否覆盖额外 candidate 带来的通信流量。**
+实际系统中，\(V/W\) 也不一定与消息大小严格线性。小消息往往更受 latency 和 synchronization 限制，而消息变大后才逐渐进入 bandwidth-bound 区间。Collective algorithm、GPU 拓扑和并行方式也可能随消息大小改变。因此，speculative decoding 对通信的影响不能简单总结成“通信次数更少”或“通信量更多”。更准确的说法是：**它把多次小规模 collective 合并成更少的、更宽的 collective，而收益取决于减少的同步成本能否覆盖额外 candidate 带来的通信流量。**
 
-这一点在不同并行方式下还会表现得不同。Tensor parallel 中，verification 通常扩大每次 all-reduce、reduce-scatter 或 all-gather 所处理的 activation；而在 MoE 中，candidate token 还会进一步影响 expert dispatch 和 combine 的流量及负载分布。因此，不能只统计总 communication time，而应该同时观察 collective 次数、message size、有效 bandwidth，以及真正暴露在 critical path 上的同步时间。
+这一点在不同并行方式下还会表现得不同。Tensor parallel 中，verification 通常扩大每次 all-reduce、reduce-scatter 或 all-gather 所处理的 activation。在 MoE 中，candidate token 还会进一步影响 expert dispatch 和 combine 的流量及负载分布。因此，不能只统计总 communication time，而应该同时观察 collective 次数、message size、有效 bandwidth，以及真正暴露在 critical path 上的同步时间。
 
 ### 6.4 MoE: Expert Utilization and Load Imbalance
 
@@ -453,7 +453,7 @@ T_{\mathrm{combine}},
 
 其中 \(g\) 表示一个 expert-parallel rank。这里出现的是 \(\max_g\)，因为下一层通常需要等待最慢的 rank 完成，因此平均每个 expert 收到多少 token 并不能完整描述实际 latency。
 
-Speculation 可能改善 expert computation。普通 decode 中每轮只有 \(B\) 个新 token，经过 routing 后，单个 expert 实际拿到的 micro-batch 可能很小；verification 将 token 数扩大到 \(Bq\) 后，一些 expert 的 GEMM 会变宽，权重读取能够被更多 token 分摊，GPU utilization 也可能提高。对于 expert \(e\)，真正值得比较的不是
+Speculation 可能改善 expert computation。普通 decode 中每轮只有 \(B\) 个新 token，经过 routing 后，单个 expert 实际拿到的 micro-batch 可能很小。Verification 将 token 数扩大到 \(Bq\) 后，一些 expert 的 GEMM 会变宽，权重读取能够被更多 token 分摊，GPU utilization 也可能提高。对于 expert \(e\)，真正值得比较的不是
 
 \[
 T_e(qn_e) \quad \text{和} \quad qT_e(n_e),
@@ -461,13 +461,13 @@ T_e(qn_e) \quad \text{和} \quad qT_e(n_e),
 
 而是生成相同 \(A\) 个最终 token 时的成本：只有 verification 后的 expert computation 小于 \(A\) 次普通 decode 的累计成本，这部分才真正贡献 speedup。
 
-但更多 candidate 并不保证 MoE 更高效。不同 candidate 可能被路由到更多 experts，使一次 verification 触达更大的 expert 集合，增加权重访问和 dispatch/combine traffic；也可能集中到少数 experts，使这些 experts 或所在 rank 成为 straggler。尤其需要注意，verification 会先执行整段 candidate 的 routing 和 expert computation，然后才知道哪里发生 rejection。因此，如果第一个或第二个 candidate 就被拒绝，后面的 token 虽然不会成为最终输出，它们已经消耗的 MoE computation 和 communication 并不会被追回。
+但更多 candidate 并不保证 MoE 更高效。不同 candidate 可能被路由到更多 experts，使一次 verification 触达更大的 expert 集合，增加权重访问和 dispatch/combine traffic。也可能集中到少数 experts，使这些 experts 或所在 rank 成为 straggler。尤其需要注意，verification 会先执行整段 candidate 的 routing 和 expert computation，然后才知道哪里发生 rejection。因此，如果第一个或第二个 candidate 就被拒绝，后面的 token 虽然不会成为最终输出，它们已经消耗的 MoE computation 和 communication 并不会被追回。
 
 因此，MoE 场景下 acceptance length \(A\) 仍然不够解释性能，还需要观察 routing pattern。比较 speculative decoding 和普通 decode 时，至少应该同时记录每个 expert 的 token count \(n_e\)、每个 rank 的总 routed tokens、active expert 数量以及最慢 rank 的执行时间。**Speculation 真正有利的情况，是更宽的 verification 能提高 expert 的有效计算效率，同时没有引入足以抵消这一收益的 routing imbalance 和额外 expert-parallel traffic。** 这也是为什么同样的 \(B\)、\(q\) 和 \(A\)，在 dense model 和 MoE model 上可能表现出完全不同的 speedup。
 
 ### 6.5 KV Cache: Reuse, Rollback, and Capacity
 
-Speculative verification 一次处理同一请求的多个 query token，而这些 query 共享相同的历史 KV cache。与普通 decode 相比，这给 attention 提供了更强的 KV reuse 机会：如果每个 query 都独立从 HBM 读取一遍历史 KV，那么 verification 的历史读取量会接近普通 decode 的 \(q\) 倍；如果 attention kernel 能在多个 query 之间有效复用已经加载的 K/V，这个放大倍数就会明显降低。设 verification 相对一次普通 decode 的历史 KV 读取放大倍数为 \(r_{\mathrm{KV}}\)，那么生成同样平均 \(A\) 个输出 token 时，仅从历史 KV traffic 来看，speculation 获得收益需要满足
+Speculative verification 一次处理同一请求的多个 query token，而这些 query 共享相同的历史 KV cache。与普通 decode 相比，这给 attention 提供了更强的 KV reuse 机会：如果每个 query 都独立从 HBM 读取一遍历史 KV，那么 verification 的历史读取量会接近普通 decode 的 \(q\) 倍。如果 attention kernel 能在多个 query 之间有效复用已经加载的 K/V，这个放大倍数就会明显降低。设 verification 相对一次普通 decode 的历史 KV 读取放大倍数为 \(r_{\mathrm{KV}}\)，那么生成同样平均 \(A\) 个输出 token 时，仅从历史 KV traffic 来看，speculation 获得收益需要满足
 
 \[
 r_{\mathrm{KV}} < A.
@@ -475,7 +475,7 @@ r_{\mathrm{KV}} < A.
 
 Verification 同时也会为整段 candidate 计算并写入新的 KV。问题在于，这些 candidate 是否最终保留，要到 verification 结束后才能确定。假设前 \(m\) 个 draft token 被接受，而第 \(m+1\) 个发生 rejection，那么更靠后的 candidate KV 即使已经完成计算和写入，也不会成为最终序列的一部分。这部分工作可以看作 speculative decoding 的另一种“wasted work”：acceptance 越短，相对于最终输出产生的无效 KV computation 和 memory traffic 就越多。
 
-这里需要区分 **rollback 的逻辑成本** 和 **已经发生的计算成本**。发生 rejection 后，系统通常只需要把有效序列长度恢复到正确的位置，并让后续分配覆盖或重新使用失效的 KV 空间，并不意味着把整个历史 KV cache 重新复制一遍。因此，rollback 本身可以很便宜；真正无法追回的是那些已经为被丢弃 candidate 执行过的 attention、KV projection 和 KV write。
+这里需要区分 **rollback 的逻辑成本** 和 **已经发生的计算成本**。发生 rejection 后，系统通常只需要把有效序列长度恢复到正确的位置，并让后续分配覆盖或重新使用失效的 KV 空间，并不意味着把整个历史 KV cache 重新复制一遍。因此，rollback 本身可以很便宜。真正无法追回的是那些已经为被丢弃 candidate 执行过的 attention、KV projection 和 KV write。
 
 KV cache 还会通过显存容量间接影响系统性能。Speculative decoding 需要为 verification 中尚未确认的 candidate 预留 KV 空间，独立 drafter 还可能维护自己的 KV cache，再加上额外 workspace，这些都会减少同一 GPU 上能够同时驻留的请求数量。因此，即使固定 batch 下 speculative decoding 的单步 latency 更低，也可能出现
 

@@ -787,6 +787,53 @@
   
   
   
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_8" id="__nav_4_8_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    KV Cache
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    KV Cache
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
     <li class="md-nav__item">
       <a href="../kv-cache/" class="md-nav__link">
         
@@ -804,6 +851,70 @@
   
 
       </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../deepseek-kv-cache-storage/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SWA KV Cache 存储方案
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../kv-offloading-vllm/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    vLLM KV Cache Offloading 源码梳理
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
     </li>
   
 
@@ -1300,6 +1411,7 @@ I \approx \frac{2bd^2}{2d^2} = b\quad\text{FLOPs/byte}
 \]</div>
 <p>当 <span class="arithmatex">\(b\)</span> 从 1 增加到 32 时，读取的权重不变，参与计算的 token 数增加到 32 倍，算术强度也从约 1 增加到 32 FLOPs/byte。Batching 就是通过这种权重复用提高算术强度。</p>
 <p>Prefill 和 decode 在线性层上的差异也可以这样理解。Prefill 一次处理多个输入 token，权重可以在这些 token 之间复用。Decode 每轮为每个活跃请求处理一个 token，低并发时的 <span class="arithmatex">\(b\)</span> 较小，权重复用有限。将多个请求组成 batch，可以增大这一轮的 <span class="arithmatex">\(b\)</span>。</p>
+<p>Speculative decoding 的 verification 沿着同一方向起作用。每个请求一次提交 <span class="arithmatex">\(q\)</span> 个候选 token 时，这一轮 target forward 的 <span class="arithmatex">\(b\)</span> 就从请求数扩大到请求数乘 <span class="arithmatex">\(q\)</span>，权重因此能在更多 token 之间复用。这部分的展开见 <a href="../speculative-decoding/#62-batch-size-compute-and-memory-traffic">Speculative Decoding §6.2</a>。</p>
 <h3 id="_1">减少数据搬运</h3>
 <p>量化通过减少数据量提高算术强度。在同一个例子中，如果每个权重从 2 字节减到 1 字节，忽略量化元数据和格式转换的开销，权重流量减半，算术强度变为：</p>
 <div class="arithmatex">\[

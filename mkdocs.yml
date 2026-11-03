@@ -31,7 +31,10 @@ plugins:
                 - Metrics: llms/metrics.md
                 - Roofline Model: llms/roofline.md
                 - Collective Communication: llms/collective-communication.md
-                - KV Cache: llms/kv-cache.md
+                - KV Cache:
+                    - KV Cache: llms/kv-cache.md
+                    - SWA KV Cache Storage: llms/deepseek-kv-cache-storage.md
+                    - vLLM KV Cache Offloading: llms/kv-offloading-vllm.md
                 - Serving Runtime: llms/serving-runtime.md
                 - GLM-5.2 Inference Case Study: llms/glm-5.2-inference-path.md
                 - Parallelism: llms/parallelism.md
@@ -54,6 +57,8 @@ plugins:
             Roofline Model: Roofline 模型
             Collective Communication: 集合通信
             KV Cache: KV Cache
+            SWA KV Cache Storage: SWA KV Cache 存储方案
+            vLLM KV Cache Offloading: vLLM KV Cache Offloading 源码梳理
             Serving Runtime: 推理运行时
             Parallelism: 并行策略
             Decoding: 解码与采样

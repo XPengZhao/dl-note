@@ -35,9 +35,7 @@ $$
 
 
 
-<div align="center">
-  <img src="../../assets/images/kv-offloading-swa-full-storage.png" alt="SWA Full KV Baseline" width="300px">
-</div>
+![SWA Full KV Baseline](../../assets/images/kv-offloading/kv-offloading-swa-full-storage.svg){ width="300px" style="display: block; margin: 0 auto;" }
 
 图中的例子取 $L=4, W=2$，因此位置 $N$ 在每一层只访问窗口 $\mathcal{W}_N=\{N-1,N\}$。绿色块表示已经保存好的 full KV，橙色块表示当前位置 $N$ 沿层向上计算得到的 hidden state。虚线框表示当前 decode step 需要计算的，实线框表示已经缓存并可直接读取的。
 
@@ -109,9 +107,7 @@ $$
 
 ### 示例
 
-<div align="center">
-  <img src="../../assets/images/kv-offloading-swa-full-recompute.png" alt="SWA Full KV Baseline" width="300px">
-</div>
+![SWA Full KV Baseline](../../assets/images/kv-offloading/kv-offloading-swa-full-recompute.png){ width="300px" style="display: block; margin: 0 auto;" }
 
 仍取 $L=4, W=2$。为了计算 $h_N^{(4)}$，第 4 层需要第 3 层窗口内的 hidden states，即位置 $\{N-1,N\}$。继续向低层展开。这正对应图里的依赖锥：虽然每一层 SWA 只看 2 个位置，但为了从零恢复最高层当前位置的输出，底部输入范围会扩展到 5 个 token。
 
@@ -187,9 +183,7 @@ $$
 
 ### 示例
 
-<div align="center">
-  <img src="../../assets/images/kv-offloading-swa-shallow-kv.png" alt="SWA shallow-layer KV storage" width="300px">
-</div>
+![SWA shallow-layer KV storage](../../assets/images/kv-offloading/kv-offloading-swa-shallow-kv.svg){ width="300px" style="display: block; margin: 0 auto;" }
 
 图中例子取 $L=4, W=2, m=2$。第 1、2 层的 KV 已经保存，第 3、4 层的 KV 需要恢复。为了得到最终的 $h_N^{(4)}$，第 4 层需要窗口内 $KV_{N-1}^{(4)},KV_N^{(4)}$；这些 KV 又需要第 3 层对应位置的 hidden states。因此第 3 层要恢复位置 $\{N-1,N\}$，第 2 层需要提供位置 $\{N-2,N-1,N\}$ 的 hidden states。浅层 KV 虽然已经保存，但系统仍然要把这 3 个位置从输入侧推到第 2 层，形成一个浅层矩形带。
 
@@ -308,9 +302,7 @@ $$
 
 ### 示例
 
-<div align="center">
-  <img src="../../assets/images/kv-offloading-swa-deep-kv.png" alt="SWA deep-layer KV storage" width="300px">
-</div>
+![SWA deep-layer KV storage](../../assets/images/kv-offloading/kv-offloading-swa-deep-kv.png){ width="300px" style="display: block; margin: 0 auto;" }
 
 图中例子取 $L=4,W=2,m=2$。第 3、4 层的 KV 已经保存，第 1、2 层的 KV 需要恢复。为了得到 $h_N^{(4)}$，第 4 层可以直接读取 $KV_{N-1}^{(4)},KV_N^{(4)}$；第 3 层也可以直接读取 $KV_{N-1}^{(3)},KV_N^{(3)}$。因此，高层只需要沿当前位置 $N$ 形成一条竖线：$h_N^{(2)} \rightarrow h_N^{(3)} \rightarrow h_N^{(4)}$。
 
@@ -427,9 +419,7 @@ $$
 
 ### 示例
 
-<div align="center">
-  <img src="../../assets/images/kv-offloading-swa-interval-layer-kv.svg" alt="SWA interval-layer KV checkpoint" width="300px">
-</div>
+![SWA interval-layer KV checkpoint](../../assets/images/kv-offloading/kv-offloading-swa-interval-layer-kv.svg){ width="300px" style="display: block; margin: 0 auto;" }
 
 图中例子取 $L=4,W=2,S=2$，保存的是 Layer2 和 Layer4 的 KV。Layer1 和 Layer3 的 KV 需要在当前 step 恢复。为了得到 $h_N^{(4)}$，Layer4 可以直接读取已保存的 $KV_{N-1}^{(4)},KV_N^{(4)}$，但仍然需要输入 $h_N^{(3)}$。为了得到 $h_N^{(3)}$，Layer3 需要恢复窗口内 $KV_{N-1}^{(3)},KV_N^{(3)}$，因此需要下方 Layer2 提供 $h_{N-1}^{(2)},h_N^{(2)}$。这两个 hidden states 再由 Layer2 借助已保存的 KV 计算出来。
 
@@ -540,9 +530,7 @@ $$
 
 ### 示例
 
-<div align="center">
-  <img src="../../assets/images/kv-offloading-swa-token-checkpoint.png" alt="SWA token checkpoint recovery" width="300px">
-</div>
+![SWA token checkpoint recovery](../../assets/images/kv-offloading/kv-offloading-swa-token-checkpoint.svg){ width="300px" style="display: block; margin: 0 auto;" }
 
 图中的例子取 $L=4,W=2$，最近的 token checkpoint 位于 $c=N-2$。预测 $\text{token}_{N+1}$ 时，系统不从更早 token 展开完整依赖锥，而是从 checkpoint 边界状态出发，顺序恢复 $N-1$ 和 $N$ 两个位置。
 
