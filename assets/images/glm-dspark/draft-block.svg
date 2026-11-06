@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xl="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="61.72963 -.6 452.7594 142.89527" width="452.7594" height="142.89527">
+  <defs>
+    <marker orient="auto" overflow="visible" markerUnits="strokeWidth" id="FilledArrow_Marker" stroke-linejoin="miter" stroke-miterlimit="10" viewBox="-1 -4 8 8" markerWidth="8" markerHeight="8" color="#ff7e79">
+      <g>
+        <path d="M 5.866667 0 L 0 -2.2 L 0 2.2 Z" fill="currentColor" stroke="currentColor" stroke-width="1"/>
+      </g>
+    </marker>
+  </defs>
+  <g id="Canvas_3" stroke="none" stroke-opacity="1" stroke-dasharray="none" fill="none" fill-opacity="1">
+    <title>Canvas 3</title>
+    <rect fill="white" x="61.72963" y="-.6" width="452.7594" height="142.89527"/>
+    <g id="Canvas_3_Layer_1">
+      <title>Layer 1</title>
+      <g id="Group_91">
+        <g id="Group_92">
+          <g id="Graphic_93">
+            <title>Text</title>
+            <text transform="translate(68.96484 16.759766)" fill="#f4d35e">
+              <tspan font-family="Helvetica" font-size="12" fill="#f4d35e" x="0" y="11" xml:space="preserve">input_ids</tspan>
+            </text>
+          </g>
+        </g>
+      </g>
+      <g id="Group_84">
+        <g id="Group_88">
+          <g id="Graphic_89">
+            <rect x="135.9" y="-.1" width="50" height="50" fill="#f4d35e"/>
+            <rect x="135.9" y="-.1" width="50" height="50" stroke="#c9a227" stroke-linecap="butt" stroke-linejoin="round" stroke-width="1"/>
+          </g>
+        </g>
+        <g id="Group_85">
+          <g id="Group_86">
+            <g id="Graphic_87">
+              <title>Text</title>
+              <text transform="translate(153.99731 13.719727)" fill="#1a1a1a">
+                <tspan font-family="Helvetica" font-size="14" fill="#1a1a1a" x="0" y="14" xml:space="preserve">x</tspan>
+                <tspan font-family="Helvetica" font-size="9" fill="#1a1a1a" y="18" xml:space="preserve">0</tspan>
+              </text>
+            </g>
+          </g>
+        </g>
+      </g>
+      <g id="Group_78">
+        <g id="Group_82">
+          <g id="Graphic_83">
+            <rect x="197.9" y="-.1" width="50" height="50" fill="#f4d35e"/>
+            <rect x="197.9" y="-.1" width="50" height="50" stroke="#c9a227" stroke-linecap="butt" stroke-linejoin="round" stroke-width="1"/>
+          </g>
+        </g>
+        <g id="Group_79">
+          <g id="Group_80">
+            <g id="Graphic_81">
+              <title>Text</title>
+              <text transform="translate(215.99731 13.719727)" fill="#1a1a1a">
+                <tspan font-family="Helvetica" font-size="14" fill="#1a1a1a" x="0" y="14" xml:space="preserve">x</tspan>
+                <tspan font-family="Helvetica" font-size="9" fill="#1a1a1a" y="18" xml:space="preserve">1</tspan>
+              </text>
+            </g>
+          </g>
+        </g>
+      </g>
+      <g id="Group_72">
+        <g id="Group_76">
+          <g id="Graphic_77">
+            <rect x="259.9" y="-.1" width="50" height="50" fill="#f4d35e"/>
+            <rect x="259.9" y="-.1" width="50" height="50" stroke="#c9a227" stroke-linecap="butt" stroke-linejoin="round" stroke-width="1"/>
+          </g>
+        </g>
+        <g id="Group_73">
+          <g id="Group_74">
+            <g id="Graphic_75">
+              <title>Text</title>
+              <text transform="translate(276 13.679688)" fill="#1a1a1a">
+                <tspan font-family="Helvetica" font-size="16" fill="#1a1a1a" x="0" y="15" xml:space="preserve">…</tspan>
+              </text>
+            </g>
+          </g>
+        </g>
+      </g>
+      <g id="Group_66">
+        <g id="Group_70">
+          <g id="Graphic_71">
+            <rect x="321.9" y="-.1" width="50" height="50" fill="#ef9a9a"/>
+            <rect x="321.9" y="-.1" width="50" height="50" stroke="#e57373" stroke-linecap="butt" stroke-linejoin="round" stroke-width="1"/>
+          </g>
+        </g>
+        <g id="Group_67">
+          <g id="Group_68">
+            <g id="Graphic_69">
+              <title>Text</title>
+              <text transform="translate(339.49854 13.719727)" fill="#1a1a1a">
+                <tspan font-family="Helvetica" font-size="14" fill="#1a1a1a" x="0" y="14" xml:space="preserve">x</tspan>
+                <tspan font-family="Helvetica" font-size="9" fill="#1a1a1a" y="18" xml:space="preserve">A</tspan>
+              </text>
+            </g>
+          </g>
+        </g>
+      </g>
+      <g id="Group_60">
+        <g id="Group_64">
+          <g id="Graphic_65">
+            <rect x="383.9" y="-.1" width="50" height="50" fill="#f4d35e"/>
+            <rect x="383.9" y="-.1" width="50" height="50" stroke="#c9a227" stroke-linecap="butt" stroke-linejoin="round" stroke-width="1"/>
+          </g>
+        </g>
+        <g id="Group_61">
+          <g id="Group_62">
+            <g id="Graphic_63">
+              <title>Text</title>
+              <text transform="translate(400 13.679688)" fill="#1a1a1a">
+                <tspan font-family="Helvetica" font-size="16" fill="#1a1a1a" x="0" y="15" xml:space="preserve">…</tspan>
+              </text>
+            </g>
+          </g>
+        </g>
+      </g>
+      <g id="Group_54">
+        <g id="Group_58">
+          <g id="Graphic_59">
+            <rect x="445.9" y="-.1" width="56" height="50" fill="#f4d35e"/>
+            <rect x="445.9" y="-.1" width="56" height="50" stroke="#c9a227" stroke-linecap="butt" stroke-linejoin="round" stroke-width="1"/>
+          </g>
+        </g>
+        <g id="Group_55">
+          <g id="Group_56">
+            <g id="Graphic_57">
+              <title>Text</title>
+              <text transform="translate(463.7754 15.259766)" fill="#1a1a1a">
+                <tspan font-family="Helvetica" font-size="12" fill="#1a1a1a" x="0" y="11" xml:space="preserve">x</tspan>
+                <tspan font-family="Helvetica" font-size="8" fill="#1a1a1a" y="15" xml:space="preserve">S-1</tspan>
+              </text>
+            </g>
+          </g>
+        </g>
+      </g>
+      <g id="Group_48">
+        <g id="Group_52">
+          <g id="Graphic_53"/>
+        </g>
+        <g id="Group_49">
+          <g id="Group_50">
+            <g id="Graphic_51">
+              <title>Text</title>
+              <text transform="translate(324.28735 58.529785)" fill="#ef9a9a">
+                <tspan font-family="Helvetica" font-size="11" fill="#ef9a9a" x="0" y="10" xml:space="preserve">anchor A</tspan>
+              </text>
+            </g>
+          </g>
+        </g>
+      </g>
+      <g id="Group_43">
+        <g id="Group_44">
+          <g id="Graphic_45">
+            <title>Text</title>
+            <text transform="translate(61.72963 108.65504)" fill="#90caf9">
+              <tspan font-family="Helvetica" font-size="12" fill="#90caf9" x="0" y="11" xml:space="preserve">draft block</tspan>
+            </text>
+          </g>
+        </g>
+      </g>
+      <g id="Group_36">
+        <g id="Group_40">
+          <g id="Graphic_41">
+            <rect x="135.989" y="91.79527" width="50" height="50" fill="#ef9a9a"/>
+            <rect x="135.989" y="91.79527" width="50" height="50" stroke="#e57373" stroke-linecap="butt" stroke-linejoin="round" stroke-width="1"/>
+          </g>
+        </g>
+        <g id="Group_37">
+          <g id="Group_38">
+            <g id="Graphic_39">
+              <title>Text</title>
+              <text transform="translate(153.58754 105.615)" fill="#1a1a1a">
+                <tspan font-family="Helvetica" font-size="14" fill="#1a1a1a" x="0" y="14" xml:space="preserve">x</tspan>
+                <tspan font-family="Helvetica" font-size="9" fill="#1a1a1a" y="18" xml:space="preserve">A</tspan>
+              </text>
+            </g>
+          </g>
+        </g>
+      </g>
+      <g id="Group_30">
+        <g id="Group_34">
+          <g id="Graphic_35">
+            <rect x="197.989" y="91.79527" width="70" height="50" fill="#90caf9"/>
+            <rect x="197.989" y="91.79527" width="70" height="50" stroke="#64b5f6" stroke-linecap="butt" stroke-linejoin="round" stroke-width="1"/>
+          </g>
+        </g>
+        <g id="Group_31">
+          <g id="Group_32">
+            <g id="Graphic_33">
+              <title>Text</title>
+              <text transform="translate(215.0851 108.65504)" fill="#1a1a1a">
+                <tspan font-family="Helvetica" font-size="12" fill="#1a1a1a" x="0" y="11" xml:space="preserve">MASK</tspan>
+              </text>
+            </g>
+          </g>
+        </g>
+      </g>
+      <g id="Group_24">
+        <g id="Group_28">
+          <g id="Graphic_29">
+            <rect x="279.989" y="91.79527" width="70" height="50" fill="#90caf9"/>
+            <rect x="279.989" y="91.79527" width="70" height="50" stroke="#64b5f6" stroke-linecap="butt" stroke-linejoin="round" stroke-width="1"/>
+          </g>
+        </g>
+        <g id="Group_25">
+          <g id="Group_26">
+            <g id="Graphic_27">
+              <title>Text</title>
+              <text transform="translate(297.0851 108.65504)" fill="#1a1a1a">
+                <tspan font-family="Helvetica" font-size="12" fill="#1a1a1a" x="0" y="11" xml:space="preserve">MASK</tspan>
+              </text>
+            </g>
+          </g>
+        </g>
+      </g>
+      <g id="Group_18">
+        <g id="Group_22">
+          <g id="Graphic_23">
+            <rect x="361.989" y="91.79527" width="70" height="50" fill="#90caf9"/>
+            <rect x="361.989" y="91.79527" width="70" height="50" stroke="#64b5f6" stroke-linecap="butt" stroke-linejoin="round" stroke-width="1"/>
+          </g>
+        </g>
+        <g id="Group_19">
+          <g id="Group_20">
+            <g id="Graphic_21">
+              <title>Text</title>
+              <text transform="translate(379.0851 108.65504)" fill="#1a1a1a">
+                <tspan font-family="Helvetica" font-size="12" fill="#1a1a1a" x="0" y="11" xml:space="preserve">MASK</tspan>
+              </text>
+            </g>
+          </g>
+        </g>
+      </g>
+      <g id="Group_12">
+        <g id="Group_16">
+          <g id="Graphic_17">
+            <rect x="443.989" y="91.79527" width="70" height="50" fill="#90caf9"/>
+            <rect x="443.989" y="91.79527" width="70" height="50" stroke="#64b5f6" stroke-linecap="butt" stroke-linejoin="round" stroke-width="1"/>
+          </g>
+        </g>
+        <g id="Group_13">
+          <g id="Group_14">
+            <g id="Graphic_15">
+              <title>Text</title>
+              <text transform="translate(461.0851 108.65504)" fill="#1a1a1a">
+                <tspan font-family="Helvetica" font-size="12" fill="#1a1a1a" x="0" y="11" xml:space="preserve">MASK</tspan>
+              </text>
+            </g>
+          </g>
+        </g>
+      </g>
+      <g id="Line_97">
+        <line x1="321.9" y1="49.683544" x2="192.6618" y2="84.09232" marker-end="url(#FilledArrow_Marker)" stroke="#ff7e79" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
+      </g>
+    </g>
+  </g>
+</svg>
