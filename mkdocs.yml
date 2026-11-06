@@ -23,6 +23,7 @@ plugins:
             - Neural Graphics: neural-graphics.md
             - AI Infra:
                 - Overview: llms/overview.md
+                - Agent 的指令与工具: llms/agent-input.md
                 - Model Architecture:
                     - Position Encoding: llms/position-encoding.md
                     - Model Notes: llms/models.md

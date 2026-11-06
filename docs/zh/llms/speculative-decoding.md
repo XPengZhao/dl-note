@@ -6,11 +6,11 @@
 
 自回归大模型在生成文本时，decoding 阶段的 token 是逐个产生的。以 “once upon a time there ...” 为例，假设模型已经生成到 **once**，接下来需要生成 **upon → a → time → there**。由于后一个 token 的预测依赖此前已经生成的序列，target model 必须连续执行四次 decode，才能依次得到这四个 token。
 
-在每一步 decode 中，模型实际上只生成一个新的 token。尤其当 batch size 较小时，单次 forward 的计算量并不高，但仍然需要读取已有的 KV cache、执行 GPU kernel，并完成必要的同步。因此，生成四个 token 基本对应四次 target forward 的开销。Speculative decoding 的出发点正是在这里。如果可以先由一个**更小、更快**的模型生成若干候选 token，再让 target model 在一次 forward 中完成验证，就有可能显著减少昂贵的 target decode 次数。
+batch size 较小时，单步 decode 的计算量很小，延迟主要花在把模型权重和已有的 KV cache 从显存读进来。每一步 decode 都要把权重和 KV cache 重新读一遍。读多少由模型大小和上下文长度决定，和这一步算 1 个 token 还是 4 个 token 基本无关：权重读一遍，这一步里所有位置的计算都能用上。也就是说，让 target 在一次 forward 中同时处理四个位置，开销约等于一次普通 decode（6.2 节有更定量的讨论）。如果先由一个**更小、更快**的模型生成若干候选 token，再让 target model 在一次 forward 中完成验证，就能显著减少昂贵的 target decode 次数。这就是 speculative decoding 的出发点。
 
-如图所示，draft model 首先连续生成 **upon → a → time → flies**——小模型在句尾被 “time flies” 的局部搭配带偏了。随后，target model 不再逐个生成这些 token，而是在一次 forward 中同时计算多个位置的预测结果，并按照自左向右的顺序进行验证。在这个例子中，**upon、a、time** 均被接受，而 **flies** 是第一个被拒绝的 token，本轮验证在该位置结束。被拒绝的 token 不会进入输出：这个位置最终会由 target 自己重新生成，在这个例子中就是 **there**。
+如图所示，draft model 首先连续生成 **upon → a → time → flies**。小模型在句尾被 “time flies” 的局部搭配带偏了。随后，target model 不再逐个解码，而是把这段候选序列整体送入一次 forward，同时得到每个位置的预测结果，再按照自左向右的顺序进行验证。在这个例子中，**upon、a、time** 均被接受，而 **flies** 是第一个被拒绝的 token，本轮验证在该位置结束。被拒绝的 token 不会进入输出：这个位置最终会由 target 自己重新生成，得到 **there**。
 
-这样，原本需要多次 target decode 才能确认的多个 token，可以通过一次 target forward 完成验证，只额外引入若干次成本更低的 draft forward。这构成了 speculative decoding 的基本思想。**由低成本的 draft model 提出候选序列，再利用 target model 并行验证多个候选 token，从而减少昂贵的 target decode 次数。** Draft model 与 target model 的预测越一致，一次 target forward 能够接受的 token 越多，speculative decoding 所带来的加速也就越明显。
+**Speculative decoding 的基本思想：由低成本的 draft model 提出候选序列，用 target model 的一次 forward 并行验证，从而减少昂贵的 target decode 次数，代价只是若干次便宜得多的 draft forward。** Draft 与 target 的预测越一致，一次验证能接受的 token 越多，加速也就越明显。
 
 
 ## 2. Vanilla Speculative Decoding
@@ -257,7 +257,7 @@ W_{\mathrm{aux}}\,[H_j^{(\ell)}]_{\ell\in\Lambda}
 W_{\mathrm{aux}}:\mathbb R^{|\Lambda|\,d_t}\rightarrow\mathbb R^{d_d}.
 $$
 
-Attention 中，query 来自当前 draft 隐藏状态，上下文特征与当前 block 隐藏状态分别经过该层的 K/V 投影，沿序列维拼接后在同一次 attention 中读取。上下文特征在各层间共享，K/V 投影逐层独立。Block 末端经 RMSNorm 得到 \(h_1,\ldots,h_B\)，由冻结的 LM head 并行给出初始 logits \(\ell_1^0,\ldots,\ell_B^0\)——**一次 forward 覆盖全部 \(B\) 个位置，而不是像 vanilla drafter 那样逐 token 生成。**
+Attention 中，query 来自当前 draft 隐藏状态，上下文特征与当前 block 隐藏状态分别经过该层的 K/V 投影，沿序列维拼接后在同一次 attention 中读取。上下文特征在各层间共享，K/V 投影逐层独立。Block 末端经 RMSNorm 得到 \(h_1,\ldots,h_B\)，由冻结的 LM head 并行给出初始 logits \(\ell_1^0,\ldots,\ell_B^0\)，**一次 forward 覆盖全部 \(B\) 个位置，而不是像 vanilla drafter 那样逐 token 生成。**
 
 **Markov 顺序修正。** 并行的 MASK 槽无法看见彼此将要生成的 token，Markov head 用前驱 token 的低秩表示在 logits 上加偏置：
 

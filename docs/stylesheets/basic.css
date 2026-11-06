@@ -11,6 +11,44 @@
   text-autospace: ideograph-alpha ideograph-numeric;
 }
 
+.md-typeset .chat-example {
+  display: flex;
+  flex-direction: column;
+  gap: .55rem;
+  max-width: 28rem;
+  margin: 1rem auto;
+}
+
+.chat-example .chat-turn {
+  align-self: flex-start;
+  max-width: 85%;
+}
+
+.chat-example .chat-turn-user {
+  align-self: flex-end;
+  text-align: end;
+}
+
+.chat-example .chat-speaker {
+  display: block;
+  margin-bottom: .15rem;
+  font-size: .7em;
+  color: var(--md-default-fg-color--light);
+}
+
+.md-typeset .chat-turn p {
+  margin: 0;
+  padding: .4rem .65rem;
+  border-radius: .6rem;
+  background: var(--md-code-bg-color);
+  text-align: start;
+  overflow-wrap: anywhere;
+}
+
+.md-typeset .chat-turn-user p {
+  background: color-mix(in srgb, var(--md-primary-fg-color) 12%, var(--md-default-bg-color));
+}
+
 .md-typeset .cjk-latin-space {
   padding-inline-end: 0.25em;
 }

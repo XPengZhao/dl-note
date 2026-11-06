@@ -1,126 +1,92 @@
-# AI Infra 总览
+# AI Infra
 
-现代推理系统是一个完整的技术栈，而不是某一个单独框架。当人们说“我们在用 vLLM”或者“我们在用 SGLang”时，通常只是在指这个大系统中的一层。真实部署里还包括应用逻辑、agent 编排、请求路由、调度策略、模型执行、算子库，以及底层的运行时和硬件支持。如果没有一个全栈视角，就很容易把瓶颈归错层，或者误判到底该由哪一层来解决问题。
+## 序言
 
-## 为什么需要总览
+当我在2025年3月5号第一次从Wireless Systems 调转60度车头开始接触 AI Systems 这个领域时，我对这个领域很多东西都感到十分陌生，一开始甚至对很多名词都毫无概念。当时恰逢DeepSeek V3 惊艳问世，公司上下针对昇腾上MoE模型推理优化忙成了一锅粥，在某地组织了集中攻关。而我作为一个新人，自然也被召集了过去。但是彼时彼刻，我几乎没有啥大模型推理的经验，仅有的知识也只是做Wireless期间对Transformer模型的一点训练经验，对于 AI Infra 完全陌生。一开始我印象特别深，对于很多几乎是常识性的名词，比如算子，我都不清楚含义。AI 基建时代好像是一列火车不停向前开的火车，没有时间等你停下来慢慢去理解。好在是过程中逐渐干中学，慢慢地对这个领域有了入门的理解。仅以此笔记记录下我在 AI Infra 领域的学习过程，供自己回顾，也希望能帮助到后来者。
 
-很多 AI Infra 问题表面上看起来相似，但本质上属于不同层。
 
-- 如果一个 agent workflow 很慢，瓶颈可能在 prompt 组装、工具调用延迟，或者请求 fan-out，而不一定在 serving engine 本身。
-- 如果吞吐低，问题可能在上层路由或 batching 策略，而不一定在 kernel。
-- 如果某个 engine 出现 preemption 或延迟抖动，根因可能是 KV 压力、准入控制或部署拓扑，而不一定是模型本身。
+## Overview
 
-总览的价值就在于先把这些层次拆开，再去讨论具体机制。
+AI Infra 涉及的技术点很多。我刚开始干 AI Systems 的时候，就是胡子眉毛一把抓，哪里有问题就学哪里。这样学能很快解决眼前的问题，但学到的东西比较零散。回头看整个推理系统，总有种管中窥豹的感觉。
 
-## 两条轴线：控制面与数据面
+后来我想，不妨从一次日常对话入手，把这些零散的技术点串起来。假设你打开一个接入 GLM-5.2 的写作助手（Agent），在对话框里输入“你好！”。从你按下发送，到屏幕上出现第一行回答，中间发生了什么？
 
-理解这个系统，一个很有用的方法是先区分控制面和数据面。
+### 用户输入
 
-- **控制面（control plane）** 决定什么应该运行、在哪里运行、按什么策略运行。它包括路由、配额、自动扩缩容、准入控制、模型选择，以及 agent 级编排。
-- **数据面（data plane）** 负责真正执行请求。它包括 prompt 预处理、serving engine 内部调度、模型前向、kernel 执行、内存移动，以及硬件上的实际运行。
+你按下发送后，写作助手开始准备这次模型调用。它从应用配置里取出预设指令“你是一个中文写作助手。”，用这条指令告诉 GLM-5.2 该以什么身份回答。随后，它把你的“你好！”作为用户消息接在指令后面。这两条消息按顺序放进请求的 `messages` 字段。
 
-真实系统往往横跨这两条轴线。比如上层路由是控制面决策，但它会直接影响数据面的 cache 局部性和 batch 形成方式。
-
-## 推理系统的分层视图
-
-下面这张图是一个比较实用的分层方式：
-
-```mermaid
-flowchart TD
-    A["应用层<br/>Chat app, API 产品, workflow service"] --> B["Agent / 编排层<br/>工具调用, prompt assembly, 多步计划"]
-    B --> C["网关 / 路由层<br/>负载均衡, 模型选择, sticky routing, 配额"]
-    C --> D["Serving Engine 层<br/>vLLM, SGLang, TGI, TensorRT-LLM server"]
-    D --> E["运行时 / 调度层<br/>Continuous batching, KV manager, admission control, prefill/decode scheduling"]
-    E --> F["模型执行层<br/>Transformer blocks, attention, MLP, MoE, sampling"]
-    F --> G["算子 / Kernel 层<br/>Paged attention, GEMM, all-reduce, fused ops, Triton/CUDA kernels"]
-    G --> H["系统运行时 / 硬件层<br/>CUDA, NCCL, GPU memory, NVLink/PCIe, HBM, SMs"]
+```json
+{
+  "messages": [
+    {"role": "system", "content": "你是一个中文写作助手。"},
+    {"role": "user", "content": "你好！"}
+  ]
+}
 ```
 
-### 1. 应用层
+每条消息都保留了两个信息。`content` 是这条消息的文本，`role` 标明它在对话中的角色。上例中，`system` 是应用给模型的指令，`user` 是你刚发出的消息。模型生成的回复则可以作为 `assistant` 消息保存在会话历史中。
 
-这一层是最终用户直接接触到的产品形态，例如聊天系统、搜索系统、编码助手、文档处理流水线或企业 workflow。它决定什么用户行为会触发模型调用，以及系统真正关心的业务约束是什么，比如延迟目标、会话连续性或成本上限。
+<div class="chat-example" role="group" aria-label="写作助手对话示例">
+  <div class="chat-turn chat-turn-user"><span class="chat-speaker">你</span><p>你好！</p></div>
+  <div class="chat-turn"><span class="chat-speaker">写作助手</span><p>你好！你想写什么？</p></div>
+  <div class="chat-turn chat-turn-user"><span class="chat-speaker">你</span><p>帮我给这篇 AI Infra 笔记写两段序言。</p></div>
+</div>
 
-### 2. Agent 与编排层
+你发出第二条消息时，应用把上一轮问答和这次的新要求一起放进 `messages`。
 
-这一层负责把业务需求组织成真正的模型负载。它可能包括 prompt 组装、检索增强、工具调用、多轮记忆、分支推理或任务拆解。各种 agent framework 都属于这一层。它的主要作用不是底层执行效率，而是 workload shaping，也就是决定请求有多大、请求有多频繁，以及请求之间是否存在结构上的相似性。
+```json
+{
+  "messages": [
+    {"role": "system", "content": "你是一个中文写作助手。"},
+    {"role": "user", "content": "你好！"},
+    {"role": "assistant", "content": "你好！你想写什么？"},
+    {"role": "user", "content": "帮我给这篇 AI Infra 笔记写两段序言。"}
+  ]
+}
+```
 
-### 3. 网关与路由层
+到了下一轮，助手要决定把哪些历史内容带进请求。假设它刚替你写了一份草稿，你接着说“把第二段再改短一点”。助手取出上一轮包含草稿的 `assistant` 消息，再追加这次修改要求作为新的 `user` 消息。有了草稿，模型才知道“第二段”指的是哪段文字。如果应用还保存过“我喜欢短句”这样的长期偏好，助手也可以在这一轮取回它，作为补充要求放进上下文。
 
-这一层负责决定每个请求被送往哪个后端。它包括外部负载均衡、模型选择、sticky routing、流量隔离和多副本流量策略。对长上下文 serving 来说，这一层比看起来更重要，因为路由决策会直接影响 prefix cache 局部性、batch 形成方式，以及不同副本之间的公平性。
+回到最初的“你好！”。你输入的文字很短，助手随请求附带的内容却可能很长。例如，Codex CLI 会在用户消息之前加入工作环境信息，也可以带上项目的 `AGENTS.md` 指令。[OpenAI 对首轮请求的拆解](https://openai.com/index/unrolling-the-codex-agent-loop/)
 
-### 4. Serving Engine 层
+工具定义也占输入空间。Anthropic 举过一个例子：接入 5 个 MCP 服务，一次加载全部 58 个工具的定义，仅工具名称、说明和参数等内容就占约 5.5 万 token。这个数字取决于加载了哪些工具，用户的问候本身仍然只有“你好！”。[Anthropic 的工具加载示例](https://www.anthropic.com/research/advanced-tool-use)
 
-这一层通常就是 **vLLM**、**SGLang** 这类框架所在的位置。它们提供 engine 抽象，对上接受 tokenized 或结构化请求，对外暴露 generation API。它们并不是整个系统本身，而是处在上层流量管理和下层模型执行之间的核心 serving substrate。
+项目指令如何加载、工具定义和调用结果分别在哪一轮进入上下文，见 [Agent 的指令与工具](agent-input.md)。
 
-这一层常见职责包括：
+## 请求进入推理引擎
 
-- 请求准入与生命周期管理
-- batching 与 streaming 接口
-- KV cache 管理与 paging
-- decode loop 编排
-- 与分布式执行的集成
+输入准备好后，写作助手向服务端的 `POST /v1/chat/completions` 接口发送请求。请求体除了 `messages`，还用 `model` 指定要调用的 `glm-5.2`，用 `stream: true` 请求流式返回。假设服务端有 A、B 两个实例，都部署了 GLM-5.2。请求先到网关，由网关的路由器（Router）选择其中一个实例。
 
-### 5. 运行时与调度层
+A 刚处理过同一个写作助手的请求，B 当前排队的请求更少，该发给谁？假如这个助手有几千个 token 的固定系统指令，发给 A 有机会复用相同前缀的计算结果。发给 B 则可能更早轮到执行。缓存感知路由考虑的是两笔时间：选 A 能省下多少前缀计算，是否值得为此多排一会儿队。对于上例中很短的系统指令，缓存收益可能很小。下面假设 Router 选中 A。
 
-在一个 serving engine 内部，其实还有更细的一层结构，也就是 runtime。本层负责内部调度。continuous batching、chunked prefill、preemption、block 分配、准入控制和 KV 压力处理都属于这里。
+请求抵达 A 后，需要有人把对话转成模型输入，安排 GPU 执行，并把生成的结果送回调用方。实例里的推理服务负责这些工作。下面以 vLLM 为例：它的 API 层接收聊天请求，执行引擎负责任务调度和模型计算。
 
-这一层往往决定了系统的真实性能。即使模型相同、engine 相同，不同 runtime 策略也可能导致完全不同的行为。
+API 层先按 GLM-5.2 的对话模板（**chat template**）渲染 `messages`。例如，用户消息会带上 `<|user|>`，生成回答的位置会带上 `<|assistant|>`。在启用思考的模板配置下，末尾还会出现 `<think>`。Tokenizer 再把渲染后的内容编码为 token ID。这些角色标记和生成提示也占输入位置，所以不能用“你好！”的字符数估算这次实际要处理的 token 数。[GLM-5.2 对话模板示例](glm-5.2-inference-path.md#对话模板与分词)
 
-### 6. 模型执行层
+接下来，请求进入引擎的等待队列。A 可以用输入的 token 序列查找本地 **prefix cache**。假设两次请求的开头相同，且 A 仍保留着对应的完整 KV 块，本次请求就可以引用这些块，从其后的 token 继续计算。即使用户发了同一句“你好！”，只要系统指令在前面某处变了，匹配也只能延续到差异之前。Router 估计哪个副本可能命中，A 决定具体哪些块可以复用。[KV Cache](kv-cache.md)
 
-这一层是模型本身的数学结构：attention blocks、MLP、MoE routing、RoPE、sampling head 和输出 logits。像“这个模型是不是 GQA”“每个 token 的 KV 状态有多大”这种问题，都属于这一层。
+调度器每轮都要决定两件事：哪些请求可以执行，每条请求在这一轮计算几个 token。举个小例子，假设每轮最多安排 8 个 token，已有两条请求各要做一步 decode，你的 prompt 还有 9 个输入 token 待计算，显存中也有足够的 KV 空间。在启用 chunked prefill 的情况下，一种排法是：
 
-### 7. 算子与 Kernel 层
+| 调度轮次 | 其他请求 | 你的请求 |
+| --- | --- | --- |
+| 第一轮 | 两条请求各处理 1 个 token | 处理前 6 个输入 token |
+| 第二轮 | 若两条请求都继续生成，各处理 1 个 token | 处理剩余 3 个输入 token，得到首个输出 token |
+| 第三轮 | 已结束的请求退出，新请求可以加入 | 用刚生成的 token 做一步 decode |
 
-这一层负责真正的重计算：GEMM、fused kernel、paged attention、all-reduce、reduce-scatter、dispatch/combine，以及各种 Triton 或 CUDA kernel。它是抽象模型计算转化为真实设备工作量的地方。
+每轮重新组合请求，就是 **continuous batching**。同一条长输入可以分几轮完成 prefill，就是 **chunked prefill**。例子中的 8 是单轮的计算预算。另一个约束是 KV 空间：即使本轮还有计算预算，引擎也要能为新增位置分配 KV 块，才能安排相应的计算。[推理运行时](serving-runtime.md) · [vLLM 调度说明](https://docs.vllm.ai/en/stable/configuration/optimization/#chunked-prefill)
 
-### 8. 系统运行时与硬件层
+## 从 prefill 到 decode
 
-最底层是 CUDA、NCCL、GPU 显存系统、NVLink/PCIe 这样的互联，以及硬件本身的执行资源。带宽、显存容量、collective 延迟和 kernel launch 开销，最终都会落到这一层。
+现在跟着你的输入看一次 GPU 前向。模型通过 embedding 为每个待处理的 token ID 取出一个向量。向量经过一层层 Transformer，在 attention 中结合当前位置可见的前文，在前馈网络中进一步变换。各层还会把历史位置的注意力状态写入 KV Cache，后续 token 可以直接读取这些状态。[GLM-5.2 推理案例](glm-5.2-inference-path.md)
 
-## vLLM 和 SGLang 在哪里
+具体到 GLM-5.2，前 3 层使用 dense MLP，后 75 层使用 MoE。进入 MoE 层时，模型内部也有一个 router：它根据 token 的向量选择参与计算的专家。如果专家分布在多张 GPU 上，执行引擎就要把 token 向量发往所选专家所在的卡，再取回专家输出，按路由权重合并。网关 Router 为整条请求选副本，MoE router 为一层里的每个 token 选专家。二者的决策发生在不同时间，也涉及不同的数据。[并行策略](parallelism.md) · [集合通信](collective-communication.md)
 
-理解 vLLM 和 SGLang，一个比较准确的方式是把它们看成 **带有大量内部 runtime 逻辑的 serving engine**。
+处理到完整 prompt 的最后一个位置后，模型把该位置的最终向量投影到词表，得到每个候选 token 的分数，即 **logits**。解码器按请求配置选择一个 token：贪心解码选分数最高的候选，采样则根据调整后的概率分布选取。由此产生的是回答的第一个 token。它来自 prefill 最后一步的结果。[解码与采样](decoding.md)
 
-- 它们位于应用层、agent 层和外部路由层之下。
-- 它们位于模型 kernel 和硬件执行之上。
-- 它们内部自带 scheduler、batching 逻辑、KV manager 和一整套 runtime 策略。
+设刚选出的 token 为 $y_1$。进入 **decode** 后，这条请求的新输入只有 $y_1$。模型仍要走过全部层，但可以直接读取 prompt 已有的 KV，同时追加 $y_1$ 的状态。新的 logits 用于选择 $y_2$。下一轮以 $y_2$ 为输入，同样的依赖一直延续到停止条件成立。投机解码正是从这个串行依赖入手，用一次目标模型前向验证多个候选。[Speculative Decoding](speculative-decoding.md)
 
-所以当有人说“我们在用 vLLM”时，通常意味着：
+同样是一次前向，prefill 可以把多个输入位置一起送进矩阵乘，复用读入的权重。普通 decode 中，一条请求每轮只增加一个位置，却仍需要读取权重和历史 KV。低并发时，一轮能共同使用权重的 token 较少，数据搬运占用的时间就更值得关注。这也是服务端会把你的 decode 和其他用户的 decode 放进同一批的原因。[Roofline 模型](roofline.md)
 
-1. 上层系统仍然负责决定发什么请求
-2. vLLM 负责请求执行、batching 和内部 runtime 管理
-3. 下层系统仍然决定实际算子效率和硬件利用率
+最后回到请求里的 `stream: true`。服务端随着生成进度把 token 解码成文本片段，经网关发回 Agent，对话框才开始逐段显示文字。首个输出 token 和屏幕上的第一个字是两个测量点。后端的首 token 时间包含排队和 prefill，用户看到正文的时间还受网络、缓冲以及应用如何展示推理内容影响。回答开始后，相邻片段之间的停顿又是另一种体验。[推理指标](metrics.md)
 
-这也是为什么只调 engine 参数从来不是全部答案。即使 engine 本身调得很好，如果上层 workload 形状不好，性能依然可能很差；反过来，上层策略再好，如果 runtime 调度或 kernel 效率不足，也仍然会被卡住。
-
-## 一次请求是怎样穿过整个栈的
-
-一条在线请求通常会大致按下面的顺序流过整个系统：
-
-1. 应用层或 agent 层决定需要一次模型调用。
-2. 编排层组装 prompt、检索上下文、工具输出和 decoding policy。
-3. 路由层选择具体的模型端点或副本。
-4. Serving engine 接收请求，并将其送入内部 scheduler。
-5. Runtime 分配 KV blocks，对 prefill 或 decode 进行 batching，并决定这个请求何时执行。
-6. 模型执行层运行 transformer 计算。
-7. 算子层发起 kernels 和 collectives。
-8. 硬件/runtime 层执行这些 kernels 并搬运数据。
-9. 生成出的 token 再沿着同一条链路向上返回。
-
-按照这个顺序思考问题，调试会容易很多。例如：
-
-- TTFT 高，可能来自 prompt 组装、排队，或者 prefill 成本
-- TPS 低，可能来自路由碎片化、batching 不充分，或者通信开销
-- 延迟不稳定，可能来自 scheduler 压力、KV 耗尽，或者上层 fan-out 行为
-
-## 在本笔记中的阅读路径
-
-在这套 notebook 里，AI Infra 各页可以理解为对这条栈中间部分的逐层拆解：
-
-- [指标](metrics.md)：系统行为如何被测量
-- [KV Cache](kv-cache.md)：长上下文 serving 的核心内存对象
-- [推理运行时](serving-runtime.md)：单个 engine 如何调度和稳定请求
-- [并行策略](parallelism.md)：执行如何分布到多个设备上
-- [解码与采样](decoding.md)：decode 行为如何被塑造
-- [训练目标](training-objective.md)：推理输出背后的概率学基础
+生成结束，引擎释放这条请求持有的 KV 块引用，可复用的前缀块仍可能留在缓存里。此时你再问一句“能帮我改段文字吗？”，Agent 会把上一轮问答加入新的 `messages`。这次请求比第一次长了。如果仍命中相同的前缀，GPU 就可以接着已有状态往下算。
