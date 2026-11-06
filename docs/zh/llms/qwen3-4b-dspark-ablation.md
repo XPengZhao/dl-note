@@ -6,8 +6,6 @@
 
 | **项目** | 设置 |
 |---|---|
-| **训练数据** | Open PerfectBlend；经目标模型重新生成回复并缓存特征，共 1,339,875 个样本 |
-| **Regen 采样** | Non-thinking；temperature 0.7，top-p 0.8，top-k 20，min-p 0；每次回复最多生成 4096 tokens（不含 prompt） |
 | **最大序列长度** | 4096 tokens（完整对话，含 prompt 与 response） |
 | **Draft 架构** | 5 层；隐藏维度 2560；FFN 中间维度 9728；GQA：32 个 Q heads、8 个 KV heads，head dim 128 |
 | **Aux 层** | `[1, 9, 17, 25, 33]` |
@@ -21,23 +19,6 @@
 | **训练步数** | 2,616 optimizer step，约一个 epoch |
 | **总参数量** | GQA baseline：1,393,133,569（约 1.393B；含冻结的 embedding 与 LM head，不含 target backbone） |
 | **可训练参数量** | GQA baseline：615,221,249（约 615.2M） |
-
-### 指标
-
-设 \(p_i\)、\(q_i\) 分别为第 \(i\) 个位置的 target 与 draft 分布。概率采样的接受率为
-
-$$
-a_i
-=\sum_v\min\bigl(p_i(v),q_i(v)\bigr)
-=1-\tfrac12\lVert p_i-q_i\rVert_1.
-$$
-
-训练指标 \(\tau\) 由各位置接受率的前缀乘积计算，包含一个 bonus token：
-
-$$
-\tau
-=1+\sum_{i=0}^{6}\prod_{j=0}^{i}a_j.
-$$
 
 ### 消融条件
 
@@ -68,7 +49,6 @@ $$
 | **实验** | CE ↓ | L1 ↓ | Acc. ↑ | τ ↑ | Δτ |
 | --- | :---: | :---: | :---: | :---: | :---: |
 | **GQA baseline** | 1.1191 | 0.4550 | 74.35% | 4.9591 | 0.00% |
-| **GQA baseline（2.3 epoch）** | 0.8744 | 0.3721 | — | 5.3611 | +8.11% |
 | **GQA + tau loss** | 1.1260 | 0.4546 | 74.34% | 4.9860 | +0.54% |
 | **MLA** | 1.1402 | 0.4623 | 74.00% | 4.9368 | -0.45% |
 | **MLA + SWA1024** | 1.1571 | 0.4690 | 73.65% | 4.9008 | -1.17% |
@@ -114,12 +94,6 @@ Context-only 和 all-mask 的 \(\tau\) 分别下降 1.76% 和 1.61%，但影响�
 
 ![末段各位置接受率相对 baseline 的差异](../../assets/images/qwen3-4b-dspark-ablation/aux-3layers-position.svg){ width="50%" }
 
-### 延长训练
-
-同一 GQA 配置训练至约 2.3 epoch，\(\tau\) 提高 8.11%，后续位置改善更大。这一收益明显高于本组实验中的 tau loss。统计区间为 5820–6010 步。
-
-![末段各位置接受率相对 1 epoch 的差异](../../assets/images/qwen3-4b-dspark-ablation/epoch3-position.svg){ width="50%" }
-
 <details markdown="1">
 <summary>训练过程曲线</summary>
 
@@ -137,19 +111,46 @@ Context-only 和 all-mask 的 \(\tau\) 分别下降 1.76% 和 1.61%，但影响�
 
 </details>
 
-## GSM8K 生成评测
+## Evaluation
 
-生成评测使用 GSM8K test 全集 1,319 题，target 为 Qwen3-4B，采用 non-thinking 模式，每轮提出 7 个 draft tokens。MAL 为实测平均接受长度，按 `1 + accepted / rounds` 计算，包含 bonus token；MOL 为平均输出 tokens/题；`pos-i` 为前 i 个 draft tokens 全部被接受的比例。
+### Settings
 
-### 评测协议与 shot 数对比
+#### 训练数据集
 
-使用官方权重 `deepseek-ai/dspark_qwen3_4b_block7`，比较 prompt 协议与 shot 数。采样设置如下：
+训练消融使用 Open PerfectBlend。我们用 Qwen3-4B 在 non-thinking 模式下重新生成回复，采样参数为 `temperature=0.7`、`top-p=0.8`、`top-k=20`、`min-p=0`，每条回复最多生成 4,096 个 token。重新生成后共有 1,339,875 个训练样本，其 target hidden states 预先缓存，供 offline training 使用。
 
-| 项目 | 设置 |
-| --- | --- |
-| Target | Qwen3-4B；non-thinking |
-| Target 采样 | temperature 1、top-p 1、top-k -1、min-p 0 |
-| Draft 采样 | Probabilistic；每轮 7 个 draft tokens |
+#### 测试数据集
+
+- **GSM8K** 收录小学数学应用题，通常需要多步算术运算才能得到答案。本文使用全部 1,319 道测试题，比较 prompt 格式、shot 数和采样参数对接受长度的影响。[数据集](https://github.com/openai/grade-school-math)
+- **HumanEval** 是 Python 函数补全基准。模型根据函数签名和文档字符串生成实现。本文在 Markov GQA 实验中用它观察代码生成时的接受率。[数据集](https://github.com/openai/human-eval)
+- **MT-Bench** 是多轮对话基准，第二轮问题承接第一轮的回答。本文在 Markov GQA 实验中用它比较对话任务上的接受率。[论文](https://arxiv.org/abs/2306.05685)
+
+#### 生成配置
+
+Target 为 Qwen3-4B，采用 non-thinking 模式。Draft 每轮提出 7 个候选 token。
+
+#### 指标
+
+训练时，设 \(p_i\)、\(q_i\) 分别为第 \(i\) 个位置的 target 与 draft 分布。概率采样的接受率为
+
+$$
+a_i
+=\sum_v\min\bigl(p_i(v),q_i(v)\bigr)
+=1-\tfrac12\lVert p_i-q_i\rVert_1.
+$$
+
+估算的平均接受长度 \(\tau\) 由各位置接受率的前缀乘积计算，包含一个 bonus token：
+
+$$
+\tau
+=1+\sum_{i=0}^{6}\prod_{j=0}^{i}a_j.
+$$
+
+生成评测直接统计接受的 draft token 总数（`accepted`）和验证轮数（`rounds`）。实测平均接受长度 MAL 按 `1 + accepted / rounds` 计算，其中 1 表示 bonus token。MOL 为每题平均输出的 token 数。`pos-i` 表示前 $i$ 个候选 token 全部被接受的轮次占比。
+
+### 接受率 vs. 评测方法
+
+这组实验使用官方 draft 权重 `deepseek-ai/dspark_qwen3_4b_block7`，在相同采样设置下比较 prompt 格式和 shot 数。Target 的采样参数固定为 `temperature=1`、`top-p=1`、`top-k=-1`、`min-p=0`。Draft 采用概率采样。
 
 <details markdown="1">
 <summary>Prompt 与复现设置</summary>
@@ -161,7 +162,7 @@ DeepSpec 用户 prompt 为：
 Please reason step by step, and put your final answer within \boxed{}.
 ```
 
-自有评测脚本（vLLM 协议）的 0-shot 用户 prompt 为：
+我们使用自写评测脚本，0-shot 的用户 prompt 如下。
 
 ```text
 Question: {question}
@@ -176,15 +177,15 @@ DeepSpec 评测的输出上限为 2048 tokens，并发数为 32，seed 从 98040
 
 <div class="js-sortable-table js-multisort js-row-reorder dspark-three-line dspark-compact" markdown="1">
 
-| 评测协议 | MAL | pos-1 | pos-2 | pos-3 | pos-4 | pos-5 | pos-6 | pos-7 | MOL |
+| 评测方法 | MAL | pos-1 | pos-2 | pos-3 | pos-4 | pos-5 | pos-6 | pos-7 | MOL |
 | --- | :---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | :---: |
 | DeepSpec 0-shot | **6.1305** | 93.25% | 86.04% | 79.01% | 72.63% | 66.44% | 60.60% | 55.08% | 305.63 |
-| vLLM 0-shot | **6.1511** | 93.63% | 86.72% | 79.56% | 73.08% | 66.52% | 60.68% | 54.92% | 248.38 |
-| vLLM 5-shot | **5.1025** | 88.73% | 78.02% | 67.69% | 57.29% | 47.69% | 39.33% | 31.51% | 143.73 |
+| 自写脚本 0-shot | **6.1511** | 93.63% | 86.72% | 79.56% | 73.08% | 66.52% | 60.68% | 54.92% | 248.38 |
+| 自写脚本 5-shot | **5.1025** | 88.73% | 78.02% | 67.69% | 57.29% | 47.69% | 39.33% | 31.51% | 143.73 |
 
 </div>
 
-两种 0-shot 协议的 MAL 接近，但输出长度不同。加入 5-shot 后，输出更短，MAL 下降约 17%。后续对比统一采用 vLLM 0-shot 协议。
+两种评测方法在 0-shot 下的 MAL 接近，但平均输出长度不同。使用自写脚本时，加入 5 个示例后，MAL 从 6.15 降至 5.10（约 17%），平均输出长度从 248 降至 144 tokens/题。后续对比采用自写脚本的 0-shot 设置。
 
 ### 接受率 vs. 采样参数
 
@@ -212,7 +213,10 @@ T 表示 target temperature，Top-p、Top-k 为 target 截断参数，min-p 固�
 
 该变体将 backbone attention 替换为 MLA，并在原有 Markov head 的 `W₁ → W₂` 之间加入 MLA。Backbone 并行计算各位置的基础 logits，Markov head 则根据上一个生成 token 和 target context，逐步修正 logits 并采样。
 
-![Backbone MLA 与 Markov MLA 架构](../../assets/images/qwen3-4b-dspark-ablation/markov-mla.svg){ width="100%" }
+<figure id="fig-markov-mla" markdown="span">
+  ![Backbone MLA 与 Markov MLA 架构](../../assets/images/qwen3-4b-dspark-ablation/markov-mla.svg){ width="100%" style="display: block; margin: 0 auto;" }
+  <figcaption style="color: var(--md-default-fg-color--light); font-style: normal; margin-top: 0;">Fig. 1: Backbone MLA 与 Markov MLA 架构</figcaption>
+</figure>
 
 五层 target features 按 token 拼接，经 FC 和 RMSNorm 融合为 \(C\)。Markov MLA 的 Q 来自上一个 token 的 embedding \(z_i=W_1[x_{i-1}]\)，K/V 由 \(C\) 投影得到。以本轮起始 token \(x_0\) 为边界，所有生成步骤都读取同一段早于 \(x_0\) 的 context：
 
@@ -223,7 +227,7 @@ $$
 
 其中 \(\ell_i^0\) 为 backbone 的基础 logits，\(b_i\) 为 Markov 修正项。Markov MLA 不加残差，其投影权重与 backbone 独立。
 
-Baseline 与该变体均采用 online training，训练 1 epoch。客户端并发数与服务端最大请求数均为 32。
+Baseline 和 Backbone MLA + Markov MLA 均采用 online training，学习率为 `3e-4`，训练 1 个 epoch。评测时，客户端并发数与服务端最大请求数均为 32。
 
 <div class="js-sortable-table js-multisort js-row-reorder dspark-three-line dspark-compact dspark-sampling dspark-paired" markdown="1">
 
@@ -242,13 +246,11 @@ Baseline 与该变体均采用 online training，训练 1 epoch。客户端并�
 
 </div>
 
-各设置下，两组 MAL 的差异均不足 1%。T=1 时 Markov MLA 略高，其余设置接近或略低，尚未显示一致的接受长度收益。
-
 ### Markov GQA
 
-与 Markov MLA 对应，该变体将 Markov head 中的 attention 由 MLA 替换为 GQA（32 个 Q heads、8 个 KV heads），其余结构不变。Baseline 与 Markov GQA 均采用 online training，训练约 10 epoch。
+Markov GQA 沿用 baseline 的 5 层 GQA backbone，在 Markov head 的 `W₁` 与 `W₂` 之间加入 GQA（32 个 Q heads、8 个 KV heads）。该 GQA 的位置对应 [Fig. 1](#fig-markov-mla) 中 Markov head 的 MLA。Baseline 与 Markov GQA 均采用 online training，训练约 10 个 epoch。
 
-**GSM8K**（test 全集 1,319 题，MOL 按输出 tokens/题计算）：
+**GSM8K**：
 
 <div class="js-sortable-table js-multisort js-row-reorder dspark-three-line dspark-compact dspark-sampling dspark-paired" markdown="1">
 
@@ -305,11 +307,7 @@ Baseline 与该变体均采用 online training，训练 1 epoch。客户端并�
 
 </div>
 
-延长训练至 10 epoch 后，baseline 在 GSM8K 上的 MAL 达到 6.19–6.33，明显高于 1 epoch 的 5.2–5.6。三个基准上均呈现同一规律：T=1 时 greedy draft 的 MAL 最低，probabilistic draft 相对 greedy 提升约 6%–7%（GSM8K 5.82→6.19，HumanEval 5.65→5.81，MTBench 3.49→3.74）；T=0.7、有截断时两种方式接近。MTBench 的接受率整体显著低于另外两个基准。
-
-15 组对比中，Markov GQA 仅在 2 组略高（HumanEval T=0 +0.5%、MTBench T=0.7 greedy +2.6%），其余设置低 0.2%–3.3%，未显示一致的接受长度收益。
-
-### 接受率：Baseline vs. DrawSpec
+### Baseline vs. DrawSpec
 
 DrawSpec 将五层 backbone 分为四层预计算和一层条件化，最后一层输入为 anchor + 6 states。此处使用 late-conditioning 分支的 12-state 权重，与 baseline 均训练约 1 epoch，target temperature 为 0.7。
 

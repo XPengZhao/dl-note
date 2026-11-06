@@ -128,7 +128,24 @@ p:has(+ .arithmatex) {
     color: #133167; /* LimeGreen color for h3 */
     font-weight: bold;
   }
-  .md-content h4,
+  .md-content .md-typeset h4 {
+    font-size: 1em;
+    font-weight: 600;
+    line-height: 1.4;
+    margin: 1.4em 0 .45em;
+    color: var(--md-default-fg-color);
+  }
+
+  .md-content .md-typeset h4::before {
+    content: "";
+    display: inline-block;
+    inline-size: .42em;
+    block-size: .42em;
+    margin-inline-end: .5em;
+    vertical-align: .12em;
+    background-color: currentColor;
+  }
+
   .md-content h5,
   .md-content h6 {
     font-size: 1.15em;
