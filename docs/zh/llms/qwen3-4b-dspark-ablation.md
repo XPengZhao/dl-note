@@ -1,8 +1,12 @@
 # Qwen3-4B DSpark 训练消融
 
-## 实验设置
+## 1 Design {#design}
 
-以冻结的 Qwen3-4B 为 target，训练五层 DSpark draft，token embedding 与 LM head 保持冻结。训练消融采用 offline training，预先缓存 target hidden states；生成评测另列 online training 模型。
+### 1.1 Baseline Design {#_1}
+
+DSpark baseline 读取 Qwen3-4B 的中间层隐藏状态，用五层 GQA backbone 并行预测接下来 7 个位置的基础 logits，再由 Markov head 根据前一个 token 逐步修正。Target、token embedding 和 LM head 均冻结。并行预测与顺序采样的推导见 [Speculative Decoding §5.2 DSpark](speculative-decoding.md#52-dspark)。
+
+下表列出 offline 训练消融使用的 baseline 配置。
 
 | **项目** | 设置 |
 |---|---|
@@ -20,7 +24,7 @@
 | **总参数量** | GQA baseline：1,393,133,569（约 1.393B；含冻结的 embedding 与 LM head，不含 target backbone） |
 | **可训练参数量** | GQA baseline：615,221,249（约 615.2M） |
 
-### 消融条件
+### 1.2 Ablation Design {#_2}
 
 以下训练消融均以 GQA baseline 为对照，各改一项；SWA 以 MLA 为对照。
 
@@ -42,7 +46,25 @@ $$
 
 <span class="ablation-sq">\(\blacksquare\)</span>**三层 aux.** 将 target 特征层改为 `[1, 17, 33]`。
 
-## 结果总览
+### 1.3 Markov MLA {#markov-mla}
+
+该变体将 backbone attention 替换为 MLA，并在原有 Markov head 的 `W₁ → W₂` 之间加入 MLA。Backbone 并行计算各位置的基础 logits，Markov head 则根据上一个生成 token 和 target context，逐步修正 logits 并采样。
+
+<figure id="fig-markov-mla" markdown="span">
+  ![Backbone MLA 与 Markov MLA 架构](../../assets/images/qwen3-4b-dspark-ablation/markov-mla.svg){ width="100%" style="display: block; margin: 0 auto;" }
+  <figcaption style="color: var(--md-default-fg-color--light); font-style: normal; margin-top: 0;">Fig. 1: Backbone MLA 与 Markov MLA 架构</figcaption>
+</figure>
+
+五层 target features 按 token 拼接，经 FC 和 RMSNorm 融合为 \(C\)。Markov MLA 的 Q 来自上一个 token 的 embedding \(z_i=W_1[x_{i-1}]\)，K/V 由 \(C\) 投影得到。以本轮起始 token \(x_0\) 为边界，所有生成步骤都读取同一段早于 \(x_0\) 的 context：
+
+$$
+b_i=W_2\,\mathrm{MLA}(z_i,C),\qquad
+\ell_i=\ell_i^0+b_i.
+$$
+
+其中 \(\ell_i^0\) 为 backbone 的基础 logits，\(b_i\) 为 Markov 修正项。Markov MLA 不加残差，其投影权重与 backbone 独立。
+
+## 2 结果总览 {#_3}
 
 <div class="js-sortable-table js-multisort js-row-reorder dspark-three-line dspark-compact" markdown="1">
 
@@ -60,15 +82,15 @@ $$
 
 </div>
 
-## 训练消融分析
+## 3 训练消融分析 {#_4}
 
-### Tau loss
+### 3.1 Tau loss {#tau-loss}
 
 Tau loss 使 \(\tau\) 提高 0.54%，收益主要出现在后续位置和训练中后期。
 
 ![末段各位置接受率相对 baseline 的差异](../../assets/images/qwen3-4b-dspark-ablation/tau-loss-position.svg){ width="50%" }
 
-### MLA 与历史窗口
+### 3.2 MLA 与历史窗口 {#mla}
 
 MLA 的可训练参数从 615.2M 降至 612.1M，\(\tau\) 下降 0.45%，差距未随 draft 位置明显扩大。
 
@@ -80,7 +102,7 @@ MLA 的压缩表示每层每 token 包含 \(512+64=576\) 个数，约为 GQA 的
 
 ![末段各位置接受率相对 MLA 的差异](../../assets/images/qwen3-4b-dspark-ablation/swa-position.svg){ width="50%" }
 
-### Anchor 输入与块内 K/V
+### 3.3 Anchor 输入与块内 K/V {#anchor-kv}
 
 Context-only 和 all-mask 的 \(\tau\) 分别下降 1.76% 和 1.61%，但影响的位置不同：移除块内 K/V 主要影响后续位置，移除 anchor 输入主要影响首位置。两组均保留 Markov head 的前驱 token 输入。
 
@@ -88,7 +110,7 @@ Context-only 和 all-mask 的 \(\tau\) 分别下降 1.76% 和 1.61%，但影响�
 
 ![All-mask 各位置接受率相对 baseline 的差异](../../assets/images/qwen3-4b-dspark-ablation/all-mask-position.svg){ width="50%" }
 
-### 三层 aux
+### 3.4 三层 aux {#aux}
 
 减少特征层使输入投影参数从 32.77M 降至 19.66M，总可训练参数减少 2.13%，代价是 \(\tau\) 下降 1.52%，后续位置受影响更大。
 
@@ -111,25 +133,25 @@ Context-only 和 all-mask 的 \(\tau\) 分别下降 1.76% 和 1.61%，但影响�
 
 </details>
 
-## Evaluation
+## 4 Evaluation {#evaluation}
 
-### Settings
+### 4.1 Settings {#settings}
 
-#### 训练数据集
+生成评测使用 Qwen3-4B 的 non-thinking 模式，draft 每轮提出 7 个候选 token。
+
+#### 训练数据集 {#_5}
 
 训练消融使用 Open PerfectBlend。我们用 Qwen3-4B 在 non-thinking 模式下重新生成回复，采样参数为 `temperature=0.7`、`top-p=0.8`、`top-k=20`、`min-p=0`，每条回复最多生成 4,096 个 token。重新生成后共有 1,339,875 个训练样本，其 target hidden states 预先缓存，供 offline training 使用。
 
-#### 测试数据集
+#### 测试数据集 {#_6}
 
-- **GSM8K** 收录小学数学应用题，通常需要多步算术运算才能得到答案。本文使用全部 1,319 道测试题，比较 prompt 格式、shot 数和采样参数对接受长度的影响。[数据集](https://github.com/openai/grade-school-math)
-- **HumanEval** 是 Python 函数补全基准。模型根据函数签名和文档字符串生成实现。本文在 Markov GQA 实验中用它观察代码生成时的接受率。[数据集](https://github.com/openai/human-eval)
-- **MT-Bench** 是多轮对话基准，第二轮问题承接第一轮的回答。本文在 Markov GQA 实验中用它比较对话任务上的接受率。[论文](https://arxiv.org/abs/2306.05685)
+- **GSM8K** 收录小学数学应用题，通常需要多步算术运算才能得到答案。两种设置都使用全部 1,319 道测试题。本文脚本用 `Question: …` 给出当前题目，在下一行用 `Answer:` 引出回答。0-shot 直接使用这一提示。5-shot 在每道测试题前附上相同的五组示例，取自训练集前五道题及其完整解答。[数据集](https://github.com/openai/grade-school-math)
+- **HumanEval** 包含 164 道 Python 函数补全题，每题给出函数签名和文档字符串，要求模型补全函数实现。[数据集](https://github.com/openai/human-eval)
+- **MT-Bench** 包含 80 组双轮对话。每组先给出一个问题，第二轮保留首轮问答作为上下文，再提出追问。[论文](https://arxiv.org/abs/2306.05685)
+- **MATH-500** 收录从 MATH 测试集选出的 500 道竞赛数学题，涵盖代数、几何、数论等七个主题。本文使用全部 500 道题评测数学推理过程中的 draft token 接受率。[数据集](https://huggingface.co/datasets/HuggingFaceH4/MATH-500)
+- **AIME 2024** 收录 2024 年美国数学邀请赛（AIME I 和 AIME II）的全部 30 道题，每题的答案都是 0 至 999 的整数。本文对 AIME 和 MATH-500 使用相同的提示，要求模型逐步推理，并将最终答案写在 `\boxed{}` 中。[数据集](https://huggingface.co/datasets/Maxwell-Jia/AIME_2024)
 
-#### 生成配置
-
-Target 为 Qwen3-4B，采用 non-thinking 模式。Draft 每轮提出 7 个候选 token。
-
-#### 指标
+#### Metrics {#metrics}
 
 训练时，设 \(p_i\)、\(q_i\) 分别为第 \(i\) 个位置的 target 与 draft 分布。概率采样的接受率为
 
@@ -148,51 +170,58 @@ $$
 
 生成评测直接统计接受的 draft token 总数（`accepted`）和验证轮数（`rounds`）。实测平均接受长度 MAL 按 `1 + accepted / rounds` 计算，其中 1 表示 bonus token。MOL 为每题平均输出的 token 数。`pos-i` 表示前 $i$ 个候选 token 全部被接受的轮次占比。
 
-### 接受率 vs. 评测方法
-
-这组实验使用官方 draft 权重 `deepseek-ai/dspark_qwen3_4b_block7`，在相同采样设置下比较 prompt 格式和 shot 数。Target 的采样参数固定为 `temperature=1`、`top-p=1`、`top-k=-1`、`min-p=0`。Draft 采用概率采样。
-
-<details markdown="1">
-<summary>Prompt 与复现设置</summary>
-
-DeepSpec 用户 prompt 为：
-
-```text
-{question}
-Please reason step by step, and put your final answer within \boxed{}.
-```
-
-我们使用自写评测脚本，0-shot 的用户 prompt 如下。
-
-```text
-Question: {question}
-Answer:
-```
-
-5-shot 在测试题之前加入五个示例问答，沿用 `Question: ...\nAnswer: ...` 格式。
-
-DeepSpec 评测的输出上限为 2048 tokens，并发数为 32，seed 从 980406 开始逐题递增。
-
-</details>
-
-<div class="js-sortable-table js-multisort js-row-reorder dspark-three-line dspark-compact" markdown="1">
-
-| 评测方法 | MAL | pos-1 | pos-2 | pos-3 | pos-4 | pos-5 | pos-6 | pos-7 | MOL |
-| --- | :---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | :---: |
-| DeepSpec 0-shot | **6.1305** | 93.25% | 86.04% | 79.01% | 72.63% | 66.44% | 60.60% | 55.08% | 305.63 |
-| 自写脚本 0-shot | **6.1511** | 93.63% | 86.72% | 79.56% | 73.08% | 66.52% | 60.68% | 54.92% | 248.38 |
-| 自写脚本 5-shot | **5.1025** | 88.73% | 78.02% | 67.69% | 57.29% | 47.69% | 39.33% | 31.51% | 143.73 |
-
-</div>
-
-两种评测方法在 0-shot 下的 MAL 接近，但平均输出长度不同。使用自写脚本时，加入 5 个示例后，MAL 从 6.15 降至 5.10（约 17%），平均输出长度从 248 降至 144 tokens/题。后续对比采用自写脚本的 0-shot 设置。
-
-
-### 接受率 vs. Epochs
+### 4.2 MAL vs. Epochs {#mal-vs-epochs}
 
 Baseline 在每个 epoch 包含 2658 个训练 step。pos-$k$ 表示一次起草中前 $k$ 个 token 连续被接受的比例。
 
-#### GSM8K (5-shot)
+#### GSM8K {#gsm8k}
+
+<details class="dspark-temperature" open markdown="1">
+<summary>Temperature = 0</summary>
+
+<div class="js-sortable-table js-multisort js-row-reorder dspark-three-line dspark-compact dspark-sampling" markdown="1">
+
+| Epochs | T | Top-p | Top-k | Draft 采样 | **MAL** | pos-1 | pos-2 | pos-3 | pos-4 | pos-5 | pos-6 | pos-7 |
+| --- | :---: | ---: | ---: | --- | :---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| 1 | 0.0 | 1.0 | -1 | greedy | **5.8135** | 91.78% | 83.27% | 75.20% | 68.06% | 60.93% | 54.28% | 47.83% |
+| 2 | 0.0 | 1.0 | -1 | greedy | **6.0450** | 92.75% | 85.18% | 77.98% | 71.35% | 65.11% | 59.03% | 53.10% |
+| 3 | 0.0 | 1.0 | -1 | greedy | **6.0451** | 92.78% | 85.20% | 78.05% | 71.41% | 65.10% | 58.92% | 53.04% |
+| 4 | 0.0 | 1.0 | -1 | greedy | **6.2469** | 93.77% | 87.23% | 80.49% | 74.56% | 68.60% | 62.80% | 57.24% |
+| 5 | 0.0 | 1.0 | -1 | greedy | **6.3036** | 93.91% | 87.67% | 81.20% | 75.40% | 69.60% | 63.99% | 58.58% |
+| 6 | 0.0 | 1.0 | -1 | greedy | **6.3180** | 94.03% | 87.83% | 81.45% | 75.66% | 69.76% | 64.22% | 58.85% |
+| 7 | 0.0 | 1.0 | -1 | greedy | <u>**6.3460**</u> | 94.10% | 88.06% | 81.82% | 75.99% | 70.19% | 64.85% | 59.59% |
+| 8 | 0.0 | 1.0 | -1 | greedy | **6.3392** | 94.02% | 87.89% | 81.68% | 75.93% | 70.20% | 64.75% | 59.45% |
+| 9 | 0.0 | 1.0 | -1 | greedy | **6.3323** | 94.05% | 87.83% | 81.62% | 75.81% | 70.07% | 64.70% | 59.16% |
+| 10 | 0.0 | 1.0 | -1 | greedy | **6.3358** | 94.02% | 87.85% | 81.73% | 75.95% | 70.13% | 64.68% | 59.21% |
+
+</div>
+
+</details>
+
+
+<details class="dspark-temperature" markdown="1">
+<summary>Temperature = 1</summary>
+
+<div class="js-sortable-table js-multisort js-row-reorder dspark-three-line dspark-compact dspark-sampling" markdown="1">
+
+| Epochs | T | Top-p | Top-k | Draft 采样 | **MAL** | pos-1 | pos-2 | pos-3 | pos-4 | pos-5 | pos-6 | pos-7 |
+| --- | :---: | ---: | ---: | --- | :---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| 1 | 1.0 | 1.0 | -1 | probabilistic | **5.5583** | 90.68% | 81.10% | 72.03% | 63.91% | 56.22% | 49.30% | 42.60% |
+| 2 | 1.0 | 1.0 | -1 | probabilistic | **5.8144** | 91.77% | 83.48% | 75.16% | 67.82% | 60.70% | 54.44% | 48.07% |
+| 3 | 1.0 | 1.0 | -1 | probabilistic | **5.7996** | 91.77% | 83.32% | 74.89% | 67.53% | 60.48% | 54.15% | 47.82% |
+| 4 | 1.0 | 1.0 | -1 | probabilistic | **6.0275** | 92.90% | 85.41% | 77.86% | 71.13% | 64.62% | 58.41% | 52.41% |
+| 5 | 1.0 | 1.0 | -1 | probabilistic | **6.0840** | 93.23% | 85.98% | 78.66% | 71.91% | 65.59% | 59.48% | 53.54% |
+| 6 | 1.0 | 1.0 | -1 | probabilistic | **6.1033** | 93.33% | 86.22% | 79.02% | 72.24% | 65.73% | 59.81% | 53.98% |
+| 7 | 1.0 | 1.0 | -1 | probabilistic | **6.1650** | 93.58% | 86.79% | 79.68% | 73.24% | 66.91% | 61.07% | 55.23% |
+| 8 | 1.0 | 1.0 | -1 | probabilistic | **6.1340** | 93.46% | 86.46% | 79.27% | 72.70% | 66.33% | 60.46% | 54.72% |
+| 9 | 1.0 | 1.0 | -1 | probabilistic | <u>**6.1677**</u> | 93.58% | 86.76% | 79.75% | 73.22% | 66.99% | 61.13% | 55.33% |
+| 10 | 1.0 | 1.0 | -1 | probabilistic | **6.1344** | 93.33% | 86.42% | 79.32% | 72.70% | 66.38% | 60.57% | 54.73% |
+
+</div>
+
+</details>
+
+#### GSM8K (5-shot) {#gsm8k-5-shot}
 
 <details class="dspark-temperature" open markdown="1">
 <summary>Temperature = 0</summary>
@@ -239,7 +268,7 @@ Baseline 在每个 epoch 包含 2658 个训练 step。pos-$k$ 表示一次起草
 
 </details>
 
-#### HumanEval
+#### HumanEval {#humaneval}
 
 
 <details class="dspark-temperature" open markdown="1">
@@ -287,7 +316,7 @@ Baseline 在每个 epoch 包含 2658 个训练 step。pos-$k$ 表示一次起草
 
 </details>
 
-#### MT-Bench
+#### MT-Bench {#mt-bench}
 
 
 <details class="dspark-temperature" open markdown="1">
@@ -335,7 +364,7 @@ Baseline 在每个 epoch 包含 2658 个训练 step。pos-$k$ 表示一次起草
 
 </details>
 
-#### MATH-500
+#### MATH-500 {#math-500}
 
 <details class="dspark-temperature" open markdown="1">
 <summary>Temperature = 0</summary>
@@ -382,7 +411,7 @@ Baseline 在每个 epoch 包含 2658 个训练 step。pos-$k$ 表示一次起草
 
 </details>
 
-#### AIME 2024
+#### AIME 2024 {#aime-2024}
 
 
 <details class="dspark-temperature" open markdown="1">
@@ -432,7 +461,7 @@ Baseline 在每个 epoch 包含 2658 个训练 step。pos-$k$ 表示一次起草
 
 
 
-### 接受率 vs. 采样参数
+### 4.3 接受率 vs. 采样参数 {#vs}
 
 T 表示 target temperature，Top-p、Top-k 为 target 截断参数，min-p 固定为 0。Probabilistic draft 使用相同温度，但不做 top-p/top-k 截断；greedy draft 取最大概率 token。T=0 时两者均采用 greedy。使用 huggingface上 `deepseek-ai/dspark_qwen3_4b_block7`官方权重。
 
@@ -450,23 +479,7 @@ T 表示 target temperature，Top-p、Top-k 为 target 截断参数，min-p 固�
 
 在 T=0.7、top-p=0.8、top-k=20 时，两种 draft 采样方式的 MAL 接近。T=1、无截断时，probabilistic 比 greedy 提高约 5.1%，而输出长度接近。Draft 采样方式的收益取决于 target 的采样设置。
 
-### Backbone MLA + Markov MLA
-
-该变体将 backbone attention 替换为 MLA，并在原有 Markov head 的 `W₁ → W₂` 之间加入 MLA。Backbone 并行计算各位置的基础 logits，Markov head 则根据上一个生成 token 和 target context，逐步修正 logits 并采样。
-
-<figure id="fig-markov-mla" markdown="span">
-  ![Backbone MLA 与 Markov MLA 架构](../../assets/images/qwen3-4b-dspark-ablation/markov-mla.svg){ width="100%" style="display: block; margin: 0 auto;" }
-  <figcaption style="color: var(--md-default-fg-color--light); font-style: normal; margin-top: 0;">Fig. 1: Backbone MLA 与 Markov MLA 架构</figcaption>
-</figure>
-
-五层 target features 按 token 拼接，经 FC 和 RMSNorm 融合为 \(C\)。Markov MLA 的 Q 来自上一个 token 的 embedding \(z_i=W_1[x_{i-1}]\)，K/V 由 \(C\) 投影得到。以本轮起始 token \(x_0\) 为边界，所有生成步骤都读取同一段早于 \(x_0\) 的 context：
-
-$$
-b_i=W_2\,\mathrm{MLA}(z_i,C),\qquad
-\ell_i=\ell_i^0+b_i.
-$$
-
-其中 \(\ell_i^0\) 为 backbone 的基础 logits，\(b_i\) 为 Markov 修正项。Markov MLA 不加残差，其投影权重与 backbone 独立。
+### 4.4 Backbone MLA + Markov MLA {#backbone-mla-markov-mla}
 
 Baseline 和 Backbone MLA + Markov MLA 均采用 online training，学习率为 `3e-4`，训练 1 个 epoch。评测时，客户端并发数与服务端最大请求数均为 32。
 
@@ -487,7 +500,7 @@ Baseline 和 Backbone MLA + Markov MLA 均采用 online training，学习率为 
 
 </div>
 
-### Markov GQA
+### 4.5 Markov GQA {#markov-gqa}
 
 Markov GQA 沿用 baseline 的 5 层 GQA backbone，在 Markov head 的 `W₁` 与 `W₂` 之间加入 GQA（32 个 Q heads、8 个 KV heads）。该 GQA 的位置对应 [Fig. 1](#fig-markov-mla) 中 Markov head 的 MLA。Baseline 与 Markov GQA 均采用 online training，训练约 10 个 epoch。
 
@@ -548,7 +561,7 @@ Markov GQA 沿用 baseline 的 5 层 GQA backbone，在 Markov head 的 `W₁` �
 
 </div>
 
-### Baseline vs. DrawSpec
+### 4.6 Baseline vs. DrawSpec {#baseline-vs-drawspec}
 
 DrawSpec 将五层 backbone 分为四层预计算和一层条件化，最后一层输入为 anchor + 6 states。此处使用 late-conditioning 分支的 12-state 权重，与 baseline 均训练约 1 epoch，target temperature 为 0.7。
 
@@ -563,12 +576,19 @@ DrawSpec 将五层 backbone 分为四层预计算和一层条件化，最后一�
 
 两组输出长度接近，DrawSpec 的 MAL 下降约 14.7%。
 
-## 历史评测
+## 5 历史评测 {#_7}
+
+<details markdown="1">
+<summary>GSM8K 评测脚本对照（官方权重）</summary>
+
+使用官方 draft 权重 `deepseek-ai/dspark_qwen3_4b_block7`，在 target temperature 为 1、top-p 为 1、top-k 为 -1、min-p 为 0 且 draft 采用概率采样时，DeepSpec 和本文脚本在 GSM8K 0-shot 上的 MAL 分别为 6.1305 和 6.1511，平均每题输出长度分别为 305.63 和 248.38 个 token。DeepSpec 的提示要求逐步推理并用 `\boxed{}` 标出答案。
+
+</details>
 
 <details markdown="1">
 <summary>早期 online / offline 评测记录</summary>
 
-### Online training 与官方权重
+### 5.1 Online training 与官方权重 {#online-training}
 
 在 vLLM 服务上评测 GSM8K test 全集 1,319 题。自训练 baseline 训练至 step 2616（约 1 epoch）。Prompt 使用 `Question: {question}\nAnswer:` 格式。Target 使用 **non-thinking**，采样参数为 **temperature=0.7、top-p=0.8、top-k=20、min-p=0**；Draft 均采用 **greedy**，每轮提出 7 个 draft tokens。
 
@@ -581,7 +601,7 @@ DrawSpec 将五层 backbone 分为四层预计算和一层条件化，最后一�
 
 </div>
 
-### Offline training（5-shot）
+### 5.2 Offline training（5-shot） {#offline-training5-shot}
 
 <div class="js-sortable-table js-multisort js-row-reorder dspark-three-line dspark-compact" markdown="1">
 
