@@ -415,6 +415,11 @@ p:has(+ .arithmatex) {
 
 
 /* Three-line tables for DSpark experiment results. */
+.md-typeset details.dspark-temperature {
+    border: 0;
+    box-shadow: none;
+}
+
 .md-typeset .dspark-three-line {
   overflow-x: auto;
   margin: 1em 0;
@@ -587,22 +592,37 @@ p:has(+ .arithmatex) {
   font-weight: 600;
 }
 
+.md-typeset .js-multisort {
+  position: relative;
+  padding-block-start: 1em;
+}
+
+/* Use the existing gap above the table for the sorting controls. */
+.md-typeset .js-multisort .md-typeset__scrollwrap {
+  margin-block-start: 0;
+}
+
 .md-typeset .table-sort-controls {
+  position: absolute;
+  inset: 0 0 auto;
   display: flex;
   align-items: center;
-  flex-wrap: wrap;
-  gap: 0.5em 1em;
-  margin-bottom: 0.6em;
-  min-height: 1.5rem;
+  gap: .65em;
+  height: 1.25em;
+  line-height: 1;
   font-size: 0.8em;
 }
 
 .md-typeset .table-sort-status {
   color: var(--md-default-fg-color--light);
+  white-space: nowrap;
+  overflow-x: auto;
+  scrollbar-width: none;
 }
 
 .md-typeset .table-sort-reset {
-  padding: 0.2em 0.6em;
+  flex: none;
+  padding: 0 .45em;
   border: 1px solid var(--md-default-fg-color--lighter);
   border-radius: 4px;
   color: var(--md-default-fg-color--light);

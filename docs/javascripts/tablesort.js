@@ -52,7 +52,7 @@ function enableMultiSort(table) {
   reset.className = "table-sort-reset";
   reset.textContent = "清除排序";
   controls.append(status, reset);
-  wrapper.before(controls);
+  wrapper.prepend(controls);
 
   const labels = headers.map((header) => header.textContent.trim());
   const buttons = headers.map((header, column) => {
