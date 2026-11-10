@@ -415,9 +415,48 @@ p:has(+ .arithmatex) {
 
 
 /* Three-line tables for DSpark experiment results. */
+.md-typeset figure.dspark-table-figure {
+  display: block;
+  width: 100%;
+  margin: 1em 0;
+  text-align: start;
+}
+
+.md-typeset .dspark-table-figure > .dspark-three-line,
+.md-typeset .dspark-table-figure .md-typeset__scrollwrap,
+.md-typeset .dspark-table-figure .md-typeset__table {
+  margin: 0;
+}
+
+.md-typeset .dspark-table-figure .md-typeset__table {
+  padding: 0;
+}
+
+.md-typeset .dspark-table-figure table:not([class]) {
+  display: table;
+  width: 100%;
+  margin: 0;
+}
+
+.md-typeset .dspark-table-figure > figcaption {
+  max-width: none;
+  margin: .2rem 0 0;
+  text-align: center;
+  font-size: .85em;
+  color: var(--md-default-fg-color--light);
+}
+
+.md-typeset details:has(> .dspark-table-figure) {
+  padding-inline: 0;
+}
+
 .md-typeset details.dspark-temperature {
-    border: 0;
-    box-shadow: none;
+  border: 0;
+  box-shadow: none;
+}
+
+.md-typeset details:has(> .dspark-table-figure) > summary {
+  margin-inline: 0;
 }
 
 .md-typeset .dspark-three-line {
@@ -611,6 +650,39 @@ p:has(+ .arithmatex) {
   height: 1.25em;
   line-height: 1;
   font-size: 0.8em;
+}
+
+
+.md-typeset .js-multisort.has-position-rates {
+  padding-block-start: 0;
+}
+
+.md-typeset .has-position-rates .table-sort-controls {
+  position: static;
+  height: auto;
+  margin-block-end: .4em;
+}
+
+.position-rate-switch {
+  display: inline-flex;
+  flex: none;
+  margin-inline-start: auto;
+  padding: 2px;
+  border-radius: .45rem;
+  background: var(--md-default-fg-color--lightest);
+}
+
+.position-rate-switch button {
+  padding: .45em .7em;
+  border-radius: .35rem;
+  color: var(--md-default-fg-color--light);
+  cursor: pointer;
+}
+
+.position-rate-switch button[aria-pressed="true"] {
+  color: var(--md-default-fg-color);
+  background: var(--md-default-bg-color);
+  font-weight: 600;
 }
 
 .md-typeset .table-sort-status {
