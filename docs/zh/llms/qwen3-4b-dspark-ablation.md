@@ -6,7 +6,7 @@
 
 DSpark baseline 读取 Qwen3-4B 的中间层隐藏状态，用五层 GQA backbone 并行预测接下来 7 个位置的基础 logits，再由 Markov head 根据前一个 token 逐步修正。Target、token embedding 和 LM head 均冻结。并行预测与顺序采样的推导见 [Speculative Decoding §5.2 DSpark](speculative-decoding.md#52-dspark)。
 
-下表列出 offline 训练消融使用的 baseline 配置。
+下表列出 baseline 的模型配置。
 
 <figure class="dspark-table-figure" markdown="1">
 
@@ -16,20 +16,15 @@ DSpark baseline 读取 Qwen3-4B 的中间层隐藏状态，用五层 GQA backbon
 | **Draft 架构** | 5 层；隐藏维度 2560；FFN 中间维度 9728；GQA：32 个 Q heads、8 个 KV heads，head dim 128 |
 | **Aux 层** | `[1, 9, 17, 25, 33]` |
 | **Block size** | 7；Backbone 输入为 `[anchor, MASK × 6]` |
-| **Anchor 采样** | 每个样本最多 512 个 |
 | **监督** | 仅监督 response |
 | **Markov head** | Vanilla，rank 256 |
-| **Batch size** | 4 GPUs × micro-batch 1 × 梯度累积 128；global batch 512 |
-| **学习率** | 峰值 \(6\times10^{-4}\)；warmup 比例 0.04；完整计划为 26,160 步 |
-| **Loss** | \(0.1L_{\mathrm{CE}}+0.9L_{\mathrm{L1}}+L_{\mathrm{conf}}\)；位置权重为 \(\exp(-i/4)\)，\(i=0,\ldots,6\) |
-| **训练步数** | 2,616 optimizer step，约一个 epoch |
-| **总参数量** | GQA baseline：1,393,133,569（约 1.393B；含冻结的 embedding 与 LM head，不含 target backbone） |
-| **可训练参数量** | GQA baseline：615,221,249（约 615.2M） |
+| **总参数量** | GQA baseline：约 1.393B（含冻结的 embedding 与 LM head） |
+| **可训练参数量** | GQA baseline：约 615.2M |
 
-<figcaption>DSpark baseline 的模型结构与训练配置</figcaption>
+<figcaption>DSpark baseline 的模型配置</figcaption>
 </figure>
 
-### 1.2 Ablation Design {#_2}
+### 1.2 Ablation Study {#_2}
 
 以下训练消融均以 GQA baseline 为对照，各改一项；SWA 以 MLA 为对照。
 
@@ -93,13 +88,15 @@ $$
 </figure>
 
 
-### 2.1 Tau loss {#tau-loss}
+## 3 训练消融分析 {#training-ablation-analysis}
+
+### 3.1 Tau loss {#tau-loss}
 
 Tau loss 使 \(\tau\) 提高 0.54%，收益主要出现在后续位置和训练中后期。
 
 ![末段各位置接受率相对 baseline 的差异](../../assets/images/qwen3-4b-dspark-ablation/tau-loss-position.svg){ width="50%" }
 
-### 2.2 MLA 与历史窗口 {#mla}
+### 3.2 MLA 与历史窗口 {#mla}
 
 MLA 的可训练参数从 615.2M 降至 612.1M，\(\tau\) 下降 0.45%，差距未随 draft 位置明显扩大。
 
@@ -111,7 +108,7 @@ MLA 的压缩表示每层每 token 包含 \(512+64=576\) 个数，约为 GQA 的
 
 ![末段各位置接受率相对 MLA 的差异](../../assets/images/qwen3-4b-dspark-ablation/swa-position.svg){ width="50%" }
 
-### 2.3 Anchor 输入与块内 K/V {#anchor-kv}
+### 3.3 Anchor 输入与块内 K/V {#anchor-kv}
 
 Context-only 和 all-mask 的 \(\tau\) 分别下降 1.76% 和 1.61%，但影响的位置不同：移除块内 K/V 主要影响后续位置，移除 anchor 输入主要影响首位置。两组均保留 Markov head 的前驱 token 输入。
 
@@ -119,7 +116,7 @@ Context-only 和 all-mask 的 \(\tau\) 分别下降 1.76% 和 1.61%，但影响�
 
 ![All-mask 各位置接受率相对 baseline 的差异](../../assets/images/qwen3-4b-dspark-ablation/all-mask-position.svg){ width="50%" }
 
-### 2.4 三层 aux {#aux}
+### 3.4 三层 aux {#aux}
 
 减少特征层使输入投影参数从 32.77M 降至 19.66M，总可训练参数减少 2.13%，代价是 \(\tau\) 下降 1.52%，后续位置受影响更大。
 
@@ -142,15 +139,23 @@ Context-only 和 all-mask 的 \(\tau\) 分别下降 1.76% 和 1.61%，但影响�
 
 </details>
 
-## 3 Evaluation {#evaluation}
+## 4 Evaluation {#evaluation}
 
-### 3.1 Settings {#settings}
+### 4.1 Settings {#settings}
 
 生成评测使用 Qwen3-4B 的 non-thinking 模式，draft 每轮提出 7 个候选 token。
 
 #### 训练数据集 {#_5}
 
-训练消融使用 Open PerfectBlend。我们用 Qwen3-4B 在 non-thinking 模式下重新生成回复，采样参数为 `temperature=0.7`、`top-p=0.8`、`top-k=20`、`min-p=0`，每条回复最多生成 4,096 个 token。重新生成后共有 1,339,875 个训练样本，其 target hidden states 预先缓存，供 offline training 使用。
+训练消融使用 Open PerfectBlend。我们用 Qwen3-4B 在 non-thinking 模式下重新生成回复，采样参数为 `temperature=0.7`、`top-p=0.8`、`top-k=20`、`min-p=0`，每条回复最多生成 4,096 个 token。重新生成后共有 1,339,875 个训练样本。
+
+#### 训练方式
+
+Offline 和 online 训练均使用预先生成的对话样本，由冻结的 Qwen3-4B 提供 target hidden states。每个样本最多采样 512 个 anchor，仅监督回复部分。Baseline 的损失为 \(0.1L_{\mathrm{CE}}+0.9L_{\mathrm{L1}}+L_{\mathrm{conf}}\)，位置权重为 \(\exp(-i/4)\)，其中 \(i=0,\ldots,6\)。
+
+- **Offline training** 用于第 2 节的训练消融。训练前先计算全部样本的 target hidden states，写入约 38 TB 的磁盘缓存，后续各轮训练复用这份缓存。Draft 使用 4 张 GPU，每卡 micro-batch 为 1，梯度累积 128 次，global batch size 为 \(4\times1\times128=512\)。峰值学习率为 \(6\times10^{-4}\)，warmup 占完整 26,160 步学习率计划的 4%。消融实验实际训练 2,616 个 optimizer step，约 1 个 epoch。
+
+- **Online training** 由 SGLang 在训练期间计算 target hidden states，SpecForge 从缓冲区读取并训练 draft。Target 计算下一批数据时，draft 可以并行训练当前批。MAL vs. Epochs 的 baseline 使用 7 张 GPU 训练 draft，每卡 micro-batch 为 4，梯度累积 18 次，global batch size 为 \(7\times4\times18=504\)。Markov MLA 和 Markov GQA 的对比实验也采用 online training。
 
 #### 测试数据集 {#_6}
 
@@ -179,7 +184,7 @@ $$
 
 生成评测直接统计接受的 draft token 总数（`accepted`）和验证轮数（`rounds`）。实测平均接受长度 MAL 按 `1 + accepted / rounds` 计算，其中 1 表示 bonus token。MOL 为每题平均输出的 token 数。`pos-i` 表示前 $i$ 个候选 token 全部被接受的轮次占比。
 
-### 3.2 MAL vs. Epochs {#mal-vs-epochs}
+### 4.2 MAL vs. Epochs {#mal-vs-epochs}
 
 Baseline 在每个 epoch 包含 2658 个训练 step。pos-$k$ 表示一次起草中前 $k$ 个 token 连续被接受的比例。
 
@@ -640,7 +645,7 @@ Baseline 在每个 epoch 包含 2658 个训练 step。pos-$k$ 表示一次起草
 
 
 
-### 3.3 接受率 vs. 采样参数 {#vs}
+### 4.3 MAL vs. Sampling/Verification {#vs}
 
 T 表示 target temperature，Top-p、Top-k 为 target 截断参数，min-p 固定为 0。Probabilistic draft 使用相同温度，但不做 top-p/top-k 截断；greedy draft 取最大概率 token。T=0 时两者均采用 greedy。使用 huggingface上 `deepseek-ai/dspark_qwen3_4b_block7`官方权重。
 
@@ -663,7 +668,326 @@ T 表示 target temperature，Top-p、Top-k 为 target 截断参数，min-p 固�
 
 在 T=0.7、top-p=0.8、top-k=20 时，两种 draft 采样方式的 MAL 接近。T=1、无截断时，probabilistic 比 greedy 提高约 5.1%，而输出长度接近。Draft 采样方式的收益取决于 target 的采样设置。
 
-### 3.4 Markov MLA {#backbone-mla-markov-mla}
+### 4.4 MAL vs. Attention {#mal-vs-attention}
+
+GQA baseline 采用 online training，以下结果来自 step 2616（约 1 个 epoch）的 checkpoint。
+
+#### GSM8K {#attention-gsm8k}
+
+<details class="dspark-temperature" open markdown="1">
+<summary>Temperature = 0</summary>
+
+<figure class="dspark-table-figure" markdown="1">
+
+<div class="js-sortable-table js-multisort js-row-reorder dspark-three-line dspark-compact dspark-sampling" markdown="1">
+
+| Attention | T | Top-p | Top-k | Draft 采样 | **MAL** | pos-1 | pos-2 | pos-3 | pos-4 | pos-5 | pos-6 | pos-7 |
+| --- | :---: | ---: | ---: | --- | :---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| GQA {: data-conditional="91.60% 90.53% 90.24% 90.20% 89.69% 89.34% 88.59%"} | 0.0 | 1.0 | -1 | greedy | <u>**5.7936**</u> | 91.60% | 82.92% | 74.83% | 67.49% | 60.53% | 54.08% | 47.91% |
+| MLA {: data-conditional="91.27% 90.43% 90.07% 90.04% 89.21% 89.18% 88.33%"} | 0.0 | 1.0 | -1 | greedy | **5.7505** | 91.27% | 82.53% | 74.33% | 66.93% | 59.71% | 53.25% | 47.03% |
+| MLA + SWA1024 {: data-conditional="91.55% 90.53% 90.00% 90.08% 89.48% 89.06% 88.18%"} | 0.0 | 1.0 | -1 | greedy | **5.7705** | 91.55% | 82.87% | 74.58% | 67.18% | 60.11% | 53.54% | 47.21% |
+| MLA + SWA512 {: data-conditional="91.39% 90.45% 90.02% 90.20% 89.32% 88.92% 88.03%"} | 0.0 | 1.0 | -1 | greedy | **5.7579** | 91.39% | 82.67% | 74.42% | 67.12% | 59.95% | 53.31% | 46.93% |
+| MLA + SWA128 {: data-conditional="90.39% 89.44% 88.69% 88.70% 88.23% 87.80% 87.24%"} | 0.0 | 1.0 | -1 | greedy | **5.5495** | 90.39% | 80.85% | 71.71% | 63.61% | 56.12% | 49.28% | 42.99% |
+
+</div>
+
+<figcaption>GSM8K 不同 attention 配置的接受率（T = 0，Greedy draft）</figcaption>
+</figure>
+
+</details>
+
+<details class="dspark-temperature" markdown="1">
+<summary>Temperature = 1</summary>
+
+<figure class="dspark-table-figure" markdown="1">
+
+<div class="js-sortable-table js-multisort js-row-reorder dspark-three-line dspark-compact dspark-sampling" markdown="1">
+
+| Attention | T | Top-p | Top-k | Draft 采样 | **MAL** | pos-1 | pos-2 | pos-3 | pos-4 | pos-5 | pos-6 | pos-7 |
+| --- | :---: | ---: | ---: | --- | :---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| GQA {: data-conditional="88.44% 88.15% 88.35% 88.93% 88.42% 88.23% 87.66%"} | 1.0 | 1.0 | -1 | greedy | <u>**5.4035**</u> | 88.44% | 77.96% | 68.87% | 61.25% | 54.16% | 47.79% | 41.89% |
+| MLA {: data-conditional="87.68% 87.68% 88.01% 88.79% 88.07% 87.94% 87.15%"} | 1.0 | 1.0 | -1 | greedy | **5.3226** | 87.68% | 76.87% | 67.65% | 60.07% | 52.90% | 46.52% | 40.55% |
+| MLA + SWA1024 {: data-conditional="87.83% 87.68% 87.92% 88.92% 88.11% 88.23% 87.28%"} | 1.0 | 1.0 | -1 | greedy | **5.3346** | 87.83% | 77.01% | 67.71% | 60.20% | 53.05% | 46.80% | 40.85% |
+| MLA + SWA512 {: data-conditional="88.10% 87.77% 88.20% 88.68% 87.78% 87.92% 87.58%"} | 1.0 | 1.0 | -1 | greedy | **5.3478** | 88.10% | 77.33% | 68.20% | 60.48% | 53.10% | 46.68% | 40.88% |
+| MLA + SWA128 {: data-conditional="86.92% 86.52% 86.73% 87.56% 86.81% 86.70% 86.55%"} | 1.0 | 1.0 | -1 | greedy | **5.1420** | 86.92% | 75.20% | 65.22% | 57.11% | 49.58% | 42.98% | 37.20% |
+
+</div>
+
+<figcaption>GSM8K 不同 attention 配置的接受率（T = 1，Greedy draft）</figcaption>
+</figure>
+
+<figure class="dspark-table-figure" markdown="1">
+
+<div class="js-sortable-table js-multisort js-row-reorder dspark-three-line dspark-compact dspark-sampling" markdown="1">
+
+| Attention | T | Top-p | Top-k | Draft 采样 | **MAL** | pos-1 | pos-2 | pos-3 | pos-4 | pos-5 | pos-6 | pos-7 |
+| --- | :---: | ---: | ---: | --- | :---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| GQA {: data-conditional="90.41% 89.01% 88.56% 88.67% 87.78% 87.24% 86.40%"} | 1.0 | 1.0 | -1 | probabilistic | **5.5107** | 90.41% | 80.48% | 71.27% | 63.20% | 55.48% | 48.40% | 41.82% |
+| MLA {: data-conditional="90.14% 89.07% 88.36% 88.54% 87.38% 87.20% 86.44%"} | 1.0 | 1.0 | -1 | probabilistic | **5.4832** | 90.14% | 80.29% | 70.95% | 62.82% | 54.89% | 47.86% | 41.37% |
+| MLA + SWA1024 {: data-conditional="90.01% 88.86% 88.57% 88.67% 87.70% 87.01% 86.32%"} | 1.0 | 1.0 | -1 | probabilistic | **5.4807** | 90.01% | 79.99% | 70.85% | 62.82% | 55.09% | 47.94% | 41.38% |
+| MLA + SWA512 {: data-conditional="90.56% 89.19% 88.55% 88.53% 87.88% 87.15% 86.50%"} | 1.0 | 1.0 | -1 | probabilistic | <u>**5.5223**</u> | 90.56% | 80.76% | 71.52% | 63.32% | 55.64% | 48.49% | 41.95% |
+| MLA + SWA128 {: data-conditional="89.22% 87.65% 87.34% 87.12% 86.36% 85.92% 85.65%"} | 1.0 | 1.0 | -1 | probabilistic | **5.2856** | 89.22% | 78.20% | 68.30% | 59.50% | 51.38% | 44.15% | 37.81% |
+
+</div>
+
+<figcaption>GSM8K 不同 attention 配置的接受率（T = 1，Probabilistic draft）</figcaption>
+</figure>
+
+</details>
+
+#### HumanEval {#attention-humaneval}
+
+<details class="dspark-temperature" open markdown="1">
+<summary>Temperature = 0</summary>
+
+<figure class="dspark-table-figure" markdown="1">
+
+<div class="js-sortable-table js-multisort js-row-reorder dspark-three-line dspark-compact dspark-sampling" markdown="1">
+
+| Attention | T | Top-p | Top-k | Draft 采样 | **MAL** | pos-1 | pos-2 | pos-3 | pos-4 | pos-5 | pos-6 | pos-7 |
+| --- | :---: | ---: | ---: | --- | :---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| GQA {: data-conditional="88.53% 87.45% 85.84% 86.40% 86.52% 86.18% 81.12%"} | 0.0 | 1.0 | -1 | greedy | **5.1707** | 88.53% | 77.43% | 66.46% | 57.42% | 49.68% | 42.81% | 34.73% |
+| MLA {: data-conditional="88.22% 86.55% 87.31% 86.12% 85.78% 85.58% 82.88%"} | 0.0 | 1.0 | -1 | greedy | **5.1496** | 88.22% | 76.35% | 66.66% | 57.41% | 49.24% | 42.14% | 34.93% |
+| MLA + SWA1024 {: data-conditional="89.11% 86.38% 86.82% 86.61% 87.29% 86.23% 83.55%"} | 0.0 | 1.0 | -1 | greedy | <u>**5.2128**</u> | 89.11% | 76.97% | 66.83% | 57.88% | 50.52% | 43.56% | 36.40% |
+| MLA + SWA512 {: data-conditional="87.93% 85.44% 84.80% 85.03% 84.15% 83.40% 78.17%"} | 0.0 | 1.0 | -1 | greedy | **4.9428** | 87.93% | 75.13% | 63.71% | 54.17% | 45.59% | 38.02% | 29.72% |
+| MLA + SWA128 {: data-conditional="83.73% 78.38% 78.92% 76.32% 77.98% 77.81% 75.57%"} | 0.0 | 1.0 | -1 | greedy | **4.1360** | 83.73% | 65.62% | 51.79% | 39.53% | 30.82% | 23.98% | 18.12% |
+
+</div>
+
+<figcaption>HumanEval 不同 attention 配置的接受率（T = 0，Greedy draft）</figcaption>
+</figure>
+
+</details>
+
+<details class="dspark-temperature" markdown="1">
+<summary>Temperature = 1</summary>
+
+<figure class="dspark-table-figure" markdown="1">
+
+<div class="js-sortable-table js-multisort js-row-reorder dspark-three-line dspark-compact dspark-sampling" markdown="1">
+
+| Attention | T | Top-p | Top-k | Draft 采样 | **MAL** | pos-1 | pos-2 | pos-3 | pos-4 | pos-5 | pos-6 | pos-7 |
+| --- | :---: | ---: | ---: | --- | :---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| GQA {: data-conditional="85.84% 85.39% 85.19% 85.99% 85.56% 84.70% 80.99%"} | 1.0 | 1.0 | -1 | greedy | <u>**4.9166**</u> | 85.84% | 73.30% | 62.45% | 53.70% | 45.94% | 38.91% | 31.52% |
+| MLA {: data-conditional="85.88% 84.88% 84.98% 85.19% 84.47% 84.06% 81.58%"} | 1.0 | 1.0 | -1 | greedy | **4.8610** | 85.88% | 72.89% | 61.95% | 52.77% | 44.58% | 37.47% | 30.57% |
+| MLA + SWA1024 {: data-conditional="86.51% 85.12% 85.15% 84.84% 84.69% 84.60% 82.08%"} | 1.0 | 1.0 | -1 | greedy | **4.9050** | 86.51% | 73.64% | 62.70% | 53.20% | 45.05% | 38.11% | 31.28% |
+| MLA + SWA512 {: data-conditional="86.18% 84.81% 84.71% 84.84% 83.86% 84.07% 80.19%"} | 1.0 | 1.0 | -1 | greedy | **4.8448** | 86.18% | 73.09% | 61.91% | 52.53% | 44.05% | 37.03% | 29.69% |
+| MLA + SWA128 {: data-conditional="82.92% 77.95% 78.16% 76.81% 77.53% 77.51% 75.49%"} | 1.0 | 1.0 | -1 | greedy | **4.0790** | 82.92% | 64.64% | 50.52% | 38.81% | 30.09% | 23.32% | 17.60% |
+
+</div>
+
+<figcaption>HumanEval 不同 attention 配置的接受率（T = 1，Greedy draft）</figcaption>
+</figure>
+
+<figure class="dspark-table-figure" markdown="1">
+
+<div class="js-sortable-table js-multisort js-row-reorder dspark-three-line dspark-compact dspark-sampling" markdown="1">
+
+| Attention | T | Top-p | Top-k | Draft 采样 | **MAL** | pos-1 | pos-2 | pos-3 | pos-4 | pos-5 | pos-6 | pos-7 |
+| --- | :---: | ---: | ---: | --- | :---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| GQA {: data-conditional="87.95% 85.95% 85.01% 85.71% 83.77% 83.74% 78.84%"} | 1.0 | 1.0 | -1 | probabilistic | <u>**4.9817**</u> | 87.95% | 75.60% | 64.27% | 55.09% | 46.15% | 38.64% | 30.47% |
+| MLA {: data-conditional="87.43% 84.73% 84.77% 84.44% 82.13% 82.72% 78.73%"} | 1.0 | 1.0 | -1 | probabilistic | **4.8527** | 87.43% | 74.08% | 62.80% | 53.03% | 43.55% | 36.03% | 28.36% |
+| MLA + SWA1024 {: data-conditional="87.02% 85.33% 84.75% 84.32% 83.28% 83.09% 78.46%"} | 1.0 | 1.0 | -1 | probabilistic | **4.8698** | 87.02% | 74.25% | 62.93% | 53.06% | 44.19% | 36.72% | 28.81% |
+| MLA + SWA512 {: data-conditional="87.06% 84.46% 83.60% 83.22% 82.54% 81.07% 77.32%"} | 1.0 | 1.0 | -1 | probabilistic | **4.7618** | 87.06% | 73.53% | 61.48% | 51.16% | 42.23% | 34.24% | 26.47% |
+| MLA + SWA128 {: data-conditional="83.20% 77.75% 77.16% 74.83% 76.76% 76.30% 73.50%"} | 1.0 | 1.0 | -1 | probabilistic | **4.0179** | 83.20% | 64.69% | 49.92% | 37.35% | 28.67% | 21.88% | 16.08% |
+
+</div>
+
+<figcaption>HumanEval 不同 attention 配置的接受率（T = 1，Probabilistic draft）</figcaption>
+</figure>
+
+</details>
+
+#### MT-Bench {#attention-mtbench}
+
+<details class="dspark-temperature" open markdown="1">
+<summary>Temperature = 0</summary>
+
+<figure class="dspark-table-figure" markdown="1">
+
+<div class="js-sortable-table js-multisort js-row-reorder dspark-three-line dspark-compact dspark-sampling" markdown="1">
+
+| Attention | T | Top-p | Top-k | Draft 采样 | **MAL** | pos-1 | pos-2 | pos-3 | pos-4 | pos-5 | pos-6 | pos-7 |
+| --- | :---: | ---: | ---: | --- | :---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| GQA {: data-conditional="70.82% 68.88% 69.87% 72.00% 73.65% 75.31% 75.88%"} | 0.0 | 1.0 | -1 | greedy | **3.2024** | 70.82% | 48.78% | 34.09% | 24.54% | 18.07% | 13.61% | 10.33% |
+| MLA {: data-conditional="71.59% 69.48% 71.35% 72.37% 75.40% 76.94% 77.34%"} | 0.0 | 1.0 | -1 | greedy | <u>**3.2830**</u> | 71.59% | 49.74% | 35.49% | 25.68% | 19.37% | 14.90% | 11.52% |
+| MLA + SWA1024 {: data-conditional="70.56% 68.44% 69.55% 71.91% 72.06% 75.29% 75.50%"} | 0.0 | 1.0 | -1 | greedy | **3.1700** | 70.56% | 48.29% | 33.59% | 24.15% | 17.41% | 13.11% | 9.89% |
+| MLA + SWA512 {: data-conditional="70.24% 68.45% 68.70% 71.16% 72.10% 72.99% 76.05%"} | 0.0 | 1.0 | -1 | greedy | **3.1357** | 70.24% | 48.08% | 33.03% | 23.50% | 16.95% | 12.37% | 9.41% |
+| MLA + SWA128 {: data-conditional="70.85% 67.88% 67.59% 69.63% 72.77% 74.44% 74.16%"} | 0.0 | 1.0 | -1 | greedy | **3.1190** | 70.85% | 48.09% | 32.51% | 22.63% | 16.47% | 12.26% | 9.09% |
+
+</div>
+
+<figcaption>MT-Bench 不同 attention 配置的接受率（T = 0，Greedy draft）</figcaption>
+</figure>
+
+</details>
+
+<details class="dspark-temperature" markdown="1">
+<summary>Temperature = 1</summary>
+
+<figure class="dspark-table-figure" markdown="1">
+
+<div class="js-sortable-table js-multisort js-row-reorder dspark-three-line dspark-compact dspark-sampling" markdown="1">
+
+| Attention | T | Top-p | Top-k | Draft 采样 | **MAL** | pos-1 | pos-2 | pos-3 | pos-4 | pos-5 | pos-6 | pos-7 |
+| --- | :---: | ---: | ---: | --- | :---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| GQA {: data-conditional="66.56% 65.39% 67.27% 69.55% 71.28% 73.31% 74.04%"} | 1.0 | 1.0 | -1 | greedy | <u>**2.9277**</u> | 66.56% | 43.53% | 29.28% | 20.36% | 14.52% | 10.64% | 7.88% |
+| MLA {: data-conditional="65.05% 65.39% 67.18% 69.83% 72.37% 74.38% 74.14%"} | 1.0 | 1.0 | -1 | greedy | **2.8927** | 65.05% | 42.54% | 28.58% | 19.96% | 14.44% | 10.74% | 7.96% |
+| MLA + SWA1024 {: data-conditional="66.20% 65.70% 67.53% 69.13% 71.18% 73.66% 72.73%"} | 1.0 | 1.0 | -1 | greedy | **2.9221** | 66.20% | 43.49% | 29.37% | 20.30% | 14.45% | 10.65% | 7.74% |
+| MLA + SWA512 {: data-conditional="65.44% 65.22% 66.02% 67.89% 71.52% 72.28% 73.37%"} | 1.0 | 1.0 | -1 | greedy | **2.8625** | 65.44% | 42.68% | 28.18% | 19.13% | 13.68% | 9.89% | 7.26% |
+| MLA + SWA128 {: data-conditional="65.43% 63.57% 64.13% 65.91% 68.10% 68.45% 70.79%"} | 1.0 | 1.0 | -1 | greedy | **2.7724** | 65.43% | 41.59% | 26.67% | 17.58% | 11.97% | 8.20% | 5.80% |
+
+</div>
+
+<figcaption>MT-Bench 不同 attention 配置的接受率（T = 1，Greedy draft）</figcaption>
+</figure>
+
+<figure class="dspark-table-figure" markdown="1">
+
+<div class="js-sortable-table js-multisort js-row-reorder dspark-three-line dspark-compact dspark-sampling" markdown="1">
+
+| Attention | T | Top-p | Top-k | Draft 采样 | **MAL** | pos-1 | pos-2 | pos-3 | pos-4 | pos-5 | pos-6 | pos-7 |
+| --- | :---: | ---: | ---: | --- | :---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| GQA {: data-conditional="68.96% 67.61% 67.88% 68.85% 71.41% 73.23% 73.98%"} | 1.0 | 1.0 | -1 | probabilistic | <u>**3.0440**</u> | 68.96% | 46.62% | 31.65% | 21.79% | 15.56% | 11.39% | 8.43% |
+| MLA {: data-conditional="68.46% 66.76% 67.23% 69.11% 71.25% 71.75% 72.76%"} | 1.0 | 1.0 | -1 | probabilistic | **3.0001** | 68.46% | 45.70% | 30.73% | 21.24% | 15.13% | 10.86% | 7.90% |
+| MLA + SWA1024 {: data-conditional="67.97% 66.10% 67.30% 68.41% 70.37% 73.58% 72.39%"} | 1.0 | 1.0 | -1 | probabilistic | **2.9686** | 67.97% | 44.93% | 30.24% | 20.69% | 14.56% | 10.71% | 7.75% |
+| MLA + SWA512 {: data-conditional="67.67% 65.91% 66.71% 67.63% 68.56% 72.00% 72.16%"} | 1.0 | 1.0 | -1 | probabilistic | **2.9305** | 67.67% | 44.60% | 29.75% | 20.12% | 13.80% | 9.93% | 7.17% |
+| MLA + SWA128 {: data-conditional="67.19% 64.07% 64.74% 66.44% 66.44% 69.87% 67.91%"} | 1.0 | 1.0 | -1 | probabilistic | **2.8334** | 67.19% | 43.04% | 27.87% | 18.51% | 12.30% | 8.59% | 5.84% |
+
+</div>
+
+<figcaption>MT-Bench 不同 attention 配置的接受率（T = 1，Probabilistic draft）</figcaption>
+</figure>
+
+</details>
+
+#### MATH-500 {#attention-math500}
+
+<details class="dspark-temperature" open markdown="1">
+<summary>Temperature = 0</summary>
+
+<figure class="dspark-table-figure" markdown="1">
+
+<div class="js-sortable-table js-multisort js-row-reorder dspark-three-line dspark-compact dspark-sampling" markdown="1">
+
+| Attention | T | Top-p | Top-k | Draft 采样 | **MAL** | pos-1 | pos-2 | pos-3 | pos-4 | pos-5 | pos-6 | pos-7 |
+| --- | :---: | ---: | ---: | --- | :---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| GQA {: data-conditional="91.37% 90.02% 89.86% 90.37% 90.05% 89.66% 88.27%"} | 0.0 | 1.0 | -1 | greedy | <u>**5.7596**</u> | 91.37% | 82.24% | 73.90% | 66.79% | 60.14% | 53.92% | 47.60% |
+| MLA {: data-conditional="90.86% 88.94% 89.85% 89.74% 89.80% 88.37% 87.70%"} | 0.0 | 1.0 | -1 | greedy | **5.6498** | 90.86% | 80.81% | 72.60% | 65.15% | 58.51% | 51.70% | 45.35% |
+| MLA + SWA1024 {: data-conditional="90.06% 88.66% 89.22% 89.45% 89.31% 89.10% 88.21%"} | 0.0 | 1.0 | -1 | greedy | **5.5725** | 90.06% | 79.85% | 71.24% | 63.73% | 56.92% | 50.71% | 44.73% |
+| MLA + SWA512 {: data-conditional="90.56% 89.47% 89.38% 89.13% 89.33% 88.63% 87.30%"} | 0.0 | 1.0 | -1 | greedy | **5.6194** | 90.56% | 81.03% | 72.42% | 64.55% | 57.66% | 51.11% | 44.61% |
+| MLA + SWA128 {: data-conditional="90.41% 87.48% 86.86% 87.53% 87.04% 86.25% 85.47%"} | 0.0 | 1.0 | -1 | greedy | **5.3435** | 90.41% | 79.08% | 68.69% | 60.12% | 52.33% | 45.14% | 38.58% |
+
+</div>
+
+<figcaption>MATH-500 不同 attention 配置的接受率（T = 0，Greedy draft）</figcaption>
+</figure>
+
+</details>
+
+<details class="dspark-temperature" markdown="1">
+<summary>Temperature = 1</summary>
+
+<figure class="dspark-table-figure" markdown="1">
+
+<div class="js-sortable-table js-multisort js-row-reorder dspark-three-line dspark-compact dspark-sampling" markdown="1">
+
+| Attention | T | Top-p | Top-k | Draft 采样 | **MAL** | pos-1 | pos-2 | pos-3 | pos-4 | pos-5 | pos-6 | pos-7 |
+| --- | :---: | ---: | ---: | --- | :---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| GQA {: data-conditional="79.77% 82.01% 84.57% 85.66% 86.08% 85.75% 85.03%"} | 1.0 | 1.0 | -1 | greedy | **4.5341** | 79.77% | 65.42% | 55.32% | 47.39% | 40.79% | 34.98% | 29.74% |
+| MLA {: data-conditional="79.69% 81.99% 84.27% 85.34% 85.94% 85.51% 84.61%"} | 1.0 | 1.0 | -1 | greedy | **4.5117** | 79.69% | 65.33% | 55.05% | 46.98% | 40.38% | 34.53% | 29.21% |
+| MLA + SWA1024 {: data-conditional="80.05% 82.27% 84.42% 85.66% 85.87% 85.68% 84.49%"} | 1.0 | 1.0 | -1 | greedy | <u>**4.5468**</u> | 80.05% | 65.86% | 55.60% | 47.63% | 40.90% | 35.04% | 29.60% |
+| MLA + SWA512 {: data-conditional="79.36% 81.29% 83.59% 84.93% 85.45% 85.37% 84.63%"} | 1.0 | 1.0 | -1 | greedy | **4.4443** | 79.36% | 64.52% | 53.93% | 45.80% | 39.14% | 33.41% | 28.28% |
+| MLA + SWA128 {: data-conditional="79.85% 81.22% 82.81% 83.79% 84.00% 83.94% 82.99%"} | 1.0 | 1.0 | -1 | greedy | **4.3928** | 79.85% | 64.86% | 53.71% | 45.00% | 37.80% | 31.73% | 26.33% |
+
+</div>
+
+<figcaption>MATH-500 不同 attention 配置的接受率（T = 1，Greedy draft）</figcaption>
+</figure>
+
+<figure class="dspark-table-figure" markdown="1">
+
+<div class="js-sortable-table js-multisort js-row-reorder dspark-three-line dspark-compact dspark-sampling" markdown="1">
+
+| Attention | T | Top-p | Top-k | Draft 采样 | **MAL** | pos-1 | pos-2 | pos-3 | pos-4 | pos-5 | pos-6 | pos-7 |
+| --- | :---: | ---: | ---: | --- | :---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| GQA {: data-conditional="87.14% 86.12% 85.86% 85.92% 86.21% 85.65% 85.03%"} | 1.0 | 1.0 | -1 | probabilistic | <u>**5.0535**</u> | 87.14% | 75.04% | 64.43% | 55.36% | 47.73% | 40.88% | 34.76% |
+| MLA {: data-conditional="86.37% 85.21% 85.57% 85.64% 85.95% 85.23% 83.76%"} | 1.0 | 1.0 | -1 | probabilistic | **4.9582** | 86.37% | 73.59% | 62.97% | 53.93% | 46.35% | 39.51% | 33.09% |
+| MLA + SWA1024 {: data-conditional="86.31% 85.11% 85.06% 85.34% 85.50% 85.09% 83.86%"} | 1.0 | 1.0 | -1 | probabilistic | **4.9247** | 86.31% | 73.45% | 62.48% | 53.32% | 45.59% | 38.79% | 32.53% |
+| MLA + SWA512 {: data-conditional="86.35% 84.92% 85.17% 84.95% 85.33% 84.66% 83.40%"} | 1.0 | 1.0 | -1 | probabilistic | **4.9073** | 86.35% | 73.33% | 62.45% | 53.05% | 45.27% | 38.32% | 31.96% |
+| MLA + SWA128 {: data-conditional="85.86% 83.95% 83.68% 82.96% 83.37% 82.81% 82.07%"} | 1.0 | 1.0 | -1 | probabilistic | **4.7293** | 85.86% | 72.08% | 60.32% | 50.04% | 41.72% | 34.55% | 28.36% |
+
+</div>
+
+<figcaption>MATH-500 不同 attention 配置的接受率（T = 1，Probabilistic draft）</figcaption>
+</figure>
+
+</details>
+
+#### AIME 2024 {#attention-aime}
+
+<details class="dspark-temperature" open markdown="1">
+<summary>Temperature = 0</summary>
+
+<figure class="dspark-table-figure" markdown="1">
+
+<div class="js-sortable-table js-multisort js-row-reorder dspark-three-line dspark-compact dspark-sampling" markdown="1">
+
+| Attention | T | Top-p | Top-k | Draft 采样 | **MAL** | pos-1 | pos-2 | pos-3 | pos-4 | pos-5 | pos-6 | pos-7 |
+| --- | :---: | ---: | ---: | --- | :---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| GQA {: data-conditional="90.09% 89.41% 89.02% 89.30% 89.35% 88.78% 88.71%"} | 0.0 | 1.0 | -1 | greedy | <u>**5.5948**</u> | 90.09% | 80.55% | 71.71% | 64.04% | 57.22% | 50.80% | 45.07% |
+| MLA {: data-conditional="89.75% 88.81% 88.65% 88.97% 88.90% 88.33% 87.87%"} | 0.0 | 1.0 | -1 | greedy | **5.5164** | 89.75% | 79.71% | 70.66% | 62.87% | 55.89% | 49.37% | 43.38% |
+| MLA + SWA1024 {: data-conditional="89.47% 88.55% 88.35% 88.24% 88.88% 87.95% 87.45%"} | 0.0 | 1.0 | -1 | greedy | **5.4582** | 89.47% | 79.22% | 69.99% | 61.76% | 54.89% | 48.28% | 42.22% |
+| MLA + SWA512 {: data-conditional="90.02% 87.85% 88.20% 88.69% 88.57% 88.54% 87.79%"} | 0.0 | 1.0 | -1 | greedy | **5.4660** | 90.02% | 79.08% | 69.75% | 61.86% | 54.79% | 48.51% | 42.59% |
+| MLA + SWA128 {: data-conditional="87.47% 85.87% 84.66% 84.84% 84.97% 85.39% 84.47%"} | 0.0 | 1.0 | -1 | greedy | **4.9818** | 87.47% | 75.11% | 63.59% | 53.95% | 45.84% | 39.14% | 33.07% |
+
+</div>
+
+<figcaption>AIME 2024 不同 attention 配置的接受率（T = 0，Greedy draft）</figcaption>
+</figure>
+
+</details>
+
+<details class="dspark-temperature" markdown="1">
+<summary>Temperature = 1</summary>
+
+<figure class="dspark-table-figure" markdown="1">
+
+<div class="js-sortable-table js-multisort js-row-reorder dspark-three-line dspark-compact dspark-sampling" markdown="1">
+
+| Attention | T | Top-p | Top-k | Draft 采样 | **MAL** | pos-1 | pos-2 | pos-3 | pos-4 | pos-5 | pos-6 | pos-7 |
+| --- | :---: | ---: | ---: | --- | :---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| GQA {: data-conditional="73.79% 76.70% 79.51% 80.82% 81.23% 80.42% 81.89%"} | 1.0 | 1.0 | -1 | greedy | <u>**3.8449**</u> | 73.79% | 56.59% | 45.00% | 36.37% | 29.54% | 23.76% | 19.45% |
+| MLA {: data-conditional="72.78% 75.40% 78.21% 80.86% 81.02% 81.51% 79.80%"} | 1.0 | 1.0 | -1 | greedy | **3.7461** | 72.78% | 54.88% | 42.92% | 34.70% | 28.12% | 22.92% | 18.29% |
+| MLA + SWA1024 {: data-conditional="72.32% 75.41% 77.09% 79.67% 80.92% 81.50% 80.16%"} | 1.0 | 1.0 | -1 | greedy | **3.6927** | 72.32% | 54.53% | 42.04% | 33.49% | 27.10% | 22.09% | 17.71% |
+| MLA + SWA512 {: data-conditional="72.30% 74.60% 77.74% 79.88% 81.16% 79.72% 79.49%"} | 1.0 | 1.0 | -1 | greedy | **3.6774** | 72.30% | 53.94% | 41.93% | 33.50% | 27.18% | 21.67% | 17.23% |
+| MLA + SWA128 {: data-conditional="72.61% 74.60% 76.25% 77.80% 78.30% 78.00% 77.24%"} | 1.0 | 1.0 | -1 | greedy | **3.6017** | 72.61% | 54.17% | 41.30% | 32.13% | 25.16% | 19.63% | 15.16% |
+
+</div>
+
+<figcaption>AIME 2024 不同 attention 配置的接受率（T = 1，Greedy draft）</figcaption>
+</figure>
+
+<figure class="dspark-table-figure" markdown="1">
+
+<div class="js-sortable-table js-multisort js-row-reorder dspark-three-line dspark-compact dspark-sampling" markdown="1">
+
+| Attention | T | Top-p | Top-k | Draft 采样 | **MAL** | pos-1 | pos-2 | pos-3 | pos-4 | pos-5 | pos-6 | pos-7 |
+| --- | :---: | ---: | ---: | --- | :---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| GQA {: data-conditional="81.90% 80.75% 80.34% 80.13% 80.43% 79.77% 78.87%"} | 1.0 | 1.0 | -1 | probabilistic | **4.2685** | 81.90% | 66.14% | 53.13% | 42.58% | 34.25% | 27.32% | 21.55% |
+| MLA {: data-conditional="81.96% 80.89% 80.85% 79.76% 80.35% 79.76% 78.44%"} | 1.0 | 1.0 | -1 | probabilistic | **4.2787** | 81.96% | 66.30% | 53.60% | 42.75% | 34.35% | 27.40% | 21.49% |
+| MLA + SWA1024 {: data-conditional="81.75% 80.83% 80.85% 80.61% 81.06% 81.69% 79.39%"} | 1.0 | 1.0 | -1 | probabilistic | <u>**4.3037**</u> | 81.75% | 66.08% | 53.42% | 43.06% | 34.91% | 28.52% | 22.64% |
+| MLA + SWA512 {: data-conditional="82.19% 79.59% 79.20% 80.38% 79.78% 79.34% 77.98%"} | 1.0 | 1.0 | -1 | probabilistic | **4.2121** | 82.19% | 65.42% | 51.81% | 41.65% | 33.23% | 26.36% | 20.56% |
+| MLA + SWA128 {: data-conditional="81.18% 79.59% 78.44% 78.99% 79.48% 77.43% 77.61%"} | 1.0 | 1.0 | -1 | probabilistic | **4.1205** | 81.18% | 64.61% | 50.67% | 40.03% | 31.81% | 24.63% | 19.12% |
+
+</div>
+
+<figcaption>AIME 2024 不同 attention 配置的接受率（T = 1，Probabilistic draft）</figcaption>
+</figure>
+
+</details>
+
+### 4.5 Markov MLA {#backbone-mla-markov-mla}
 
 Baseline 和 Backbone MLA + Markov MLA 均采用 online training，学习率为 `3e-4`，训练 1 个 epoch。评测时，客户端并发数与服务端最大请求数均为 32。
 
@@ -689,7 +1013,7 @@ Baseline 和 Backbone MLA + Markov MLA 均采用 online training，学习率为 
 <figcaption>Baseline 与 Markov MLA 的接受率对比</figcaption>
 </figure>
 
-### 3.5 Markov GQA {#markov-gqa}
+### 4.6 Markov GQA {#markov-gqa}
 
 Markov GQA 沿用 baseline 的 5 层 GQA backbone，在 Markov head 的 `W₁` 与 `W₂` 之间加入 GQA（32 个 Q heads、8 个 KV heads）。该 GQA 的位置对应 [Fig. 1](#fig-markov-mla) 中 Markov head 的 MLA。Baseline 与 Markov GQA 均采用 online training，训练约 10 个 epoch。
 
@@ -759,7 +1083,7 @@ Markov GQA 沿用 baseline 的 5 层 GQA backbone，在 Markov head 的 `W₁` �
 <figcaption>Baseline 与 Markov GQA 在 MT-Bench 上的接受率</figcaption>
 </figure>
 
-### 3.6 Baseline vs. DrawSpec {#baseline-vs-drawspec}
+### 4.7 Baseline vs. DrawSpec {#baseline-vs-drawspec}
 
 DrawSpec 将五层 backbone 分为四层预计算和一层条件化，最后一层输入为 anchor + 6 states。此处使用 late-conditioning 分支的 12-state 权重，与 baseline 均训练约 1 epoch，target temperature 为 0.7。
 
@@ -779,7 +1103,7 @@ DrawSpec 将五层 backbone 分为四层预计算和一层条件化，最后一�
 
 两组输出长度接近，DrawSpec 的 MAL 下降约 14.7%。
 
-## 4 历史评测 {#_7}
+## 5 历史评测 {#_7}
 
 <details markdown="1">
 <summary>GSM8K 评测脚本对照（官方权重）</summary>
@@ -791,7 +1115,7 @@ DrawSpec 将五层 backbone 分为四层预计算和一层条件化，最后一�
 <details markdown="1">
 <summary>早期 online / offline 评测记录</summary>
 
-### 4.1 Online training 与官方权重 {#online-training}
+### 5.1 Online training 与官方权重 {#online-training}
 
 在 vLLM 服务上评测 GSM8K test 全集 1,319 题。自训练 baseline 训练至 step 2616（约 1 epoch）。Prompt 使用 `Question: {question}\nAnswer:` 格式。Target 使用 **non-thinking**，采样参数为 **temperature=0.7、top-p=0.8、top-k=20、min-p=0**；Draft 均采用 **greedy**，每轮提出 7 个 draft tokens。
 
@@ -809,7 +1133,7 @@ DrawSpec 将五层 backbone 分为四层预计算和一层条件化，最后一�
 <figcaption>GSM8K 上 online 训练权重与官方权重的接受率</figcaption>
 </figure>
 
-### 4.2 Offline training（5-shot） {#offline-training5-shot}
+### 5.2 Offline training（5-shot） {#offline-training5-shot}
 
 <figure class="dspark-table-figure" markdown="1">
 
