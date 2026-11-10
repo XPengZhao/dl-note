@@ -653,14 +653,52 @@ p:has(+ .arithmatex) {
 }
 
 
+.md-typeset .js-multisort.has-table-copy,
 .md-typeset .js-multisort.has-position-rates {
   padding-block-start: 0;
 }
 
+.md-typeset .has-table-copy .table-sort-controls,
 .md-typeset .has-position-rates .table-sort-controls {
   position: static;
   height: auto;
   margin-block-end: .4em;
+}
+
+.md-typeset .table-copy {
+  flex: none;
+  margin-inline-start: auto;
+  padding: .2rem;
+  border-radius: .35rem;
+  color: var(--md-default-fg-color--light);
+  cursor: pointer;
+}
+
+.md-typeset .table-copy svg {
+  display: block;
+  width: .9rem;
+  height: .9rem;
+}
+
+.md-typeset .position-rate-switch + .table-copy {
+  margin-inline-start: 0;
+}
+
+.md-typeset figure > .table-copy {
+  display: block;
+  margin-block-end: .4em;
+  font-size: .8em;
+}
+
+.md-typeset .table-copy:hover {
+  background: var(--md-default-fg-color--lightest);
+  color: var(--md-default-fg-color);
+}
+
+@media print {
+  .md-typeset figure > .table-copy {
+    display: none;
+  }
 }
 
 .position-rate-switch {

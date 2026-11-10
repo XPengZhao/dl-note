@@ -159,7 +159,7 @@ function enableMultiSort(table) {
       }
       button.title = button.getAttribute("aria-label");
     });
-    controls.hidden = !hasRateSwitch && keys.length === 0 && !manual;
+    controls.hidden = !wrapper.classList.contains("has-table-copy") && !hasRateSwitch && keys.length === 0 && !manual;
     reset.hidden = hasRateSwitch && keys.length === 0;
     reset.disabled = keys.length === 0;
     status.textContent = keys.map((key, index) =>
@@ -419,6 +419,47 @@ function enableRowReorder(table) {
   });
 }
 
+function enableTableCopy(figure) {
+  const table = figure.querySelector("table");
+  if (!table || figure.querySelector(".table-copy")) return;
+  const button = document.createElement("button");
+  button.className = "table-copy";
+  button.type = "button";
+  button.innerHTML = '<svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path/></svg>';
+  const icon = button.querySelector("path");
+  const copyPath = "M8 15H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v3 M10 8h9a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-9a2 2 0 0 1-2-2v-9a2 2 0 0 1 2-2Z";
+  const show = (label, path) => {
+    button.title = label;
+    button.setAttribute("aria-label", label);
+    icon.setAttribute("d", path);
+  };
+  show("复制表格", copyPath);
+  let timer;
+  button.addEventListener("click", async () => {
+    const text = Array.from(table.rows, row => Array.from(row.cells, cell => {
+      const copy = cell.cloneNode(true);
+      copy.querySelectorAll(".table-row-handle, .table-sort-badge").forEach(el => el.remove());
+      return copy.textContent.trim().replace(/\s+/g, " ");
+    }).join("\t")).join("\n");
+    try {
+      await navigator.clipboard.writeText(text);
+      show("已复制", "m4 12 5 5L20 6");
+    } catch {
+      show("复制失败", "M12 4v10m0 4v1");
+    }
+    clearTimeout(timer);
+    timer = setTimeout(() => show("复制表格", copyPath), 1800);
+  });
+  const controls = figure.querySelector(".table-sort-controls");
+  if (controls) {
+    controls.append(button);
+    controls.hidden = false;
+    controls.parentElement.classList.add("has-table-copy");
+  } else {
+    figure.prepend(button);
+  }
+}
+
 document$.subscribe(() => {
   document.querySelectorAll("figure.dspark-table-figure > figcaption").forEach((caption, index) => {
     let label = caption.querySelector(".table-caption-number");
@@ -444,6 +485,7 @@ document$.subscribe(() => {
   });
   document.querySelectorAll(".js-multisort table").forEach(enableMultiSort);
   document.querySelectorAll(".js-row-reorder table").forEach(enableRowReorder);
+  document.querySelectorAll("figure.dspark-table-figure").forEach(enableTableCopy);
   if (typeof Tablesort === "undefined") return;
   if (!Tablesort._metricExtended) {
     Tablesort.extend("metric", isMetric, compareMetric);
