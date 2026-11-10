@@ -29,6 +29,62 @@ function compareMetric(a, b) {
   return vb - va;
 }
 
+// Epoch rows carry conditional rates computed from the original evaluation summary.
+function addRateSwitch(table, labels, controls, onChange) {
+  const first = labels.indexOf("pos-1");
+  if (first < 0 || !Array.from({length: 7}, (_, i) => labels[first + i] === `pos-${i + 1}`).every(Boolean)) return false;
+  const estimate = table.closest(".estimate-position-rates");
+  const entries = [];
+  for (const row of table.tBodies[0].rows) {
+    const rates = row.cells[0].dataset.conditional?.split(" ");
+    if (!estimate && rates?.length !== 7) return false;
+    let previous = 100;
+    for (let i = 0; i < 7; i++) {
+      const cell = row.cells[first + i];
+      const cumulative = cell.textContent;
+      let conditional = rates?.[i];
+      if (conditional === undefined) {
+        const value = /^\d+(?:\.\d+)?%$/.test(cumulative.trim()) ? parseFloat(cumulative) : NaN;
+        conditional = previous > 0 && Number.isFinite(value)
+          ? (100 * value / previous).toFixed(2) + "%" : "—";
+        previous = value;
+      }
+      entries.push({ cell, cumulative, conditional });
+    }
+  }
+  const group = document.createElement("div");
+  group.className = "position-rate-switch";
+  group.setAttribute("role", "group");
+  group.setAttribute("aria-label", "位置接受率显示方式");
+  for (const [mode, label] of [["cumulative", "累计接受率"], ["conditional", "条件接受率"]]) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.textContent = label;
+    if (estimate && mode === "conditional") {
+      button.title = "按表中已舍入的累计接受率估算";
+      button.setAttribute("aria-label", "条件接受率（按表中累计值估算）");
+    }
+    button.dataset.mode = mode;
+    button.setAttribute("aria-pressed", String(mode === "cumulative"));
+    button.addEventListener("click", () => {
+      if (button.getAttribute("aria-pressed") === "true") return;
+      document.querySelectorAll(".position-rate-switch").forEach(peer => {
+        peer.dispatchEvent(new CustomEvent("ratechange", { detail: mode }));
+      });
+    });
+    group.append(button);
+  }
+  group.addEventListener("ratechange", ({ detail: mode }) => {
+    entries.forEach(entry => { entry.cell.textContent = entry[mode]; });
+    for (const button of group.children) {
+      button.setAttribute("aria-pressed", String(button.dataset.mode === mode));
+    }
+    onChange(first);
+  });
+  controls.append(group);
+  return true;
+}
+
 // Each selected header is a sort key, in the order it was selected.
 // Cycling a key's direction keeps its priority; removing it promotes later keys.
 function enableMultiSort(table) {
@@ -52,7 +108,7 @@ function enableMultiSort(table) {
   reset.className = "table-sort-reset";
   reset.textContent = "清除排序";
   controls.append(status, reset);
-  wrapper.before(controls);
+  wrapper.prepend(controls);
 
   const labels = headers.map((header) => header.textContent.trim());
   const buttons = headers.map((header, column) => {
@@ -103,7 +159,8 @@ function enableMultiSort(table) {
       }
       button.title = button.getAttribute("aria-label");
     });
-    controls.hidden = keys.length === 0 && !manual;
+    controls.hidden = !hasRateSwitch && keys.length === 0 && !manual;
+    reset.hidden = hasRateSwitch && keys.length === 0;
     reset.disabled = keys.length === 0;
     status.textContent = keys.map((key, index) =>
       `${index + 1}. ${labels[key.column]} ${key.direction === "ascending" ? "↑" : "↓"}`
@@ -136,6 +193,10 @@ function enableMultiSort(table) {
     });
     updateHeaders();
   };
+  const hasRateSwitch = addRateSwitch(table, labels, controls, first => {
+    if (keys.some(key => key.column >= first && key.column < first + 7)) applySort();
+  });
+  if (hasRateSwitch) wrapper.classList.add("has-position-rates");
   reset.addEventListener("click", () => {
     if (table.dataset.rowDragging === "true") return;
     keys = [];
@@ -359,6 +420,15 @@ function enableRowReorder(table) {
 }
 
 document$.subscribe(() => {
+  document.querySelectorAll("figure.dspark-table-figure > figcaption").forEach((caption, index) => {
+    let label = caption.querySelector(".table-caption-number");
+    if (!label) {
+      label = document.createElement("span");
+      label.className = "table-caption-number";
+      caption.prepend(label);
+    }
+    label.textContent = `Table ${index + 1}: `;
+  });
   // Pair colors follow sampling settings even after sorting or dragging rows.
   document.querySelectorAll(".dspark-paired table").forEach((table) => {
     const groups = new Map();

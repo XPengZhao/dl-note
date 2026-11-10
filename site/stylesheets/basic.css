@@ -11,6 +11,44 @@
   text-autospace: ideograph-alpha ideograph-numeric;
 }
 
+.md-typeset .chat-example {
+  display: flex;
+  flex-direction: column;
+  gap: .55rem;
+  max-width: 28rem;
+  margin: 1rem auto;
+}
+
+.chat-example .chat-turn {
+  align-self: flex-start;
+  max-width: 85%;
+}
+
+.chat-example .chat-turn-user {
+  align-self: flex-end;
+  text-align: end;
+}
+
+.chat-example .chat-speaker {
+  display: block;
+  margin-bottom: .15rem;
+  font-size: .7em;
+  color: var(--md-default-fg-color--light);
+}
+
+.md-typeset .chat-turn p {
+  margin: 0;
+  padding: .4rem .65rem;
+  border-radius: .6rem;
+  background: var(--md-code-bg-color);
+  text-align: start;
+  overflow-wrap: anywhere;
+}
+
+.md-typeset .chat-turn-user p {
+  background: color-mix(in srgb, var(--md-primary-fg-color) 12%, var(--md-default-bg-color));
+}
+
 .md-typeset .cjk-latin-space {
   padding-inline-end: 0.25em;
 }
@@ -90,7 +128,24 @@ p:has(+ .arithmatex) {
     color: #133167; /* LimeGreen color for h3 */
     font-weight: bold;
   }
-  .md-content h4,
+  .md-content .md-typeset h4 {
+    font-size: 1em;
+    font-weight: 600;
+    line-height: 1.4;
+    margin: 1.4em 0 .45em;
+    color: var(--md-default-fg-color);
+  }
+
+  .md-content .md-typeset h4::before {
+    content: "";
+    display: inline-block;
+    inline-size: .42em;
+    block-size: .42em;
+    margin-inline-end: .5em;
+    vertical-align: .12em;
+    background-color: currentColor;
+  }
+
   .md-content h5,
   .md-content h6 {
     font-size: 1.15em;
@@ -360,6 +415,50 @@ p:has(+ .arithmatex) {
 
 
 /* Three-line tables for DSpark experiment results. */
+.md-typeset figure.dspark-table-figure {
+  display: block;
+  width: 100%;
+  margin: 1em 0;
+  text-align: start;
+}
+
+.md-typeset .dspark-table-figure > .dspark-three-line,
+.md-typeset .dspark-table-figure .md-typeset__scrollwrap,
+.md-typeset .dspark-table-figure .md-typeset__table {
+  margin: 0;
+}
+
+.md-typeset .dspark-table-figure .md-typeset__table {
+  padding: 0;
+}
+
+.md-typeset .dspark-table-figure table:not([class]) {
+  display: table;
+  width: 100%;
+  margin: 0;
+}
+
+.md-typeset .dspark-table-figure > figcaption {
+  max-width: none;
+  margin: .2rem 0 0;
+  text-align: center;
+  font-size: .85em;
+  color: var(--md-default-fg-color--light);
+}
+
+.md-typeset details:has(> .dspark-table-figure) {
+  padding-inline: 0;
+}
+
+.md-typeset details.dspark-temperature {
+  border: 0;
+  box-shadow: none;
+}
+
+.md-typeset details:has(> .dspark-table-figure) > summary {
+  margin-inline: 0;
+}
+
 .md-typeset .dspark-three-line {
   overflow-x: auto;
   margin: 1em 0;
@@ -532,22 +631,70 @@ p:has(+ .arithmatex) {
   font-weight: 600;
 }
 
+.md-typeset .js-multisort {
+  position: relative;
+  padding-block-start: 1em;
+}
+
+/* Use the existing gap above the table for the sorting controls. */
+.md-typeset .js-multisort .md-typeset__scrollwrap {
+  margin-block-start: 0;
+}
+
 .md-typeset .table-sort-controls {
+  position: absolute;
+  inset: 0 0 auto;
   display: flex;
   align-items: center;
-  flex-wrap: wrap;
-  gap: 0.5em 1em;
-  margin-bottom: 0.6em;
-  min-height: 1.5rem;
+  gap: .65em;
+  height: 1.25em;
+  line-height: 1;
   font-size: 0.8em;
+}
+
+
+.md-typeset .js-multisort.has-position-rates {
+  padding-block-start: 0;
+}
+
+.md-typeset .has-position-rates .table-sort-controls {
+  position: static;
+  height: auto;
+  margin-block-end: .4em;
+}
+
+.position-rate-switch {
+  display: inline-flex;
+  flex: none;
+  margin-inline-start: auto;
+  padding: 2px;
+  border-radius: .45rem;
+  background: var(--md-default-fg-color--lightest);
+}
+
+.position-rate-switch button {
+  padding: .45em .7em;
+  border-radius: .35rem;
+  color: var(--md-default-fg-color--light);
+  cursor: pointer;
+}
+
+.position-rate-switch button[aria-pressed="true"] {
+  color: var(--md-default-fg-color);
+  background: var(--md-default-bg-color);
+  font-weight: 600;
 }
 
 .md-typeset .table-sort-status {
   color: var(--md-default-fg-color--light);
+  white-space: nowrap;
+  overflow-x: auto;
+  scrollbar-width: none;
 }
 
 .md-typeset .table-sort-reset {
-  padding: 0.2em 0.6em;
+  flex: none;
+  padding: 0 .45em;
   border: 1px solid var(--md-default-fg-color--lighter);
   border-radius: 4px;
   color: var(--md-default-fg-color--light);

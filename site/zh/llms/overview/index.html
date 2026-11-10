@@ -14,18 +14,11 @@
         <link rel="prev" href="../../neural-graphics/">
       
       
-        <link rel="next" href="../position-encoding/">
-      
-      
-        
-          <link rel="alternate" href="../../../llms/overview/" hreflang="en">
-        
-          <link rel="alternate" href="./" hreflang="zh">
-        
+        <link rel="next" href="../agent-input/">
       
       
       <link rel="icon" href="../../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.21">
     
     
       
@@ -33,7 +26,7 @@
       
     
     
-      <link rel="stylesheet" href="../../../assets/stylesheets/main.ec1eaa64.min.css">
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.2a3383ac.min.css">
       
       
 
@@ -60,6 +53,7 @@
     
       
 
+    
     
     
   </head>
@@ -237,14 +231,9 @@
   
   
   <span class="md-ellipsis">
-    
-  
     首页
-  
-
     
   </span>
-  
   
 
       </a>
@@ -264,14 +253,9 @@
   
   
   <span class="md-ellipsis">
-    
-  
     张量操作
-  
-
     
   </span>
-  
   
 
       </a>
@@ -291,14 +275,9 @@
   
   
   <span class="md-ellipsis">
-    
-  
     神经图形
-  
-
     
   </span>
-  
   
 
       </a>
@@ -331,14 +310,9 @@
   
   
   <span class="md-ellipsis">
-    
-  
     AI Infra
-  
-
     
   </span>
-  
   
 
             <span class="md-nav__icon md-icon"></span>
@@ -347,11 +321,7 @@
         <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_4">
             <span class="md-nav__icon md-icon"></span>
-            
-  
-    AI Infra
-  
-
+            AI Infra
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
@@ -376,14 +346,9 @@
   
   
   <span class="md-ellipsis">
-    
-  
     Overview
-  
-
     
   </span>
-  
   
 
           <span class="md-nav__icon md-icon"></span>
@@ -394,14 +359,9 @@
   
   
   <span class="md-ellipsis">
-    
-  
     Overview
-  
-
     
   </span>
-  
   
 
       </a>
@@ -424,75 +384,49 @@
         <li class="md-nav__item">
   <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      
-        序言
-      
+      序言
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#_2" class="md-nav__link">
+  <a href="#overview" class="md-nav__link">
     <span class="md-ellipsis">
-      
-        按下发送
-      
+      Overview
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Overview">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      用户输入
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
         <li class="md-nav__item">
   <a href="#_3" class="md-nav__link">
     <span class="md-ellipsis">
-      
-        等待执行
-      
+      请求进入推理引擎
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#_4" class="md-nav__link">
+  <a href="#prefill-decode" class="md-nav__link">
     <span class="md-ellipsis">
-      
-        处理输入
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#gpu" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        GPU 上的计算
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#_5" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        回答逐渐出现
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#_6" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        你感受到的快慢
-      
+      从 prefill 到 decode
     </span>
   </a>
   
@@ -513,6 +447,29 @@
   
   
   
+    <li class="md-nav__item">
+      <a href="../agent-input/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Agent 的指令与工具
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
     
     
     
@@ -522,35 +479,26 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_2" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_3" >
         
           
-          <label class="md-nav__link" for="__nav_4_2" id="__nav_4_2_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_3" id="__nav_4_3_label" tabindex="0">
             
   
   
   <span class="md-ellipsis">
-    
-  
     模型结构
-  
-
     
   </span>
-  
   
 
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_2_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_2">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_3">
             <span class="md-nav__icon md-icon"></span>
-            
-  
-    模型结构
-  
-
+            模型结构
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
@@ -566,14 +514,9 @@
   
   
   <span class="md-ellipsis">
-    
-  
     位置编码
-  
-
     
   </span>
-  
   
 
       </a>
@@ -594,14 +537,9 @@
   
   
   <span class="md-ellipsis">
-    
-  
     模型笔记
-  
-
     
   </span>
-  
   
 
       </a>
@@ -630,14 +568,9 @@
   
   
   <span class="md-ellipsis">
-    
-  
     硬件
-  
-
     
   </span>
-  
   
 
       </a>
@@ -658,14 +591,9 @@
   
   
   <span class="md-ellipsis">
-    
-  
     请求生命周期
-  
-
     
   </span>
-  
   
 
       </a>
@@ -686,14 +614,9 @@
   
   
   <span class="md-ellipsis">
-    
-  
     指标
-  
-
     
   </span>
-  
   
 
       </a>
@@ -714,14 +637,9 @@
   
   
   <span class="md-ellipsis">
-    
-  
     Roofline 模型
-  
-
     
   </span>
-  
   
 
       </a>
@@ -742,14 +660,9 @@
   
   
   <span class="md-ellipsis">
-    
-  
     集合通信
-  
-
     
   </span>
-  
   
 
       </a>
@@ -773,35 +686,26 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_8" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_9" >
         
           
-          <label class="md-nav__link" for="__nav_4_8" id="__nav_4_8_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_9" id="__nav_4_9_label" tabindex="0">
             
   
   
   <span class="md-ellipsis">
-    
-  
     KV Cache
-  
-
     
   </span>
-  
   
 
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_8_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_8">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_9">
             <span class="md-nav__icon md-icon"></span>
-            
-  
-    KV Cache
-  
-
+            KV Cache
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
@@ -817,14 +721,9 @@
   
   
   <span class="md-ellipsis">
-    
-  
     KV Cache
-  
-
     
   </span>
-  
   
 
       </a>
@@ -845,14 +744,9 @@
   
   
   <span class="md-ellipsis">
-    
-  
     SWA KV Cache 存储方案
-  
-
     
   </span>
-  
   
 
       </a>
@@ -873,14 +767,9 @@
   
   
   <span class="md-ellipsis">
-    
-  
     vLLM KV Cache Offloading 源码梳理
-  
-
     
   </span>
-  
   
 
       </a>
@@ -909,14 +798,9 @@
   
   
   <span class="md-ellipsis">
-    
-  
     推理运行时
-  
-
     
   </span>
-  
   
 
       </a>
@@ -937,14 +821,9 @@
   
   
   <span class="md-ellipsis">
-    
-  
     GLM-5.2 推理案例
-  
-
     
   </span>
-  
   
 
       </a>
@@ -965,14 +844,9 @@
   
   
   <span class="md-ellipsis">
-    
-  
     并行策略
-  
-
     
   </span>
-  
   
 
       </a>
@@ -993,14 +867,9 @@
   
   
   <span class="md-ellipsis">
-    
-  
     解码与采样
-  
-
     
   </span>
-  
   
 
       </a>
@@ -1024,35 +893,26 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_13" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_14" >
         
           
-          <label class="md-nav__link" for="__nav_4_13" id="__nav_4_13_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_14" id="__nav_4_14_label" tabindex="0">
             
   
   
   <span class="md-ellipsis">
-    
-  
     Speculative Decoding
-  
-
     
   </span>
-  
   
 
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_13_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_13">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_14_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_14">
             <span class="md-nav__icon md-icon"></span>
-            
-  
-    Speculative Decoding
-  
-
+            Speculative Decoding
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
@@ -1068,14 +928,9 @@
   
   
   <span class="md-ellipsis">
-    
-  
     Speculative Decoding
-  
-
     
   </span>
-  
   
 
       </a>
@@ -1096,14 +951,9 @@
   
   
   <span class="md-ellipsis">
-    
-  
     GLM-5.2 DSpark 训练设计
-  
-
     
   </span>
-  
   
 
       </a>
@@ -1124,14 +974,9 @@
   
   
   <span class="md-ellipsis">
-    
-  
-    Qwen3-4B DSpark 消融报告
-  
-
+    Qwen3-4B DSpark
     
   </span>
-  
   
 
       </a>
@@ -1152,14 +997,9 @@
   
   
   <span class="md-ellipsis">
-    
-  
     Qwen3.8-Flash-Next DSpark 训练实验
-  
-
     
   </span>
-  
   
 
       </a>
@@ -1188,14 +1028,9 @@
   
   
   <span class="md-ellipsis">
-    
-  
     训练目标
-  
-
     
   </span>
-  
   
 
       </a>
@@ -1240,75 +1075,49 @@
         <li class="md-nav__item">
   <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      
-        序言
-      
+      序言
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#_2" class="md-nav__link">
+  <a href="#overview" class="md-nav__link">
     <span class="md-ellipsis">
-      
-        按下发送
-      
+      Overview
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Overview">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      用户输入
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
         <li class="md-nav__item">
   <a href="#_3" class="md-nav__link">
     <span class="md-ellipsis">
-      
-        等待执行
-      
+      请求进入推理引擎
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#_4" class="md-nav__link">
+  <a href="#prefill-decode" class="md-nav__link">
     <span class="md-ellipsis">
-      
-        处理输入
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#gpu" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        GPU 上的计算
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#_5" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        回答逐渐出现
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#_6" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        你感受到的快慢
-      
+      从 prefill 到 decode
     </span>
   </a>
   
@@ -1324,7 +1133,6 @@
           
           
             <div class="md-content" data-md-component="content">
-              
               <article class="md-content__inner md-typeset">
                 
                   
@@ -1334,33 +1142,81 @@
 <h1 id="ai-infra">AI Infra</h1>
 <h2 id="_1">序言</h2>
 <p>当我在2025年3月5号第一次从Wireless Systems 调转60度车头开始接触 AI Systems 这个领域时，我对这个领域很多东西都感到十分陌生，一开始甚至对很多名词都毫无概念。当时恰逢DeepSeek V3 惊艳问世，公司上下针对昇腾上MoE模型推理优化忙成了一锅粥，在某地组织了集中攻关。而我作为一个新人，自然也被召集了过去。但是彼时彼刻，我几乎没有啥大模型推理的经验，仅有的知识也只是做Wireless期间对Transformer模型的一点训练经验，对于 AI Infra 完全陌生。一开始我印象特别深，对于很多几乎是常识性的名词，比如算子，我都不清楚含义。AI 基建时代好像是一列火车不停向前开的火车，没有时间等你停下来慢慢去理解。好在是过程中逐渐干中学，慢慢地对这个领域有了入门的理解。仅以此笔记记录下我在 AI Infra 领域的学习过程，供自己回顾，也希望能帮助到后来者。</p>
-<h2 id="_2">按下发送</h2>
-<p>你在对话框中输入“为什么天空是蓝色的？”，选择 GLM-5.2，按下发送。接下来，屏幕上先出现等待提示，随后回答逐渐显示出来。这段时间里发生了什么？</p>
-<p>以一个通过 vLLM 在多张 GPU 上部署 GLM-5.2 的聊天服务为例。应用把你刚输入的话、之前的对话和系统提示词组成请求，发送给服务端。服务端选择一个执行实例，按照模型的对话模板组织文本，再通过 tokenizer 将文本转换为 token ID。模型实际接收的是这串编号。</p>
-<p>所以，你只输入了一句话，这次请求需要处理的内容却可能包含很长的对话历史。从请求构造、路由到执行与返回，完整过程见<a href="../request-lifecycle/">推理请求生命周期</a>。</p>
-<h2 id="_3">等待执行</h2>
-<p>请求到达执行实例时，GPU 可能还在处理其他人的对话。vLLM 的调度器需要决定这一轮处理哪些请求、各处理多少 token，并为执行分配所需的 KV Cache 空间。</p>
-<p>你的请求可能先排队，也可能与其他请求一起组成 batch 执行。有人刚发来一段长 prompt，有人已经在逐步生成回答，两类工作都需要调度。长输入可以拆成多个 chunk，已经结束的请求退出后，新请求再加入。</p>
-<p>这些安排决定了你什么时候开始得到回答，也影响同一组 GPU 能服务多少人。<a href="../serving-runtime/">推理运行时</a>展开介绍调度、batching 和显存管理。</p>
-<h2 id="_4">处理输入</h2>
-<p>轮到你的请求执行后，模型先处理输入 token，这一阶段称为 <strong>prefill</strong>。</p>
-<p>Token ID 通过 embedding 转成向量，再经过一层层 Transformer 计算。Attention 让当前位置结合前文信息，前馈网络进一步变换表示。在 MoE 层，路由器为 token 选择专家，由对应专家参与计算。最后，模型给出下一个 token 的分数，称为 logits。</p>
-<p>处理输入时，模型还会保存各层后续 attention 所需的 KV 状态。生成回答时，可以读取这些状态，避免重新计算已有前文的 Key 和 Value。对话越长，需要保存的状态通常也越多，因此历史内容既增加输入处理量，也占用显存。<a href="../kv-cache/">KV Cache</a>讨论这些状态如何存储和复用。</p>
-<p>如果想沿着 GLM-5.2 的实际模型代码看一遍，可以继续读<a href="../glm-5.2-inference-path/">GLM-5.2 推理案例</a>。不同模型的结构差异整理在<a href="../models/">模型笔记</a>中。</p>
-<h2 id="gpu">GPU 上的计算</h2>
-<p>上面的每一步还需要变成设备可以执行的工作。矩阵乘、归一化和 attention 等算子由具体的 kernel 实现。Kernel 读取权重和输入，利用片上存储复用数据，驱动计算单元完成运算。</p>
-<p>权重放进显存后，执行时仍需要把数据送到计算单元。一次能处理多少计算、每秒能搬多少数据，是两种不同的限制。<a href="../../hardware/">硬件</a>介绍这些资源，<a href="../roofline/">Roofline 模型</a>则把算力、带宽和算术强度联系起来，解释算子的性能上界。</p>
-<p>在这个多 GPU 部署中，一层计算可能被切到多张卡上，MoE 专家也可能分布在不同卡上。各卡算出的部分结果需要求和，token 需要被发送到所选专家的位置。增加 GPU 因而也引入了传输和等待。<a href="../parallelism/">并行策略</a>解释计算如何切分，<a href="../collective-communication/">集合通信</a>解释这些数据如何交换与聚合。</p>
-<p>这些 GPU 计算和通信在 prefill 中发生，也会在接下来的生成过程中重复发生。</p>
-<h2 id="_5">回答逐渐出现</h2>
-<p>Prefill 得到 logits 后，系统按解码规则选择一个 token。可以选择分数最高的 token，也可以根据调整后的概率分布采样。Temperature、top-p 等参数作用于这一过程，具体见<a href="../decoding/">解码与采样</a>。</p>
-<p>选出的 token 随后作为新的输入，与已有 KV Cache 一起参与下一轮计算，产生再下一个 token。这一阶段称为 <strong>decode</strong>。如此循环，直到产生停止标记或达到输出长度限制。</p>
-<p>生成的 token 会被逐步解码为文本，通过流式响应返回对话框。一个 token 不一定对应一个汉字，界面也可能合并显示多个 token，因此你看到的是一段段增长的文字。</p>
-<p>为了减少逐 token 执行的等待，还可以先生成一段候选 token，再由目标模型批量验证。一次接受多个候选，就能减少生成同样长度回答所需的目标模型执行轮数。这是<a href="../speculative-decoding/">投机解码</a>要解决的问题。</p>
-<h2 id="_6">你感受到的快慢</h2>
-<p>从按下发送到看到第一段回答，包含了请求传输、排队和输入处理等时间。首 token 延迟（TTFT）描述的是从指定测量起点到首个输出 token 的等待。回答开始后，后续 token 的到达间隔则影响阅读时的流畅程度。</p>
-<p>与此同时，服务端还关心同一组 GPU 每秒能为所有用户生成多少 token。更大的 batch 可能提高总吞吐，却不一定让你的回答更快。个人体验与服务容量需要分别衡量，具体定义见<a href="../metrics/">指标</a>。</p>
-<p>回答结束后，运行时释放这个请求不再需要的资源，部分前缀缓存可以保留以供复用。你再输入下一句话时，新一轮请求便从这里开始。</p>
+<h2 id="overview">Overview</h2>
+<p>AI Infra 涉及的技术点很多。我刚开始干 AI Systems 的时候，就是胡子眉毛一把抓，哪里有问题就学哪里。这样学能很快解决眼前的问题，但学到的东西比较零散。回头看整个推理系统，总有种管中窥豹的感觉。</p>
+<p>后来我想，不妨从一次日常对话入手，把这些零散的技术点串起来。假设你打开一个接入 GLM-5.2 的写作助手（Agent），在对话框里输入“你好！”。从你按下发送，到屏幕上出现第一行回答，中间发生了什么？</p>
+<h3 id="_2">用户输入</h3>
+<p>你按下发送后，写作助手从应用配置里取出预设指令“你是一个中文写作助手。”，再把你的“你好！”接在这条指令后面。在这个例子里，应用通过聊天 API 调用 GLM-5.2。它向模型服务发送一份 JSON 请求，其中的 <code>messages</code> 字段按顺序记录这两条消息。</p>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="p">{</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span><span class="nt">&quot;messages&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">    </span><span class="p">{</span><span class="nt">&quot;role&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;system&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;content&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;你是一个中文写作助手。&quot;</span><span class="p">},</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">    </span><span class="p">{</span><span class="nt">&quot;role&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;user&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;content&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;你好！&quot;</span><span class="p">}</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">  </span><span class="p">]</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="p">}</span>
+</span></code></pre></div>
+<p>每条消息都保留了两个信息。<code>content</code> 是这条消息的文本，<code>role</code> 标明它在对话中的角色。上例中，<code>system</code> 是应用给模型的指令，<code>user</code> 是你刚发出的消息。模型生成的回复则可以作为 <code>assistant</code> 消息保存在会话历史中。</p>
+<div class="chat-example" role="group" aria-label="写作助手对话示例">
+  <div class="chat-turn chat-turn-user"><span class="chat-speaker">你</span><p>你好！</p></div>
+  <div class="chat-turn"><span class="chat-speaker">写作助手</span><p>你好！你想写什么？</p></div>
+  <div class="chat-turn chat-turn-user"><span class="chat-speaker">你</span><p>帮我给这篇 AI Infra 笔记写两段序言。</p></div>
+</div>
+
+<p>你发出第二条消息时，应用会再次调用聊天 API。下面是这次 JSON 请求中的对话部分：第一条是系统指令，后面三条消息依次对应上面的三个气泡。</p>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="p">{</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">  </span><span class="nt">&quot;messages&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">    </span><span class="p">{</span><span class="nt">&quot;role&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;system&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;content&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;你是一个中文写作助手。&quot;</span><span class="p">},</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">    </span><span class="p">{</span><span class="nt">&quot;role&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;user&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;content&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;你好！&quot;</span><span class="p">},</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">    </span><span class="p">{</span><span class="nt">&quot;role&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;assistant&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;content&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;你好！你想写什么？&quot;</span><span class="p">},</span>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">    </span><span class="p">{</span><span class="nt">&quot;role&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;user&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;content&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;帮我给这篇 AI Infra 笔记写两段序言。&quot;</span><span class="p">}</span>
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">  </span><span class="p">]</span>
+</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="p">}</span>
+</span></code></pre></div>
+<p>到了下一轮，助手要决定把哪些历史内容带进请求。假设它刚替你写了一份草稿，你接着说“把第二段再改短一点”。助手取出上一轮包含草稿的 <code>assistant</code> 消息，再追加这次修改要求作为新的 <code>user</code> 消息。有了草稿，模型才知道“第二段”指的是哪段文字。如果应用还保存过“我喜欢短句”这样的长期偏好，助手也可以在这一轮取回它，作为补充要求放进上下文。</p>
+<p>回到最初的“你好！”。你输入的文字很短，助手随请求附带的内容却可能很长。例如，Codex CLI 会在用户消息之前加入工作环境信息，也可以带上项目的 <code>AGENTS.md</code> 指令。<a href="https://openai.com/index/unrolling-the-codex-agent-loop/">OpenAI 对首轮请求的拆解</a></p>
+<p>工具定义也占输入空间。Anthropic 举过一个例子：接入 5 个 MCP 服务，一次加载全部 58 个工具的定义，仅工具名称、说明和参数等内容就占约 5.5 万 token。这个数字取决于加载了哪些工具，用户的问候本身仍然只有“你好！”。<a href="https://www.anthropic.com/research/advanced-tool-use">Anthropic 的工具加载示例</a></p>
+<p>项目指令如何加载、工具定义和调用结果分别在哪一轮进入上下文，见 <a href="../agent-input/">Agent 的指令与工具</a>。</p>
+<h2 id="_3">请求进入推理引擎</h2>
+<p>输入准备好后，写作助手向服务端的 <code>POST /v1/chat/completions</code> 接口发送请求。请求体除了 <code>messages</code>，还用 <code>model</code> 指定要调用的 <code>glm-5.2</code>，用 <code>stream: true</code> 请求流式返回。假设服务端有 A、B 两个实例，都部署了 GLM-5.2。请求先到网关，由网关的路由器（Router）选择其中一个实例。</p>
+<p>A 刚处理过同一个写作助手的请求，B 当前排队的请求更少，该发给谁？假如这个助手有几千个 token 的固定系统指令，发给 A 有机会复用相同前缀的计算结果。发给 B 则可能更早轮到执行。缓存感知路由考虑的是两笔时间：选 A 能省下多少前缀计算，是否值得为此多排一会儿队。对于上例中很短的系统指令，缓存收益可能很小。下面假设 Router 选中 A。</p>
+<p>请求抵达 A 后，需要有人把对话转成模型输入，安排 GPU 执行，并把生成的结果送回调用方。实例里的推理服务负责这些工作。下面以 vLLM 为例：它的 API 层接收聊天请求，执行引擎负责任务调度和模型计算。</p>
+<p>API 层先按 GLM-5.2 的对话模板（<strong>chat template</strong>）渲染 <code>messages</code>。例如，用户消息会带上 <code>&lt;|user|&gt;</code>，生成回答的位置会带上 <code>&lt;|assistant|&gt;</code>。在启用思考的模板配置下，末尾还会出现 <code>&lt;think&gt;</code>。Tokenizer 再把渲染后的内容编码为 token ID。这些角色标记和生成提示也占输入位置，所以不能用“你好！”的字符数估算这次实际要处理的 token 数。<a href="../glm-5.2-inference-path/#对话模板与分词">GLM-5.2 对话模板示例</a></p>
+<p>接下来，请求进入引擎的等待队列。A 可以用输入的 token 序列查找本地 <strong>prefix cache</strong>。假设两次请求的开头相同，且 A 仍保留着对应的完整 KV 块，本次请求就可以引用这些块，从其后的 token 继续计算。即使用户发了同一句“你好！”，只要系统指令在前面某处变了，匹配也只能延续到差异之前。Router 估计哪个副本可能命中，A 决定具体哪些块可以复用。<a href="../kv-cache/">KV Cache</a></p>
+<p>调度器每轮都要决定两件事：哪些请求可以执行，每条请求在这一轮计算几个 token。举个小例子，假设每轮最多安排 8 个 token，已有两条请求各要做一步 decode，你的 prompt 还有 9 个输入 token 待计算，显存中也有足够的 KV 空间。在启用 chunked prefill 的情况下，一种排法是：</p>
+<table>
+<thead>
+<tr>
+<th>调度轮次</th>
+<th>其他请求</th>
+<th>你的请求</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>第一轮</td>
+<td>两条请求各处理 1 个 token</td>
+<td>处理前 6 个输入 token</td>
+</tr>
+<tr>
+<td>第二轮</td>
+<td>若两条请求都继续生成，各处理 1 个 token</td>
+<td>处理剩余 3 个输入 token，得到首个输出 token</td>
+</tr>
+<tr>
+<td>第三轮</td>
+<td>已结束的请求退出，新请求可以加入</td>
+<td>用刚生成的 token 做一步 decode</td>
+</tr>
+</tbody>
+</table>
+<p>每轮重新组合请求，就是 <strong>continuous batching</strong>。同一条长输入可以分几轮完成 prefill，就是 <strong>chunked prefill</strong>。例子中的 8 是单轮的计算预算。另一个约束是 KV 空间：即使本轮还有计算预算，引擎也要能为新增位置分配 KV 块，才能安排相应的计算。<a href="../serving-runtime/">推理运行时</a> · <a href="https://docs.vllm.ai/en/stable/configuration/optimization/#chunked-prefill">vLLM 调度说明</a></p>
+<h2 id="prefill-decode">从 prefill 到 decode</h2>
+<p>现在跟着你的输入看一次 GPU 前向。模型通过 embedding 为每个待处理的 token ID 取出一个向量。向量经过一层层 Transformer，在 attention 中结合当前位置可见的前文，在前馈网络中进一步变换。各层还会把历史位置的注意力状态写入 KV Cache，后续 token 可以直接读取这些状态。<a href="../glm-5.2-inference-path/">GLM-5.2 推理案例</a></p>
+<p>具体到 GLM-5.2，前 3 层使用 dense MLP，后 75 层使用 MoE。进入 MoE 层时，模型内部也有一个 router：它根据 token 的向量选择参与计算的专家。如果专家分布在多张 GPU 上，执行引擎就要把 token 向量发往所选专家所在的卡，再取回专家输出，按路由权重合并。网关 Router 为整条请求选副本，MoE router 为一层里的每个 token 选专家。二者的决策发生在不同时间，也涉及不同的数据。<a href="../parallelism/">并行策略</a> · <a href="../collective-communication/">集合通信</a></p>
+<p>处理到完整 prompt 的最后一个位置后，模型把该位置的最终向量投影到词表，得到每个候选 token 的分数，即 <strong>logits</strong>。解码器按请求配置选择一个 token：贪心解码选分数最高的候选，采样则根据调整后的概率分布选取。由此产生的是回答的第一个 token。它来自 prefill 最后一步的结果。<a href="../decoding/">解码与采样</a></p>
+<p>设刚选出的 token 为 <span class="arithmatex">\(y_1\)</span>。进入 <strong>decode</strong> 后，这条请求的新输入只有 <span class="arithmatex">\(y_1\)</span>。模型仍要走过全部层，但可以直接读取 prompt 已有的 KV，同时追加 <span class="arithmatex">\(y_1\)</span> 的状态。新的 logits 用于选择 <span class="arithmatex">\(y_2\)</span>。下一轮以 <span class="arithmatex">\(y_2\)</span> 为输入，同样的依赖一直延续到停止条件成立。投机解码正是从这个串行依赖入手，用一次目标模型前向验证多个候选。<a href="../speculative-decoding/">Speculative Decoding</a></p>
+<p>同样是一次前向，prefill 可以把多个输入位置一起送进矩阵乘，复用读入的权重。普通 decode 中，一条请求每轮只增加一个位置，却仍需要读取权重和历史 KV。低并发时，一轮能共同使用权重的 token 较少，数据搬运占用的时间就更值得关注。这也是服务端会把你的 decode 和其他用户的 decode 放进同一批的原因。<a href="../roofline/">Roofline 模型</a></p>
+<p>最后回到请求里的 <code>stream: true</code>。服务端随着生成进度把 token 解码成文本片段，经网关发回 Agent，对话框才开始逐段显示文字。首个输出 token 和屏幕上的第一个字是两个测量点。后端的首 token 时间包含排队和 prefill，用户看到正文的时间还受网络、缓冲以及应用如何展示推理内容影响。回答开始后，相邻片段之间的停顿又是另一种体验。<a href="../metrics/">推理指标</a></p>
+<p>生成结束，引擎释放这条请求持有的 KV 块引用，可复用的前缀块仍可能留在缓存里。此时你再问一句“能帮我改段文字吗？”，Agent 会把上一轮问答加入新的 <code>messages</code>。这次请求比第一次长了。如果仍命中相同的前缀，GPU 就可以接着已有状态往下算。</p>
 
 
 
@@ -1409,11 +1265,10 @@
     
     
       
-      
-      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": [], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}, "version": null}</script>
+      <script id="__config" type="application/json">{"base": "../../..", "features": [], "search": "../../../assets/javascripts/workers/search.973d3a69.min.js", "tags": null, "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}, "version": null}</script>
     
     
-      <script src="../../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      <script src="../../../assets/javascripts/bundle.f55a23d4.min.js"></script>
       
         <script src="../../../javascripts/mathjax.js"></script>
       

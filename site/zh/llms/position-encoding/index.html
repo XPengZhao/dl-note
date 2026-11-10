@@ -11,21 +11,14 @@
         <link rel="canonical" href="https://XPengZhao.github.io/dl-note/zh/llms/position-encoding/">
       
       
-        <link rel="prev" href="../overview/">
+        <link rel="prev" href="../agent-input/">
       
       
         <link rel="next" href="../models/">
       
       
-        
-          <link rel="alternate" href="../../../llms/position-encoding/" hreflang="en">
-        
-          <link rel="alternate" href="./" hreflang="zh">
-        
-      
-      
       <link rel="icon" href="../../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.21">
     
     
       
@@ -33,7 +26,7 @@
       
     
     
-      <link rel="stylesheet" href="../../../assets/stylesheets/main.ec1eaa64.min.css">
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.2a3383ac.min.css">
       
       
 
@@ -60,6 +53,7 @@
     
       
 
+    
     
     
   </head>
@@ -237,14 +231,9 @@
   
   
   <span class="md-ellipsis">
-    
-  
     首页
-  
-
     
   </span>
-  
   
 
       </a>
@@ -264,14 +253,9 @@
   
   
   <span class="md-ellipsis">
-    
-  
     张量操作
-  
-
     
   </span>
-  
   
 
       </a>
@@ -291,14 +275,9 @@
   
   
   <span class="md-ellipsis">
-    
-  
     神经图形
-  
-
     
   </span>
-  
   
 
       </a>
@@ -331,14 +310,9 @@
   
   
   <span class="md-ellipsis">
-    
-  
     AI Infra
-  
-
     
   </span>
-  
   
 
             <span class="md-nav__icon md-icon"></span>
@@ -347,11 +321,7 @@
         <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_4">
             <span class="md-nav__icon md-icon"></span>
-            
-  
-    AI Infra
-  
-
+            AI Infra
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
@@ -367,14 +337,32 @@
   
   
   <span class="md-ellipsis">
-    
-  
     Overview
-  
-
     
   </span>
   
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../agent-input/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Agent 的指令与工具
+    
+  </span>
   
 
       </a>
@@ -400,35 +388,26 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_2" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_3" checked>
         
           
-          <label class="md-nav__link" for="__nav_4_2" id="__nav_4_2_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_3" id="__nav_4_3_label" tabindex="0">
             
   
   
   <span class="md-ellipsis">
-    
-  
     模型结构
-  
-
     
   </span>
-  
   
 
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_2_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_4_2">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4_3">
             <span class="md-nav__icon md-icon"></span>
-            
-  
-    模型结构
-  
-
+            模型结构
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
@@ -453,14 +432,9 @@
   
   
   <span class="md-ellipsis">
-    
-  
     位置编码
-  
-
     
   </span>
-  
   
 
           <span class="md-nav__icon md-icon"></span>
@@ -471,14 +445,9 @@
   
   
   <span class="md-ellipsis">
-    
-  
     位置编码
-  
-
     
   </span>
-  
   
 
       </a>
@@ -501,9 +470,7 @@
         <li class="md-nav__item">
   <a href="#rope" class="md-nav__link">
     <span class="md-ellipsis">
-      
-        RoPE
-      
+      RoPE
     </span>
   </a>
   
@@ -512,9 +479,7 @@
         <li class="md-nav__item">
   <a href="#m-rope" class="md-nav__link">
     <span class="md-ellipsis">
-      
-        M-RoPE
-      
+      M-RoPE
     </span>
   </a>
   
@@ -523,9 +488,7 @@
         <li class="md-nav__item">
   <a href="#tm-rope" class="md-nav__link">
     <span class="md-ellipsis">
-      
-        TM-RoPE
-      
+      TM-RoPE
     </span>
   </a>
   
@@ -534,9 +497,7 @@
         <li class="md-nav__item">
   <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
-      
-        一个统一视角
-      
+      一个统一视角
     </span>
   </a>
   
@@ -545,9 +506,7 @@
         <li class="md-nav__item">
   <a href="#_3" class="md-nav__link">
     <span class="md-ellipsis">
-      
-        对比
-      
+      对比
     </span>
   </a>
   
@@ -556,9 +515,7 @@
         <li class="md-nav__item">
   <a href="#_4" class="md-nav__link">
     <span class="md-ellipsis">
-      
-        实际理解
-      
+      实际理解
     </span>
   </a>
   
@@ -567,9 +524,7 @@
         <li class="md-nav__item">
   <a href="#_5" class="md-nav__link">
     <span class="md-ellipsis">
-      
-        备注
-      
+      备注
     </span>
   </a>
   
@@ -596,14 +551,9 @@
   
   
   <span class="md-ellipsis">
-    
-  
     模型笔记
-  
-
     
   </span>
-  
   
 
       </a>
@@ -632,14 +582,9 @@
   
   
   <span class="md-ellipsis">
-    
-  
     硬件
-  
-
     
   </span>
-  
   
 
       </a>
@@ -660,14 +605,9 @@
   
   
   <span class="md-ellipsis">
-    
-  
     请求生命周期
-  
-
     
   </span>
-  
   
 
       </a>
@@ -688,14 +628,9 @@
   
   
   <span class="md-ellipsis">
-    
-  
     指标
-  
-
     
   </span>
-  
   
 
       </a>
@@ -716,14 +651,9 @@
   
   
   <span class="md-ellipsis">
-    
-  
     Roofline 模型
-  
-
     
   </span>
-  
   
 
       </a>
@@ -744,14 +674,9 @@
   
   
   <span class="md-ellipsis">
-    
-  
     集合通信
-  
-
     
   </span>
-  
   
 
       </a>
@@ -775,35 +700,26 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_8" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_9" >
         
           
-          <label class="md-nav__link" for="__nav_4_8" id="__nav_4_8_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_9" id="__nav_4_9_label" tabindex="0">
             
   
   
   <span class="md-ellipsis">
-    
-  
     KV Cache
-  
-
     
   </span>
-  
   
 
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_8_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_8">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_9">
             <span class="md-nav__icon md-icon"></span>
-            
-  
-    KV Cache
-  
-
+            KV Cache
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
@@ -819,14 +735,9 @@
   
   
   <span class="md-ellipsis">
-    
-  
     KV Cache
-  
-
     
   </span>
-  
   
 
       </a>
@@ -847,14 +758,9 @@
   
   
   <span class="md-ellipsis">
-    
-  
     SWA KV Cache 存储方案
-  
-
     
   </span>
-  
   
 
       </a>
@@ -875,14 +781,9 @@
   
   
   <span class="md-ellipsis">
-    
-  
     vLLM KV Cache Offloading 源码梳理
-  
-
     
   </span>
-  
   
 
       </a>
@@ -911,14 +812,9 @@
   
   
   <span class="md-ellipsis">
-    
-  
     推理运行时
-  
-
     
   </span>
-  
   
 
       </a>
@@ -939,14 +835,9 @@
   
   
   <span class="md-ellipsis">
-    
-  
     GLM-5.2 推理案例
-  
-
     
   </span>
-  
   
 
       </a>
@@ -967,14 +858,9 @@
   
   
   <span class="md-ellipsis">
-    
-  
     并行策略
-  
-
     
   </span>
-  
   
 
       </a>
@@ -995,14 +881,9 @@
   
   
   <span class="md-ellipsis">
-    
-  
     解码与采样
-  
-
     
   </span>
-  
   
 
       </a>
@@ -1026,35 +907,26 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_13" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_14" >
         
           
-          <label class="md-nav__link" for="__nav_4_13" id="__nav_4_13_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_14" id="__nav_4_14_label" tabindex="0">
             
   
   
   <span class="md-ellipsis">
-    
-  
     Speculative Decoding
-  
-
     
   </span>
-  
   
 
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_13_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_13">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_14_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_14">
             <span class="md-nav__icon md-icon"></span>
-            
-  
-    Speculative Decoding
-  
-
+            Speculative Decoding
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
@@ -1070,14 +942,9 @@
   
   
   <span class="md-ellipsis">
-    
-  
     Speculative Decoding
-  
-
     
   </span>
-  
   
 
       </a>
@@ -1098,14 +965,9 @@
   
   
   <span class="md-ellipsis">
-    
-  
     GLM-5.2 DSpark 训练设计
-  
-
     
   </span>
-  
   
 
       </a>
@@ -1126,14 +988,9 @@
   
   
   <span class="md-ellipsis">
-    
-  
-    Qwen3-4B DSpark 消融报告
-  
-
+    Qwen3-4B DSpark
     
   </span>
-  
   
 
       </a>
@@ -1154,14 +1011,9 @@
   
   
   <span class="md-ellipsis">
-    
-  
     Qwen3.8-Flash-Next DSpark 训练实验
-  
-
     
   </span>
-  
   
 
       </a>
@@ -1190,14 +1042,9 @@
   
   
   <span class="md-ellipsis">
-    
-  
     训练目标
-  
-
     
   </span>
-  
   
 
       </a>
@@ -1242,9 +1089,7 @@
         <li class="md-nav__item">
   <a href="#rope" class="md-nav__link">
     <span class="md-ellipsis">
-      
-        RoPE
-      
+      RoPE
     </span>
   </a>
   
@@ -1253,9 +1098,7 @@
         <li class="md-nav__item">
   <a href="#m-rope" class="md-nav__link">
     <span class="md-ellipsis">
-      
-        M-RoPE
-      
+      M-RoPE
     </span>
   </a>
   
@@ -1264,9 +1107,7 @@
         <li class="md-nav__item">
   <a href="#tm-rope" class="md-nav__link">
     <span class="md-ellipsis">
-      
-        TM-RoPE
-      
+      TM-RoPE
     </span>
   </a>
   
@@ -1275,9 +1116,7 @@
         <li class="md-nav__item">
   <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
-      
-        一个统一视角
-      
+      一个统一视角
     </span>
   </a>
   
@@ -1286,9 +1125,7 @@
         <li class="md-nav__item">
   <a href="#_3" class="md-nav__link">
     <span class="md-ellipsis">
-      
-        对比
-      
+      对比
     </span>
   </a>
   
@@ -1297,9 +1134,7 @@
         <li class="md-nav__item">
   <a href="#_4" class="md-nav__link">
     <span class="md-ellipsis">
-      
-        实际理解
-      
+      实际理解
     </span>
   </a>
   
@@ -1308,9 +1143,7 @@
         <li class="md-nav__item">
   <a href="#_5" class="md-nav__link">
     <span class="md-ellipsis">
-      
-        备注
-      
+      备注
     </span>
   </a>
   
@@ -1326,7 +1159,6 @@
           
           
             <div class="md-content" data-md-component="content">
-              
               <article class="md-content__inner md-typeset">
                 
                   
@@ -1559,11 +1391,10 @@ R\big(\theta_i(t,h,w)\big),
     
     
       
-      
-      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": [], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}, "version": null}</script>
+      <script id="__config" type="application/json">{"base": "../../..", "features": [], "search": "../../../assets/javascripts/workers/search.973d3a69.min.js", "tags": null, "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}, "version": null}</script>
     
     
-      <script src="../../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      <script src="../../../assets/javascripts/bundle.f55a23d4.min.js"></script>
       
         <script src="../../../javascripts/mathjax.js"></script>
       

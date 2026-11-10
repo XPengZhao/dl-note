@@ -43,7 +43,7 @@ plugins:
                 - Speculative Decoding:
                     - Speculative Decoding: llms/speculative-decoding.md
                     - GLM-5.2 DSpark Design: llms/glm-5.2-dspark-design.md
-                    - Qwen3-4B DSpark Ablation: llms/qwen3-4b-dspark-ablation.md
+                    - Qwen3-4B DSpark: llms/qwen3-4b-dspark-ablation.md
                     - Qwen3.8-Flash-Next DSpark Training: llms/qwen3.8-flash-next-dspark-training.md
                 - Training Objective: llms/training-objective.md
           nav_translations:
@@ -70,7 +70,6 @@ plugins:
             Model Notes: 模型笔记
             GLM-5.2 Inference Case Study: GLM-5.2 推理案例
             GLM-5.2 DSpark Design: GLM-5.2 DSpark 训练设计
-            Qwen3-4B DSpark Ablation: Qwen3-4B DSpark 消融报告
             Qwen3.8-Flash-Next DSpark Training: Qwen3.8-Flash-Next DSpark 训练实验
 nav:
   - Home: index.md
@@ -94,7 +93,7 @@ nav:
       - Speculative Decoding:
           - Speculative Decoding: llms/speculative-decoding.md
           - GLM-5.2 DSpark Design: llms/glm-5.2-dspark-design.md
-          - Qwen3-4B DSpark Ablation: llms/qwen3-4b-dspark-ablation.md
+          - Qwen3-4B DSpark: llms/qwen3-4b-dspark-ablation.md
       - Training Objective: llms/training-objective.md
 markdown_extensions:
   - pymdownx.highlight:
