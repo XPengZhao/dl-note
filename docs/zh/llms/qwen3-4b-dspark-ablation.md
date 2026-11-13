@@ -1044,7 +1044,301 @@ GQA baseline 采用 online training，以下结果来自 step 2616（约 1 个 e
 
 </details>
 
-### 4.5 Markov MLA {#backbone-mla-markov-mla}
+### 4.5 MAL vs. Markov-Engram {#mal-vs-markov-engram}
+
+Markov-Engram（结构见 1.4 节）采用 online training，以下结果来自 step 7974（约 3 个 epoch）的 checkpoint，评测均为 greedy 验证。表中 Baseline 行为 4.2 节第 3 个 epoch 的结果，两者训练量相同。除 GSM8K 为 5-shot 外，各基准的设置与 4.2 节一致。
+
+
+#### GSM8K (5-shot) {#engram-gsm8k}
+
+
+<details class="dspark-temperature" open markdown="1">
+<summary>Temperature = 0</summary>
+
+<figure class="dspark-table-figure" markdown="1">
+
+<div class="js-sortable-table js-multisort js-row-reorder dspark-three-line dspark-compact dspark-sampling" markdown="1">
+
+| 模型 | T | Top-p | Top-k | Draft 采样 | **MAL** | pos-1 | pos-2 | pos-3 | pos-4 | pos-5 | pos-6 | pos-7 | MIT | MOT |
+| --- | :---: | ---: | ---: | --- | :---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Baseline {: data-conditional="88.80% 88.47% 86.67% 83.60% 81.84% 81.60% 81.62%"} | 0.0 | 1.0 | -1 | greedy | <u>**5.0800**</u> | 88.80% | 78.56% | 68.09% | 56.92% | 46.59% | 38.01% | 31.03% | 735.03 | 147.46 |
+| Markov-Engram {: data-conditional="88.51% 87.63% 86.47% 83.74% 83.06% 82.14% 81.84%"} | 0.0 | 1.0 | -1 | greedy | **5.0563** | 88.51% | 77.55% | 67.08% | 56.16% | 46.65% | 38.32% | 31.36% | 735.03 | 147.46 |
+
+</div>
+
+<figcaption>GSM8K (5-shot) 上 Baseline 与 Markov-Engram 的接受率（均 3 epoch，T = 0，Greedy draft）</figcaption>
+</figure>
+
+</details>
+
+
+<details class="dspark-temperature" markdown="1">
+<summary>Temperature = 1</summary>
+
+<figure class="dspark-table-figure" markdown="1">
+
+<div class="js-sortable-table js-multisort js-row-reorder dspark-three-line dspark-compact dspark-sampling" markdown="1">
+
+| 模型 | T | Top-p | Top-k | Draft 采样 | **MAL** | pos-1 | pos-2 | pos-3 | pos-4 | pos-5 | pos-6 | pos-7 | MIT | MOT |
+| --- | :---: | ---: | ---: | --- | :---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Baseline {: data-conditional="88.28% 88.04% 86.63% 83.47% 82.03% 81.20% 80.93%"} | 1.0 | 1.0 | -1 | greedy | **5.0336** | 88.28% | 77.72% | 67.33% | 56.20% | 46.10% | 37.43% | 30.30% | 735.03 | 143.61 |
+| Markov-Engram {: data-conditional="88.27% 87.49% 86.32% 84.07% 82.63% 82.16% 82.50%"} | 1.0 | 1.0 | -1 | greedy | <u>**5.0395**</u> | 88.27% | 77.23% | 66.67% | 56.05% | 46.31% | 38.05% | 31.38% | 735.03 | 145.27 |
+
+</div>
+
+<figcaption>GSM8K (5-shot) 上 Baseline 与 Markov-Engram 的接受率（均 3 epoch，T = 1，Greedy draft）</figcaption>
+</figure>
+
+<figure class="dspark-table-figure" markdown="1">
+
+<div class="js-sortable-table js-multisort js-row-reorder dspark-three-line dspark-compact dspark-sampling" markdown="1">
+
+| 模型 | T | Top-p | Top-k | Draft 采样 | **MAL** | pos-1 | pos-2 | pos-3 | pos-4 | pos-5 | pos-6 | pos-7 | MIT | MOT |
+| --- | :---: | ---: | ---: | --- | :---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Baseline {: data-conditional="88.57% 87.75% 86.02% 82.80% 81.12% 80.78% 79.75%"} | 1.0 | 1.0 | -1 | probabilistic | **4.9861** | 88.57% | 77.72% | 66.86% | 55.36% | 44.90% | 36.27% | 28.93% | 735.03 | 144.87 |
+| Markov-Engram {: data-conditional="88.22% 87.23% 86.03% 83.22% 82.07% 82.20% 80.83%"} | 1.0 | 1.0 | -1 | probabilistic | <u>**4.9887**</u> | 88.22% | 76.95% | 66.20% | 55.09% | 45.21% | 37.16% | 30.04% | 735.03 | 144.65 |
+
+</div>
+
+<figcaption>GSM8K (5-shot) 上 Baseline 与 Markov-Engram 的接受率（均 3 epoch，T = 1，Probabilistic draft）</figcaption>
+</figure>
+
+</details>
+
+
+#### HumanEval {#engram-humaneval}
+
+
+<details class="dspark-temperature" open markdown="1">
+<summary>Temperature = 0</summary>
+
+<figure class="dspark-table-figure" markdown="1">
+
+<div class="js-sortable-table js-multisort js-row-reorder dspark-three-line dspark-compact dspark-sampling" markdown="1">
+
+| 模型 | T | Top-p | Top-k | Draft 采样 | **MAL** | pos-1 | pos-2 | pos-3 | pos-4 | pos-5 | pos-6 | pos-7 | MIT | MOT |
+| --- | :---: | ---: | ---: | --- | :---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Baseline {: data-conditional="90.44% 88.46% 89.62% 89.61% 89.16% 89.29% 87.20%"} | 0.0 | 1.0 | -1 | greedy | **5.5943** | 90.44% | 80.01% | 71.70% | 64.25% | 57.28% | 51.15% | 44.60% | 167.22 | 355.60 |
+| Markov-Engram {: data-conditional="90.32% 88.61% 90.40% 89.93% 89.20% 90.00% 87.95%"} | 0.0 | 1.0 | -1 | greedy | <u>**5.6395**</u> | 90.32% | 80.04% | 72.35% | 65.06% | 58.03% | 52.21% | 45.93% | 167.22 | 355.60 |
+
+</div>
+
+<figcaption>HumanEval 上 Baseline 与 Markov-Engram 的接受率（均 3 epoch，T = 0，Greedy draft）</figcaption>
+</figure>
+
+</details>
+
+
+<details class="dspark-temperature" markdown="1">
+<summary>Temperature = 1</summary>
+
+<figure class="dspark-table-figure" markdown="1">
+
+<div class="js-sortable-table js-multisort js-row-reorder dspark-three-line dspark-compact dspark-sampling" markdown="1">
+
+| 模型 | T | Top-p | Top-k | Draft 采样 | **MAL** | pos-1 | pos-2 | pos-3 | pos-4 | pos-5 | pos-6 | pos-7 | MIT | MOT |
+| --- | :---: | ---: | ---: | --- | :---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Baseline {: data-conditional="89.27% 87.15% 89.17% 88.80% 89.73% 88.63% 87.34%"} | 1.0 | 1.0 | -1 | greedy | **5.4508** | 89.27% | 77.79% | 69.37% | 61.60% | 55.27% | 48.99% | 42.79% | 167.22 | 347.03 |
+| Markov-Engram {: data-conditional="88.70% 88.07% 89.85% 89.68% 89.70% 88.99% 88.24%"} | 1.0 | 1.0 | -1 | greedy | <u>**5.5098**</u> | 88.70% | 78.12% | 70.19% | 62.94% | 56.46% | 50.24% | 44.33% | 167.22 | 345.15 |
+
+</div>
+
+<figcaption>HumanEval 上 Baseline 与 Markov-Engram 的接受率（均 3 epoch，T = 1，Greedy draft）</figcaption>
+</figure>
+
+<figure class="dspark-table-figure" markdown="1">
+
+<div class="js-sortable-table js-multisort js-row-reorder dspark-three-line dspark-compact dspark-sampling" markdown="1">
+
+| 模型 | T | Top-p | Top-k | Draft 采样 | **MAL** | pos-1 | pos-2 | pos-3 | pos-4 | pos-5 | pos-6 | pos-7 | MIT | MOT |
+| --- | :---: | ---: | ---: | --- | :---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Baseline {: data-conditional="90.35% 88.34% 88.45% 89.13% 88.28% 88.75% 85.66%"} | 1.0 | 1.0 | -1 | probabilistic | **5.5077** | 90.35% | 79.82% | 70.60% | 62.93% | 55.55% | 49.30% | 42.23% | 167.22 | 351.16 |
+| Markov-Engram {: data-conditional="90.69% 88.54% 88.96% 89.34% 87.82% 88.76% 87.23%"} | 1.0 | 1.0 | -1 | probabilistic | <u>**5.5533**</u> | 90.69% | 80.29% | 71.42% | 63.79% | 56.03% | 49.73% | 43.38% | 167.22 | 347.61 |
+
+</div>
+
+<figcaption>HumanEval 上 Baseline 与 Markov-Engram 的接受率（均 3 epoch，T = 1，Probabilistic draft）</figcaption>
+</figure>
+
+</details>
+
+
+#### MT-Bench {#engram-mtbench}
+
+
+<details class="dspark-temperature" open markdown="1">
+<summary>Temperature = 0</summary>
+
+<figure class="dspark-table-figure" markdown="1">
+
+<div class="js-sortable-table js-multisort js-row-reorder dspark-three-line dspark-compact dspark-sampling" markdown="1">
+
+| 模型 | T | Top-p | Top-k | Draft 采样 | **MAL** | pos-1 | pos-2 | pos-3 | pos-4 | pos-5 | pos-6 | pos-7 | MIT | MOT |
+| --- | :---: | ---: | ---: | --- | :---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Baseline {: data-conditional="76.33% 74.19% 73.95% 75.41% 76.69% 77.93% 79.62%"} | 0.0 | 1.0 | -1 | greedy | **3.6453** | 76.33% | 56.63% | 41.88% | 31.58% | 24.22% | 18.87% | 15.03% | 330.07 | 496.62 |
+| Markov-Engram {: data-conditional="76.54% 74.46% 75.19% 76.50% 77.09% 78.61% 78.90%"} | 0.0 | 1.0 | -1 | greedy | <u>**3.6997**</u> | 76.54% | 56.99% | 42.85% | 32.78% | 25.27% | 19.87% | 15.68% | 330.08 | 496.63 |
+
+</div>
+
+<figcaption>MT-Bench 上 Baseline 与 Markov-Engram 的接受率（均 3 epoch，T = 0，Greedy draft）</figcaption>
+</figure>
+
+</details>
+
+
+<details class="dspark-temperature" markdown="1">
+<summary>Temperature = 1</summary>
+
+<figure class="dspark-table-figure" markdown="1">
+
+<div class="js-sortable-table js-multisort js-row-reorder dspark-three-line dspark-compact dspark-sampling" markdown="1">
+
+| 模型 | T | Top-p | Top-k | Draft 采样 | **MAL** | pos-1 | pos-2 | pos-3 | pos-4 | pos-5 | pos-6 | pos-7 | MIT | MOT |
+| --- | :---: | ---: | ---: | --- | :---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Baseline {: data-conditional="71.00% 70.54% 70.88% 73.18% 74.74% 76.94% 77.98%"} | 1.0 | 1.0 | -1 | greedy | <u>**3.2858**</u> | 71.00% | 50.09% | 35.50% | 25.98% | 19.42% | 14.94% | 11.65% | 335.27 | 500.48 |
+| Markov-Engram {: data-conditional="70.87% 70.20% 71.52% 73.36% 74.19% 77.20% 78.62%"} | 1.0 | 1.0 | -1 | greedy | **3.2837** | 70.87% | 49.75% | 35.58% | 26.10% | 19.36% | 14.95% | 11.75% | 329.58 | 493.81 |
+
+</div>
+
+<figcaption>MT-Bench 上 Baseline 与 Markov-Engram 的接受率（均 3 epoch，T = 1，Greedy draft）</figcaption>
+</figure>
+
+<figure class="dspark-table-figure" markdown="1">
+
+<div class="js-sortable-table js-multisort js-row-reorder dspark-three-line dspark-compact dspark-sampling" markdown="1">
+
+| 模型 | T | Top-p | Top-k | Draft 采样 | **MAL** | pos-1 | pos-2 | pos-3 | pos-4 | pos-5 | pos-6 | pos-7 | MIT | MOT |
+| --- | :---: | ---: | ---: | --- | :---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Baseline {: data-conditional="75.20% 72.59% 72.24% 72.92% 74.66% 74.51% 77.03%"} | 1.0 | 1.0 | -1 | probabilistic | **3.4775** | 75.20% | 54.58% | 39.43% | 28.75% | 21.47% | 16.00% | 12.32% | 330.44 | 504.91 |
+| Markov-Engram {: data-conditional="74.71% 72.93% 72.78% 73.36% 75.24% 75.72% 77.53%"} | 1.0 | 1.0 | -1 | probabilistic | <u>**3.4927**</u> | 74.71% | 54.49% | 39.68% | 29.09% | 21.89% | 16.57% | 12.85% | 336.36 | 513.70 |
+
+</div>
+
+<figcaption>MT-Bench 上 Baseline 与 Markov-Engram 的接受率（均 3 epoch，T = 1，Probabilistic draft）</figcaption>
+</figure>
+
+</details>
+
+
+#### MATH-500 {#engram-math500}
+
+
+<details class="dspark-temperature" open markdown="1">
+<summary>Temperature = 0</summary>
+
+<figure class="dspark-table-figure" markdown="1">
+
+<div class="js-sortable-table js-multisort js-row-reorder dspark-three-line dspark-compact dspark-sampling" markdown="1">
+
+| 模型 | T | Top-p | Top-k | Draft 采样 | **MAL** | pos-1 | pos-2 | pos-3 | pos-4 | pos-5 | pos-6 | pos-7 | MIT | MOT |
+| --- | :---: | ---: | ---: | --- | :---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Baseline {: data-conditional="93.08% 92.05% 92.07% 92.06% 92.02% 92.02% 90.87%"} | 0.0 | 1.0 | -1 | greedy | **6.1447** | 93.08% | 85.68% | 78.89% | 72.62% | 66.83% | 61.50% | 55.88% | 98.16 | 920.65 |
+| Markov-Engram {: data-conditional="93.00% 92.29% 92.32% 92.43% 92.37% 92.01% 91.44%"} | 0.0 | 1.0 | -1 | greedy | <u>**6.1814**</u> | 93.00% | 85.83% | 79.24% | 73.23% | 67.64% | 62.26% | 56.93% | 98.16 | 920.65 |
+
+</div>
+
+<figcaption>MATH-500 上 Baseline 与 Markov-Engram 的接受率（均 3 epoch，T = 0，Greedy draft）</figcaption>
+</figure>
+
+</details>
+
+
+<details class="dspark-temperature" markdown="1">
+<summary>Temperature = 1</summary>
+
+<figure class="dspark-table-figure" markdown="1">
+
+<div class="js-sortable-table js-multisort js-row-reorder dspark-three-line dspark-compact dspark-sampling" markdown="1">
+
+| 模型 | T | Top-p | Top-k | Draft 采样 | **MAL** | pos-1 | pos-2 | pos-3 | pos-4 | pos-5 | pos-6 | pos-7 | MIT | MOT |
+| --- | :---: | ---: | ---: | --- | :---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Baseline {: data-conditional="81.47% 84.03% 86.30% 87.88% 88.75% 88.54% 87.51%"} | 1.0 | 1.0 | -1 | greedy | **4.8354** | 81.47% | 68.46% | 59.08% | 51.92% | 46.08% | 40.80% | 35.71% | 98.16 | 899.90 |
+| Markov-Engram {: data-conditional="81.48% 84.24% 86.54% 87.80% 88.46% 88.28% 88.27%"} | 1.0 | 1.0 | -1 | greedy | <u>**4.8451**</u> | 81.48% | 68.64% | 59.40% | 52.15% | 46.14% | 40.74% | 35.95% | 98.16 | 869.76 |
+
+</div>
+
+<figcaption>MATH-500 上 Baseline 与 Markov-Engram 的接受率（均 3 epoch，T = 1，Greedy draft）</figcaption>
+</figure>
+
+<figure class="dspark-table-figure" markdown="1">
+
+<div class="js-sortable-table js-multisort js-row-reorder dspark-three-line dspark-compact dspark-sampling" markdown="1">
+
+| 模型 | T | Top-p | Top-k | Draft 采样 | **MAL** | pos-1 | pos-2 | pos-3 | pos-4 | pos-5 | pos-6 | pos-7 | MIT | MOT |
+| --- | :---: | ---: | ---: | --- | :---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Baseline {: data-conditional="89.22% 88.31% 88.00% 88.01% 88.23% 87.93% 87.30%"} | 1.0 | 1.0 | -1 | probabilistic | **5.4089** | 89.22% | 78.79% | 69.34% | 61.02% | 53.84% | 47.34% | 41.33% | 98.16 | 911.74 |
+| Markov-Engram {: data-conditional="89.42% 88.36% 88.58% 88.77% 88.90% 88.81% 88.38%"} | 1.0 | 1.0 | -1 | probabilistic | <u>**5.4818**</u> | 89.42% | 79.01% | 69.99% | 62.12% | 55.23% | 49.05% | 43.36% | 98.16 | 875.20 |
+
+</div>
+
+<figcaption>MATH-500 上 Baseline 与 Markov-Engram 的接受率（均 3 epoch，T = 1，Probabilistic draft）</figcaption>
+</figure>
+
+</details>
+
+
+#### AIME 2024 {#engram-aime}
+
+
+<details class="dspark-temperature" open markdown="1">
+<summary>Temperature = 0</summary>
+
+<figure class="dspark-table-figure" markdown="1">
+
+<div class="js-sortable-table js-multisort js-row-reorder dspark-three-line dspark-compact dspark-sampling" markdown="1">
+
+| 模型 | T | Top-p | Top-k | Draft 采样 | **MAL** | pos-1 | pos-2 | pos-3 | pos-4 | pos-5 | pos-6 | pos-7 | MIT | MOT |
+| --- | :---: | ---: | ---: | --- | :---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Baseline {: data-conditional="92.39% 91.58% 91.27% 91.30% 91.94% 91.30% 90.80%"} | 0.0 | 1.0 | -1 | greedy | **6.0252** | 92.39% | 84.62% | 77.23% | 70.51% | 64.83% | 59.19% | 53.74% | 128.93 | 2963.73 |
+| Markov-Engram {: data-conditional="92.08% 91.25% 91.85% 91.78% 92.06% 91.80% 90.94%"} | 0.0 | 1.0 | -1 | greedy | <u>**6.0360**</u> | 92.08% | 84.02% | 77.17% | 70.82% | 65.20% | 59.86% | 54.44% | 128.93 | 2963.73 |
+
+</div>
+
+<figcaption>AIME 2024 上 Baseline 与 Markov-Engram 的接受率（均 3 epoch，T = 0，Greedy draft）</figcaption>
+</figure>
+
+</details>
+
+
+<details class="dspark-temperature" markdown="1">
+<summary>Temperature = 1</summary>
+
+<figure class="dspark-table-figure" markdown="1">
+
+<div class="js-sortable-table js-multisort js-row-reorder dspark-three-line dspark-compact dspark-sampling" markdown="1">
+
+| 模型 | T | Top-p | Top-k | Draft 采样 | **MAL** | pos-1 | pos-2 | pos-3 | pos-4 | pos-5 | pos-6 | pos-7 | MIT | MOT |
+| --- | :---: | ---: | ---: | --- | :---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Baseline {: data-conditional="74.42% 78.69% 81.50% 82.56% 84.05% 83.53% 84.05%"} | 1.0 | 1.0 | -1 | greedy | **4.0419** | 74.42% | 58.57% | 47.74% | 39.41% | 33.12% | 27.67% | 23.26% | 128.93 | 2863.17 |
+| Markov-Engram {: data-conditional="75.63% 78.99% 81.60% 83.47% 84.85% 84.22% 83.24%"} | 1.0 | 1.0 | -1 | greedy | <u>**4.1258**</u> | 75.63% | 59.75% | 48.73% | 40.69% | 34.52% | 29.07% | 24.21% | 128.93 | 2840.43 |
+
+</div>
+
+<figcaption>AIME 2024 上 Baseline 与 Markov-Engram 的接受率（均 3 epoch，T = 1，Greedy draft）</figcaption>
+</figure>
+
+<figure class="dspark-table-figure" markdown="1">
+
+<div class="js-sortable-table js-multisort js-row-reorder dspark-three-line dspark-compact dspark-sampling" markdown="1">
+
+| 模型 | T | Top-p | Top-k | Draft 采样 | **MAL** | pos-1 | pos-2 | pos-3 | pos-4 | pos-5 | pos-6 | pos-7 | MIT | MOT |
+| --- | :---: | ---: | ---: | --- | :---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Baseline {: data-conditional="85.62% 84.28% 84.17% 83.20% 84.69% 83.52% 82.40%"} | 1.0 | 1.0 | -1 | probabilistic | **4.7704** | 85.62% | 72.16% | 60.74% | 50.53% | 42.80% | 35.74% | 29.45% | 128.93 | 2817.67 |
+| Markov-Engram {: data-conditional="85.83% 84.46% 85.07% 85.16% 85.15% 84.06% 84.22%"} | 1.0 | 1.0 | -1 | probabilistic | <u>**4.8643**</u> | 85.83% | 72.49% | 61.65% | 52.51% | 44.71% | 37.58% | 31.65% | 128.93 | 2593.07 |
+
+</div>
+
+<figcaption>AIME 2024 上 Baseline 与 Markov-Engram 的接受率（均 3 epoch，T = 1，Probabilistic draft）</figcaption>
+</figure>
+
+</details>
+
+
+相同训练量（3 epoch）下，Markov-Engram 在 15 组对比中的 13 组 MAL 高于 baseline，且收益随输出变长而扩大：GSM8K（5-shot）基本持平（-0.5%–+0.1%），HumanEval 高 0.8%–1.1%，MT-Bench 高 0.4%–1.5%（T = 1 greedy 持平），MATH-500 高 0.2%–1.3%，AIME 高 0.2%–2.1%。
+
+各基准上 T = 0 的 MAL 均最高，随 temperature 升高而下降，输出长度也随之变短。T = 1 时 probabilistic draft 一致高于 greedy draft，两者差距随任务变长而扩大：GSM8K（5-shot，MOT 约 145）上 greedy 反而略高 1.0%，HumanEval（MOT 约 350）高 0.8%，MT-Bench（MOT 约 500）高 6.4%，MATH-500（MOT 约 870）高 13.1%，AIME（MOT 约 2600–2900）高 17.9%，且差距主要来自 pos-1（如 AIME 85.8% vs. 75.6%）。长输出任务上 target 分布更平坦，greedy draft 的概率质量更集中，拒绝采样损失更大；n-gram 记忆对短输出的 GSM8K 帮助有限（T = 0 时 MAL 5.06，低于 HumanEval 的 5.64），与 4.2 节 GSM8K 5-shot 接受率整体偏低的现象一致。
+
+### 4.6 Markov MLA {#backbone-mla-markov-mla}
 
 Baseline 和 Backbone MLA + Markov MLA 均采用 online training，学习率为 `3e-4`，训练 1 个 epoch。评测时，客户端并发数与服务端最大请求数均为 32。
 
@@ -1070,7 +1364,7 @@ Baseline 和 Backbone MLA + Markov MLA 均采用 online training，学习率为 
 <figcaption>Baseline 与 Markov MLA 的接受率对比</figcaption>
 </figure>
 
-### 4.6 Markov GQA {#markov-gqa}
+### 4.7 Markov GQA {#markov-gqa}
 
 Markov GQA 沿用 baseline 的 5 层 GQA backbone，在 Markov head 的 `W₁` 与 `W₂` 之间加入 GQA（32 个 Q heads、8 个 KV heads）。该 GQA 的位置对应 [Fig. 1](#fig-markov-mla) 中 Markov head 的 MLA。Baseline 与 Markov GQA 均采用 online training，训练约 10 个 epoch。
 
@@ -1140,7 +1434,7 @@ Markov GQA 沿用 baseline 的 5 层 GQA backbone，在 Markov head 的 `W₁` �
 <figcaption>Baseline 与 Markov GQA 在 MT-Bench 上的接受率</figcaption>
 </figure>
 
-### 4.7 Baseline vs. DrawSpec {#baseline-vs-drawspec}
+### 4.8 Baseline vs. DrawSpec {#baseline-vs-drawspec}
 
 DrawSpec 将五层 backbone 分为四层预计算和一层条件化，最后一层输入为 anchor + 6 states。此处使用 late-conditioning 分支的 12-state 权重，与 baseline 均训练约 1 epoch，target temperature 为 0.7。
 
