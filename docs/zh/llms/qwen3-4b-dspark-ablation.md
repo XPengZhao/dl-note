@@ -1073,7 +1073,7 @@ GQA baseline 采用 online training，以下结果来自 step 2616（约 1 个 e
 
 ### 4.5 MAL vs. Markov-Engram {#mal-vs-markov-engram}
 
-Markov-Engram 的 0.13M 配置（结构见 1.4 节）采用 online training，以下结果来自 step 7974（约 3 个 epoch）的 checkpoint，评测均为 greedy 验证。表中 Baseline 行为 4.2 节第 3 个 epoch 的结果，两者训练量相同。新增 2.6M Engram 配置同样训练至 step 7974，GSM8K 使用 0-shot。0.13M 配置的 GSM8K 结果为 5-shot，分别与相同 shot 设置的 Baseline 对比。其他基准的设置与 4.2 节一致。
+Markov-Engram 的 0.13M 配置（结构见 1.4 节）采用 online training，以下结果来自 step 7974（约 3 个 epoch）的 checkpoint，评测均为 greedy 验证。表中 Baseline 行为 4.2 节第 3 个 epoch 的结果，两者训练量相同。2.6M Engram 配置同样训练至 step 7974，GSM8K 包含 0-shot 和 5-shot 结果。0.13M 配置的 GSM8K 结果为 5-shot，分别与相同 shot 设置的 Baseline 对比。其他基准的设置与 4.2 节一致。
 
 
 <p class="dspark-subheading" id="engram-gsm8k-0-shot">GSM8K (0-shot)</p>
@@ -1146,10 +1146,11 @@ Markov-Engram 的 0.13M 配置（结构见 1.4 节）采用 online training，�
 | --- | :---: | ---: | ---: | --- | :---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | Baseline {: data-conditional="88.80% 88.47% 86.67% 83.60% 81.84% 81.60% 81.62%"} | 0.0 | 1.0 | -1 | greedy | <u>**5.08**</u> | 88.80% | 78.56% | 68.09% | 56.92% | 46.59% | 38.01% | 31.03% | 735.03 | 147.46 |
 | Markov-Engram (0.13M) {: data-conditional="88.51% 87.63% 86.47% 83.74% 83.06% 82.14% 81.84%"} | 0.0 | 1.0 | -1 | greedy | **5.06** | 88.51% | 77.55% | 67.08% | 56.16% | 46.65% | 38.32% | 31.36% | 735.03 | 147.46 |
+| Markov-Engram (2.6M) {: data-conditional="88.80% 87.02% 85.68% 84.03% 83.14% 81.96% 81.80%"} | 0.0 | 1.0 | -1 | greedy | **5.03** | 88.80% | 77.27% | 66.20% | 55.63% | 46.25% | 37.91% | 31.01% | 735.03 | 147.46 |
 
 </div>
 
-<figcaption>GSM8K (5-shot) 上 Baseline 与 Markov-Engram (0.13M) 的接受率（均 3 epoch，T = 0，Greedy draft）</figcaption>
+<figcaption>GSM8K (5-shot) 上 Baseline 与 Markov-Engram（0.13M、2.6M）的接受率（均 3 epoch，T = 0，Greedy draft）</figcaption>
 </figure>
 
 </details>
@@ -1166,10 +1167,11 @@ Markov-Engram 的 0.13M 配置（结构见 1.4 节）采用 online training，�
 | --- | :---: | ---: | ---: | --- | :---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | Baseline {: data-conditional="88.28% 88.04% 86.63% 83.47% 82.03% 81.20% 80.93%"} | 1.0 | 1.0 | -1 | greedy | **5.03** | 88.28% | 77.72% | 67.33% | 56.20% | 46.10% | 37.43% | 30.30% | 735.03 | 143.61 |
 | Markov-Engram (0.13M) {: data-conditional="88.27% 87.49% 86.32% 84.07% 82.63% 82.16% 82.50%"} | 1.0 | 1.0 | -1 | greedy | <u>**5.04**</u> | 88.27% | 77.23% | 66.67% | 56.05% | 46.31% | 38.05% | 31.38% | 735.03 | 145.27 |
+| Markov-Engram (2.6M) {: data-conditional="88.42% 86.66% 85.78% 84.19% 82.95% 82.28% 81.48%"} | 1.0 | 1.0 | -1 | greedy | **5.01** | 88.42% | 76.63% | 65.73% | 55.34% | 45.90% | 37.77% | 30.77% | 735.03 | 144.74 |
 
 </div>
 
-<figcaption>GSM8K (5-shot) 上 Baseline 与 Markov-Engram (0.13M) 的接受率（均 3 epoch，T = 1，Greedy draft）</figcaption>
+<figcaption>GSM8K (5-shot) 上 Baseline 与 Markov-Engram（0.13M、2.6M）的接受率（均 3 epoch，T = 1，Greedy draft）</figcaption>
 </figure>
 
 <figure class="dspark-table-figure" markdown="1">
@@ -1180,10 +1182,11 @@ Markov-Engram 的 0.13M 配置（结构见 1.4 节）采用 online training，�
 | --- | :---: | ---: | ---: | --- | :---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | Baseline {: data-conditional="88.57% 87.75% 86.02% 82.80% 81.12% 80.78% 79.75%"} | 1.0 | 1.0 | -1 | probabilistic | **4.99** | 88.57% | 77.72% | 66.86% | 55.36% | 44.90% | 36.27% | 28.93% | 735.03 | 144.87 |
 | Markov-Engram (0.13M) {: data-conditional="88.22% 87.23% 86.03% 83.22% 82.07% 82.20% 80.83%"} | 1.0 | 1.0 | -1 | probabilistic | <u>**4.99**</u> | 88.22% | 76.95% | 66.20% | 55.09% | 45.21% | 37.16% | 30.04% | 735.03 | 144.65 |
+| Markov-Engram (2.6M) {: data-conditional="88.28% 86.51% 84.86% 82.94% 82.14% 81.40% 80.48%"} | 1.0 | 1.0 | -1 | probabilistic | **4.92** | 88.28% | 76.37% | 64.81% | 53.75% | 44.15% | 35.94% | 28.93% | 735.03 | 143.82 |
 
 </div>
 
-<figcaption>GSM8K (5-shot) 上 Baseline 与 Markov-Engram (0.13M) 的接受率（均 3 epoch，T = 1，Probabilistic draft）</figcaption>
+<figcaption>GSM8K (5-shot) 上 Baseline 与 Markov-Engram（0.13M、2.6M）的接受率（均 3 epoch，T = 1，Probabilistic draft）</figcaption>
 </figure>
 
 </details>
