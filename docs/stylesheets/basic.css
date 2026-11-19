@@ -128,7 +128,8 @@ p:has(+ .arithmatex) {
     color: #133167; /* LimeGreen color for h3 */
     font-weight: bold;
   }
-  .md-content .md-typeset h4 {
+  .md-content .md-typeset h4,
+  .md-content .md-typeset .dspark-subheading {
     font-size: 1em;
     font-weight: 600;
     line-height: 1.4;
@@ -136,7 +137,8 @@ p:has(+ .arithmatex) {
     color: var(--md-default-fg-color);
   }
 
-  .md-content .md-typeset h4::before {
+  .md-content .md-typeset h4::before,
+  .md-content .md-typeset .dspark-subheading::before {
     content: "";
     display: inline-block;
     inline-size: .42em;
@@ -815,4 +817,8 @@ p:has(+ .arithmatex) {
 
 .md-typeset .dspark-paired table:not([class]) tbody tr[data-pair-tone="1"] td {
   background-color: #e6e6e6;
+}
+
+.md-content .md-typeset .dspark-subheading {
+  letter-spacing: -.01em;
 }

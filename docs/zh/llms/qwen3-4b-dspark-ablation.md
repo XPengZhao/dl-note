@@ -207,11 +207,11 @@ Context-only 和 all-mask 的 \(\tau\) 分别下降 1.76% 和 1.61%，但影响�
 
 生成评测使用 Qwen3-4B 的 non-thinking 模式，draft 每轮提出 7 个候选 token。
 
-#### 训练数据集 {#_5}
+<p class="dspark-subheading" id="_5">训练数据集</p>
 
 训练消融使用 Open PerfectBlend。我们用 Qwen3-4B 在 non-thinking 模式下重新生成回复，采样参数为 `temperature=0.7`、`top-p=0.8`、`top-k=20`、`min-p=0`，每条回复最多生成 4,096 个 token。重新生成后共有 1,339,875 个训练样本。
 
-#### 训练方式
+<p class="dspark-subheading" id="_4">训练方式</p>
 
 Offline 和 online 训练均使用预先生成的对话样本，由冻结的 Qwen3-4B 提供 target hidden states。每个样本最多采样 512 个 anchor，仅监督回复部分。Baseline 的损失为 \(0.1L_{\mathrm{CE}}+0.9L_{\mathrm{L1}}+L_{\mathrm{conf}}\)，位置权重为 \(\exp(-i/4)\)，其中 \(i=0,\ldots,6\)。
 
@@ -219,7 +219,7 @@ Offline 和 online 训练均使用预先生成的对话样本，由冻结的 Qwe
 
 - **Online training** 由 SGLang 在训练期间计算 target hidden states，SpecForge 从缓冲区读取并训练 draft。Target 计算下一批数据时，draft 可以并行训练当前批。MAL vs. Epochs 的 baseline 使用 7 张 GPU 训练 draft，每卡 micro-batch 为 4，梯度累积 18 次，global batch size 为 \(7\times4\times18=504\)。Markov MLA 和 Markov GQA 的对比实验也采用 online training。
 
-#### 测试数据集 {#_6}
+<p class="dspark-subheading" id="_6">测试数据集</p>
 
 - **GSM8K** 收录小学数学应用题，通常需要多步算术运算才能得到答案。两种设置都使用全部 1,319 道测试题。本文脚本用 `Question: …` 给出当前题目，在下一行用 `Answer:` 引出回答。0-shot 直接使用这一提示。5-shot 在每道测试题前附上相同的五组示例，取自训练集前五道题及其完整解答。[数据集](https://github.com/openai/grade-school-math)
 - **HumanEval** 包含 164 道 Python 函数补全题，每题给出函数签名和文档字符串，要求模型补全函数实现。[数据集](https://github.com/openai/human-eval)
@@ -227,7 +227,7 @@ Offline 和 online 训练均使用预先生成的对话样本，由冻结的 Qwe
 - **MATH-500** 收录从 MATH 测试集选出的 500 道竞赛数学题，涵盖代数、几何、数论等七个主题。本文使用全部 500 道题评测数学推理过程中的 draft token 接受率。[数据集](https://huggingface.co/datasets/HuggingFaceH4/MATH-500)
 - **AIME 2024** 收录 2024 年美国数学邀请赛（AIME I 和 AIME II）的全部 30 道题，每题的答案都是 0 至 999 的整数。本文对 AIME 和 MATH-500 使用相同的提示，要求模型逐步推理，并将最终答案写在 `\boxed{}` 中。[数据集](https://huggingface.co/datasets/Maxwell-Jia/AIME_2024)
 
-#### Metrics {#metrics}
+<p class="dspark-subheading" id="metrics">Metrics</p>
 
 训练时，设 \(p_i\)、\(q_i\) 分别为第 \(i\) 个位置的 target 与 draft 分布。概率采样的接受率为
 
@@ -250,7 +250,7 @@ $$
 
 Baseline 在每个 epoch 包含 2658 个训练 step。pos-$k$ 表示一次起草中前 $k$ 个 token 连续被接受的比例。除 GSM8K (5-shot) 外，第 1–10 个 epoch 的结果使用 `VLLM_BATCH_INVARIANT=1` 评测。MIT 和 MOT 分别为每个成功请求的平均输入和输出 token 数；MT-Bench 合并两轮统计。
 
-#### GSM8K {#gsm8k}
+<p class="dspark-subheading" id="gsm8k">GSM8K</p>
 
 <details class="dspark-temperature" open markdown="1">
 <summary>Temperature = 0</summary>
@@ -329,7 +329,7 @@ Baseline 在每个 epoch 包含 2658 个训练 step。pos-$k$ 表示一次起草
 
 </details>
 
-#### GSM8K (5-shot) {#gsm8k-5-shot}
+<p class="dspark-subheading" id="gsm8k-5-shot">GSM8K (5-shot)</p>
 
 <details class="dspark-temperature" open markdown="1">
 <summary>Temperature = 0</summary>
@@ -408,7 +408,7 @@ Baseline 在每个 epoch 包含 2658 个训练 step。pos-$k$ 表示一次起草
 
 </details>
 
-#### HumanEval {#humaneval}
+<p class="dspark-subheading" id="humaneval">HumanEval</p>
 
 
 <details class="dspark-temperature" open markdown="1">
@@ -488,7 +488,7 @@ Baseline 在每个 epoch 包含 2658 个训练 step。pos-$k$ 表示一次起草
 
 </details>
 
-#### MT-Bench {#mt-bench}
+<p class="dspark-subheading" id="mt-bench">MT-Bench</p>
 
 
 <details class="dspark-temperature" open markdown="1">
@@ -568,7 +568,7 @@ Baseline 在每个 epoch 包含 2658 个训练 step。pos-$k$ 表示一次起草
 
 </details>
 
-#### MATH-500 {#math-500}
+<p class="dspark-subheading" id="math-500">MATH-500</p>
 
 <details class="dspark-temperature" open markdown="1">
 <summary>Temperature = 0</summary>
@@ -647,7 +647,7 @@ Baseline 在每个 epoch 包含 2658 个训练 step。pos-$k$ 表示一次起草
 
 </details>
 
-#### AIME 2024 {#aime-2024}
+<p class="dspark-subheading" id="aime-2024">AIME 2024</p>
 
 
 <details class="dspark-temperature" open markdown="1">
@@ -756,7 +756,7 @@ T 表示 target temperature，Top-p、Top-k 为 target 截断参数，min-p 固�
 
 GQA baseline 采用 online training，以下结果来自 step 2616（约 1 个 epoch）的 checkpoint。本节所有配置均使用 vLLM 的批次不变模式（`VLLM_BATCH_INVARIANT=1`）评测。MIT 和 MOT 分别为每个成功请求的平均输入和输出 token 数，MT-Bench 按两轮请求合并计算。
 
-#### GSM8K {#attention-gsm8k}
+<p class="dspark-subheading" id="attention-gsm8k">GSM8K</p>
 
 <details class="dspark-temperature" open markdown="1">
 <summary>Temperature = 0</summary>
@@ -819,7 +819,7 @@ GQA baseline 采用 online training，以下结果来自 step 2616（约 1 个 e
 
 </details>
 
-#### HumanEval {#attention-humaneval}
+<p class="dspark-subheading" id="attention-humaneval">HumanEval</p>
 
 <details class="dspark-temperature" open markdown="1">
 <summary>Temperature = 0</summary>
@@ -882,7 +882,7 @@ GQA baseline 采用 online training，以下结果来自 step 2616（约 1 个 e
 
 </details>
 
-#### MT-Bench {#attention-mtbench}
+<p class="dspark-subheading" id="attention-mtbench">MT-Bench</p>
 
 <details class="dspark-temperature" open markdown="1">
 <summary>Temperature = 0</summary>
@@ -945,7 +945,7 @@ GQA baseline 采用 online training，以下结果来自 step 2616（约 1 个 e
 
 </details>
 
-#### MATH-500 {#attention-math500}
+<p class="dspark-subheading" id="attention-math500">MATH-500</p>
 
 <details class="dspark-temperature" open markdown="1">
 <summary>Temperature = 0</summary>
@@ -1008,7 +1008,7 @@ GQA baseline 采用 online training，以下结果来自 step 2616（约 1 个 e
 
 </details>
 
-#### AIME 2024 {#attention-aime}
+<p class="dspark-subheading" id="attention-aime">AIME 2024</p>
 
 <details class="dspark-temperature" open markdown="1">
 <summary>Temperature = 0</summary>
@@ -1076,7 +1076,7 @@ GQA baseline 采用 online training，以下结果来自 step 2616（约 1 个 e
 Markov-Engram（结构见 1.4 节）采用 online training，以下结果来自 step 7974（约 3 个 epoch）的 checkpoint，评测均为 greedy 验证。表中 Baseline 行为 4.2 节第 3 个 epoch 的结果，两者训练量相同。除 GSM8K 为 5-shot 外，各基准的设置与 4.2 节一致。
 
 
-#### GSM8K (5-shot) {#engram-gsm8k}
+<p class="dspark-subheading" id="engram-gsm8k">GSM8K (5-shot)</p>
 
 
 <details class="dspark-temperature" open markdown="1">
@@ -1133,7 +1133,7 @@ Markov-Engram（结构见 1.4 节）采用 online training，以下结果来自 
 </details>
 
 
-#### HumanEval {#engram-humaneval}
+<p class="dspark-subheading" id="engram-humaneval">HumanEval</p>
 
 
 <details class="dspark-temperature" open markdown="1">
@@ -1190,7 +1190,7 @@ Markov-Engram（结构见 1.4 节）采用 online training，以下结果来自 
 </details>
 
 
-#### MT-Bench {#engram-mtbench}
+<p class="dspark-subheading" id="engram-mtbench">MT-Bench</p>
 
 
 <details class="dspark-temperature" open markdown="1">
@@ -1247,7 +1247,7 @@ Markov-Engram（结构见 1.4 节）采用 online training，以下结果来自 
 </details>
 
 
-#### MATH-500 {#engram-math500}
+<p class="dspark-subheading" id="engram-math500">MATH-500</p>
 
 
 <details class="dspark-temperature" open markdown="1">
@@ -1304,7 +1304,7 @@ Markov-Engram（结构见 1.4 节）采用 online training，以下结果来自 
 </details>
 
 
-#### AIME 2024 {#engram-aime}
+<p class="dspark-subheading" id="engram-aime">AIME 2024</p>
 
 
 <details class="dspark-temperature" open markdown="1">
@@ -1369,7 +1369,7 @@ Markov-Engram（结构见 1.4 节）采用 online training，以下结果来自 
 
 使用 1/10 训练集训练 Markov-Engram，checkpoint 为 step 2659。Baseline 对照结果同样来自 step 2659。比较三组 2-gram / 3-gram 词表大小，分别为 0.131M / 0.262M、1.31M / 2.62M 和 2.62M / 5.24M。表中按 2-gram / 3-gram 的顺序标注词表大小。原 0.131M / 0.262M 配置各有 8 个哈希头、每头 16 维。GSM8K 使用 0-shot；所有结果均为 top-p = 1、top-k = -1。表中 pos-1 至 pos-7 为连续接受率，MIT、MOT 分别为平均输入、输出 token 数。
 
-#### GSM8K (0-shot) {#engram-subset-gsm8k}
+<p class="dspark-subheading" id="engram-subset-gsm8k">GSM8K (0-shot)</p>
 
 <details class="dspark-temperature" open markdown="1">
 <summary>Temperature = 0</summary>
@@ -1429,7 +1429,7 @@ Markov-Engram（结构见 1.4 节）采用 online training，以下结果来自 
 
 </details>
 
-#### HumanEval {#engram-subset-humaneval}
+<p class="dspark-subheading" id="engram-subset-humaneval">HumanEval</p>
 
 <details class="dspark-temperature" open markdown="1">
 <summary>Temperature = 0</summary>
@@ -1489,7 +1489,7 @@ Markov-Engram（结构见 1.4 节）采用 online training，以下结果来自 
 
 </details>
 
-#### MT-Bench {#engram-subset-mtbench}
+<p class="dspark-subheading" id="engram-subset-mtbench">MT-Bench</p>
 
 <details class="dspark-temperature" open markdown="1">
 <summary>Temperature = 0</summary>
@@ -1549,7 +1549,7 @@ Markov-Engram（结构见 1.4 节）采用 online training，以下结果来自 
 
 </details>
 
-#### MATH-500 {#engram-subset-math500}
+<p class="dspark-subheading" id="engram-subset-math500">MATH-500</p>
 
 <details class="dspark-temperature" open markdown="1">
 <summary>Temperature = 0</summary>
@@ -1609,7 +1609,7 @@ Markov-Engram（结构见 1.4 节）采用 online training，以下结果来自 
 
 </details>
 
-#### AIME {#engram-subset-aime}
+<p class="dspark-subheading" id="engram-subset-aime">AIME</p>
 
 <details class="dspark-temperature" open markdown="1">
 <summary>Temperature = 0</summary>
