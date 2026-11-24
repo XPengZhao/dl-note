@@ -1972,6 +1972,50 @@ GSM8K 取 64 道题、共 512 个固定前缀，另取 Open PerfectBlend 的 64 
 
 </details>
 
+<p class="dspark-subheading" id="rollout-subset-regen">Open PerfectBlend (regen)</p>
+
+评测 prompt 从 Open PerfectBlend 训练集中抽取，在线重新生成回答。以下比较 Baseline (AdamW)、Baseline (Muon) 与 1.3M (Muon + AdamW)，均使用 step 2659 checkpoint。
+
+<details class="dspark-temperature" open markdown="1">
+<summary>Temperature = 0</summary>
+
+<figure class="dspark-table-figure" markdown="1">
+
+<div class="js-sortable-table js-multisort js-row-reorder dspark-three-line dspark-compact dspark-sampling" markdown="1">
+
+| 模型 | T | Top-p | Top-k | Draft 采样 | **MAL** | pos-1 | pos-2 | pos-3 | pos-4 | pos-5 | pos-6 | pos-7 | MIT | MOT |
+| --- | :---: | ---: | ---: | --- | :---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Baseline (AdamW) {: data-conditional="80.34% 78.71% 80.04% 82.06% 83.27% 84.46% 84.73%"} | 0.0 | 1.0 | -1 | greedy | **4.24** | 80.34% | 63.23% | 50.62% | 41.53% | 34.59% | 29.21% | 24.75% | 501.05 | 579.35 |
+| Baseline (Muon) {: data-conditional="81.75% 80.58% 81.06% 82.48% 82.94% 84.19% 83.81%"} | 0.0 | 1.0 | -1 | greedy | **4.38** | 81.75% | 65.87% | 53.40% | 44.04% | 36.53% | 30.75% | 25.77% | 501.05 | 579.35 |
+| 1.3M (Muon + AdamW) {: data-conditional="82.42% 81.47% 81.61% 83.39% 84.71% 85.38% 86.00%"} | 0.0 | 1.0 | -1 | greedy | <u>**4.50**</u> | 82.42% | 67.15% | 54.80% | 45.70% | 38.71% | 33.05% | 28.43% | 501.05 | 579.35 |
+
+</div>
+
+<figcaption>Open PerfectBlend 训练集抽样 prompt 上的在线接受率（step 2659，T = 0，Greedy draft）</figcaption>
+</figure>
+
+</details>
+
+<details class="dspark-temperature" markdown="1">
+<summary>Temperature = 1</summary>
+
+<figure class="dspark-table-figure" markdown="1">
+
+<div class="js-sortable-table js-multisort js-row-reorder dspark-three-line dspark-compact dspark-sampling" markdown="1">
+
+| 模型 | T | Top-p | Top-k | Draft 采样 | **MAL** | pos-1 | pos-2 | pos-3 | pos-4 | pos-5 | pos-6 | pos-7 | MIT | MOT |
+| --- | :---: | ---: | ---: | --- | :---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Baseline (AdamW) {: data-conditional="76.61% 75.40% 76.24% 78.68% 79.70% 80.54% 81.28%"} | 1.0 | 1.0 | -1 | probabilistic | **3.81** | 76.61% | 57.76% | 44.03% | 34.64% | 27.61% | 22.24% | 18.07% | 501.05 | 546.26 |
+| Baseline (Muon) {: data-conditional="78.37% 77.24% 77.25% 78.42% 79.88% 80.41% 80.35%"} | 1.0 | 1.0 | -1 | probabilistic | **3.94** | 78.37% | 60.53% | 46.76% | 36.67% | 29.29% | 23.55% | 18.93% | 501.05 | 548.80 |
+| 1.3M (Muon + AdamW) {: data-conditional="79.06% 77.82% 78.36% 80.79% 81.60% 83.13% 82.23%"} | 1.0 | 1.0 | -1 | probabilistic | <u>**4.08**</u> | 79.06% | 61.52% | 48.21% | 38.95% | 31.78% | 26.42% | 21.73% | 501.05 | 543.70 |
+
+</div>
+
+<figcaption>Open PerfectBlend 训练集抽样 prompt 上的在线接受率（step 2659，T = 1，Probabilistic draft）</figcaption>
+</figure>
+
+</details>
+
 <p class="dspark-subheading" id="rollout-subset-humaneval">HumanEval</p>
 
 <details class="dspark-temperature" open markdown="1">
