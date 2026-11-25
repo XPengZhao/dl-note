@@ -1913,7 +1913,9 @@ GSM8K 取 64 道题、共 512 个固定前缀，另取 Open PerfectBlend 的 64 
 
 ### 4.7 MAL vs. Rollout (1/10 Train Set, 10 Rollouts) {#mal-vs-rollout-subset}
 
-选取 Open PerfectBlend 的 1/10 prompt，以 Qwen3-4B 在 temperature = 1 下为每条 prompt 采样 10 条回答轨迹，组成训练集，每条轨迹训练一遍。比较 Baseline (AdamW)、Baseline (Muon) 与 1.3M (Muon + AdamW)。后者使用 1.3M Engram 表，Baseline 部分使用 Muon，Engram 使用 AdamW。三组评测 checkpoint 均为 step 2659。表中 T 表示评测时 target 的采样温度，Draft 采样表示 draft 的采样方式。GSM8K 使用 0-shot，所有评测均为 top-p = 1、top-k = -1。
+选取 Open PerfectBlend 的 1/10 prompt，以 Qwen3-4B 在 temperature = 1 下为每条 prompt 采样 10 条回答轨迹，组成训练集，每条轨迹训练一遍。比较 Baseline (AdamW)、Baseline (Muon) 与 1.3M (Muon + AdamW)。后者使用 1.3M Engram 表，Baseline 部分使用 Muon，Engram 使用 AdamW。新增 Vector gate, Engram-only：使用相同的 1.3M 表配置，加入向量 gate，冻结 baseline 参数，仅训练 Engram，学习率为 `3e-3`。除单独标注的 step 1596 外，各组评测 checkpoint 均为 step 2659。表中 T 表示评测时 target 的采样温度，Draft 采样表示 draft 的采样方式。GSM8K 使用 0-shot，所有评测均为 top-p = 1、top-k = -1。
+
+Vector gate, Engram-only 对应实验 `dspark-gate-markov-engram-only-1.3M-table-rollout10-lr3e-3-20261124-203734`，同时记录 step 1596 与 step 2659。训练指标先升后降，step 1596 接近训练曲线最优点。两组均覆盖以下五个测试集，未包含 Open PerfectBlend (regen)。
 
 <p class="dspark-subheading" id="rollout-subset-gsm8k">GSM8K (0-shot)</p>
 
@@ -1927,12 +1929,14 @@ GSM8K 取 64 道题、共 512 个固定前缀，另取 Open PerfectBlend 的 64 
 | 模型 | T | Top-p | Top-k | Draft 采样 | **MAL** | pos-1 | pos-2 | pos-3 | pos-4 | pos-5 | pos-6 | pos-7 | MIT | MOT |
 | --- | :---: | ---: | ---: | --- | :---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | Baseline (AdamW) {: data-conditional="92.40% 91.08% 90.47% 90.89% 89.77% 89.48% 88.97%"} | 0.0 | 1.0 | -1 | greedy | **5.89** | 92.40% | 84.16% | 76.14% | 69.21% | 62.13% | 55.59% | 49.46% | 77.03 | 252.23 |
-| Baseline (Muon) {: data-conditional="92.80% 91.80% 90.98% 91.31% 90.06% 89.92% 89.08%"} | 0.0 | 1.0 | -1 | greedy | <u>**5.98**</u> | 92.80% | 85.19% | 77.51% | 70.78% | 63.74% | 57.32% | 51.06% | 77.03 | 252.23 |
+| Baseline (Muon) {: data-conditional="92.80% 91.80% 90.98% 91.31% 90.06% 89.92% 89.08%"} | 0.0 | 1.0 | -1 | greedy | **5.98** | 92.80% | 85.19% | 77.51% | 70.78% | 63.74% | 57.32% | 51.06% | 77.03 | 252.23 |
 | 1.3M (Muon + AdamW) {: data-conditional="92.93% 91.63% 90.83% 90.95% 90.07% 89.88% 89.13%"} | 0.0 | 1.0 | -1 | greedy | **5.97** | 92.93% | 85.16% | 77.35% | 70.34% | 63.36% | 56.95% | 50.76% | 77.03 | 252.23 |
+| 1.3M (Vector gate, Engram-only, step 1596) {: data-conditional="92.93% 91.95% 91.05% 91.49% 90.53% 90.28% 89.66%"} | 0.0 | 1.0 | -1 | greedy | <u>**6.02**</u> | 92.93% | 85.45% | 77.80% | 71.18% | 64.44% | 58.17% | 52.16% | 77.03 | 252.23 |
+| 1.3M (Vector gate, Engram-only, step 2659) {: data-conditional="92.92% 91.81% 91.08% 91.52% 90.54% 90.20% 89.67%"} | 0.0 | 1.0 | -1 | greedy | <u>**6.02**</u> | 92.92% | 85.31% | 77.70% | 71.11% | 64.38% | 58.07% | 52.07% | 77.03 | 252.23 |
 
 </div>
 
-<figcaption>GSM8K (0-shot) 上 Baseline (AdamW)、Baseline (Muon) 与 1.3M (Muon + AdamW) 的接受率（1/10 prompt，每条 10 rollouts，step 2659，T = 0，Greedy draft）</figcaption>
+<figcaption>GSM8K (0-shot) 上各模型的接受率（1/10 prompt，每条 10 rollouts，step 见模型标注，T = 0，Greedy draft）</figcaption>
 </figure>
 
 </details>
@@ -1948,11 +1952,13 @@ GSM8K 取 64 道题、共 512 个固定前缀，另取 Open PerfectBlend 的 64 
 | --- | :---: | ---: | ---: | --- | :---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | Baseline (AdamW) {: data-conditional="89.14% 88.50% 88.38% 89.14% 88.59% 88.47% 87.90%"} | 1.0 | 1.0 | -1 | greedy | **5.46** | 89.14% | 78.89% | 69.72% | 62.15% | 55.06% | 48.71% | 42.82% | 77.03 | 248.30 |
 | Baseline (Muon) {: data-conditional="89.39% 88.86% 88.56% 89.49% 89.01% 88.63% 88.46%"} | 1.0 | 1.0 | -1 | greedy | **5.52** | 89.39% | 79.43% | 70.35% | 62.95% | 56.03% | 49.66% | 43.93% | 77.03 | 248.24 |
-| 1.3M (Muon + AdamW) {: data-conditional="89.68% 88.91% 88.79% 89.46% 88.84% 88.78% 88.62%"} | 1.0 | 1.0 | -1 | greedy | <u>**5.54**</u> | 89.68% | 79.74% | 70.80% | 63.34% | 56.27% | 49.95% | 44.27% | 77.03 | 246.61 |
+| 1.3M (Muon + AdamW) {: data-conditional="89.68% 88.91% 88.79% 89.46% 88.84% 88.78% 88.62%"} | 1.0 | 1.0 | -1 | greedy | **5.54** | 89.68% | 79.74% | 70.80% | 63.34% | 56.27% | 49.95% | 44.27% | 77.03 | 246.61 |
+| 1.3M (Vector gate, Engram-only, step 1596) {: data-conditional="89.48% 89.07% 89.10% 89.89% 89.36% 88.96% 88.68%"} | 1.0 | 1.0 | -1 | greedy | <u>**5.57**</u> | 89.48% | 79.70% | 71.02% | 63.84% | 57.05% | 50.75% | 45.01% | 77.03 | 250.01 |
+| 1.3M (Vector gate, Engram-only, step 2659) {: data-conditional="89.49% 89.21% 88.91% 89.89% 89.43% 88.85% 88.79%"} | 1.0 | 1.0 | -1 | greedy | <u>**5.57**</u> | 89.49% | 79.83% | 70.98% | 63.81% | 57.06% | 50.70% | 45.02% | 77.03 | 249.44 |
 
 </div>
 
-<figcaption>GSM8K (0-shot) 上 Baseline (AdamW)、Baseline (Muon) 与 1.3M (Muon + AdamW) 的接受率（1/10 prompt，每条 10 rollouts，step 2659，T = 1，Greedy draft）</figcaption>
+<figcaption>GSM8K (0-shot) 上各模型的接受率（1/10 prompt，每条 10 rollouts，step 见模型标注，T = 1，Greedy draft）</figcaption>
 </figure>
 
 <figure class="dspark-table-figure" markdown="1">
@@ -1963,11 +1969,13 @@ GSM8K 取 64 道题、共 512 个固定前缀，另取 Open PerfectBlend 的 64 
 | --- | :---: | ---: | ---: | --- | :---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | Baseline (AdamW) {: data-conditional="91.62% 90.02% 89.33% 89.07% 88.23% 87.49% 86.89%"} | 1.0 | 1.0 | -1 | probabilistic | **5.66** | 91.62% | 82.48% | 73.68% | 65.63% | 57.91% | 50.66% | 44.02% | 77.03 | 246.45 |
 | Baseline (Muon) {: data-conditional="92.07% 90.55% 89.69% 89.37% 88.23% 87.95% 87.17%"} | 1.0 | 1.0 | -1 | probabilistic | **5.73** | 92.07% | 83.37% | 74.77% | 66.83% | 58.96% | 51.86% | 45.20% | 77.03 | 250.79 |
-| 1.3M (Muon + AdamW) {: data-conditional="92.24% 90.45% 89.48% 89.83% 89.17% 88.26% 87.74%"} | 1.0 | 1.0 | -1 | probabilistic | <u>**5.76**</u> | 92.24% | 83.44% | 74.66% | 67.07% | 59.81% | 52.79% | 46.32% | 77.03 | 249.13 |
+| 1.3M (Muon + AdamW) {: data-conditional="92.24% 90.45% 89.48% 89.83% 89.17% 88.26% 87.74%"} | 1.0 | 1.0 | -1 | probabilistic | **5.76** | 92.24% | 83.44% | 74.66% | 67.07% | 59.81% | 52.79% | 46.32% | 77.03 | 249.13 |
+| 1.3M (Vector gate, Engram-only, step 1596) {: data-conditional="92.06% 90.59% 90.26% 89.91% 89.21% 88.83% 88.39%"} | 1.0 | 1.0 | -1 | probabilistic | <u>**5.80**</u> | 92.06% | 83.39% | 75.27% | 67.68% | 60.38% | 53.64% | 47.41% | 77.03 | 248.88 |
+| 1.3M (Vector gate, Engram-only, step 2659) {: data-conditional="92.15% 90.49% 90.04% 90.03% 89.19% 88.72% 88.01%"} | 1.0 | 1.0 | -1 | probabilistic | **5.79** | 92.15% | 83.39% | 75.08% | 67.60% | 60.29% | 53.49% | 47.08% | 77.03 | 251.02 |
 
 </div>
 
-<figcaption>GSM8K (0-shot) 上 Baseline (AdamW)、Baseline (Muon) 与 1.3M (Muon + AdamW) 的接受率（1/10 prompt，每条 10 rollouts，step 2659，T = 1，Probabilistic draft）</figcaption>
+<figcaption>GSM8K (0-shot) 上各模型的接受率（1/10 prompt，每条 10 rollouts，step 见模型标注，T = 1，Probabilistic draft）</figcaption>
 </figure>
 
 </details>
@@ -2029,11 +2037,13 @@ GSM8K 取 64 道题、共 512 个固定前缀，另取 Open PerfectBlend 的 64 
 | --- | :---: | ---: | ---: | --- | :---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | Baseline (AdamW) {: data-conditional="88.47% 86.79% 86.21% 85.62% 84.32% 85.40% 82.31%"} | 0.0 | 1.0 | -1 | greedy | **5.10** | 88.47% | 76.78% | 66.19% | 56.67% | 47.79% | 40.81% | 33.59% | 167.22 | 355.60 |
 | Baseline (Muon) {: data-conditional="89.39% 88.07% 87.08% 86.35% 85.12% 85.58% 81.36%"} | 0.0 | 1.0 | -1 | greedy | **5.24** | 89.39% | 78.72% | 68.55% | 59.19% | 50.38% | 43.11% | 35.08% | 167.22 | 355.60 |
-| 1.3M (Muon + AdamW) {: data-conditional="89.70% 87.47% 86.63% 86.87% 85.17% 85.98% 83.62%"} | 0.0 | 1.0 | -1 | greedy | <u>**5.25**</u> | 89.70% | 78.46% | 67.97% | 59.05% | 50.29% | 43.24% | 36.16% | 167.22 | 355.60 |
+| 1.3M (Muon + AdamW) {: data-conditional="89.70% 87.47% 86.63% 86.87% 85.17% 85.98% 83.62%"} | 0.0 | 1.0 | -1 | greedy | **5.25** | 89.70% | 78.46% | 67.97% | 59.05% | 50.29% | 43.24% | 36.16% | 167.22 | 355.60 |
+| 1.3M (Vector gate, Engram-only, step 1596) {: data-conditional="89.59% 87.41% 87.67% 87.25% 86.51% 86.42% 83.97%"} | 0.0 | 1.0 | -1 | greedy | **5.31** | 89.59% | 78.31% | 68.65% | 59.90% | 51.82% | 44.78% | 37.60% | 167.22 | 355.60 |
+| 1.3M (Vector gate, Engram-only, step 2659) {: data-conditional="89.61% 87.60% 87.78% 87.26% 86.38% 86.42% 84.27%"} | 0.0 | 1.0 | -1 | greedy | <u>**5.32**</u> | 89.61% | 78.50% | 68.91% | 60.13% | 51.94% | 44.89% | 37.83% | 167.22 | 355.60 |
 
 </div>
 
-<figcaption>HumanEval 上 Baseline (AdamW)、Baseline (Muon) 与 1.3M (Muon + AdamW) 的接受率（1/10 prompt，每条 10 rollouts，step 2659，T = 0，Greedy draft）</figcaption>
+<figcaption>HumanEval 上各模型的接受率（1/10 prompt，每条 10 rollouts，step 见模型标注，T = 0，Greedy draft）</figcaption>
 </figure>
 
 </details>
@@ -2050,10 +2060,12 @@ GSM8K 取 64 道题、共 512 个固定前缀，另取 Open PerfectBlend 的 64 
 | Baseline (AdamW) {: data-conditional="87.97% 85.59% 86.62% 85.97% 85.38% 84.41% 82.27%"} | 1.0 | 1.0 | -1 | greedy | **5.06** | 87.97% | 75.29% | 65.22% | 56.07% | 47.87% | 40.41% | 33.25% | 167.22 | 342.90 |
 | Baseline (Muon) {: data-conditional="87.28% 86.86% 86.36% 85.86% 85.44% 84.81% 82.65%"} | 1.0 | 1.0 | -1 | greedy | **5.07** | 87.28% | 75.81% | 65.47% | 56.21% | 48.02% | 40.73% | 33.66% | 167.22 | 360.71 |
 | 1.3M (Muon + AdamW) {: data-conditional="88.77% 86.66% 86.79% 86.47% 86.22% 84.76% 84.08%"} | 1.0 | 1.0 | -1 | greedy | <u>**5.18**</u> | 88.77% | 76.93% | 66.76% | 57.73% | 49.77% | 42.19% | 35.47% | 167.22 | 347.91 |
+| 1.3M (Vector gate, Engram-only, step 1596) {: data-conditional="87.57% 87.18% 87.11% 87.18% 85.85% 86.70% 84.05%"} | 1.0 | 1.0 | -1 | greedy | <u>**5.18**</u> | 87.57% | 76.35% | 66.51% | 57.98% | 49.78% | 43.16% | 36.27% | 167.22 | 350.41 |
+| 1.3M (Vector gate, Engram-only, step 2659) {: data-conditional="87.79% 86.90% 86.86% 87.26% 86.07% 86.49% 84.25%"} | 1.0 | 1.0 | -1 | greedy | **5.17** | 87.79% | 76.30% | 66.27% | 57.82% | 49.77% | 43.04% | 36.26% | 167.22 | 348.05 |
 
 </div>
 
-<figcaption>HumanEval 上 Baseline (AdamW)、Baseline (Muon) 与 1.3M (Muon + AdamW) 的接受率（1/10 prompt，每条 10 rollouts，step 2659，T = 1，Greedy draft）</figcaption>
+<figcaption>HumanEval 上各模型的接受率（1/10 prompt，每条 10 rollouts，step 见模型标注，T = 1，Greedy draft）</figcaption>
 </figure>
 
 <figure class="dspark-table-figure" markdown="1">
@@ -2064,11 +2076,13 @@ GSM8K 取 64 道题、共 512 个固定前缀，另取 Open PerfectBlend 的 64 
 | --- | :---: | ---: | ---: | --- | :---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | Baseline (AdamW) {: data-conditional="88.02% 85.17% 85.49% 83.99% 83.38% 83.42% 81.50%"} | 1.0 | 1.0 | -1 | probabilistic | **4.94** | 88.02% | 74.97% | 64.09% | 53.83% | 44.88% | 37.44% | 30.51% | 167.22 | 350.74 |
 | Baseline (Muon) {: data-conditional="88.77% 87.43% 86.57% 84.97% 83.45% 82.21% 80.04%"} | 1.0 | 1.0 | -1 | probabilistic | **5.09** | 88.77% | 77.62% | 67.19% | 57.09% | 47.64% | 39.16% | 31.35% | 167.22 | 342.88 |
-| 1.3M (Muon + AdamW) {: data-conditional="89.20% 86.77% 85.83% 85.73% 84.62% 84.66% 82.37%"} | 1.0 | 1.0 | -1 | probabilistic | <u>**5.13**</u> | 89.20% | 77.40% | 66.43% | 56.95% | 48.19% | 40.80% | 33.61% | 167.22 | 351.68 |
+| 1.3M (Muon + AdamW) {: data-conditional="89.20% 86.77% 85.83% 85.73% 84.62% 84.66% 82.37%"} | 1.0 | 1.0 | -1 | probabilistic | **5.13** | 89.20% | 77.40% | 66.43% | 56.95% | 48.19% | 40.80% | 33.61% | 167.22 | 351.68 |
+| 1.3M (Vector gate, Engram-only, step 1596) {: data-conditional="89.20% 87.77% 87.58% 86.14% 84.97% 84.28% 81.93%"} | 1.0 | 1.0 | -1 | probabilistic | <u>**5.22**</u> | 89.20% | 78.30% | 68.57% | 59.07% | 50.19% | 42.30% | 34.65% | 167.22 | 344.66 |
+| 1.3M (Vector gate, Engram-only, step 2659) {: data-conditional="88.75% 87.65% 87.06% 86.27% 85.53% 84.70% 82.35%"} | 1.0 | 1.0 | -1 | probabilistic | **5.20** | 88.75% | 77.79% | 67.72% | 58.42% | 49.97% | 42.32% | 34.85% | 167.22 | 340.36 |
 
 </div>
 
-<figcaption>HumanEval 上 Baseline (AdamW)、Baseline (Muon) 与 1.3M (Muon + AdamW) 的接受率（1/10 prompt，每条 10 rollouts，step 2659，T = 1，Probabilistic draft）</figcaption>
+<figcaption>HumanEval 上各模型的接受率（1/10 prompt，每条 10 rollouts，step 见模型标注，T = 1，Probabilistic draft）</figcaption>
 </figure>
 
 </details>
@@ -2086,11 +2100,13 @@ GSM8K 取 64 道题、共 512 个固定前缀，另取 Open PerfectBlend 的 64 
 | --- | :---: | ---: | ---: | --- | :---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | Baseline (AdamW) {: data-conditional="72.40% 69.54% 69.93% 72.17% 73.67% 74.97% 76.65%"} | 0.0 | 1.0 | -1 | greedy | **3.27** | 72.40% | 50.35% | 35.21% | 25.41% | 18.72% | 14.03% | 10.76% | 330.07 | 496.62 |
 | Baseline (Muon) {: data-conditional="73.91% 71.06% 70.88% 73.13% 74.20% 75.75% 75.14%"} | 0.0 | 1.0 | -1 | greedy | **3.38** | 73.91% | 52.52% | 37.23% | 27.22% | 20.20% | 15.30% | 11.50% | 330.07 | 496.62 |
-| 1.3M (Muon + AdamW) {: data-conditional="74.46% 71.48% 71.75% 73.41% 74.19% 75.67% 76.05%"} | 0.0 | 1.0 | -1 | greedy | <u>**3.42**</u> | 74.46% | 53.22% | 38.19% | 28.04% | 20.80% | 15.74% | 11.97% | 330.07 | 496.62 |
+| 1.3M (Muon + AdamW) {: data-conditional="74.46% 71.48% 71.75% 73.41% 74.19% 75.67% 76.05%"} | 0.0 | 1.0 | -1 | greedy | **3.42** | 74.46% | 53.22% | 38.19% | 28.04% | 20.80% | 15.74% | 11.97% | 330.07 | 496.62 |
+| 1.3M (Vector gate, Engram-only, step 1596) {: data-conditional="74.63% 71.46% 71.75% 73.74% 74.80% 76.58% 77.09%"} | 0.0 | 1.0 | -1 | greedy | **3.44** | 74.63% | 53.33% | 38.27% | 28.22% | 21.11% | 16.16% | 12.46% | 330.07 | 496.62 |
+| 1.3M (Vector gate, Engram-only, step 2659) {: data-conditional="74.60% 71.50% 72.06% 73.78% 74.90% 76.39% 76.86%"} | 0.0 | 1.0 | -1 | greedy | <u>**3.45**</u> | 74.60% | 53.34% | 38.44% | 28.36% | 21.24% | 16.23% | 12.47% | 330.07 | 496.62 |
 
 </div>
 
-<figcaption>MT-Bench 上 Baseline (AdamW)、Baseline (Muon) 与 1.3M (Muon + AdamW) 的接受率（1/10 prompt，每条 10 rollouts，step 2659，T = 0，Greedy draft）</figcaption>
+<figcaption>MT-Bench 上各模型的接受率（1/10 prompt，每条 10 rollouts，step 见模型标注，T = 0，Greedy draft）</figcaption>
 </figure>
 
 </details>
@@ -2106,11 +2122,13 @@ GSM8K 取 64 道题、共 512 个固定前缀，另取 Open PerfectBlend 的 64 
 | --- | :---: | ---: | ---: | --- | :---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | Baseline (AdamW) {: data-conditional="66.91% 65.77% 67.14% 69.78% 71.03% 73.46% 74.38%"} | 1.0 | 1.0 | -1 | greedy | **2.95** | 66.91% | 44.01% | 29.55% | 20.62% | 14.65% | 10.76% | 8.00% | 329.10 | 502.72 |
 | Baseline (Muon) {: data-conditional="68.42% 66.97% 68.40% 70.07% 72.28% 74.95% 73.04%"} | 1.0 | 1.0 | -1 | greedy | **3.04** | 68.42% | 45.82% | 31.34% | 21.96% | 15.87% | 11.90% | 8.69% | 328.69 | 507.57 |
-| 1.3M (Muon + AdamW) {: data-conditional="69.05% 68.10% 69.51% 71.56% 72.77% 74.98% 74.65%"} | 1.0 | 1.0 | -1 | greedy | <u>**3.11**</u> | 69.05% | 47.02% | 32.68% | 23.39% | 17.02% | 12.76% | 9.53% | 329.68 | 501.66 |
+| 1.3M (Muon + AdamW) {: data-conditional="69.05% 68.10% 69.51% 71.56% 72.77% 74.98% 74.65%"} | 1.0 | 1.0 | -1 | greedy | **3.11** | 69.05% | 47.02% | 32.68% | 23.39% | 17.02% | 12.76% | 9.53% | 329.68 | 501.66 |
+| 1.3M (Vector gate, Engram-only, step 1596) {: data-conditional="69.63% 68.13% 69.36% 70.87% 72.52% 74.88% 75.01%"} | 1.0 | 1.0 | -1 | greedy | <u>**3.12**</u> | 69.63% | 47.44% | 32.91% | 23.32% | 16.91% | 12.67% | 9.50% | 327.32 | 500.66 |
+| 1.3M (Vector gate, Engram-only, step 2659) {: data-conditional="68.78% 67.29% 68.71% 71.05% 72.68% 74.44% 74.69%"} | 1.0 | 1.0 | -1 | greedy | **3.07** | 68.78% | 46.29% | 31.81% | 22.60% | 16.42% | 12.23% | 9.13% | 331.84 | 504.26 |
 
 </div>
 
-<figcaption>MT-Bench 上 Baseline (AdamW)、Baseline (Muon) 与 1.3M (Muon + AdamW) 的接受率（1/10 prompt，每条 10 rollouts，step 2659，T = 1，Greedy draft）</figcaption>
+<figcaption>MT-Bench 上各模型的接受率（1/10 prompt，每条 10 rollouts，step 见模型标注，T = 1，Greedy draft）</figcaption>
 </figure>
 
 <figure class="dspark-table-figure" markdown="1">
@@ -2121,11 +2139,13 @@ GSM8K 取 64 道题、共 512 个固定前缀，另取 Open PerfectBlend 的 64 
 | --- | :---: | ---: | ---: | --- | :---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | Baseline (AdamW) {: data-conditional="70.20% 67.06% 67.24% 68.92% 71.13% 72.68% 73.18%"} | 1.0 | 1.0 | -1 | probabilistic | **3.06** | 70.20% | 47.08% | 31.66% | 21.82% | 15.52% | 11.28% | 8.26% | 323.38 | 485.73 |
 | Baseline (Muon) {: data-conditional="71.93% 68.47% 68.40% 68.94% 70.08% 71.56% 73.30%"} | 1.0 | 1.0 | -1 | probabilistic | **3.15** | 71.93% | 49.25% | 33.69% | 23.22% | 16.28% | 11.65% | 8.54% | 333.10 | 501.66 |
-| 1.3M (Muon + AdamW) {: data-conditional="72.82% 70.07% 70.56% 71.51% 71.36% 73.10% 73.68%"} | 1.0 | 1.0 | -1 | probabilistic | <u>**3.27**</u> | 72.82% | 51.03% | 36.00% | 25.74% | 18.37% | 13.43% | 9.89% | 319.94 | 489.49 |
+| 1.3M (Muon + AdamW) {: data-conditional="72.82% 70.07% 70.56% 71.51% 71.36% 73.10% 73.68%"} | 1.0 | 1.0 | -1 | probabilistic | **3.27** | 72.82% | 51.03% | 36.00% | 25.74% | 18.37% | 13.43% | 9.89% | 319.94 | 489.49 |
+| 1.3M (Vector gate, Engram-only, step 1596) {: data-conditional="72.59% 69.94% 70.88% 70.96% 73.06% 73.88% 74.29%"} | 1.0 | 1.0 | -1 | probabilistic | <u>**3.28**</u> | 72.59% | 50.76% | 35.98% | 25.53% | 18.65% | 13.78% | 10.24% | 328.49 | 509.40 |
+| 1.3M (Vector gate, Engram-only, step 2659) {: data-conditional="72.96% 70.29% 69.84% 70.46% 73.23% 72.83% 74.72%"} | 1.0 | 1.0 | -1 | probabilistic | **3.27** | 72.96% | 51.28% | 35.81% | 25.23% | 18.48% | 13.46% | 10.06% | 327.55 | 486.86 |
 
 </div>
 
-<figcaption>MT-Bench 上 Baseline (AdamW)、Baseline (Muon) 与 1.3M (Muon + AdamW) 的接受率（1/10 prompt，每条 10 rollouts，step 2659，T = 1，Probabilistic draft）</figcaption>
+<figcaption>MT-Bench 上各模型的接受率（1/10 prompt，每条 10 rollouts，step 见模型标注，T = 1，Probabilistic draft）</figcaption>
 </figure>
 
 </details>
@@ -2144,10 +2164,12 @@ GSM8K 取 64 道题、共 512 个固定前缀，另取 Open PerfectBlend 的 64 
 | Baseline (AdamW) {: data-conditional="91.83% 90.53% 90.12% 90.22% 90.04% 89.40% 88.73%"} | 0.0 | 1.0 | -1 | greedy | **5.81** | 91.83% | 83.14% | 74.92% | 67.59% | 60.85% | 54.40% | 48.27% | 98.16 | 920.65 |
 | Baseline (Muon) {: data-conditional="92.40% 91.09% 90.70% 90.49% 90.30% 89.76% 88.42%"} | 0.0 | 1.0 | -1 | greedy | **5.90** | 92.40% | 84.17% | 76.34% | 69.08% | 62.38% | 55.99% | 49.51% | 98.16 | 920.65 |
 | 1.3M (Muon + AdamW) {: data-conditional="92.69% 91.22% 91.11% 91.17% 90.96% 90.30% 89.12%"} | 0.0 | 1.0 | -1 | greedy | <u>**5.97**</u> | 92.69% | 84.55% | 77.03% | 70.23% | 63.88% | 57.69% | 51.41% | 98.16 | 920.65 |
+| 1.3M (Vector gate, Engram-only, step 1596) {: data-conditional="92.49% 91.45% 91.05% 91.08% 90.86% 90.26% 89.22%"} | 0.0 | 1.0 | -1 | greedy | <u>**5.97**</u> | 92.49% | 84.57% | 77.00% | 70.13% | 63.72% | 57.51% | 51.32% | 98.16 | 920.65 |
+| 1.3M (Vector gate, Engram-only, step 2659) {: data-conditional="92.54% 91.41% 91.03% 91.14% 90.93% 90.26% 89.35%"} | 0.0 | 1.0 | -1 | greedy | <u>**5.97**</u> | 92.54% | 84.59% | 77.01% | 70.18% | 63.82% | 57.60% | 51.47% | 98.16 | 920.65 |
 
 </div>
 
-<figcaption>MATH-500 上 Baseline (AdamW)、Baseline (Muon) 与 1.3M (Muon + AdamW) 的接受率（1/10 prompt，每条 10 rollouts，step 2659，T = 0，Greedy draft）</figcaption>
+<figcaption>MATH-500 上各模型的接受率（1/10 prompt，每条 10 rollouts，step 见模型标注，T = 0，Greedy draft）</figcaption>
 </figure>
 
 </details>
@@ -2164,10 +2186,12 @@ GSM8K 取 64 道题、共 512 个固定前缀，另取 Open PerfectBlend 的 64 
 | Baseline (AdamW) {: data-conditional="80.77% 82.48% 84.81% 86.02% 86.75% 86.58% 85.67%"} | 1.0 | 1.0 | -1 | greedy | **4.62** | 80.77% | 66.62% | 56.51% | 48.61% | 42.17% | 36.51% | 31.28% | 98.16 | 902.82 |
 | Baseline (Muon) {: data-conditional="82.06% 84.14% 85.69% 87.00% 87.24% 87.10% 86.20%"} | 1.0 | 1.0 | -1 | greedy | <u>**4.80**</u> | 82.06% | 69.05% | 59.17% | 51.48% | 44.91% | 39.12% | 33.72% | 98.16 | 877.60 |
 | 1.3M (Muon + AdamW) {: data-conditional="81.60% 83.60% 85.78% 86.94% 87.36% 87.30% 86.64%"} | 1.0 | 1.0 | -1 | greedy | **4.76** | 81.60% | 68.21% | 58.52% | 50.87% | 44.44% | 38.80% | 33.62% | 98.16 | 886.37 |
+| 1.3M (Vector gate, Engram-only, step 1596) {: data-conditional="81.88% 83.64% 85.88% 87.10% 87.63% 87.19% 86.63%"} | 1.0 | 1.0 | -1 | greedy | **4.78** | 81.88% | 68.48% | 58.81% | 51.23% | 44.89% | 39.14% | 33.90% | 98.16 | 891.28 |
+| 1.3M (Vector gate, Engram-only, step 2659) {: data-conditional="81.92% 83.92% 86.03% 86.96% 87.70% 87.34% 86.65%"} | 1.0 | 1.0 | -1 | greedy | <u>**4.80**</u> | 81.92% | 68.74% | 59.14% | 51.43% | 45.10% | 39.39% | 34.13% | 98.16 | 893.15 |
 
 </div>
 
-<figcaption>MATH-500 上 Baseline (AdamW)、Baseline (Muon) 与 1.3M (Muon + AdamW) 的接受率（1/10 prompt，每条 10 rollouts，step 2659，T = 1，Greedy draft）</figcaption>
+<figcaption>MATH-500 上各模型的接受率（1/10 prompt，每条 10 rollouts，step 见模型标注，T = 1，Greedy draft）</figcaption>
 </figure>
 
 <figure class="dspark-table-figure" markdown="1">
@@ -2178,11 +2202,13 @@ GSM8K 取 64 道题、共 512 个固定前缀，另取 Open PerfectBlend 的 64 
 | --- | :---: | ---: | ---: | --- | :---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | Baseline (AdamW) {: data-conditional="88.45% 86.64% 86.20% 86.31% 86.10% 85.89% 84.62%"} | 1.0 | 1.0 | -1 | probabilistic | **5.15** | 88.45% | 76.63% | 66.06% | 57.02% | 49.09% | 42.16% | 35.68% | 98.16 | 878.40 |
 | Baseline (Muon) {: data-conditional="89.11% 87.30% 86.53% 86.35% 86.38% 85.79% 84.47%"} | 1.0 | 1.0 | -1 | probabilistic | **5.22** | 89.11% | 77.79% | 67.31% | 58.12% | 50.21% | 43.07% | 36.38% | 98.16 | 906.45 |
-| 1.3M (Muon + AdamW) {: data-conditional="89.44% 87.39% 87.31% 87.14% 87.34% 86.68% 85.68%"} | 1.0 | 1.0 | -1 | probabilistic | <u>**5.31**</u> | 89.44% | 78.16% | 68.25% | 59.47% | 51.94% | 45.02% | 38.58% | 98.16 | 906.83 |
+| 1.3M (Muon + AdamW) {: data-conditional="89.44% 87.39% 87.31% 87.14% 87.34% 86.68% 85.68%"} | 1.0 | 1.0 | -1 | probabilistic | **5.31** | 89.44% | 78.16% | 68.25% | 59.47% | 51.94% | 45.02% | 38.58% | 98.16 | 906.83 |
+| 1.3M (Vector gate, Engram-only, step 1596) {: data-conditional="89.38% 87.99% 87.43% 87.37% 87.46% 86.94% 85.94%"} | 1.0 | 1.0 | -1 | probabilistic | **5.34** | 89.38% | 78.65% | 68.76% | 60.08% | 52.55% | 45.68% | 39.26% | 98.16 | 886.11 |
+| 1.3M (Vector gate, Engram-only, step 2659) {: data-conditional="89.61% 88.04% 87.36% 87.35% 87.31% 87.16% 86.05%"} | 1.0 | 1.0 | -1 | probabilistic | <u>**5.35**</u> | 89.61% | 78.89% | 68.91% | 60.19% | 52.56% | 45.81% | 39.42% | 98.16 | 907.12 |
 
 </div>
 
-<figcaption>MATH-500 上 Baseline (AdamW)、Baseline (Muon) 与 1.3M (Muon + AdamW) 的接受率（1/10 prompt，每条 10 rollouts，step 2659，T = 1，Probabilistic draft）</figcaption>
+<figcaption>MATH-500 上各模型的接受率（1/10 prompt，每条 10 rollouts，step 见模型标注，T = 1，Probabilistic draft）</figcaption>
 </figure>
 
 </details>
@@ -2201,10 +2227,12 @@ GSM8K 取 64 道题、共 512 个固定前缀，另取 Open PerfectBlend 的 64 
 | Baseline (AdamW) {: data-conditional="90.96% 89.43% 89.61% 89.33% 90.00% 89.50% 88.32%"} | 0.0 | 1.0 | -1 | greedy | **5.68** | 90.96% | 81.35% | 72.90% | 65.12% | 58.61% | 52.45% | 46.33% | 128.93 | 2963.73 |
 | Baseline (Muon) {: data-conditional="91.73% 90.63% 89.71% 89.73% 89.59% 89.23% 87.63%"} | 0.0 | 1.0 | -1 | greedy | **5.77** | 91.73% | 83.14% | 74.58% | 66.92% | 59.95% | 53.49% | 46.88% | 128.93 | 2963.73 |
 | 1.3M (Muon + AdamW) {: data-conditional="91.69% 90.35% 90.24% 90.47% 90.28% 89.28% 88.15%"} | 0.0 | 1.0 | -1 | greedy | <u>**5.81**</u> | 91.69% | 82.84% | 74.75% | 67.63% | 61.06% | 54.51% | 48.05% | 128.93 | 2963.73 |
+| 1.3M (Vector gate, Engram-only, step 1596) {: data-conditional="91.71% 90.74% 89.94% 90.03% 89.81% 89.81% 87.89%"} | 0.0 | 1.0 | -1 | greedy | **5.80** | 91.71% | 83.21% | 74.85% | 67.38% | 60.52% | 54.35% | 47.77% | 128.93 | 2963.73 |
+| 1.3M (Vector gate, Engram-only, step 2659) {: data-conditional="91.80% 90.56% 90.02% 89.78% 90.14% 89.73% 88.09%"} | 0.0 | 1.0 | -1 | greedy | **5.80** | 91.80% | 83.14% | 74.84% | 67.19% | 60.57% | 54.35% | 47.88% | 128.93 | 2963.73 |
 
 </div>
 
-<figcaption>AIME 2024 上 Baseline (AdamW)、Baseline (Muon) 与 1.3M (Muon + AdamW) 的接受率（1/10 prompt，每条 10 rollouts，step 2659，T = 0，Greedy draft）</figcaption>
+<figcaption>AIME 2024 上各模型的接受率（1/10 prompt，每条 10 rollouts，step 见模型标注，T = 0，Greedy draft）</figcaption>
 </figure>
 
 </details>
@@ -2219,12 +2247,14 @@ GSM8K 取 64 道题、共 512 个固定前缀，另取 Open PerfectBlend 的 64 
 | 模型 | T | Top-p | Top-k | Draft 采样 | **MAL** | pos-1 | pos-2 | pos-3 | pos-4 | pos-5 | pos-6 | pos-7 | MIT | MOT |
 | --- | :---: | ---: | ---: | --- | :---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | Baseline (AdamW) {: data-conditional="73.99% 76.67% 78.75% 81.50% 82.62% 80.57% 79.95%"} | 1.0 | 1.0 | -1 | greedy | **3.85** | 73.99% | 56.73% | 44.67% | 36.41% | 30.08% | 24.24% | 19.38% | 128.93 | 2547.67 |
-| Baseline (Muon) {: data-conditional="74.17% 77.08% 79.10% 81.30% 82.58% 81.91% 81.06%"} | 1.0 | 1.0 | -1 | greedy | <u>**3.89**</u> | 74.17% | 57.17% | 45.22% | 36.77% | 30.36% | 24.87% | 20.16% | 128.93 | 2752.03 |
+| Baseline (Muon) {: data-conditional="74.17% 77.08% 79.10% 81.30% 82.58% 81.91% 81.06%"} | 1.0 | 1.0 | -1 | greedy | **3.89** | 74.17% | 57.17% | 45.22% | 36.77% | 30.36% | 24.87% | 20.16% | 128.93 | 2752.03 |
 | 1.3M (Muon + AdamW) {: data-conditional="74.91% 76.55% 78.37% 80.14% 81.62% 81.39% 80.01%"} | 1.0 | 1.0 | -1 | greedy | **3.86** | 74.91% | 57.34% | 44.94% | 36.02% | 29.40% | 23.93% | 19.14% | 128.93 | 2953.37 |
+| 1.3M (Vector gate, Engram-only, step 1596) {: data-conditional="75.57% 78.97% 80.68% 82.17% 82.95% 82.63% 81.97%"} | 1.0 | 1.0 | -1 | greedy | <u>**4.05**</u> | 75.57% | 59.68% | 48.15% | 39.56% | 32.82% | 27.12% | 22.23% | 128.93 | 2735.50 |
+| 1.3M (Vector gate, Engram-only, step 2659) {: data-conditional="75.87% 78.16% 80.58% 82.26% 83.31% 83.27% 82.26%"} | 1.0 | 1.0 | -1 | greedy | <u>**4.05**</u> | 75.87% | 59.30% | 47.79% | 39.31% | 32.75% | 27.27% | 22.43% | 128.93 | 2727.37 |
 
 </div>
 
-<figcaption>AIME 2024 上 Baseline (AdamW)、Baseline (Muon) 与 1.3M (Muon + AdamW) 的接受率（1/10 prompt，每条 10 rollouts，step 2659，T = 1，Greedy draft）</figcaption>
+<figcaption>AIME 2024 上各模型的接受率（1/10 prompt，每条 10 rollouts，step 见模型标注，T = 1，Greedy draft）</figcaption>
 </figure>
 
 <figure class="dspark-table-figure" markdown="1">
@@ -2235,11 +2265,13 @@ GSM8K 取 64 道题、共 512 个固定前缀，另取 Open PerfectBlend 的 64 
 | --- | :---: | ---: | ---: | --- | :---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | Baseline (AdamW) {: data-conditional="84.84% 82.19% 81.78% 81.04% 80.61% 81.33% 80.20%"} | 1.0 | 1.0 | -1 | probabilistic | **4.50** | 84.84% | 69.72% | 57.02% | 46.20% | 37.24% | 30.29% | 24.29% | 128.93 | 2620.17 |
 | Baseline (Muon) {: data-conditional="85.51% 82.71% 80.41% 81.15% 80.99% 80.95% 79.39%"} | 1.0 | 1.0 | -1 | probabilistic | **4.51** | 85.51% | 70.73% | 56.87% | 46.15% | 37.38% | 30.25% | 24.02% | 128.93 | 2575.80 |
-| 1.3M (Muon + AdamW) {: data-conditional="86.04% 82.83% 82.22% 82.23% 81.84% 80.67% 81.13%"} | 1.0 | 1.0 | -1 | probabilistic | <u>**4.61**</u> | 86.04% | 71.26% | 58.59% | 48.18% | 39.43% | 31.81% | 25.80% | 128.93 | 2592.50 |
+| 1.3M (Muon + AdamW) {: data-conditional="86.04% 82.83% 82.22% 82.23% 81.84% 80.67% 81.13%"} | 1.0 | 1.0 | -1 | probabilistic | **4.61** | 86.04% | 71.26% | 58.59% | 48.18% | 39.43% | 31.81% | 25.80% | 128.93 | 2592.50 |
+| 1.3M (Vector gate, Engram-only, step 1596) {: data-conditional="85.55% 83.30% 82.68% 82.13% 81.45% 81.66% 79.94%"} | 1.0 | 1.0 | -1 | probabilistic | **4.61** | 85.55% | 71.26% | 58.92% | 48.39% | 39.42% | 32.19% | 25.73% | 128.93 | 2669.60 |
+| 1.3M (Vector gate, Engram-only, step 2659) {: data-conditional="86.12% 83.77% 82.24% 82.54% 81.92% 81.34% 80.33%"} | 1.0 | 1.0 | -1 | probabilistic | <u>**4.66**</u> | 86.12% | 72.15% | 59.33% | 48.97% | 40.11% | 32.63% | 26.21% | 128.93 | 2825.13 |
 
 </div>
 
-<figcaption>AIME 2024 上 Baseline (AdamW)、Baseline (Muon) 与 1.3M (Muon + AdamW) 的接受率（1/10 prompt，每条 10 rollouts，step 2659，T = 1，Probabilistic draft）</figcaption>
+<figcaption>AIME 2024 上各模型的接受率（1/10 prompt，每条 10 rollouts，step 见模型标注，T = 1，Probabilistic draft）</figcaption>
 </figure>
 
 </details>
